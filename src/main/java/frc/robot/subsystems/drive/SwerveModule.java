@@ -2,6 +2,7 @@ package frc.robot.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drive.motors.CIMSteer;
 import frc.robot.subsystems.drive.motors.NEODrive;
 
@@ -9,6 +10,9 @@ public class SwerveModule {
 
   private NEODrive drive;
   private CIMSteer steer;
+
+  private Rotation2d targetAngle;
+  private double targetSpeed;
 
   SwerveModule(int driveId, int steerId) {
     drive = new NEODrive(driveId);
@@ -41,7 +45,16 @@ public class SwerveModule {
   }
 
   public void setState(SwerveModuleState state) {
-    drive.setSpeed(state.speedMetersPerSecond);
-    steer.setAngle(state.angle.getDegrees());
+    targetSpeed = state.speedMetersPerSecond;
+    targetAngle = state.angle;
+  }
+
+  public void periodic() {
+    steer.setAngle(targetAngle.getDegrees());
+
+    if(SmartDashboard.getBoolean("/Swerve/ScaleWheelSpeed", true)) {
+      /* Scale drive wheel speed based on cosine difference */ 
+      drive.setSpeed(targetSpeed * Math.cos(targetAngle.getRadians() - getRotation2d().getRadians()));
+    }
   }
 }

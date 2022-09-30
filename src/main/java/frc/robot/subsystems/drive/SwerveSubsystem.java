@@ -10,7 +10,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Drivetrain;
 
@@ -26,10 +28,13 @@ public class SwerveSubsystem extends SubsystemBase {
   AHRS gyro = new AHRS(SPI.Port.kMXP);
   SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics, new Rotation2d(0));
 
-  /** Creates a new ExampleSubsystem. */
+  /** Creates a new SwerveSubsystem. */
   public SwerveSubsystem() {
     gyro.reset();
     zeroEncoders();
+
+    /* Initialize SmartDashboard values */
+    SmartDashboard.putBoolean("/Swerve/ScaleWheelSpeed", true);
   }
 
 
@@ -45,6 +50,39 @@ public class SwerveSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     odometry.update(gyro.getRotation2d(), modules[0].getState(), modules[1].getState(), modules[2].getState(), modules[3].getState());
+  }
+
+  
+  private double windowShiftScalingFactor = 0.3;
+
+  /* Very experimental */
+  public SwerveModuleState[] optimizedOptimize(SwerveModuleState[] currentStates, SwerveModuleState[] targetStates) {
+    /* First, average the direction that all modules will take (normally) */
+    double averageAngle = 0;
+    for (int i = 0; i < currentStates.length; i++) {
+      /* If the change is greater than 90 degrees, we would normally flip */
+      if(Math.abs(targetStates[i].angle.minus(currentStates[i].angle).getDegrees()) > 90) {
+        averageAngle += targetStates[i].angle.rotateBy(Rotation2d.fromDegrees(180)).getDegrees();
+      } else {
+        /* Don't flip */
+        averageAngle += targetStates[i].angle.getDegrees();
+      }
+    }
+    averageAngle /= currentStates.length;
+
+    /* Now let's do it for real */
+    SwerveModuleState[] finalStates = {};
+
+    for (int i = 0; i < currentStates.length; i++) {
+      /* FLIP */
+      if(Math.abs(targetStates[i].angle.minus(currentStates[i].angle).getDegrees()) > 90 + (averageAngle * windowShiftScalingFactor)) {
+        finalStates[i] = new SwerveModuleState(-targetStates[i].speedMetersPerSecond, targetStates[i].angle.rotateBy(Rotation2d.fromDegrees(180)));
+      } else {
+        /* Don't flip */
+        finalStates[i] = new SwerveModuleState(targetStates[i].speedMetersPerSecond, targetStates[i].angle);
+      }
+    }
+    return finalStates;
   }
 
   @Override
