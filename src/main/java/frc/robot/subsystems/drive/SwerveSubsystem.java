@@ -38,6 +38,8 @@ public class SwerveSubsystem extends SubsystemBase {
     /* Initialize SmartDashboard values */
     SmartDashboard.putBoolean("/Swerve/ScaleWheelSpeed", true);
     SmartDashboard.putBoolean("/Swerve/UseOptimizedOptimize", true);
+    SmartDashboard.putBoolean("/Swerve/ShiftWindow", true);
+
   }
 
   public void zeroEncoders() {
@@ -71,6 +73,11 @@ public class SwerveSubsystem extends SubsystemBase {
   public void drive(ChassisSpeeds speeds) {
     var states = kinematics.toSwerveModuleStates(speeds);
     SwerveModuleState[] optimizedStates = {};
+    if (SmartDashboard.getBoolean("/Swerve/ShiftWindow", true)) {
+      windowShiftScalingFactor = 0.3;
+    } else {
+      windowShiftScalingFactor = Integer.MAX_VALUE;
+    }
     if (SmartDashboard.getBoolean("/Swerve/UseOptimizedOptimize", true)) {
       optimizedStates = optimizedOptimize(getStates(), states);
     } else {

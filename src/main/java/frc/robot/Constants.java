@@ -47,7 +47,8 @@ public final class Constants {
     public static Translation2d RL_POS = new Translation2d(-1, -1);
     public static Translation2d RR_POS = new Translation2d(1, 1);
 
-
+    public static double MAX_LIN_VEL = 1;
+    public static double MAX_ROT_VEL = 1;
   }
 
   public static final class Controllers {
