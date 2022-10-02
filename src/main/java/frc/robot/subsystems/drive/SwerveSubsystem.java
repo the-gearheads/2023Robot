@@ -8,6 +8,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Drivetrain;
+import frc.robot.commands.ArcadeDrive;
 
 public class SwerveSubsystem extends SubsystemBase {
 
@@ -49,10 +51,43 @@ public class SwerveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    odometry.update(gyro.getRotation2d(), modules[0].getState(), modules[1].getState(), modules[2].getState(), modules[3].getState());
+    odometry.update(gyro.getRotation2d(), getStates());
   }
 
-  
+  public SwerveModuleState[] getStates() {
+    SwerveModuleState[] states = {};
+    for(int i = 0; i < modules.length; i++) {
+      states[i] = modules[i].getState();
+    }
+    return states;
+  }
+
+  private void setStates(SwerveModuleState[] states) {
+    for(int i = 0; i < modules.length; i++) {
+      modules[i].setState(states[i]);
+    }
+  }
+
+  public void drive(ChassisSpeeds speeds) {
+    var states = kinematics.toSwerveModuleStates(speeds);
+    var optimizedStates = optimizedOptimize(getStates(), states);
+    setStates(optimizedStates);
+  }
+
+  public void driveFieldRelative(ChassisSpeeds speeds) {
+    var robotOrientedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond,
+                                                                    speeds.omegaRadiansPerSecond, getPose().getRotation());
+    drive(robotOrientedSpeeds);
+  }
+
+  public void setPose(Pose2d pose) {
+    odometry.resetPosition(pose, gyro.getRotation2d());
+  }
+
+  public Pose2d getPose() {
+    return odometry.getPoseMeters();
+  }
+
   private double windowShiftScalingFactor = 0.3;
 
   /* Very experimental */

@@ -6,9 +6,12 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.ArcadeDrive;
+import frc.robot.commands.Auton;
+import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -18,14 +21,17 @@ import edu.wpi.first.wpilibj2.command.Command;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem m_exampleSubsystem = new SwerveSubsystem();
+  private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
 
-  private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
+  private final Auton m_autoCommand = new Auton();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    // Configure default teleop command
+    swerveSubsystem.setDefaultCommand(new ArcadeDrive(swerveSubsystem));
+    
     // Configure the button bindings
-    configureButtonBindings();
+    updateControllers();
   }
 
   /**
@@ -34,8 +40,19 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {}
+  public void updateControllers() {
+    // Do nothing if controller layout hasn't changed.
+    if(!Controllers.didControllersChange()) return; 
+    System.out.println("Updating controller layout");
 
+    // Clear buttons
+    CommandScheduler.getInstance().clearButtons();
+
+    // Find new controllers
+    Controllers.updateActiveControllerInstance();
+
+    // Put new bindings here. 
+  }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
