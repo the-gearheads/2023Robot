@@ -19,7 +19,8 @@ public class CIMSteer implements SteerMotor {
     motor.config_kF(0, Constants.Drivetrain.STEER_F);
     motor.config_kP(0, Constants.Drivetrain.STEER_P);
     motor.config_kI(0, Constants.Drivetrain.STEER_I);
-    motor.config_kD(0, Constants.Drivetrain.STEER_D);    
+    motor.config_kD(0, Constants.Drivetrain.STEER_D);
+    setBrakeMode(true);
   }
 
   private double angleToNative(double angle) {
