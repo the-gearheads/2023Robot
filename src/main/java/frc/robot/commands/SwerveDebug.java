@@ -1,18 +1,12 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 
-/** An example command that uses an example subsystem. */
-public class ArcadeDrive extends CommandBase {
+public class SwerveDebug extends CommandBase {
   private final SwerveSubsystem swerveSubsystem;
 
   /**
@@ -20,7 +14,7 @@ public class ArcadeDrive extends CommandBase {
    *
    * @param subsystem The subsystem used by this command.
    */
-  public ArcadeDrive(SwerveSubsystem subsystem) {
+  public SwerveDebug(SwerveSubsystem subsystem) {
     swerveSubsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
@@ -35,13 +29,12 @@ public class ArcadeDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    var xSpd = Controllers.activeController.getXMoveAxis() * Constants.Drivetrain.MAX_LIN_VEL;
-    var ySpd = Controllers.activeController.getYMoveAxis() * Constants.Drivetrain.MAX_LIN_VEL;
-    var rotSpd = Controllers.activeController.getRotateAxis() * Constants.Drivetrain.MAX_ROT_VEL;
-    SmartDashboard.putNumber("ArcadeDrive/xSpd", xSpd);
-    SmartDashboard.putNumber("ArcadeDrive/ySpd", ySpd);
-    SmartDashboard.putNumber("ArcadeDrive/rot", rotSpd);
+    var xSpd = Controllers.activeController.getXMoveAxis();
+    var ySpd = Controllers.activeController.getYMoveAxis();
+    var rotSpd = Controllers.activeController.getRotateAxis();
     swerveSubsystem.driveFieldRelative(new ChassisSpeeds(xSpd, ySpd, rotSpd));
+
+    SmartDashboard.putBoolean("/Swerve/PerformOptimizations", !Controllers.activeController.getSwerveDebugOptimizeEnabledButton().get());
   }
 
   // Called once the command ends or is interrupted.

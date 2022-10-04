@@ -34,12 +34,12 @@ public final class Constants {
     public static double STEER_GEAR_RATIO = 1;
 
     public static double STEER_F = 0.0;
-    public static double STEER_P = 0.0;
+    public static double STEER_P = 6.5;
     public static double STEER_I = 0.0;
     public static double STEER_D = 0.0;
 
-    public static double DRIVE_KS = 0.0;
-    public static double DRIVE_KV = 0.0;
+    public static double DRIVE_KS = 0.5;
+    public static double DRIVE_KV = 1.0;
     public static double DRIVE_KA = 0.0;
 
     public static Translation2d FL_POS = new Translation2d(-1, 1);
@@ -52,7 +52,7 @@ public final class Constants {
   }
 
   public static final class Controllers {
-    public static double JOYSTICK_DEADBAND = 0.02;
+    public static double JOYSTICK_DEADBAND = 0.15;
   }
 
 }

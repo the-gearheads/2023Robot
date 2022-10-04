@@ -39,7 +39,7 @@ public class SwerveSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("/Swerve/ScaleWheelSpeed", true);
     SmartDashboard.putBoolean("/Swerve/UseOptimizedOptimize", true);
     SmartDashboard.putNumber("/Swerve/ShiftWindow", 0.3);
-
+    SmartDashboard.putBoolean("/Swerve/PerformOptimizations", true);
   }
 
   public void zeroEncoders() {
@@ -54,32 +54,46 @@ public class SwerveSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     odometry.update(gyro.getRotation2d(), getStates());
+
+    for (int i = 0; i < modules.length; i++) {
+      modules[i].periodic();
+    }
   }
 
   public SwerveModuleState[] getStates() {
-    SwerveModuleState[] states = {};
+    SwerveModuleState states[] = new SwerveModuleState[modules.length];
     for (int i = 0; i < modules.length; i++) {
       states[i] = modules[i].getState();
     }
     return states;
   }
 
-  private void setStates(SwerveModuleState[] states) {
+  public void setStates(SwerveModuleState[] states) {
     for (int i = 0; i < modules.length; i++) {
       modules[i].setState(states[i]);
     }
   }
 
-  public void drive(ChassisSpeeds speeds) {
-    var states = kinematics.toSwerveModuleStates(speeds);
-    SwerveModuleState[] optimizedStates = {};
+  public SwerveModuleState[] performOptimizations(SwerveModuleState[] states) {
+    if(!SmartDashboard.getBoolean("/Swerve/PerformOptimizations", true)) return states;
     windowShiftScalingFactor = SmartDashboard.getNumber("/Swerve/ShiftWindow", 0.3);
+    SwerveModuleState[] optimizedStates = new SwerveModuleState[modules.length];
     if (SmartDashboard.getBoolean("/Swerve/UseOptimizedOptimize", true)) {
       optimizedStates = optimizedOptimize(getStates(), states);
     } else {
       for (int i = 0; i < modules.length; i++) {
         optimizedStates[i] = SwerveModuleState.optimize(states[i], modules[i].getRotation2d());
       }
+    }
+    return optimizedStates;
+  }
+
+  public void drive(ChassisSpeeds speeds) {
+    var states = kinematics.toSwerveModuleStates(speeds);
+    var optimizedStates = performOptimizations(states);
+    for(int i = 0; i < optimizedStates.length; i++) {
+      SmartDashboard.putNumber("/Swerve/Wheel " + i + "/Speed", optimizedStates[i].speedMetersPerSecond);
+      SmartDashboard.putNumber("/Swerve/Wheel " + i + "/Angle", optimizedStates[i].angle.getRadians());
     }
     setStates(optimizedStates);
   }
@@ -116,7 +130,7 @@ public class SwerveSubsystem extends SubsystemBase {
     averageAngle /= currentStates.length;
 
     /* Now let's do it for real */
-    SwerveModuleState[] finalStates = {};
+    SwerveModuleState[] finalStates = new SwerveModuleState[currentStates.length];
 
     for (int i = 0; i < currentStates.length; i++) {
       /* FLIP */

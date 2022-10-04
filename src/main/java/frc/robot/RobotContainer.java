@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.Auton;
+import frc.robot.commands.SwerveDebug;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -52,6 +53,7 @@ public class RobotContainer {
     Controllers.updateActiveControllerInstance();
 
     // Put new bindings here. 
+    Controllers.activeController.getSwerveDebugEnableButton().toggleWhenActive(new SwerveDebug(swerveSubsystem), true);
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
