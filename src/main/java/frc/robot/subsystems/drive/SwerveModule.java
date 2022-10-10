@@ -16,9 +16,9 @@ public class SwerveModule {
   private Rotation2d targetAngle = new Rotation2d();
   private double targetSpeed = 0;
 
-  SwerveModule(int driveId, int steerId) {
+  SwerveModule(int driveId, int steerId, Rotation2d angleOffset) {
     drive = new NEODrive(driveId);
-    steer = new CIMSteer(steerId);
+    steer = new CIMSteer(steerId, angleOffset);
     id = driveId;
   }
 

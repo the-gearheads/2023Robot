@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 /**
@@ -46,6 +47,11 @@ public final class Constants {
     public static Translation2d FR_POS = new Translation2d(1, 1);
     public static Translation2d RL_POS = new Translation2d(-1, -1);
     public static Translation2d RR_POS = new Translation2d(1, 1);
+
+    public static Rotation2d FL_OFFSET = new Rotation2d(0);
+    public static Rotation2d FR_OFFSET = new Rotation2d(0);
+    public static Rotation2d RL_OFFSET = new Rotation2d(0);
+    public static Rotation2d RR_OFFSET = new Rotation2d(0);
 
     public static double MAX_LIN_VEL = 1;
     public static double MAX_ROT_VEL = 1;

@@ -5,13 +5,14 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Constants;
 import frc.robot.util.MathUtils;
 
 /* Uses Talon SRX to drive a CIM. Expects an absolute encoder connected. */
 public class CIMSteer implements SteerMotor {
   WPI_TalonSRX motor;
-  public CIMSteer(int id) {
+  public CIMSteer(int id, Rotation2d angleOffset) {
     motor = new WPI_TalonSRX(id);
     motor.configFactoryDefault();
     motor.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.Analog, 0, 0);
@@ -20,6 +21,7 @@ public class CIMSteer implements SteerMotor {
     motor.config_kP(0, Constants.Drivetrain.STEER_P);
     motor.config_kI(0, Constants.Drivetrain.STEER_I);
     motor.config_kD(0, Constants.Drivetrain.STEER_D);
+    motor.setSelectedSensorPosition(motor.getSelectedSensorPosition() + angleToNative(angleOffset.getDegrees()));
     setBrakeMode(true);
   }
 
