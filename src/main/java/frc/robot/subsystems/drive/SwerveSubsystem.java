@@ -22,10 +22,10 @@ public class SwerveSubsystem extends SubsystemBase {
   SwerveDriveKinematics kinematics = new SwerveDriveKinematics(Drivetrain.FL_POS, Drivetrain.FR_POS, Drivetrain.RL_POS,
       Drivetrain.RR_POS);
   SwerveModule[] modules = {
-      new SwerveModule(Drivetrain.FL_DRIVE_ID, Drivetrain.FL_STEER_ID),
-      new SwerveModule(Drivetrain.FR_DRIVE_ID, Drivetrain.FR_STEER_ID),
-      new SwerveModule(Drivetrain.RL_DRIVE_ID, Drivetrain.RL_STEER_ID),
-      new SwerveModule(Drivetrain.RR_DRIVE_ID, Drivetrain.RR_STEER_ID)
+      new SwerveModule(Drivetrain.FL_DRIVE_ID, Drivetrain.FL_STEER_ID, Drivetrain.FL_OFFSET),
+      new SwerveModule(Drivetrain.FR_DRIVE_ID, Drivetrain.FR_STEER_ID, Drivetrain.FR_OFFSET),
+      new SwerveModule(Drivetrain.RL_DRIVE_ID, Drivetrain.RL_STEER_ID, Drivetrain.RL_OFFSET),
+      new SwerveModule(Drivetrain.RR_DRIVE_ID, Drivetrain.RR_STEER_ID, Drivetrain.RR_OFFSET)
   };
   AHRS gyro = new AHRS(SPI.Port.kMXP);
   SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics, new Rotation2d(0));
