@@ -91,7 +91,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public void drive(ChassisSpeeds speeds) {
     var states = kinematics.toSwerveModuleStates(speeds);
     if(SmartDashboard.getBoolean("/Swerve/PerformOptimizations", true)){
-    var optimizedStates = performOptimizations(states);
+    states = performOptimizations(states);
     }
 
 
