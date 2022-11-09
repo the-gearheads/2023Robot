@@ -55,6 +55,12 @@ public class SwerveModule {
     targetAngle = state.angle;
   }
 
+  public void setPIDConstants(double kF, double kP, double kI, double kD){
+    steer.setPIDConstants(kF, kP, kI, kD);
+  }
+  public void setAngleOffset(Rotation2d angleOffset){
+    steer.setAngleOffset(angleOffset);
+  }
   public void periodic() {
     steer.setAngle(targetAngle.getDegrees());
 
@@ -64,11 +70,13 @@ public class SwerveModule {
     SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/TargetSpeed", targetSpeed);
 
 
-    if(SmartDashboard.getBoolean("/Swerve/ScaleWheelSpeed", true)) {
-      /* Scale drive wheel speed based on cosine difference */ 
-      drive.setSpeed(targetSpeed * Math.cos(targetAngle.getRadians() - getRotation2d().getRadians()));
-    } else {
+    // if(SmartDashboard.getBoolean("/Swerve/ScaleWheelSpeed", true)) {
+    //   /* Scale drive wheel speed based on cosine difference */ 
+    //   drive.setSpeed(targetSpeed * Math.cos(targetAngle.getRadians() - getRotation2d().getRadians()));
+    // } else {
       drive.setSpeed(targetSpeed);
-    }
+    // }
   }
+
+
 }

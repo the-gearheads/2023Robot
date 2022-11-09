@@ -12,7 +12,9 @@ import frc.robot.util.MathUtils;
 /* Uses Talon SRX to drive a CIM. Expects an absolute encoder connected. */
 public class CIMSteer implements SteerMotor {
   WPI_TalonSRX motor;
+  private Rotation2d angleOffset;
   public CIMSteer(int id, Rotation2d angleOffset) {
+    this.angleOffset=angleOffset;
     motor = new WPI_TalonSRX(id);
     motor.configFactoryDefault();
     motor.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.Analog, 0, 0);
@@ -63,5 +65,16 @@ public class CIMSteer implements SteerMotor {
 
   private double getRawVelocity() {
     return motor.getSelectedSensorVelocity();
+  }
+
+  public void setPIDConstants(double kF, double kP, double kI, double kD){
+    motor.config_kF(0, kF);
+    motor.config_kP(0, kP);
+    motor.config_kI(0, kI);
+    motor.config_kD(0, kD);
+  }
+  public void setAngleOffset(Rotation2d angleOffset){
+    motor.setSelectedSensorPosition(motor.getSelectedSensorPosition() + angleToNative(angleOffset.minus(this.angleOffset).getDegrees()));
+    this.angleOffset=angleOffset;
   }
 }
