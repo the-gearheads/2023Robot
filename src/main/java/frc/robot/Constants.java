@@ -17,14 +17,14 @@ import edu.wpi.first.math.geometry.Translation2d;
  */
 public final class Constants {
   public static final class Drivetrain {
-    public static int FL_DRIVE_ID = 1;
-    public static int FL_STEER_ID = 2;
-    public static int FR_DRIVE_ID = 3;
-    public static int FR_STEER_ID = 4;
+    public static int FL_DRIVE_ID = 27;
+    public static int FL_STEER_ID = 34;
+    public static int FR_DRIVE_ID = 15;
+    public static int FR_STEER_ID = 45;
     public static int RL_DRIVE_ID = 5;
-    public static int RL_STEER_ID = 6;
-    public static int RR_DRIVE_ID = 7;
-    public static int RR_STEER_ID = 8;
+    public static int RL_STEER_ID = 49;
+    public static int RR_DRIVE_ID = 6;
+    public static int RR_STEER_ID = 50;
 
     /* Units per rotation for analog/absolute encoders on Talon SRX */
     public static double ANALOG_UPR = 1024;
@@ -48,7 +48,7 @@ public final class Constants {
     public static Translation2d RL_POS = new Translation2d(-1, -1);
     public static Translation2d RR_POS = new Translation2d(1, 1);
 
-    public static Rotation2d FL_OFFSET = new Rotation2d(0);
+    public static Rotation2d FL_OFFSET = new Rotation2d(0); 
     public static Rotation2d FR_OFFSET = new Rotation2d(0);
     public static Rotation2d RL_OFFSET = new Rotation2d(0);
     public static Rotation2d RR_OFFSET = new Rotation2d(0);
