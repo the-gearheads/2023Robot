@@ -22,10 +22,10 @@ public class SwerveSubsystem extends SubsystemBase {
   SwerveDriveKinematics kinematics = new SwerveDriveKinematics(Drivetrain.FL_POS, Drivetrain.FR_POS, Drivetrain.RL_POS,
       Drivetrain.RR_POS);
   SwerveModule[] modules = {
-      new SwerveModule(Drivetrain.FL_DRIVE_ID, Drivetrain.FL_STEER_ID, Drivetrain.FL_OFFSET),
-      new SwerveModule(Drivetrain.FR_DRIVE_ID, Drivetrain.FR_STEER_ID, Drivetrain.FR_OFFSET),
-      new SwerveModule(Drivetrain.RL_DRIVE_ID, Drivetrain.RL_STEER_ID, Drivetrain.RL_OFFSET),
-      new SwerveModule(Drivetrain.RR_DRIVE_ID, Drivetrain.RR_STEER_ID, Drivetrain.RR_OFFSET)
+      new SwerveModule(Drivetrain.FL_DRIVE_ID, Drivetrain.FL_STEER_ID, Drivetrain.FL_OFFSET, "FL"),
+      new SwerveModule(Drivetrain.FR_DRIVE_ID, Drivetrain.FR_STEER_ID, Drivetrain.FR_OFFSET, "FR"),
+      new SwerveModule(Drivetrain.RL_DRIVE_ID, Drivetrain.RL_STEER_ID, Drivetrain.RL_OFFSET, "RL"),
+      new SwerveModule(Drivetrain.RR_DRIVE_ID, Drivetrain.RR_STEER_ID, Drivetrain.RR_OFFSET, "RR")
   };
   AHRS gyro = new AHRS(SPI.Port.kMXP);
   SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics, new Rotation2d(0));
@@ -91,10 +91,15 @@ public class SwerveSubsystem extends SubsystemBase {
   public void drive(ChassisSpeeds speeds) {
     var states = kinematics.toSwerveModuleStates(speeds);
     var optimizedStates = performOptimizations(states);
+
+    /* Somewhat redundant */
+    /*
     for(int i = 0; i < optimizedStates.length; i++) {
-      SmartDashboard.putNumber("/Swerve/Wheel " + i + "/Speed", optimizedStates[i].speedMetersPerSecond);
-      SmartDashboard.putNumber("/Swerve/Wheel " + i + "/Angle", optimizedStates[i].angle.getRadians());
+      SmartDashboard.putNumber("/Swerve/Wheel " + modules[i].folderName + "/Speed", optimizedStates[i].speedMetersPerSecond);
+      SmartDashboard.putNumber("/Swerve/Wheel " + modules[i].folderName + "/Angle", optimizedStates[i].angle.getRadians());
     }
+    */
+    
     setStates(optimizedStates);
   }
 

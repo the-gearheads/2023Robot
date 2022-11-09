@@ -11,15 +11,18 @@ public class SwerveModule {
   private NEODrive drive;
   private CIMSteer steer;
   
-  private int id;
-
+  public int id;
+  public String description;
+  public String folderName = "";
   private Rotation2d targetAngle = new Rotation2d();
   private double targetSpeed = 0;
 
-  SwerveModule(int driveId, int steerId, Rotation2d angleOffset) {
+  SwerveModule(int driveId, int steerId, Rotation2d angleOffset, String description) {
     drive = new NEODrive(driveId);
     steer = new CIMSteer(steerId, angleOffset);
     id = driveId;
+    this.description = description;
+    folderName = "Wheel " + id + " (" + this.description + ")";
   }
 
   public double getAngle() {
@@ -55,10 +58,10 @@ public class SwerveModule {
   public void periodic() {
     steer.setAngle(targetAngle.getDegrees());
 
-    SmartDashboard.putNumber("/Swerve/Wheel " + id + "/TargetAngle", targetAngle.getRadians());
-    SmartDashboard.putNumber("/Swerve/Wheel " + id + "/CurrentAngle", getRotation2d().getRadians());
+    SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/TargetAngle", targetAngle.getRadians());
+    SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/CurrentAngle", getRotation2d().getRadians());
 
-    SmartDashboard.putNumber("/Swerve/Wheel " + id + "/TargetSpeed", targetSpeed);
+    SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/TargetSpeed", targetSpeed);
 
 
     if(SmartDashboard.getBoolean("/Swerve/ScaleWheelSpeed", true)) {
