@@ -24,6 +24,7 @@ public class ArcadeDrive extends CommandBase {
     swerveSubsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
+    SmartDashboard.putBoolean("ArcadeDrive/UseFieldRelative", true);
   }
 
   // Called when the command is initially scheduled.
@@ -41,7 +42,11 @@ public class ArcadeDrive extends CommandBase {
     SmartDashboard.putNumber("ArcadeDrive/xSpd", xSpd);
     SmartDashboard.putNumber("ArcadeDrive/ySpd", ySpd);
     SmartDashboard.putNumber("ArcadeDrive/rot", rotSpd);
-    swerveSubsystem.driveFieldRelative(new ChassisSpeeds(xSpd, ySpd, rotSpd));
+    if(SmartDashboard.getBoolean("ArcadeDrive/UseFieldRelative", true)) {
+      swerveSubsystem.driveFieldRelative(new ChassisSpeeds(xSpd, ySpd, rotSpd));
+    } else {
+      swerveSubsystem.drive(new ChassisSpeeds(xSpd, ySpd, rotSpd));
+    }
   }
 
   // Called once the command ends or is interrupted.
