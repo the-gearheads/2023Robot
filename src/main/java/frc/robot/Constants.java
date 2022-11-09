@@ -43,10 +43,10 @@ public final class Constants {
     public static double DRIVE_KV = 1.0;
     public static double DRIVE_KA = 0.0;
 
-    public static Translation2d FL_POS = new Translation2d(-1, 1);
-    public static Translation2d FR_POS = new Translation2d(1, 1);
-    public static Translation2d RL_POS = new Translation2d(-1, -1);
-    public static Translation2d RR_POS = new Translation2d(1, 1);
+    public static Translation2d FL_POS = new Translation2d(1, 1);
+    public static Translation2d FR_POS = new Translation2d(1, -1);
+    public static Translation2d RL_POS = new Translation2d(-1, 1);
+    public static Translation2d RR_POS = new Translation2d(-1, -1);
 
     public static Rotation2d FL_OFFSET = new Rotation2d(0); 
     public static Rotation2d FR_OFFSET = new Rotation2d(0);
