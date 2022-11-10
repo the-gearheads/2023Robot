@@ -13,7 +13,7 @@ public class NEODrive implements DriveMotor {
   RelativeEncoder encoder;
   SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Drivetrain.DRIVE_KS, Drivetrain.DRIVE_KV, Drivetrain.DRIVE_KA);
 
-  public NEODrive(int id) {
+  public NEODrive(int id, boolean invertSteer) {
     /* SparkMAX is honestly really nice and simple */
     motor = new CANSparkMax(id, MotorType.kBrushless);
     encoder = motor.getEncoder();
@@ -25,6 +25,7 @@ public class NEODrive implements DriveMotor {
     double conversionFactor = Drivetrain.WHEEL_CIRCUMFERENCE / Drivetrain.DRIVE_GEAR_RATIO;
     encoder.setPositionConversionFactor(conversionFactor);
     encoder.setVelocityConversionFactor(conversionFactor);
+    motor.setInverted(invertSteer);
     setBrakeMode(true);
   } 
 

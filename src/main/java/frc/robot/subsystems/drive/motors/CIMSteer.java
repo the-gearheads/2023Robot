@@ -13,8 +13,10 @@ import frc.robot.util.MathUtils;
 public class CIMSteer implements SteerMotor {
   WPI_TalonSRX motor;
   private Rotation2d angleOffset;
-  public CIMSteer(int id, Rotation2d angleOffset) {
-    this.angleOffset=angleOffset;
+  private boolean invert;
+  public CIMSteer(int id, Rotation2d angleOffset, boolean invert) {
+    this.angleOffset = angleOffset;
+    this.invert = invert;
     motor = new WPI_TalonSRX(id);
     motor.configFactoryDefault();
     motor.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.Analog, 0, 0);
@@ -23,19 +25,22 @@ public class CIMSteer implements SteerMotor {
     motor.config_kP(0, Constants.Drivetrain.STEER_P);
     motor.config_kI(0, Constants.Drivetrain.STEER_I);
     motor.config_kD(0, Constants.Drivetrain.STEER_D);
-    motor.setSelectedSensorPosition(motor.getSelectedSensorPosition() + angleToNative(angleOffset.getDegrees()));
+    //motor.setSelectedSensorPosition(motor.getSelectedSensorPosition() + angleToNative(angleOffset.getDegrees()));
+    motor.setSelectedSensorPosition(0);
     setBrakeMode(true);
   }
 
   private double angleToNative(double angle) {
     /* We need to take in angles in [-360, 360], and map that between -1024 and 1024. */
     double nativeAngle = MathUtils.scale(-360, 360, -Constants.Drivetrain.ANALOG_UPR, Constants.Drivetrain.ANALOG_UPR, angle);
+    if(invert) { nativeAngle *= -1; }
     return nativeAngle;
   }
 
   /* I -think- this is correct? */
   private double nativeToAngle(double nativeUnits) {
     double rotationCount = nativeUnits / Constants.Drivetrain.ANALOG_UPR;
+    if(invert) { rotationCount *= -1; }
     return rotationCount * 360;
   }
 

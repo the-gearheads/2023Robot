@@ -29,7 +29,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure default teleop command
-    swerveSubsystem.setDefaultCommand(new SwerveDebug(swerveSubsystem));
+    swerveSubsystem.setDefaultCommand(new ArcadeDrive(swerveSubsystem));
     
     // Configure the button bindings
     updateControllers();
