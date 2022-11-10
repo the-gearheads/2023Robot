@@ -19,7 +19,7 @@ public class SwerveModule {
 
   SwerveModule(int driveId, int steerId, Rotation2d angleOffset, String description, boolean invertSteer) {
     drive = new NEODrive(driveId, invertSteer);
-    steer = new CIMSteer(steerId, angleOffset, invertSteer);
+    steer = new CIMSteer(steerId, angleOffset);
     id = driveId;
     this.description = description;
     folderName = "Wheel " + id + " (" + this.description + ")";

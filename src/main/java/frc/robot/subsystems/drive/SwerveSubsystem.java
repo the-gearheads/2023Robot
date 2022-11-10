@@ -55,11 +55,11 @@ public class SwerveSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     odometry.update(gyro.getRotation2d(), getStates());
-/*
+
     for (int i = 0; i < modules.length; i++) {
       modules[i].periodic();
     }
-    */
+    
   }
 
   public SwerveModuleState[] getStates() {
@@ -92,7 +92,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public void drive(ChassisSpeeds speeds) {
     var states = kinematics.toSwerveModuleStates(speeds);
     if(SmartDashboard.getBoolean("/Swerve/PerformOptimizations", true)){
-    states = performOptimizations(states);
+      states = performOptimizations(states);
     }
 
 

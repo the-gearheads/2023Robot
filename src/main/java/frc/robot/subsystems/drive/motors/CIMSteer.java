@@ -13,10 +13,8 @@ import frc.robot.util.MathUtils;
 public class CIMSteer implements SteerMotor {
   WPI_TalonSRX motor;
   private Rotation2d angleOffset;
-  private boolean invert;
-  public CIMSteer(int id, Rotation2d angleOffset, boolean invert) {
+  public CIMSteer(int id, Rotation2d angleOffset) {
     this.angleOffset = angleOffset;
-    this.invert = invert;
     motor = new WPI_TalonSRX(id);
     motor.configFactoryDefault();
     motor.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.Analog, 0, 0);
@@ -33,14 +31,12 @@ public class CIMSteer implements SteerMotor {
   private double angleToNative(double angle) {
     /* We need to take in angles in [-360, 360], and map that between -1024 and 1024. */
     double nativeAngle = MathUtils.scale(-360, 360, -Constants.Drivetrain.ANALOG_UPR, Constants.Drivetrain.ANALOG_UPR, angle);
-    if(invert) { nativeAngle *= -1; }
     return nativeAngle;
   }
 
   /* I -think- this is correct? */
   private double nativeToAngle(double nativeUnits) {
     double rotationCount = nativeUnits / Constants.Drivetrain.ANALOG_UPR;
-    if(invert) { rotationCount *= -1; }
     return rotationCount * 360;
   }
 
