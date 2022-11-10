@@ -16,18 +16,19 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Drivetrain;
+import frc.robot.util.Gyroscope;
 
 public class SwerveSubsystem extends SubsystemBase {
 
   SwerveDriveKinematics kinematics = new SwerveDriveKinematics(Drivetrain.FL_POS, Drivetrain.FR_POS, Drivetrain.RL_POS,
       Drivetrain.RR_POS);
   SwerveModule[] modules = {
-      new SwerveModule(Drivetrain.FL_DRIVE_ID, Drivetrain.FL_STEER_ID, Drivetrain.FL_OFFSET, "FL"),
-      new SwerveModule(Drivetrain.FR_DRIVE_ID, Drivetrain.FR_STEER_ID, Drivetrain.FR_OFFSET, "FR"),
-      new SwerveModule(Drivetrain.RL_DRIVE_ID, Drivetrain.RL_STEER_ID, Drivetrain.RL_OFFSET, "RL"),
-      new SwerveModule(Drivetrain.RR_DRIVE_ID, Drivetrain.RR_STEER_ID, Drivetrain.RR_OFFSET, "RR")
+      new SwerveModule(Drivetrain.FL_DRIVE_ID, Drivetrain.FL_STEER_ID, Drivetrain.FL_OFFSET, "FL", true),
+      new SwerveModule(Drivetrain.FR_DRIVE_ID, Drivetrain.FR_STEER_ID, Drivetrain.FR_OFFSET, "FR", true),
+      new SwerveModule(Drivetrain.RL_DRIVE_ID, Drivetrain.RL_STEER_ID, Drivetrain.RL_OFFSET, "RL", false),
+      new SwerveModule(Drivetrain.RR_DRIVE_ID, Drivetrain.RR_STEER_ID, Drivetrain.RR_OFFSET, "RR", false)
   };
-  AHRS gyro = new AHRS(SPI.Port.kMXP);
+  Gyroscope gyro = new Gyroscope(SPI.Port.kMXP, true);
   SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics, new Rotation2d(0));
 
   /** Creates a new SwerveSubsystem. */
@@ -58,6 +59,7 @@ public class SwerveSubsystem extends SubsystemBase {
     for (int i = 0; i < modules.length; i++) {
       modules[i].periodic();
     }
+    
   }
 
   public SwerveModuleState[] getStates() {
@@ -75,7 +77,6 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public SwerveModuleState[] performOptimizations(SwerveModuleState[] states) {
-    if(!SmartDashboard.getBoolean("/Swerve/PerformOptimizations", true)) return states;
     windowShiftScalingFactor = SmartDashboard.getNumber("/Swerve/ShiftWindow", 0.3);
     SwerveModuleState[] optimizedStates = new SwerveModuleState[modules.length];
     if (SmartDashboard.getBoolean("/Swerve/UseOptimizedOptimize", true)) {
@@ -90,7 +91,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public void drive(ChassisSpeeds speeds) {
     var states = kinematics.toSwerveModuleStates(speeds);
-    var optimizedStates = performOptimizations(states);
+    if(SmartDashboard.getBoolean("/Swerve/PerformOptimizations", true)){
+      states = performOptimizations(states);
+    }
+
 
     /* Somewhat redundant */
     /*
@@ -100,7 +104,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     */
     
-    setStates(optimizedStates);
+    setStates(states);
   }
 
   public void driveFieldRelative(ChassisSpeeds speeds) {
@@ -150,9 +154,21 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     return finalStates;
   }
-
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+  }
+
+
+  public void setPIDConstants(double kF, double kP, double kI, double kD){
+    for (int i = 0; i < modules.length; i++) {
+      modules[i].setPIDConstants(kF, kP, kI, kD);
+    }
+  }
+
+  public void setAngleOffsets(Rotation2d[] angleOffsets){
+    for (int i = 0; i < modules.length; i++) {
+      modules[i].setAngleOffset(angleOffsets[i]);
+    }
   }
 }

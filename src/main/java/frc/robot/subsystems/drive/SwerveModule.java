@@ -17,8 +17,8 @@ public class SwerveModule {
   private Rotation2d targetAngle = new Rotation2d();
   private double targetSpeed = 0;
 
-  SwerveModule(int driveId, int steerId, Rotation2d angleOffset, String description) {
-    drive = new NEODrive(driveId);
+  SwerveModule(int driveId, int steerId, Rotation2d angleOffset, String description, boolean invertSteer) {
+    drive = new NEODrive(driveId, invertSteer);
     steer = new CIMSteer(steerId, angleOffset);
     id = driveId;
     this.description = description;
@@ -55,20 +55,28 @@ public class SwerveModule {
     targetAngle = state.angle;
   }
 
+  public void setPIDConstants(double kF, double kP, double kI, double kD){
+    steer.setPIDConstants(kF, kP, kI, kD);
+  }
+  public void setAngleOffset(Rotation2d angleOffset){
+    steer.setAngleOffset(angleOffset);
+  }
   public void periodic() {
     steer.setAngle(targetAngle.getDegrees());
 
-    SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/TargetAngle", targetAngle.getRadians());
-    SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/CurrentAngle", getRotation2d().getRadians());
+    SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/TargetAngle", targetAngle.getDegrees());
+    SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/CurrentAngle", getRotation2d().getDegrees());
 
     SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/TargetSpeed", targetSpeed);
 
 
     if(SmartDashboard.getBoolean("/Swerve/ScaleWheelSpeed", true)) {
-      /* Scale drive wheel speed based on cosine difference */ 
-      drive.setSpeed(targetSpeed * Math.cos(targetAngle.getRadians() - getRotation2d().getRadians()));
-    } else {
+       /* Scale drive wheel speed based on cosine difference */ 
+       drive.setSpeed(targetSpeed * Math.cos(targetAngle.getRadians() - getRotation2d().getRadians()));
+     } else {
       drive.setSpeed(targetSpeed);
-    }
+     }
   }
+
+
 }
