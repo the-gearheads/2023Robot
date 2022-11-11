@@ -28,7 +28,7 @@ public class CIMSteer implements SteerMotor {
     //motor.setSelectedSensorPosition(0);
     setBrakeMode(true);
   }
-
+//cats
   private double angleToNative(double angle) {
     /* We need to take in angles in [-360, 360], and map that between -1024 and 1024. */
     double nativeAngle = MathUtils.scale(-360, 360, -Constants.Drivetrain.ANALOG_UPR, Constants.Drivetrain.ANALOG_UPR, angle);
