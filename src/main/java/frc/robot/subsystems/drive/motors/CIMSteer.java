@@ -25,6 +25,7 @@ public class CIMSteer implements SteerMotor {
     motor.config_kD(0, Constants.Drivetrain.STEER_D);
     //motor.setSelectedSensorPosition(motor.getSelectedSensorPosition() + angleToNative(angleOffset.getDegrees()));
     motor.setSelectedSensorPosition(0);
+    //motor.setSelectedSensorPosition(0);
     setBrakeMode(true);
   }
 
@@ -41,7 +42,7 @@ public class CIMSteer implements SteerMotor {
   }
 
   public double getAngle() {
-    return nativeToAngle(getRawPosition());
+    return nativeToAngle(getRawPosition()) + this.angleOffset.getDegrees();
   }
 
   public double getVelocity() {
@@ -49,7 +50,7 @@ public class CIMSteer implements SteerMotor {
   }
 
   public void setAngle(double angle) {
-    motor.set(ControlMode.Position, angleToNative(angle));
+    motor.set(ControlMode.Position, angleToNative(angle+angleOffset.getDegrees()));
   }
 
   public void setBrakeMode(boolean isBraking) {
@@ -76,6 +77,5 @@ public class CIMSteer implements SteerMotor {
   }
   public void setAngleOffset(Rotation2d angleOffset){
     motor.setSelectedSensorPosition(motor.getSelectedSensorPosition() + angleToNative(angleOffset.minus(this.angleOffset).getDegrees()));
-    this.angleOffset=angleOffset;
   }
 }
