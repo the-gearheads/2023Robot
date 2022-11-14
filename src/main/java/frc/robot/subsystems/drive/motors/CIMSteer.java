@@ -23,26 +23,22 @@ public class CIMSteer implements SteerMotor {
     motor.config_kP(0, Constants.Drivetrain.STEER_P);
     motor.config_kI(0, Constants.Drivetrain.STEER_I);
     motor.config_kD(0, Constants.Drivetrain.STEER_D);
-    //motor.setSelectedSensorPosition(motor.getSelectedSensorPosition() + angleToNative(angleOffset.getDegrees()));
-    motor.setSelectedSensorPosition(0);
-    //motor.setSelectedSensorPosition(0);
+    motor.configNeutralDeadband(0.04);
     setBrakeMode(true);
   }
-//cats
   private double angleToNative(double angle) {
     /* We need to take in angles in [-360, 360], and map that between -1024 and 1024. */
     double nativeAngle = MathUtils.scale(-360, 360, -Constants.Drivetrain.ANALOG_UPR, Constants.Drivetrain.ANALOG_UPR, angle);
     return nativeAngle;
   }
 
-  /* I -think- this is correct? */
   private double nativeToAngle(double nativeUnits) {
     double rotationCount = nativeUnits / Constants.Drivetrain.ANALOG_UPR;
     return rotationCount * 360;
   }
 
   public double getAngle() {
-    return nativeToAngle(getRawPosition()) + this.angleOffset.getDegrees();
+    return nativeToAngle(getRawPosition()) - this.angleOffset.getDegrees();
   }
 
   public double getVelocity() {

@@ -31,6 +31,10 @@ public class ArcadeDrive extends CommandBase {
   @Override
   public void initialize() {
     swerveSubsystem.zeroEncoders();
+    SmartDashboard.putNumber("F",Constants.Drivetrain.STEER_F);
+    SmartDashboard.putNumber("P",Constants.Drivetrain.STEER_P);
+    SmartDashboard.putNumber("I",Constants.Drivetrain.STEER_I);
+    SmartDashboard.putNumber("D",Constants.Drivetrain.STEER_D);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -47,8 +51,15 @@ public class ArcadeDrive extends CommandBase {
     } else {
       swerveSubsystem.drive(new ChassisSpeeds(xSpd, ySpd, rotSpd));
     }
+    setPIDConstants();
   }
-
+  private void setPIDConstants(){
+    double kF=SmartDashboard.getNumber("F",Constants.Drivetrain.STEER_F);
+    double kP=SmartDashboard.getNumber("P",Constants.Drivetrain.STEER_P);
+    double kI=SmartDashboard.getNumber("I",Constants.Drivetrain.STEER_I);
+    double kD=SmartDashboard.getNumber("D",Constants.Drivetrain.STEER_D);
+    swerveSubsystem.setPIDConstants(kF, kP, kI, kD);
+  }
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {}

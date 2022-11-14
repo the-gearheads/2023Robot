@@ -48,13 +48,13 @@ public final class Constants {
     public static Translation2d RL_POS = new Translation2d(-1, 1);
     public static Translation2d RR_POS = new Translation2d(-1, -1);
 
-    public static Rotation2d FL_OFFSET = new Rotation2d(0); 
-    public static Rotation2d FR_OFFSET = new Rotation2d(0);
-    public static Rotation2d RL_OFFSET = new Rotation2d(0);
-    public static Rotation2d RR_OFFSET = new Rotation2d(0);
+    public static Rotation2d FL_OFFSET = Rotation2d.fromDegrees(611.718); 
+    public static Rotation2d FR_OFFSET = Rotation2d.fromDegrees(612.77);
+    public static Rotation2d RL_OFFSET = Rotation2d.fromDegrees(472.85);
+    public static Rotation2d RR_OFFSET = Rotation2d.fromDegrees(684.5);
 
-    public static double MAX_LIN_VEL = 3;
-    public static double MAX_ROT_VEL = 3;
+    public static double MAX_LIN_VEL = 10;
+    public static double MAX_ROT_VEL = 5;
   }
 
   public static final class Controllers {

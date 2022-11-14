@@ -66,7 +66,7 @@ public class SwerveModule {
 
     SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/TargetAngle", targetAngle.getDegrees());
     SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/CurrentAngle", getRotation2d().getDegrees());
-
+    SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/CurrentAngleModulo360", getRotation2d().getDegrees()%360);
     SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/TargetSpeed", targetSpeed);
 
 
