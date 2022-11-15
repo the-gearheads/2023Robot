@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.commands.ArcadeDrive;
-import frc.robot.commands.Auton;
 import frc.robot.commands.SwerveDebug;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.SwerveSubsystem;
@@ -26,8 +25,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-
-  private final Auton m_autoCommand = new Auton();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
