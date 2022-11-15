@@ -4,8 +4,11 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.PathPlanner;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.Constants.Drivetrain;
 import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.Auton;
 import frc.robot.commands.SwerveDebug;
@@ -61,7 +64,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return m_autoCommand;
+    return swerveSubsystem.followTrajectoryCommand(PathPlanner.loadPath("Test Path", Drivetrain.Auton.CONSTRAINTS), true);
   }
 }

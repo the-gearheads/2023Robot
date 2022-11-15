@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.PathConstraints;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -55,6 +58,13 @@ public final class Constants {
 
     public static double MAX_LIN_VEL = 10;
     public static double MAX_ROT_VEL = 5;
+
+    public static final class Auton {
+      public static PIDController X_PID = new PIDController(0, 0, 0);
+      public static PIDController Y_PID = new PIDController(0, 0, 0);
+      public static PIDController ROT_PID = new PIDController(0, 0, 0);
+      public static PathConstraints CONSTRAINTS = new PathConstraints(3, 3);
+    }
   }
 
   public static final class Controllers {

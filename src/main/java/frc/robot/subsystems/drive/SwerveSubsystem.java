@@ -4,6 +4,12 @@
 
 package frc.robot.subsystems.drive;
 
+import java.util.HashMap;
+
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -12,7 +18,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.util.Gyroscope;
 
@@ -74,6 +84,14 @@ public class SwerveSubsystem extends SubsystemBase {
     }
   }
 
+
+  public void setStatesOptimized(SwerveModuleState[] states) {
+    if(SmartDashboard.getBoolean("/Swerve/PerformOptimizations", true)){
+      states = performOptimizations(states);
+    }
+    setStates(states);
+  }
+
   public SwerveModuleState[] performOptimizations(SwerveModuleState[] states) {
     windowShiftScalingFactor = SmartDashboard.getNumber("/Swerve/ShiftWindow", 0.3);
     SwerveModuleState[] optimizedStates = new SwerveModuleState[modules.length];
@@ -92,16 +110,6 @@ public class SwerveSubsystem extends SubsystemBase {
     if(SmartDashboard.getBoolean("/Swerve/PerformOptimizations", true)){
       states = performOptimizations(states);
     }
-
-
-    /* Somewhat redundant */
-    /*
-    for(int i = 0; i < optimizedStates.length; i++) {
-      SmartDashboard.putNumber("/Swerve/Wheel " + modules[i].folderName + "/Speed", optimizedStates[i].speedMetersPerSecond);
-      SmartDashboard.putNumber("/Swerve/Wheel " + modules[i].folderName + "/Angle", optimizedStates[i].angle.getRadians());
-    }
-    */
-    
     setStates(states);
   }
 
@@ -169,4 +177,30 @@ public class SwerveSubsystem extends SubsystemBase {
       modules[i].setAngleOffset(angleOffsets[i]);
     }
   }
+
+  // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
+public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
+  // in your code that will be used by all path following commands.
+  HashMap<String, Command> eventMap = new HashMap<>();
+
+  return new SequentialCommandGroup(
+      new InstantCommand(() -> {
+        // Reset odometry for the first path you run during auto
+        if(isFirstPath){
+            this.setPose(traj.getInitialHolonomicPose());
+        }
+      }),
+      new PPSwerveControllerCommand(
+          traj, 
+          this::getPose, // Pose supplier
+          this.kinematics, // SwerveDriveKinematics
+          Constants.Drivetrain.Auton.X_PID, // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+          Constants.Drivetrain.Auton.Y_PID, // Y controller (usually the same values as X controller)
+          Constants.Drivetrain.Auton.ROT_PID, // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+          this::setStatesOptimized, // Module states consumer
+          eventMap, // This argument is optional if you don't use event markers
+          this // Requires this drive subsystem
+      )
+  );
+}
 }
