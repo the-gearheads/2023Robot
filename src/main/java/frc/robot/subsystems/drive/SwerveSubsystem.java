@@ -17,6 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -38,7 +39,7 @@ public class SwerveSubsystem extends SubsystemBase {
   };
   Gyroscope gyro = new Gyroscope(SPI.Port.kMXP, true);
   SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics, new Rotation2d(0));
-
+  Field2d field;
   /** Creates a new SwerveSubsystem. */
   public SwerveSubsystem() {
     gyro.reset();
@@ -49,6 +50,8 @@ public class SwerveSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("/Swerve/UseOptimizedOptimize", true);
     SmartDashboard.putNumber("/Swerve/ShiftWindow", 0.3);
     SmartDashboard.putBoolean("/Swerve/PerformOptimizations", true);
+
+    SmartDashboard.putData("/Field", field);
   }
 
   public void zeroEncoders() {
@@ -68,6 +71,7 @@ public class SwerveSubsystem extends SubsystemBase {
       modules[i].periodic();
     }
     
+    field.setRobotPose(getPose());
   }
 
   public SwerveModuleState[] getStates() {
