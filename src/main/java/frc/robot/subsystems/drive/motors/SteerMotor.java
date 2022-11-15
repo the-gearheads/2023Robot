@@ -8,5 +8,7 @@ public interface SteerMotor {
   public double getVelocity();
   public double getAngle();
 
+  public void setPIDConstants(double kF, double kP, double kI, double kD);
+  
   default public void zeroEncoders() {}
 }

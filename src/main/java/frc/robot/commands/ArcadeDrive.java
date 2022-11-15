@@ -24,7 +24,7 @@ public class ArcadeDrive extends CommandBase {
     swerveSubsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
-    SmartDashboard.putBoolean("ArcadeDrive/UseFieldRelative", false);
+    SmartDashboard.putBoolean("ArcadeDrive/UseFieldRelative", true);
   }
 
   // Called when the command is initially scheduled.
@@ -43,23 +43,28 @@ public class ArcadeDrive extends CommandBase {
     var xSpd = Controllers.activeController.getXMoveAxis() * Constants.Drivetrain.MAX_LIN_VEL;
     var ySpd = Controllers.activeController.getYMoveAxis() * Constants.Drivetrain.MAX_LIN_VEL;
     var rotSpd = Controllers.activeController.getRotateAxis() * Constants.Drivetrain.MAX_ROT_VEL;
+
     SmartDashboard.putNumber("ArcadeDrive/xSpd", xSpd);
     SmartDashboard.putNumber("ArcadeDrive/ySpd", ySpd);
     SmartDashboard.putNumber("ArcadeDrive/rot", rotSpd);
-    if(SmartDashboard.getBoolean("ArcadeDrive/UseFieldRelative", false)) {
+
+    if(SmartDashboard.getBoolean("ArcadeDrive/UseFieldRelative", true)) {
       swerveSubsystem.driveFieldRelative(new ChassisSpeeds(xSpd, ySpd, rotSpd));
     } else {
       swerveSubsystem.drive(new ChassisSpeeds(xSpd, ySpd, rotSpd));
     }
-    setPIDConstants();
+
+    updatePIDConstants();
   }
-  private void setPIDConstants(){
+
+  private void updatePIDConstants(){
     double kF=SmartDashboard.getNumber("F",Constants.Drivetrain.STEER_F);
     double kP=SmartDashboard.getNumber("P",Constants.Drivetrain.STEER_P);
     double kI=SmartDashboard.getNumber("I",Constants.Drivetrain.STEER_I);
     double kD=SmartDashboard.getNumber("D",Constants.Drivetrain.STEER_D);
     swerveSubsystem.setPIDConstants(kF, kP, kI, kD);
   }
+
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {}

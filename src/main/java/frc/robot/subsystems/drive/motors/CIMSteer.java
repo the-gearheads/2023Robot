@@ -19,11 +19,8 @@ public class CIMSteer implements SteerMotor {
     motor.configFactoryDefault();
     motor.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.Analog, 0, 0);
     motor.configFeedbackNotContinuous(false, 0);
-    motor.config_kF(0, Constants.Drivetrain.STEER_F);
-    motor.config_kP(0, Constants.Drivetrain.STEER_P);
-    motor.config_kI(0, Constants.Drivetrain.STEER_I);
-    motor.config_kD(0, Constants.Drivetrain.STEER_D);
     motor.configNeutralDeadband(0.04);
+    setPIDConstants(Constants.Drivetrain.STEER_F, Constants.Drivetrain.STEER_P, Constants.Drivetrain.STEER_I, Constants.Drivetrain.STEER_D);
     setBrakeMode(true);
   }
   private double angleToNative(double angle) {
@@ -71,6 +68,7 @@ public class CIMSteer implements SteerMotor {
     motor.config_kI(0, kI);
     motor.config_kD(0, kD);
   }
+
   public void setAngleOffset(Rotation2d angleOffset){
     motor.setSelectedSensorPosition(motor.getSelectedSensorPosition() + angleToNative(angleOffset.minus(this.angleOffset).getDegrees()));
   }
