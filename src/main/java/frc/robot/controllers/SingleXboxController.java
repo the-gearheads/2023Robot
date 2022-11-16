@@ -18,15 +18,15 @@ public class SingleXboxController implements ControllerInterface {
   }
 
   public double getXMoveAxis() {
-    return deadband(controller.getLeftY());
+    return -deadband(controller.getLeftY());
   }
 
   public double getYMoveAxis() {
-    return deadband(controller.getLeftX());
+    return -deadband(controller.getLeftX());
   }
 
   public double getRotateAxis() {
-    return deadband(controller.getRightX());
+    return -deadband(controller.getRightX());
   }
 
   public double getSwerveDebugAngleX() {

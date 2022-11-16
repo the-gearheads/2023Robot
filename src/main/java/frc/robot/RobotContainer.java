@@ -15,6 +15,8 @@ import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PerpetualCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -61,6 +63,9 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return swerveSubsystem.followTrajectoryCommand(PathPlanner.loadPath("Test Path", Drivetrain.Auton.CONSTRAINTS), true);
+    return swerveSubsystem.followTrajectoryCommand(PathPlanner.loadPath("Test Path", Drivetrain.Auton.CONSTRAINTS), true, true)
+      .andThen(new InstantCommand(() -> {
+        getAutonomousCommand().schedule();
+      }));
   }
 }

@@ -38,7 +38,7 @@ public final class Constants {
     public static double STEER_GEAR_RATIO = 1;
 
     public static double STEER_F = 0.0;
-    public static double STEER_P = 6.5;
+    public static double STEER_P = 12.5;
     public static double STEER_I = 0.0;
     public static double STEER_D = 0.0;
 
@@ -56,7 +56,7 @@ public final class Constants {
     public static Rotation2d RL_OFFSET = Rotation2d.fromDegrees(472.85);
     public static Rotation2d RR_OFFSET = Rotation2d.fromDegrees(684.5);
 
-    public static double MAX_LIN_VEL = 10;
+    public static double MAX_LIN_VEL = 3;
     public static double MAX_ROT_VEL = 5;
 
     public static final class Auton {

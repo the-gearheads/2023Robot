@@ -9,6 +9,7 @@ import java.util.HashMap;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -38,7 +39,7 @@ public class SwerveSubsystem extends SubsystemBase {
   };
   Gyroscope gyro = new Gyroscope(SPI.Port.kMXP, true);
   SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics, new Rotation2d(0));
-  Field2d field;
+  Field2d field = new Field2d();
   /** Creates a new SwerveSubsystem. */
   public SwerveSubsystem() {
     gyro.reset();
@@ -51,6 +52,11 @@ public class SwerveSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("/Swerve/PerformOptimizations", true);
 
     SmartDashboard.putData("/Field", field);
+
+    SmartDashboard.putData("xPid", Drivetrain.Auton.X_PID);
+    SmartDashboard.putData("yPid", Drivetrain.Auton.Y_PID);
+    SmartDashboard.putData("rotPid", Drivetrain.Auton.ROT_PID);
+
   }
 
   public void zeroEncoders() {
@@ -182,7 +188,7 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
-public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
+public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath, boolean stopWhenDone) {
   // in your code that will be used by all path following commands.
   HashMap<String, Command> eventMap = new HashMap<>();
 
@@ -197,13 +203,18 @@ public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFir
           traj, 
           this::getPose, // Pose supplier
           this.kinematics, // SwerveDriveKinematics
-          Constants.Drivetrain.Auton.X_PID, // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
-          Constants.Drivetrain.Auton.Y_PID, // Y controller (usually the same values as X controller)
-          Constants.Drivetrain.Auton.ROT_PID, // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+          (PIDController)SmartDashboard.getData("xPid"), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+          (PIDController)SmartDashboard.getData("yPid"), // Y controller (usually the same values as X controller)
+          (PIDController)SmartDashboard.getData("rotPid"), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
           this::setStatesOptimized, // Module states consumer
           eventMap, // This argument is optional if you don't use event markers
           this // Requires this drive subsystem
-      )
+      ),
+      new InstantCommand(() -> {
+          if(stopWhenDone) {
+            drive(new ChassisSpeeds(0, 0, 0));
+          }
+      })
   );
 }
 }
