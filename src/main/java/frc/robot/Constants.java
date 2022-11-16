@@ -42,9 +42,9 @@ public final class Constants {
     public static double STEER_I = 0.0;
     public static double STEER_D = 0.0;
 
-    public static double DRIVE_KS = 0.5;
-    public static double DRIVE_KV = 1.0;
-    public static double DRIVE_KA = 0.0;
+    public static double DRIVE_KS = 0.14678;
+    public static double DRIVE_KV = 2.6794;
+    public static double DRIVE_KA = 0.18508;
 
     public static Translation2d FL_POS = new Translation2d(1, 1);
     public static Translation2d FR_POS = new Translation2d(1, -1);
