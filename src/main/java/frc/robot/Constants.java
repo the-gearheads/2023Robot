@@ -9,6 +9,7 @@ import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 /**
@@ -47,6 +48,7 @@ public final class Constants {
     public static double DRIVE_KV = 2.7;
     public static double DRIVE_KA = 0.35632;
     public static Pose2d zeroPos = new Pose2d(0,0,new Rotation2d(0));
+    public static Transform2d zeroTransform = new Transform2d(new Translation2d(0,0), new Rotation2d(0));
 
     public static Translation2d FL_POS = new Translation2d(1, 1);
     public static Translation2d FR_POS = new Translation2d(1, -1);

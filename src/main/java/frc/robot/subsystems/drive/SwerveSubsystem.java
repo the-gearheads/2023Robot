@@ -43,7 +43,7 @@ public class SwerveSubsystem extends SubsystemBase {
   SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics, new Rotation2d(0));
   Field2d field = new Field2d();
   private Pose2d prevPos=Constants.Drivetrain.zeroPos;
-  private Transform2d vel;
+  private Transform2d vel=Constants.Drivetrain.zeroTransform;
   /** Creates a new SwerveSubsystem. */
   public SwerveSubsystem() {
     gyro.reset();
@@ -71,15 +71,11 @@ public class SwerveSubsystem extends SubsystemBase {
     odometry.resetPosition(new Pose2d(), gyro.getRotation2d());
   }
   public Transform2d getVel(){
-    if(this.vel==null)
-      return new Transform2d(Constants.Drivetrain.zeroPos,Constants.Drivetrain.zeroPos);
     return this.vel;
   }
   @Override
   public void periodic() {
-    if(getPose()!=null){
-      this.vel=getPose().minus(prevPos).times(1000/20.0);
-    }
+    this.vel=getPose().minus(prevPos).times(50 / 100.0);
     this.prevPos=getPose();
     // This method will be called once per scheduler run
     odometry.update(gyro.getRotation2d(), getStates());
