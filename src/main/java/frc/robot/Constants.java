@@ -7,6 +7,7 @@ package frc.robot;
 import com.pathplanner.lib.PathConstraints;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -38,13 +39,14 @@ public final class Constants {
     public static double STEER_GEAR_RATIO = 1;
 
     public static double STEER_F = 0.0;
-    public static double STEER_P = 12.5;
+    public static double STEER_P = 6.5;
     public static double STEER_I = 0.0;
     public static double STEER_D = 0.0;
 
-    public static double DRIVE_KS = 0.14678;
-    public static double DRIVE_KV = 2.6794;
-    public static double DRIVE_KA = 0.18508;
+    public static double DRIVE_KS = 0.18;
+    public static double DRIVE_KV = 2.7;
+    public static double DRIVE_KA = 0.35632;
+    public static Pose2d zeroPos = new Pose2d(0,0,new Rotation2d(0));
 
     public static Translation2d FL_POS = new Translation2d(1, 1);
     public static Translation2d FR_POS = new Translation2d(1, -1);
@@ -54,10 +56,10 @@ public final class Constants {
     public static Rotation2d FL_OFFSET = Rotation2d.fromDegrees(611.718); 
     public static Rotation2d FR_OFFSET = Rotation2d.fromDegrees(612.77);
     public static Rotation2d RL_OFFSET = Rotation2d.fromDegrees(472.85);
-    public static Rotation2d RR_OFFSET = Rotation2d.fromDegrees(684.5);
+    public static Rotation2d RR_OFFSET = Rotation2d.fromDegrees(684.5+554);
 
-    public static double MAX_LIN_VEL = 3;
-    public static double MAX_ROT_VEL = 5;
+    public static double MAX_LIN_VEL = 2;
+    public static double MAX_ROT_VEL = 2;
 
     public static final class Auton {
       public static PIDController X_PID = new PIDController(0, 0, 0);

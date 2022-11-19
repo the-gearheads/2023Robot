@@ -12,6 +12,8 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -40,6 +42,8 @@ public class SwerveSubsystem extends SubsystemBase {
   Gyroscope gyro = new Gyroscope(SPI.Port.kMXP, true);
   SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics, new Rotation2d(0));
   Field2d field = new Field2d();
+  private Pose2d prevPos=Constants.Drivetrain.zeroPos;
+  private Transform2d vel;
   /** Creates a new SwerveSubsystem. */
   public SwerveSubsystem() {
     gyro.reset();
@@ -66,9 +70,17 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     odometry.resetPosition(new Pose2d(), gyro.getRotation2d());
   }
-
+  public Transform2d getVel(){
+    if(this.vel==null)
+      return new Transform2d(Constants.Drivetrain.zeroPos,Constants.Drivetrain.zeroPos);
+    return this.vel;
+  }
   @Override
   public void periodic() {
+    if(getPose()!=null){
+      this.vel=getPose().minus(prevPos).times(1000/20.0);
+    }
+    this.prevPos=getPose();
     // This method will be called once per scheduler run
     odometry.update(gyro.getRotation2d(), getStates());
 
@@ -132,10 +144,9 @@ public class SwerveSubsystem extends SubsystemBase {
     odometry.resetPosition(pose, gyro.getRotation2d());
   }
 
-  public Pose2d getPose() {
-    return odometry.getPoseMeters();
+  public Pose2d getPose(){ 
+      return odometry.getPoseMeters();
   }
-
   private double windowShiftScalingFactor = 0.3;
 
   /* Very experimental */
