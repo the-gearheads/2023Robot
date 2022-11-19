@@ -138,7 +138,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public void driveFieldRelative(ChassisSpeeds speeds) {
     var robotOrientedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond,
-        speeds.omegaRadiansPerSecond, getPose().getRotation());
+        speeds.omegaRadiansPerSecond, getPose().getRotation().rotateBy(new Rotation2d(-speeds.omegaRadiansPerSecond*0.02/2)));
     drive(robotOrientedSpeeds);
   }
 
