@@ -50,13 +50,12 @@ public class ArcadeDrive extends CommandBase {
     SmartDashboard.putNumber("ArcadeDrive/xSpd Experimental", swerveSubsystem.getVel().getX());
     SmartDashboard.putNumber("ArcadeDrive/ySpd Experimental", swerveSubsystem.getVel().getY());
     SmartDashboard.putNumber("ArcadeDrive/rot Experimental", swerveSubsystem.getVel().getRotation().getDegrees());
-
+    ChassisSpeeds alteredSpeeds=swerveSubsystem.poseLog(new ChassisSpeeds(xSpd, ySpd, rotSpd));
     if(SmartDashboard.getBoolean("ArcadeDrive/UseFieldRelative", true)) {
-      swerveSubsystem.driveFieldRelative(new ChassisSpeeds(xSpd, ySpd, rotSpd));
+      swerveSubsystem.driveFieldRelative(alteredSpeeds);
     } else {
-      swerveSubsystem.drive(new ChassisSpeeds(xSpd, ySpd, rotSpd));
+      swerveSubsystem.drive(alteredSpeeds);
     }
-
     updatePIDConstants();
   }
 

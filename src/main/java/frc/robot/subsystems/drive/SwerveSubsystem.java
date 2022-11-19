@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -75,7 +76,7 @@ public class SwerveSubsystem extends SubsystemBase {
   }
   @Override
   public void periodic() {
-    this.vel=getPose().minus(prevPos).times(50 / 100.0);
+    this.vel=getPose().minus(prevPos).times(50.0);
     this.prevPos=getPose();
     // This method will be called once per scheduler run
     odometry.update(gyro.getRotation2d(), getStates());
@@ -86,7 +87,12 @@ public class SwerveSubsystem extends SubsystemBase {
     
     field.setRobotPose(getPose());
   }
-
+  public ChassisSpeeds poseLog(ChassisSpeeds desiredVel){
+    Pose2d endPos=new Pose2d(getPose().getX()+desiredVel.vxMetersPerSecond*0.02, getPose().getY()+desiredVel.vyMetersPerSecond*0.02, new Rotation2d(getPose().getRotation().getRadians()+desiredVel.omegaRadiansPerSecond*0.02));
+    Twist2d twist=getPose().log(endPos);
+    ChassisSpeeds commandedVel=new ChassisSpeeds(twist.dx/0.02, twist.dy/0.02,twist.dtheta/0.02);
+    return commandedVel;
+  }
   public SwerveModuleState[] getStates() {
     SwerveModuleState states[] = new SwerveModuleState[modules.length];
     for (int i = 0; i < modules.length; i++) {

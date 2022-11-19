@@ -24,7 +24,7 @@ public class NEODrive implements DriveMotor {
     */
     double conversionFactor = Drivetrain.WHEEL_CIRCUMFERENCE / Drivetrain.DRIVE_GEAR_RATIO;
     encoder.setPositionConversionFactor(conversionFactor);
-    encoder.setVelocityConversionFactor(conversionFactor);
+    encoder.setVelocityConversionFactor(conversionFactor * (1/60.0));
     motor.setInverted(invertSteer);
     setBrakeMode(true);
   } 
