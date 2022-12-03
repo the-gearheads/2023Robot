@@ -40,7 +40,7 @@ public final class Constants {
     public static double STEER_GEAR_RATIO = 1;
 
     public static double STEER_F = 0.0;
-    public static double STEER_P = 6.5;
+    public static double STEER_P = 12.5;
     public static double STEER_I = 0.0;
     public static double STEER_D = 0.0;
 
@@ -50,15 +50,15 @@ public final class Constants {
     public static Pose2d zeroPos = new Pose2d(0,0,new Rotation2d(0));
     public static Transform2d zeroTransform = new Transform2d(new Translation2d(0,0), new Rotation2d(0));
 
-    public static Translation2d FL_POS = new Translation2d(1, 1);
-    public static Translation2d FR_POS = new Translation2d(1, -1);
-    public static Translation2d RL_POS = new Translation2d(-1, 1);
-    public static Translation2d RR_POS = new Translation2d(-1, -1);
+    public static Translation2d FL_POS = new Translation2d(0.3, 0.55/2);
+    public static Translation2d FR_POS = new Translation2d(0.3, -0.55/2);
+    public static Translation2d RL_POS = new Translation2d(-0.3, 0.55/2);
+    public static Translation2d RR_POS = new Translation2d(-0.3, -0.55/2);
 
-    public static Rotation2d FL_OFFSET = Rotation2d.fromDegrees(611.718); 
-    public static Rotation2d FR_OFFSET = Rotation2d.fromDegrees(612.77);
-    public static Rotation2d RL_OFFSET = Rotation2d.fromDegrees(472.85);
-    public static Rotation2d RR_OFFSET = Rotation2d.fromDegrees(684.5+554);
+    public static Rotation2d FL_OFFSET = Rotation2d.fromDegrees((611.718+362)%360); 
+    public static Rotation2d FR_OFFSET = Rotation2d.fromDegrees((612.77+355)%360);
+    public static Rotation2d RL_OFFSET = Rotation2d.fromDegrees((472.85)%360);
+    public static Rotation2d RR_OFFSET = Rotation2d.fromDegrees((684.5+554+367)%360);
 
     public static double MAX_LIN_VEL = 2;
     public static double MAX_ROT_VEL = 2;
@@ -67,7 +67,7 @@ public final class Constants {
       public static PIDController X_PID = new PIDController(0, 0, 0);
       public static PIDController Y_PID = new PIDController(0, 0, 0);
       public static PIDController ROT_PID = new PIDController(0, 0, 0);
-      public static PathConstraints CONSTRAINTS = new PathConstraints(3, 3);
+      public static PathConstraints CONSTRAINTS = new PathConstraints(1, 1.5);
     }
   }
 

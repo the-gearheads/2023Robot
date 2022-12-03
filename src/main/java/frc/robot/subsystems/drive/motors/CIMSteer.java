@@ -18,7 +18,7 @@ public class CIMSteer implements SteerMotor {
     motor = new WPI_TalonSRX(id);
     motor.configFactoryDefault();
     motor.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.Analog, 0, 0);
-    motor.configFeedbackNotContinuous(false, 0);
+    motor.configFeedbackNotContinuous(true, 0);
     motor.configNeutralDeadband(0.04);
     setPIDConstants(Constants.Drivetrain.STEER_F, Constants.Drivetrain.STEER_P, Constants.Drivetrain.STEER_I, Constants.Drivetrain.STEER_D);
     setBrakeMode(true);
@@ -35,7 +35,7 @@ public class CIMSteer implements SteerMotor {
   }
 
   public double getAngle() {
-    return nativeToAngle(getRawPosition()) - this.angleOffset.getDegrees();
+    return nativeToAngle((getRawPosition() - this.angleOffset.getDegrees()) % 360);
   }
 
   public double getVelocity() {
@@ -43,7 +43,7 @@ public class CIMSteer implements SteerMotor {
   }
 
   public void setAngle(double angle) {
-    motor.set(ControlMode.Position, angleToNative(angle+angleOffset.getDegrees()));
+    motor.set(ControlMode.Position, angleToNative((angle+angleOffset.getDegrees())%360));
   }
 
   public void setBrakeMode(boolean isBraking) {
@@ -54,8 +54,12 @@ public class CIMSteer implements SteerMotor {
     }
   }
 
-  private double getRawPosition() {
+  public double getRawPosition() {
     return motor.getSelectedSensorPosition();
+  }
+
+  public double deleteThisGetRawPosition(){
+    return nativeToAngle(getRawPosition());
   }
 
   private double getRawVelocity() {
@@ -70,6 +74,6 @@ public class CIMSteer implements SteerMotor {
   }
 
   public void setAngleOffset(Rotation2d angleOffset){
-    motor.setSelectedSensorPosition(motor.getSelectedSensorPosition() + angleToNative(angleOffset.minus(this.angleOffset).getDegrees()));
+    //motor.setSelectedSensorPosition(motor.getSelectedSensorPosition() + angleToNative(angleOffset.minus(this.angleOffset).getDegrees()));
   }
 }

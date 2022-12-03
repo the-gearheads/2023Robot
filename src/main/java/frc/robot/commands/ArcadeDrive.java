@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
@@ -15,6 +16,7 @@ import frc.robot.subsystems.drive.SwerveSubsystem;
 public class ArcadeDrive extends CommandBase {
   private final SwerveSubsystem swerveSubsystem;
 
+
   /**
    * Creates a new ExampleCommand.
    *
@@ -24,7 +26,7 @@ public class ArcadeDrive extends CommandBase {
     swerveSubsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
-    SmartDashboard.putBoolean("ArcadeDrive/UseFieldRelative", true);
+    SmartDashboard.putBoolean("ArcadeDrive/UseFieldRelative", false);
   }
 
   // Called when the command is initially scheduled.
@@ -35,7 +37,7 @@ public class ArcadeDrive extends CommandBase {
     SmartDashboard.putNumber("P",Constants.Drivetrain.STEER_P);
     SmartDashboard.putNumber("I",Constants.Drivetrain.STEER_I);
     SmartDashboard.putNumber("D",Constants.Drivetrain.STEER_D);
-    SmartDashboard.putBoolean("UseLogOptimization", true);
+    SmartDashboard.putBoolean("UseLogOptimization", false);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

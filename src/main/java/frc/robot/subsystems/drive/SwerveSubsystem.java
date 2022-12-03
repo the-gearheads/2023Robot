@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.drive;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -51,12 +52,12 @@ public class SwerveSubsystem extends SubsystemBase {
     zeroEncoders();
 
     /* Initialize SmartDashboard values */
-    SmartDashboard.putBoolean("/Swerve/ScaleWheelSpeed", true);
-    SmartDashboard.putBoolean("/Swerve/UseOptimizedOptimize", true);
+    SmartDashboard.putBoolean("/Swerve/ScaleWheelSpeed", false);
+    SmartDashboard.putBoolean("/Swerve/UseOptimizedOptimize", false);
     SmartDashboard.putNumber("/Swerve/ShiftWindow", 0.3);
-    SmartDashboard.putBoolean("/Swerve/PerformOptimizations", true);
+    SmartDashboard.putBoolean("/Swerve/PerformOptimizations", false);
 
-    SmartDashboard.putData("/Field", field);
+    SmartDashboard.putData(field);
 
     SmartDashboard.putData("xPid", Drivetrain.Auton.X_PID);
     SmartDashboard.putData("yPid", Drivetrain.Auton.Y_PID);
@@ -138,7 +139,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public void driveFieldRelative(ChassisSpeeds speeds) {
     var robotOrientedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond,
-        speeds.omegaRadiansPerSecond, getPose().getRotation().rotateBy(new Rotation2d(-speeds.omegaRadiansPerSecond*0.02/2)));
+        speeds.omegaRadiansPerSecond, getPose().getRotation());
     drive(robotOrientedSpeeds);
   }
 
@@ -203,8 +204,6 @@ public class SwerveSubsystem extends SubsystemBase {
   // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
 public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath, boolean stopWhenDone) {
   // in your code that will be used by all path following commands.
-  HashMap<String, Command> eventMap = new HashMap<>();
-
   return new SequentialCommandGroup(
       new InstantCommand(() -> {
         // Reset odometry for the first path you run during auto
@@ -220,7 +219,6 @@ public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFir
           (PIDController)SmartDashboard.getData("yPid"), // Y controller (usually the same values as X controller)
           (PIDController)SmartDashboard.getData("rotPid"), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
           this::setStatesOptimized, // Module states consumer
-          eventMap, // This argument is optional if you don't use event markers
           this // Requires this drive subsystem
       ),
       new InstantCommand(() -> {
@@ -229,5 +227,16 @@ public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFir
           }
       })
   );
+}
+public Command followTrajectoriesCommand(ArrayList<PathPlannerTrajectory> trajectories, boolean stopWhenDone) {
+  // in your code that will be used by all path following commands.
+  SequentialCommandGroup fullCommand = new SequentialCommandGroup(new InstantCommand(() -> {
+    // Reset odometry for the first path you run during auto
+        // this.setPose(trajectories.get(0).getInitialHolonomicPose());
+    }));
+  for(PathPlannerTrajectory trajectory: trajectories){
+    fullCommand=fullCommand.andThen(followTrajectoryCommand(trajectory, false, false));
+  }
+  return fullCommand;
 }
 }
