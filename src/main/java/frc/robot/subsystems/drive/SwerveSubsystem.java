@@ -35,7 +35,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   SwerveDriveKinematics kinematics = new SwerveDriveKinematics(Drivetrain.FL_POS, Drivetrain.FR_POS, Drivetrain.RL_POS,
       Drivetrain.RR_POS);
-  SwerveModule[] modules = {
+  public SwerveModule[] modules = {
       new SwerveModule(Drivetrain.FL_DRIVE_ID, Drivetrain.FL_STEER_ID, Drivetrain.FL_OFFSET, "FL", true),
       new SwerveModule(Drivetrain.FR_DRIVE_ID, Drivetrain.FR_STEER_ID, Drivetrain.FR_OFFSET, "FR", true),
       new SwerveModule(Drivetrain.RL_DRIVE_ID, Drivetrain.RL_STEER_ID, Drivetrain.RL_OFFSET, "RL", false),
@@ -44,8 +44,7 @@ public class SwerveSubsystem extends SubsystemBase {
   Gyroscope gyro = new Gyroscope(SPI.Port.kMXP, true);
   SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics, new Rotation2d(0));
   Field2d field = new Field2d();
-  private Pose2d prevPos=Constants.Drivetrain.zeroPos;
-  private Transform2d vel=Constants.Drivetrain.zeroTransform;
+
   /** Creates a new SwerveSubsystem. */
   public SwerveSubsystem() {
     gyro.reset();
@@ -72,13 +71,9 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     odometry.resetPosition(new Pose2d(), gyro.getRotation2d());
   }
-  public Transform2d getVel(){
-    return this.vel;
-  }
+
   @Override
   public void periodic() {
-    this.vel=getPose().minus(prevPos).times(50.0);
-    this.prevPos=getPose();
     // This method will be called once per scheduler run
     odometry.update(gyro.getRotation2d(), getStates());
 
@@ -88,12 +83,7 @@ public class SwerveSubsystem extends SubsystemBase {
     
     field.setRobotPose(getPose());
   }
-  public ChassisSpeeds poseLog(ChassisSpeeds desiredVel){
-    Pose2d endPos=new Pose2d(getPose().getX()+desiredVel.vxMetersPerSecond*0.02, getPose().getY()+desiredVel.vyMetersPerSecond*0.02, new Rotation2d(getPose().getRotation().getRadians()+desiredVel.omegaRadiansPerSecond*0.02));
-    Twist2d twist=getPose().log(endPos);
-    ChassisSpeeds commandedVel=new ChassisSpeeds(twist.dx/0.02, twist.dy/0.02,twist.dtheta/0.02);
-    return commandedVel;
-  }
+
   public SwerveModuleState[] getStates() {
     SwerveModuleState states[] = new SwerveModuleState[modules.length];
     for (int i = 0; i < modules.length; i++) {
@@ -155,25 +145,26 @@ public class SwerveSubsystem extends SubsystemBase {
   /* Very experimental */
   public SwerveModuleState[] optimizedOptimize(SwerveModuleState[] currentStates, SwerveModuleState[] targetStates) {
     /* First, average the direction that all modules will take (normally) */
-    double averageAngle = 0;
+    double averageTargetAngle = 0;
     for (int i = 0; i < currentStates.length; i++) {
       /* If the change is greater than 90 degrees, we would normally flip */
-      if (Math.abs(targetStates[i].angle.minus(currentStates[i].angle).getDegrees()) > 90) {
-        averageAngle += targetStates[i].angle.rotateBy(Rotation2d.fromDegrees(180)).getDegrees();
+      double delta = targetStates[i].angle.minus(currentStates[i].angle).getDegrees();
+      if (Math.abs(delta) > 90) {
+        averageTargetAngle += targetStates[i].angle.rotateBy(Rotation2d.fromDegrees(180)).getDegrees();
       } else {
         /* Don't flip */
-        averageAngle += targetStates[i].angle.getDegrees();
+        averageTargetAngle += targetStates[i].angle.getDegrees();
       }
     }
-    averageAngle /= currentStates.length;
+    averageTargetAngle /= currentStates.length;
 
     /* Now let's do it for real */
     SwerveModuleState[] finalStates = new SwerveModuleState[currentStates.length];
 
     for (int i = 0; i < currentStates.length; i++) {
       /* FLIP */
-      if (Math.abs(targetStates[i].angle.minus(currentStates[i].angle).getDegrees()) > 90
-          + (averageAngle * windowShiftScalingFactor)) {
+      double delta = targetStates[i].angle.minus(currentStates[i].angle).getDegrees();
+      if (Math.abs(delta) > 90 + (averageTargetAngle * windowShiftScalingFactor)) {
         finalStates[i] = new SwerveModuleState(-targetStates[i].speedMetersPerSecond,
             targetStates[i].angle.rotateBy(Rotation2d.fromDegrees(180)));
       } else {

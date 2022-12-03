@@ -9,7 +9,7 @@ import frc.robot.subsystems.drive.motors.NEODrive;
 public class SwerveModule {
 
   private NEODrive drive;
-  private CIMSteer steer;
+  public CIMSteer steer;
   
   public int id;
   public String description;
@@ -64,12 +64,10 @@ public class SwerveModule {
   }
   
   public void periodic() {
-    steer.setAngle(targetAngle.getDegrees());
+    steer.setAngleMod360(targetAngle.getDegrees());
 
     SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/TargetAngle", targetAngle.getDegrees());
     SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/CurrentAngle", getRotation2d().getDegrees());
-
-    SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/rawCurrentAngle", steer.deleteThisGetRawPosition());
 
     SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/CurrentAngleModulo360", getRotation2d().getDegrees()%360);
     SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/TargetSpeed", targetSpeed);

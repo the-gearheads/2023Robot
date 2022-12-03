@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.commands.ArcadeDrive;
+import frc.robot.commands.SteerMotorDebug;
 import frc.robot.commands.SwerveDebug;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.SwerveSubsystem;

@@ -37,7 +37,6 @@ public class ArcadeDrive extends CommandBase {
     SmartDashboard.putNumber("P",Constants.Drivetrain.STEER_P);
     SmartDashboard.putNumber("I",Constants.Drivetrain.STEER_I);
     SmartDashboard.putNumber("D",Constants.Drivetrain.STEER_D);
-    SmartDashboard.putBoolean("UseLogOptimization", false);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -50,13 +49,8 @@ public class ArcadeDrive extends CommandBase {
     SmartDashboard.putNumber("ArcadeDrive/xSpd", xSpd);
     SmartDashboard.putNumber("ArcadeDrive/ySpd", ySpd);
     SmartDashboard.putNumber("ArcadeDrive/rot", rotSpd);
-    SmartDashboard.putNumber("ArcadeDrive/xSpd Experimental", swerveSubsystem.getVel().getX());
-    SmartDashboard.putNumber("ArcadeDrive/ySpd Experimental", swerveSubsystem.getVel().getY());
-    SmartDashboard.putNumber("ArcadeDrive/rot Experimental", swerveSubsystem.getVel().getRotation().getDegrees());
+
     var speeds = new ChassisSpeeds(xSpd, ySpd, rotSpd);
-    if(SmartDashboard.getBoolean("UseLogOptimization", true)) {
-      speeds = swerveSubsystem.poseLog(speeds);
-    }
     if(SmartDashboard.getBoolean("ArcadeDrive/UseFieldRelative", true)) {
       swerveSubsystem.driveFieldRelative(speeds);
     } else {
