@@ -72,7 +72,7 @@ public final class Constants {
   }
 
   public static final class Controllers {
-    public static double JOYSTICK_DEADBAND = 0.15;
+    public static double JOYSTICK_DEADBAND = 0.05;
   }
 
 }

@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -13,8 +15,10 @@ import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 
 /** An example command that uses an example subsystem. */
-public class ArcadeDrive extends CommandBase {
+public class TeleopDrive extends CommandBase {
   private final SwerveSubsystem swerveSubsystem;
+  private PIDController rotPIDController = new PIDController(3, 0, 0);
+  private double angleSetPoint;
 
 
   /**
@@ -22,21 +26,20 @@ public class ArcadeDrive extends CommandBase {
    *
    * @param subsystem The subsystem used by this command.
    */
-  public ArcadeDrive(SwerveSubsystem subsystem) {
+  public TeleopDrive(SwerveSubsystem subsystem) {
     swerveSubsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
     SmartDashboard.putBoolean("ArcadeDrive/UseFieldRelative", true);
+    SmartDashboard.putBoolean("Rotation PID", true);
+    SmartDashboard.putNumber("Rotation PID kP", 3);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     swerveSubsystem.zeroEncoders();
-    SmartDashboard.putNumber("F",Constants.Drivetrain.STEER_F);
-    SmartDashboard.putNumber("P",Constants.Drivetrain.STEER_P);
-    SmartDashboard.putNumber("I",Constants.Drivetrain.STEER_I);
-    SmartDashboard.putNumber("D",Constants.Drivetrain.STEER_D);
+    angleSetPoint=swerveSubsystem.getPose().getRotation().getDegrees();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -45,10 +48,26 @@ public class ArcadeDrive extends CommandBase {
     var xSpd = Controllers.activeController.getXMoveAxis() * Constants.Drivetrain.MAX_LIN_VEL;
     var ySpd = Controllers.activeController.getYMoveAxis() * Constants.Drivetrain.MAX_LIN_VEL;
     var rotSpd = Controllers.activeController.getRotateAxis() * Constants.Drivetrain.MAX_ROT_VEL;
+    //Quadratic axis control
+    xSpd*=Math.abs(xSpd);
+    ySpd*=Math.abs(ySpd);
+    rotSpd*=Math.abs(rotSpd);
 
     SmartDashboard.putNumber("ArcadeDrive/xSpd", xSpd);
     SmartDashboard.putNumber("ArcadeDrive/ySpd", ySpd);
     SmartDashboard.putNumber("ArcadeDrive/rot", rotSpd);
+
+    //Make sure the robot maintains its heading when we aren't toggling the rotation axis
+    if(SmartDashboard.putBoolean("Rotation PID", false)){
+      rotPIDController=new PIDController(SmartDashboard.getNumber("Rotation PID kP", 3), 0,0);
+
+      double gyroAngle=swerveSubsystem.getPose().getRotation().getDegrees();
+      if(MathUtil.applyDeadband(rotSpd, 1E-2)==0){
+        rotSpd=rotPIDController.calculate(angleSetPoint, gyroAngle);
+      }else{
+        angleSetPoint=gyroAngle;
+      }
+    }
 
     var speeds = new ChassisSpeeds(xSpd, ySpd, rotSpd);
     if(SmartDashboard.getBoolean("ArcadeDrive/UseFieldRelative", true)) {
@@ -56,20 +75,13 @@ public class ArcadeDrive extends CommandBase {
     } else {
       swerveSubsystem.drive(speeds);
     }
-    updatePIDConstants();
-  }
-
-  private void updatePIDConstants(){
-    double kF=SmartDashboard.getNumber("F",Constants.Drivetrain.STEER_F);
-    double kP=SmartDashboard.getNumber("P",Constants.Drivetrain.STEER_P);
-    double kI=SmartDashboard.getNumber("I",Constants.Drivetrain.STEER_I);
-    double kD=SmartDashboard.getNumber("D",Constants.Drivetrain.STEER_D);
-    swerveSubsystem.setPIDConstants(kF, kP, kI, kD);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    swerveSubsystem.drive(new ChassisSpeeds());
+  }
 
   // Returns true when the command should end.
   @Override
