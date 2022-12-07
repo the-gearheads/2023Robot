@@ -13,9 +13,8 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.Drivetrain;
-import frc.robot.commands.ArcadeDrive;
+import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.SteerMotorDebug;
-import frc.robot.commands.SwerveDebug;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.vision.Vision;
@@ -39,7 +38,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure default teleop command
-    swerveSubsystem.setDefaultCommand(new ArcadeDrive(swerveSubsystem));
+    swerveSubsystem.setDefaultCommand(new TeleopDrive(swerveSubsystem));
     // Configure the button bindings
     updateControllers();
   }
@@ -62,7 +61,6 @@ public class RobotContainer {
     Controllers.updateActiveControllerInstance();
 
     // Put new bindings here. 
-    Controllers.activeController.getSwerveDebugEnableButton().toggleWhenActive(new SwerveDebug(swerveSubsystem), true);
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

@@ -187,48 +187,36 @@ public class SwerveSubsystem extends SubsystemBase {
     }
   }
 
-  public void setAngleOffsets(Rotation2d[] angleOffsets){
-    for (int i = 0; i < modules.length; i++) {
-      modules[i].setAngleOffset(angleOffsets[i]);
-    }
-  }
-
-  // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
-public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath, boolean stopWhenDone) {
-  // in your code that will be used by all path following commands.
-  return new SequentialCommandGroup(
-      new InstantCommand(() -> {
-        // Reset odometry for the first path you run during auto
-        if(isFirstPath){
+  public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath, boolean stopWhenDone) {
+    return new SequentialCommandGroup(
+        new InstantCommand(() -> {
+          // Reset odometry for the first path you run during auto
+          if (isFirstPath) {
             this.setPose(traj.getInitialHolonomicPose());
-        }
-      }),
-      new PPSwerveControllerCommand(
-          traj, 
-          this::getPose, // Pose supplier
-          this.kinematics, // SwerveDriveKinematics
-          (PIDController)SmartDashboard.getData("xPid"), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
-          (PIDController)SmartDashboard.getData("yPid"), // Y controller (usually the same values as X controller)
-          (PIDController)SmartDashboard.getData("rotPid"), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
-          this::setStatesOptimized, // Module states consumer
-          this // Requires this drive subsystem
-      ),
-      new InstantCommand(() -> {
-          if(stopWhenDone) {
+          }
+        }),
+        new PPSwerveControllerCommand(
+            traj,
+            this::getPose, // Pose supplier
+            this.kinematics, // SwerveDriveKinematics
+            (PIDController) SmartDashboard.getData("xPid"), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+            (PIDController) SmartDashboard.getData("yPid"), // Y controller (usually the same values as X controller)
+            (PIDController) SmartDashboard.getData("rotPid"), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+            this::setStatesOptimized, // Module states consumer
+            this // Requires this drive subsystem
+        ),
+        new InstantCommand(() -> {
+          if (stopWhenDone) {
             drive(new ChassisSpeeds(0, 0, 0));
           }
-      })
-  );
-}
-public Command followTrajectoriesCommand(ArrayList<PathPlannerTrajectory> trajectories, boolean stopWhenDone) {
-  // in your code that will be used by all path following commands.
-  SequentialCommandGroup fullCommand = new SequentialCommandGroup(new InstantCommand(() -> {
-    // Reset odometry for the first path you run during auto
-        // this.setPose(trajectories.get(0).getInitialHolonomicPose());
-    }));
-  for(PathPlannerTrajectory trajectory: trajectories){
-    fullCommand=fullCommand.andThen(followTrajectoryCommand(trajectory, false, false));
+        }));
   }
-  return fullCommand;
-}
+
+  public Command followTrajectoriesCommand(ArrayList<PathPlannerTrajectory> trajectories, boolean stopWhenDone) {
+    Command fullCommand = new InstantCommand();
+    for (PathPlannerTrajectory trajectory: trajectories) {
+      fullCommand = fullCommand.andThen(followTrajectoryCommand(trajectory, false, false));
+    }
+    return fullCommand;
+  }
 }

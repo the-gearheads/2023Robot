@@ -19,24 +19,4 @@ public interface ControllerInterface {
     return 0.0;
   }
 
-  public default double getSwerveDebugAngleX() {
-    return 0.0;
-  }
-
-  public default double getSwerveDebugAngleY() {
-    return 0.0;
-  }
-
-  public default double getSwerveDebugSpeedAxis() {
-    return 0.0;
-  }
-
-  public default Trigger getSwerveDebugEnableButton() {
-    return new Trigger();
-  }
-
-  public default Trigger getSwerveDebugOptimizeEnabledButton() {
-    return new Trigger();
-  }
-
 }

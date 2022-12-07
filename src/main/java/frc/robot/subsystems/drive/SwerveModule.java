@@ -18,11 +18,11 @@ public class SwerveModule {
   private double targetSpeed = 0;
 
   SwerveModule(int driveId, int steerId, Rotation2d angleOffset, String description, boolean invertSteer) {
+    folderName = "Wheel " + id + " (" + this.description + ")";
     drive = new NEODrive(driveId, !invertSteer);
-    steer = new CIMSteer(steerId, angleOffset);
+    steer = new CIMSteer(steerId, angleOffset, folderName);
     id = driveId;
     this.description = description;
-    folderName = "Wheel " + id + " (" + this.description + ")";
   }
 
   public double getAngle() {
@@ -57,10 +57,6 @@ public class SwerveModule {
 
   public void setPIDConstants(double kF, double kP, double kI, double kD){
     steer.setPIDConstants(kF, kP, kI, kD);
-  }
-
-  public void setAngleOffset(Rotation2d angleOffset){
-    steer.setAngleOffset(angleOffset);
   }
   
   public void periodic() {

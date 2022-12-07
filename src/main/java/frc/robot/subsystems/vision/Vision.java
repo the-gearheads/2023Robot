@@ -22,9 +22,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.TrackAprilTags;
-import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
-import io.github.oblarg.oblog.annotations.Log.ToString;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +33,7 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.SimVisionSystem;
 import org.photonvision.SimVisionTarget;
 import org.photonvision.targeting.PhotonTrackedTarget;
-public class Vision extends SubsystemBase implements Loggable{
+public class Vision extends SubsystemBase {
   private final Servo servo;
   public Vision() {
     servo = new Servo(0);
