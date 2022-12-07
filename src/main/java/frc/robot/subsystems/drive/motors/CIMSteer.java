@@ -44,44 +44,22 @@ public class CIMSteer implements SteerMotor {
   public double getVelocity() {
     return nativeToAngle(getRawVelocity());
   }
-
   public void setAngle(double angle) {
     motor.set(ControlMode.Position, angleToNative(angle+angleOffset.getDegrees()));
     // motor.set(ControlMode.Position, angleToNative(angle));
   }
   public void setAngleMod360(double naiveDesiredAngle) {//So angle is [-pi,pi]. If the current angle is at -pi+0.01, and our desired angle pi-0.01, we don't want to cycle back to 2pi-0.02 degrees. 
-  //If desired angle is 90 and our position is 450, we don't want to cycle 2pi times (occurs at the beginning only)
-  double currentAngleMod360=getAngle()%360;
-  double desiredAngleMod360=naiveDesiredAngle%360;
-  double deltaBeta=desiredAngleMod360-currentAngleMod360;
-  double delta=naiveDesiredAngle-getAngle();
-  double deltaMod360=delta%360;
-  if(Math.abs(deltaMod360) > Math.abs(deltaMod360-360)){
-    deltaMod360=deltaMod360-360;
-  }
-  double desiredAngle=getAngle()+deltaMod360;
-  motor.set(ControlMode.Position, angleToNative(desiredAngle+angleOffset.getDegrees()));
-  if(id==34){
-    SmartDashboard.putNumber("naiveDesiredAngle", naiveDesiredAngle);
-    SmartDashboard.putNumber("currentAngel", getAngle());
-    SmartDashboard.putNumber("currentAngleMod360", currentAngleMod360);
-    SmartDashboard.putNumber("desiredAngleMod360", desiredAngleMod360);
-    SmartDashboard.putNumber("delta", delta);
-    SmartDashboard.putNumber("deltaMod360", deltaMod360);
-    SmartDashboard.putNumber("final desiredAngle", desiredAngle);
-  }
-  }
-  // public double getClosestMemberofDesiredAngleCongruenceFamilyMod360ToCurrentAngle(double currentAngle, double desiredAngle){
-  //   double delta=desiredAngle-currentAngle;
-  //   double member=currentAngle;
-  //   while(Math.abs(delta)>180){
-  //     if(delta>0){
-  //       member+=360;
-  //     }else{
-  //       member+=360;
-  //     }
-  //   }
-  // }
+    double delta=naiveDesiredAngle-getAngle();
+    double deltaMod360=delta%360;
+    deltaMod360=deltaMod360<360 ? deltaMod360+360 : deltaMod360;
+    deltaMod360=deltaMod360>180? deltaMod360-360 : deltaMod360;
+    if(id==34){
+      SmartDashboard.putNumber("Delta", delta);
+      SmartDashboard.putNumber("Delta % 360", deltaMod360);
+    }
+    double desiredAngle=getAngle()+deltaMod360;
+    setAngle(desiredAngle);
+    }
   public double mod360(double angle){//java is dumb and doesn't know how mod works
     return (angle%360)<0?angle%360+360:angle%360;
   }

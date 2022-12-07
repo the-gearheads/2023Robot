@@ -60,8 +60,8 @@ public final class Constants {
     public static Rotation2d RL_OFFSET = Rotation2d.fromDegrees((472.85)%360);
     public static Rotation2d RR_OFFSET = Rotation2d.fromDegrees((684.5+554+367)%360);
 
-    public static double MAX_LIN_VEL = 2;
-    public static double MAX_ROT_VEL = 2;
+    public static double MAX_LIN_VEL = 5;//set to 2
+    public static double MAX_ROT_VEL = 5;
 
     public static final class Auton {
       public static PIDController X_PID = new PIDController(0, 0, 0);

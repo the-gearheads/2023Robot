@@ -54,7 +54,8 @@ public class SwerveSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("/Swerve/ScaleWheelSpeed", false);
     SmartDashboard.putBoolean("/Swerve/UseOptimizedOptimize", false);
     SmartDashboard.putNumber("/Swerve/ShiftWindow", 0.3);
-    SmartDashboard.putBoolean("/Swerve/PerformOptimizations", false);
+    SmartDashboard.putBoolean("/Swerve/PerformOptimizations", true);
+    SmartDashboard.putBoolean("/Swerve/CoolWheelStuff", true);
 
     SmartDashboard.putData(field);
 

@@ -64,8 +64,11 @@ public class SwerveModule {
   }
   
   public void periodic() {
-    steer.setAngleMod360(targetAngle.getDegrees());
-
+    if(SmartDashboard.getBoolean("/Swerve/CoolWheelStuff", true)) {
+      steer.setAngleMod360(targetAngle.getDegrees());
+    } else {
+      steer.setAngle(targetAngle.getDegrees());
+    }
     SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/TargetAngle", targetAngle.getDegrees());
     SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/CurrentAngle", getRotation2d().getDegrees());
 

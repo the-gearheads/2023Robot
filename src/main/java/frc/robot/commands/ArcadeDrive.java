@@ -26,7 +26,7 @@ public class ArcadeDrive extends CommandBase {
     swerveSubsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
-    SmartDashboard.putBoolean("ArcadeDrive/UseFieldRelative", false);
+    SmartDashboard.putBoolean("ArcadeDrive/UseFieldRelative", true);
   }
 
   // Called when the command is initially scheduled.
