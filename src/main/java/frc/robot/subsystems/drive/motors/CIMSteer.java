@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.util.MathUtils;
 
@@ -13,20 +14,24 @@ import frc.robot.util.MathUtils;
 public class CIMSteer implements SteerMotor {
   WPI_TalonSRX motor;
   private Rotation2d angleOffset;
-  public CIMSteer(int id, Rotation2d angleOffset) {
+  private int id;
+  private String ntWheelRootPath;
+  public CIMSteer(int id, Rotation2d angleOffset, String ntWheelRootPath) {
+    this.id=id;
     this.angleOffset = angleOffset;
+    this.ntWheelRootPath = ntWheelRootPath;
     motor = new WPI_TalonSRX(id);
     motor.configFactoryDefault();
     motor.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.Analog, 0, 0);
     motor.configFeedbackNotContinuous(false, 0);
-    motor.configNeutralDeadband(0.04);
     setPIDConstants(Constants.Drivetrain.STEER_F, Constants.Drivetrain.STEER_P, Constants.Drivetrain.STEER_I, Constants.Drivetrain.STEER_D);
     setBrakeMode(true);
   }
+
   private double angleToNative(double angle) {
     /* We need to take in angles in [-360, 360], and map that between -1024 and 1024. */
-    double nativeAngle = MathUtils.scale(-360, 360, -Constants.Drivetrain.ANALOG_UPR, Constants.Drivetrain.ANALOG_UPR, angle);
-    return nativeAngle;
+    double nativeAngle = angle/360;
+    return nativeAngle * Constants.Drivetrain.ANALOG_UPR;
   }
 
   private double nativeToAngle(double nativeUnits) {
@@ -35,6 +40,7 @@ public class CIMSteer implements SteerMotor {
   }
 
   public double getAngle() {
+      // return nativeToAngle(getRawPosition());
     return nativeToAngle(getRawPosition()) - this.angleOffset.getDegrees();
   }
 
@@ -46,6 +52,26 @@ public class CIMSteer implements SteerMotor {
     motor.set(ControlMode.Position, angleToNative(angle+angleOffset.getDegrees()));
   }
 
+  public void setAngleMod360(double naiveDesiredAngle) {
+    // Calculate the change in angle from the current angle to the desired angle
+    double delta = naiveDesiredAngle - getAngle();
+
+    // Ensure that the change in angle is within the range of [-180, 180] degrees
+    double deltaMod360 = delta % 360;
+    deltaMod360 = deltaMod360 < 360 ? deltaMod360 + 360 : deltaMod360;
+    deltaMod360 = deltaMod360 > 180 ? deltaMod360 - 360 : deltaMod360;
+
+    // Debugging output to SmartDashboard
+    SmartDashboard.putNumber(ntWheelRootPath + "/Delta", delta);
+    SmartDashboard.putNumber(ntWheelRootPath + "/Delta % 360", deltaMod360);
+
+    // Calculate the final desired angle by adding the change in angle to the current angle
+    double desiredAngle = getAngle() + deltaMod360;
+
+    // Set the angle to the desired angle
+    setAngle(desiredAngle);
+  }
+
   public void setBrakeMode(boolean isBraking) {
     if(isBraking) {
       motor.setNeutralMode(NeutralMode.Brake);
@@ -54,7 +80,7 @@ public class CIMSteer implements SteerMotor {
     }
   }
 
-  private double getRawPosition() {
+  public double getRawPosition() {
     return motor.getSelectedSensorPosition();
   }
 
@@ -69,7 +95,4 @@ public class CIMSteer implements SteerMotor {
     motor.config_kD(0, kD);
   }
 
-  public void setAngleOffset(Rotation2d angleOffset){
-    motor.setSelectedSensorPosition(motor.getSelectedSensorPosition() + angleToNative(angleOffset.minus(this.angleOffset).getDegrees()));
-  }
 }

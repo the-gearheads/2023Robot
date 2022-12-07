@@ -9,7 +9,7 @@ import frc.robot.subsystems.drive.motors.NEODrive;
 public class SwerveModule {
 
   private NEODrive drive;
-  private CIMSteer steer;
+  public CIMSteer steer;
   
   public int id;
   public String description;
@@ -18,11 +18,11 @@ public class SwerveModule {
   private double targetSpeed = 0;
 
   SwerveModule(int driveId, int steerId, Rotation2d angleOffset, String description, boolean invertSteer) {
+    folderName = "Wheel " + id + " (" + this.description + ")";
     drive = new NEODrive(driveId, !invertSteer);
-    steer = new CIMSteer(steerId, angleOffset);
+    steer = new CIMSteer(steerId, angleOffset, folderName);
     id = driveId;
     this.description = description;
-    folderName = "Wheel " + id + " (" + this.description + ")";
   }
 
   public double getAngle() {
@@ -58,16 +58,16 @@ public class SwerveModule {
   public void setPIDConstants(double kF, double kP, double kI, double kD){
     steer.setPIDConstants(kF, kP, kI, kD);
   }
-
-  public void setAngleOffset(Rotation2d angleOffset){
-    steer.setAngleOffset(angleOffset);
-  }
   
   public void periodic() {
-    steer.setAngle(targetAngle.getDegrees());
-
+    if(SmartDashboard.getBoolean("/Swerve/CoolWheelStuff", true)) {
+      steer.setAngleMod360(targetAngle.getDegrees());
+    } else {
+      steer.setAngle(targetAngle.getDegrees());
+    }
     SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/TargetAngle", targetAngle.getDegrees());
     SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/CurrentAngle", getRotation2d().getDegrees());
+
     SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/CurrentAngleModulo360", getRotation2d().getDegrees()%360);
     SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/TargetSpeed", targetSpeed);
 

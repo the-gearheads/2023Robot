@@ -29,25 +29,4 @@ public class SingleXboxController implements ControllerInterface {
     return -deadband(controller.getRightX());
   }
 
-  public double getSwerveDebugAngleX() {
-    return 0.0;
-  }
-
-  public double getSwerveDebugAngleY() {
-    return 0.0;
-  }
-
-  public double getSwerveDebugSpeedAxis() {
-    return 0.0;
-  }
-
-  public Trigger getSwerveDebugEnableButton() {
-    return new Trigger(()-> controller.getYButton()).debounce(0.01);
-  }
-
-  public Trigger getSwerveDebugOptimizeEnabledButton() {
-    return new Trigger(() -> controller.getXButton()).debounce(0.01);
-  }
-
-
 }
