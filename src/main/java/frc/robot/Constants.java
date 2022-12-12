@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -21,6 +22,22 @@ import edu.wpi.first.math.geometry.Translation2d;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static boolean simReplayMode = false;
+
+  public static enum RobotMode {
+    SIM, SIM_REPLAY, REAL
+  }
+
+  public static RobotMode getMode() {
+    if(Robot.isReal()) {
+      return RobotMode.REAL;
+    }
+    if(simReplayMode) {
+      return RobotMode.SIM_REPLAY;
+    } else {
+      return RobotMode.SIM;
+    }
+  }
   public static final class Drivetrain {
     public static int FL_DRIVE_ID = 27;
     public static int FL_STEER_ID = 34;
@@ -68,6 +85,20 @@ public final class Constants {
       public static PIDController Y_PID = new PIDController(0, 0, 0);
       public static PIDController ROT_PID = new PIDController(0, 0, 0);
       public static PathConstraints CONSTRAINTS = new PathConstraints(1, 1.5);
+    }
+
+    public static final class Sim {
+      public static final class CIMSteer {
+        public static double kV = 1;
+        public static double kA = 1;
+        public static DCMotor motor = DCMotor.getCIM(1);
+      }
+
+      public static final class NEODrive {
+        public static double kV = 1;
+        public static double kA = 1;
+        public static DCMotor motor = DCMotor.getNEO(1);
+      }
     }
   }
 

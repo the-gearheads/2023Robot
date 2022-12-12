@@ -2,43 +2,26 @@ package frc.robot.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.subsystems.drive.motors.CIMSteer;
 import frc.robot.subsystems.drive.motors.NEODrive;
 
-public class SwerveModule {
+public class SwerveModule implements SwerveModuleIO, Sendable  {
 
-  private NEODrive drive;
-  public CIMSteer steer;
+  protected NEODrive drive;
+  protected CIMSteer steer;
   
   public int id;
   public String description;
-  public String folderName = "";
   private Rotation2d targetAngle = new Rotation2d();
-  private double targetSpeed = 0;
+  private double targetVelocity;
 
-  SwerveModule(int driveId, int steerId, Rotation2d angleOffset, String description, boolean invertSteer) {
-    folderName = "Wheel " + id + " (" + this.description + ")";
+  public SwerveModule(int driveId, int steerId, Rotation2d angleOffset, String description, boolean invertSteer) {
     drive = new NEODrive(driveId, !invertSteer);
-    steer = new CIMSteer(steerId, angleOffset, folderName);
+    steer = new CIMSteer(steerId, angleOffset);
     id = driveId;
     this.description = description;
-  }
-
-  public double getAngle() {
-    return steer.getAngle();
-  }
-  
-  public Rotation2d getRotation2d() {
-    return Rotation2d.fromDegrees(getAngle());
-  }
-
-  public double getPosition() {
-    return drive.getPosition();
-  }
-
-  public double getVelocity() {
-    return drive.getVelocity();
   }
 
   public void zeroEncoders() {
@@ -47,37 +30,49 @@ public class SwerveModule {
   }
 
   public SwerveModuleState getState() {
-    return new SwerveModuleState(getVelocity(), getRotation2d());
+    return new SwerveModuleState(drive.getVelocity(), Rotation2d.fromDegrees(steer.getAngle()));
   }
 
   public void setState(SwerveModuleState state) {
-    targetSpeed = state.speedMetersPerSecond;
+    targetVelocity = state.speedMetersPerSecond;
     targetAngle = state.angle;
   }
 
   public void setPIDConstants(double kF, double kP, double kI, double kD){
     steer.setPIDConstants(kF, kP, kI, kD);
   }
-  
-  public void periodic() {
-    if(SmartDashboard.getBoolean("/Swerve/CoolWheelStuff", true)) {
-      steer.setAngleMod360(targetAngle.getDegrees());
-    } else {
-      steer.setAngle(targetAngle.getDegrees());
-    }
-    SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/TargetAngle", targetAngle.getDegrees());
-    SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/CurrentAngle", getRotation2d().getDegrees());
 
-    SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/CurrentAngleModulo360", getRotation2d().getDegrees()%360);
-    SmartDashboard.putNumber("/Swerve/Wheel " + folderName + "/TargetSpeed", targetSpeed);
+  /* Called every periodic() */
+  public void updateInputs(SwerveModuleInputs inputs) {
+    /* Set our target speeds and angles */
+    steer.setAngle(targetAngle.getDegrees());
+    drive.setSpeed(targetVelocity);
 
-    if(SmartDashboard.getBoolean("/Swerve/ScaleWheelSpeed", true)) {
-       /* Scale drive wheel speed based on cosine difference */ 
-       drive.setSpeed(targetSpeed * Math.cos(targetAngle.getRadians() - getRotation2d().getRadians()));
-     } else {
-      drive.setSpeed(targetSpeed);
-     }
+    inputs.description = this.description;
+    inputs.currentAngle = steer.getAngle();
+    inputs.driveAppliedVolts = drive.getAppliedVolts();
+    inputs.drivePosition = drive.getPosition();
+    inputs.driveVelocity = drive.getVelocity();
+    inputs.steerAppliedVolts = steer.getAppliedVolts();
+    inputs.steerVelocity = steer.getVelocity();
+    inputs.targetAngle = this.targetAngle.getDegrees();
+    inputs.targetVelocity = this.targetVelocity;
   }
 
+  public String getDescription() {
+    return this.description;
+  }
 
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.addStringProperty("description", ()->{return this.description;}, null);
+    builder.addDoubleProperty("currentAngle", ()->{return steer.getAngle();}, null);
+    builder.addDoubleProperty("driveAppliedVolts", ()->{return drive.getAppliedVolts();}, null);
+    builder.addDoubleProperty("drivePosition", ()->{return drive.getPosition();}, null);
+    builder.addDoubleProperty("driveVelocity", ()->{return drive.getVelocity();}, null);
+    builder.addDoubleProperty("steerAppliedVolts", ()->{return steer.getAppliedVolts();}, null);
+    builder.addDoubleProperty("steerVelocity", ()->{return steer.getVelocity();}, null);
+    builder.addDoubleProperty("targetAngle", ()->{return targetAngle.getDegrees();}, null);
+    builder.addDoubleProperty("targetVelocity", ()->{return targetVelocity;}, null);
+  }
 }
