@@ -74,5 +74,9 @@ public class SwerveModule implements SwerveModuleIO, Sendable  {
     builder.addDoubleProperty("steerVelocity", ()->{return steer.getVelocity();}, null);
     builder.addDoubleProperty("targetAngle", ()->{return targetAngle.getDegrees();}, null);
     builder.addDoubleProperty("targetVelocity", ()->{return targetVelocity;}, null);
+    builder.addDoubleProperty("driveP",  drive::getP, drive::updateP);
+    builder.addDoubleProperty("driveI",  drive::getI, drive::updateI);
+    builder.addDoubleProperty("driveD",  drive::getD, drive::updateD);
+    builder.addDoubleProperty("driveFF",  drive::getFF, drive::updateFF);
   }
 }

@@ -9,6 +9,16 @@ public interface SteerMotor {
   public double getAngle();
 
   public void setPIDConstants(double kF, double kP, double kI, double kD);
+
+  public default void updateFF(double FF) {};
+  public default void updateP(double P) {};
+  public default void updateI(double I) {};
+  public default void updateD(double D) {};
+
+  public default double getFF() {return 0.0;};
+  public default double getP() {return 0.0;};
+  public default double getI() {return 0.0;};
+  public default double getD() {return 0.0;};
   
   default public void zeroEncoders() {}
 }

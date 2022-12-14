@@ -7,15 +7,18 @@ package frc.robot.commands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
+import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.vision.Vision;
 
 public class TrackAprilTags extends CommandBase {
   /** Creates a new TrackAprilTags. */
   private Vision vision;
-  private double timeToRotate180Deg=0.6;
   private Timer timer;
-  public TrackAprilTags(Vision vision) {
+  private SwerveSubsystem swerveSubsystem;
+  public TrackAprilTags(Vision vision, SwerveSubsystem swerveSubsystem) {
     this.vision=vision;
+    this.swerveSubsystem=swerveSubsystem;
     timer=new Timer();
     addRequirements(vision);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -34,14 +37,14 @@ public class TrackAprilTags extends CommandBase {
     boolean isAprilTagInView = false;//replace with method from vision that checks if there are apriltags in view
     if(isAprilTagInView){
       //follow april tag
-      double aprilTagAngleInFrame=0;//replace with mehod from vision that returns the angle of the tag within view of the camera
+      double aprilTagAngleInFrame=0;//replace with method from vision that returns the angle of the tag within view of the camera
       vision.setServoAngle((vision.getServoAngle()-aprilTagAngleInFrame)%180);
     }else{
       wander();
     }
   }
   public void wander(){
-    if(timer.get()>timeToRotate180Deg){
+    if(timer.get()>Constants.Vision.SERVO_SPEED*180){
       vision.setServoAngle(MathUtil.applyDeadband(vision.getServoAngle()-180,1)==0?0:180);
       timer.reset();
       timer.start();

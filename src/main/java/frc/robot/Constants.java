@@ -64,6 +64,11 @@ public final class Constants {
     public static double DRIVE_KS = 0.18;
     public static double DRIVE_KV = 2.7;
     public static double DRIVE_KA = 0.35632;
+
+    public static double DRIVE_P = 0.0;
+    public static double DRIVE_I = 0.0;
+    public static double DRIVE_D = 0.0;
+
     public static Pose2d zeroPos = new Pose2d(0,0,new Rotation2d(0));
     public static Transform2d zeroTransform = new Transform2d(new Translation2d(0,0), new Rotation2d(0));
 
@@ -77,8 +82,8 @@ public final class Constants {
     public static Rotation2d RL_OFFSET = Rotation2d.fromDegrees((472.85)%360);
     public static Rotation2d RR_OFFSET = Rotation2d.fromDegrees((684.5+554+367)%360);
 
-    public static double MAX_LIN_VEL = 5;//set to 2
-    public static double MAX_ROT_VEL = 5;
+    public static double MAX_LIN_VEL = 2;//set to 2
+    public static double MAX_ROT_VEL = 1;
 
     public static final class Auton {
       public static PIDController X_PID = new PIDController(0, 0, 0);
@@ -101,7 +106,10 @@ public final class Constants {
       }
     }
   }
-
+  public static final class Vision{
+    public static double SERVO_SPEED=180/0.6;//in deg/sec
+    public static double SERVO_OFFSET=0;
+  }
   public static final class Controllers {
     public static double JOYSTICK_DEADBAND = 0.05;
   }

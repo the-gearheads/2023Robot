@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drive;
 
+import javax.swing.plaf.synth.SynthSeparatorUI;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
@@ -20,6 +22,8 @@ public class SwerveModuleSim extends SwerveModule {
   public void updateInputs(SwerveModuleInputs inputs) {
     super.updateInputs(inputs);
     // Now to do sim stuff
+
+    System.out.println("WE ARE IN SIM");
 
     double dt = 0.02;
     rotSim.setInputVoltage(steer.getAppliedVolts());

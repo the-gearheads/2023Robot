@@ -11,8 +11,11 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.commands.TeleopDrive;
+import frc.robot.commands.TrackAprilTags;
+import frc.robot.commands.VisionServoDebug;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.drive.SwerveModule;
@@ -40,6 +43,7 @@ public class RobotContainer {
     // Configure default teleop command
     switch(Constants.getMode()) {
       case SIM:
+      SmartDashboard.putString("/Mode", "SIM");
       swerveSubsystem = new SwerveSubsystem(
         new SwerveModuleSim(Drivetrain.FL_DRIVE_ID, Drivetrain.FL_STEER_ID, Drivetrain.FL_OFFSET, "FL", true),
         new SwerveModuleSim(Drivetrain.FR_DRIVE_ID, Drivetrain.FR_STEER_ID, Drivetrain.FR_OFFSET, "FR", true),
@@ -49,11 +53,13 @@ public class RobotContainer {
       break;
 
       case SIM_REPLAY:
+        SmartDashboard.putString("/Mode", "SIM_REPLAY");
         swerveSubsystem = new SwerveSubsystem(new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {});
         break;
 
       default:
       case REAL:
+      SmartDashboard.putString("/Mode", "REAL");
       swerveSubsystem = new SwerveSubsystem(
         new SwerveModule(Drivetrain.FL_DRIVE_ID, Drivetrain.FL_STEER_ID, Drivetrain.FL_OFFSET, "FL", true),
         new SwerveModule(Drivetrain.FR_DRIVE_ID, Drivetrain.FR_STEER_ID, Drivetrain.FR_OFFSET, "FR", true),
@@ -64,6 +70,7 @@ public class RobotContainer {
     }
 
     swerveSubsystem.setDefaultCommand(new TeleopDrive(swerveSubsystem));
+    vision.setDefaultCommand(new VisionServoDebug(vision, swerveSubsystem));
     // Configure the button bindings
     updateControllers();
   }

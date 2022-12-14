@@ -12,7 +12,6 @@ public class Vision extends SubsystemBase {
   private final Servo servo;
   public Vision() {
     servo = new Servo(0);
-    setDefaultCommand(new TrackAprilTags(this));
   }
   public double getServoAngle(){
     return servo.getAngle();

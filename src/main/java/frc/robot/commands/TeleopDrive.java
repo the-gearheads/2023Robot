@@ -29,8 +29,8 @@ public class TeleopDrive extends CommandBase {
     swerveSubsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
-    SmartDashboard.putBoolean("ArcadeDrive/UseFieldRelative", true);
-    SmartDashboard.putBoolean("Rotation PID", true);
+    SmartDashboard.putBoolean("ArcadeDrive/UseFieldRelative", false);
+    SmartDashboard.putBoolean("Rotation PID", false);
     SmartDashboard.putNumber("Rotation PID kP", 3);
   }
 
@@ -44,20 +44,18 @@ public class TeleopDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    var xSpd = Controllers.activeController.getXMoveAxis() * Constants.Drivetrain.MAX_LIN_VEL;
-    var ySpd = Controllers.activeController.getYMoveAxis() * Constants.Drivetrain.MAX_LIN_VEL;
-    var rotSpd = Controllers.activeController.getRotateAxis() * Constants.Drivetrain.MAX_ROT_VEL;
-    //Quadratic axis control
-    xSpd*=Math.abs(xSpd);
-    ySpd*=Math.abs(ySpd);
-    rotSpd*=Math.abs(rotSpd);
+    var xSpd = Controllers.activeController.getXMoveAxis();
+    var ySpd = Controllers.activeController.getYMoveAxis();
+    var rotSpd = Controllers.activeController.getRotateAxis();
 
-    SmartDashboard.putNumber("ArcadeDrive/xSpd", xSpd);
-    SmartDashboard.putNumber("ArcadeDrive/ySpd", ySpd);
-    SmartDashboard.putNumber("ArcadeDrive/rot", rotSpd);
+    //Quadratic axis control
+    xSpd *= Math.abs(xSpd) * Constants.Drivetrain.MAX_LIN_VEL;
+    ySpd *= Math.abs(ySpd) * Constants.Drivetrain.MAX_LIN_VEL;
+    rotSpd *= Math.abs(rotSpd) * Constants.Drivetrain.MAX_ROT_VEL;
 
     //Make sure the robot maintains its heading when we aren't toggling the rotation axis
-    if(SmartDashboard.putBoolean("Rotation PID", false)){
+    if(SmartDashboard.getBoolean("Rotation PID", false)){
+      System.out.println("if this is running rot pid is rujnning");
       rotPIDController=new PIDController(SmartDashboard.getNumber("Rotation PID kP", 3), 0,0);
 
       double gyroAngle=swerveSubsystem.getPose().getRotation().getDegrees();
@@ -67,6 +65,10 @@ public class TeleopDrive extends CommandBase {
         angleSetPoint=gyroAngle;
       }
     }
+
+    SmartDashboard.putNumber("ArcadeDrive/xSpd", xSpd);
+    SmartDashboard.putNumber("ArcadeDrive/ySpd", ySpd);
+    SmartDashboard.putNumber("ArcadeDrive/rot", rotSpd);
 
     var speeds = new ChassisSpeeds(xSpd, ySpd, rotSpd);
     if(SmartDashboard.getBoolean("ArcadeDrive/UseFieldRelative", true)) {

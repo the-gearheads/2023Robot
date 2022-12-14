@@ -172,6 +172,10 @@ public class SwerveSubsystem extends SubsystemBase {
       return odometry.getPoseMeters();
   }
 
+  public double getContinuousGyroAngle(){
+    return gyro.getContinuousAngle();
+  }
+
   /**
    * Sets steer pid constants for all modules
    * @param kF F(eedforward) value

@@ -3,6 +3,8 @@ package frc.robot.subsystems.drive.motors;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -25,8 +27,8 @@ public class NEODrive implements DriveMotor {
   public double conversionFactor = Drivetrain.WHEEL_CIRCUMFERENCE / Drivetrain.DRIVE_GEAR_RATIO;;
   CANSparkMax motor;
   RelativeEncoder encoder;
-  SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Drivetrain.DRIVE_KS, Drivetrain.DRIVE_KV, Drivetrain.DRIVE_KA);
   double simPos, simVel;
+  SparkMaxPIDController pid;
 
   public NEODrive(int id, boolean invertSteer) {
     /* SparkMAX is honestly really nice and simple */
@@ -35,12 +37,49 @@ public class NEODrive implements DriveMotor {
       REVPhysicsSim.getInstance().addSparkMax(motor, DCMotor.getNEO(1));
     }
     encoder = motor.getEncoder();
+    pid = motor.getPIDController();
+    pid.setFF(Drivetrain.DRIVE_KV);
+    pid.setP(Drivetrain.DRIVE_P);
+    pid.setI(Drivetrain.DRIVE_I);
+    pid.setD(Drivetrain.DRIVE_D);
 
     encoder.setPositionConversionFactor(conversionFactor);
     encoder.setVelocityConversionFactor(conversionFactor * (1/60.0));
     motor.setInverted(invertSteer);
     setBrakeMode(true);
-  } 
+  }
+
+  public void updateFF(double FF) {
+    pid.setFF(FF);
+  }
+
+  public void updateP(double P) {
+    pid.setP(P);
+  }
+
+  public void updateI(double I) {
+    pid.setI(I);
+  }
+
+  public void updateD(double D) {
+    pid.setD(D);
+  }
+
+  public double getFF() {
+    return pid.getFF();
+  }
+
+  public double getP() {
+    return pid.getP();
+  }
+
+  public double getI() {
+    return pid.getI();
+  }
+
+  public double getD() {
+    return pid.getD();
+  }
 
   public void setBrakeMode(boolean isBraking) {
     if (isBraking) {
@@ -51,7 +90,7 @@ public class NEODrive implements DriveMotor {
   }
 
   public void setVoltage(double voltage) {
-    motor.setVoltage(MathUtil.clamp(voltage, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage()));
+    // motor.setVoltage(MathUtil.clamp(voltage, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage()));
   }
 
   public double getAppliedVolts() {
@@ -59,8 +98,7 @@ public class NEODrive implements DriveMotor {
   }
 
   public void setSpeed(double speed) {
-    double voltage = feedforward.calculate(speed);
-    setVoltage(voltage);
+    pid.setReference(speed, ControlType.kVelocity);
   }
 
   public void zeroEncoders() {
