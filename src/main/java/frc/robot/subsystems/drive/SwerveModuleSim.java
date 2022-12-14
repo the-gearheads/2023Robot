@@ -22,9 +22,6 @@ public class SwerveModuleSim extends SwerveModule {
   public void updateInputs(SwerveModuleInputs inputs) {
     super.updateInputs(inputs);
     // Now to do sim stuff
-
-    System.out.println("WE ARE IN SIM");
-
     double dt = 0.02;
     rotSim.setInputVoltage(steer.getAppliedVolts());
     driveSim.setInputVoltage(drive.getAppliedVolts());

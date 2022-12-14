@@ -55,7 +55,6 @@ public class TeleopDrive extends CommandBase {
 
     //Make sure the robot maintains its heading when we aren't toggling the rotation axis
     if(SmartDashboard.getBoolean("Rotation PID", false)){
-      System.out.println("if this is running rot pid is rujnning");
       rotPIDController=new PIDController(SmartDashboard.getNumber("Rotation PID kP", 3), 0,0);
 
       double gyroAngle=swerveSubsystem.getPose().getRotation().getDegrees();

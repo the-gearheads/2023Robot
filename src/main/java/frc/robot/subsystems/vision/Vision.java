@@ -6,7 +6,6 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.TrackAprilTags;
 
 public class Vision extends SubsystemBase {
   private final Servo servo;

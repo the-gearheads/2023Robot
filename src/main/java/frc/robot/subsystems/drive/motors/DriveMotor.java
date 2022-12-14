@@ -1,7 +1,6 @@
 package frc.robot.subsystems.drive.motors;
 
 public interface DriveMotor {
-  public void setVoltage(double voltage);
   public void setSpeed(double speed);
   public void setBrakeMode(boolean doBraking);
 

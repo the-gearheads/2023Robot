@@ -8,11 +8,8 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants;
 import frc.robot.Robot;
@@ -49,48 +46,12 @@ public class NEODrive implements DriveMotor {
     setBrakeMode(true);
   }
 
-  public void updateFF(double FF) {
-    pid.setFF(FF);
-  }
-
-  public void updateP(double P) {
-    pid.setP(P);
-  }
-
-  public void updateI(double I) {
-    pid.setI(I);
-  }
-
-  public void updateD(double D) {
-    pid.setD(D);
-  }
-
-  public double getFF() {
-    return pid.getFF();
-  }
-
-  public double getP() {
-    return pid.getP();
-  }
-
-  public double getI() {
-    return pid.getI();
-  }
-
-  public double getD() {
-    return pid.getD();
-  }
-
   public void setBrakeMode(boolean isBraking) {
     if (isBraking) {
       motor.setIdleMode(IdleMode.kBrake);
     } else {
       motor.setIdleMode(IdleMode.kCoast);
     }
-  }
-
-  public void setVoltage(double voltage) {
-    // motor.setVoltage(MathUtil.clamp(voltage, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage()));
   }
 
   public double getAppliedVolts() {
@@ -125,6 +86,38 @@ public class NEODrive implements DriveMotor {
 
   public FlywheelSim getSim() {
     return new FlywheelSim(LinearSystemId.identifyVelocitySystem(Drivetrain.Sim.NEODrive.kV, Drivetrain.Sim.NEODrive.kA), Drivetrain.Sim.NEODrive.motor, Constants.Drivetrain.DRIVE_GEAR_RATIO);
+  }
+
+  public void updateFF(double FF) {
+    pid.setFF(FF);
+  }
+
+  public void updateP(double P) {
+    pid.setP(P);
+  }
+
+  public void updateI(double I) {
+    pid.setI(I);
+  }
+
+  public void updateD(double D) {
+    pid.setD(D);
+  }
+
+  public double getFF() {
+    return pid.getFF();
+  }
+
+  public double getP() {
+    return pid.getP();
+  }
+
+  public double getI() {
+    return pid.getI();
+  }
+
+  public double getD() {
+    return pid.getD();
   }
 
 }
