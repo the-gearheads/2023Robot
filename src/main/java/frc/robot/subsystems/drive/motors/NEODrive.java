@@ -36,11 +36,15 @@ public class NEODrive implements DriveMotor {
       REVPhysicsSim.getInstance().addSparkMax(motor, DCMotor.getNEO(1));
     }
     encoder = motor.getEncoder();
+
     encoder.setPositionConversionFactor(conversionFactor);
     encoder.setVelocityConversionFactor(conversionFactor * (1/60.0));
     motor.setInverted(invertSteer);
 
     setBrakeMode(true);
+
+    pid.setTolerance(0.05, 0.05);
+    motor.setOpenLoopRampRate(Drivetrain.DRIVE_RAMP_RATE);
   }
 
   public void setBrakeMode(boolean isBraking) {

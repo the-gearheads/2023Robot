@@ -57,6 +57,9 @@ public class Constants extends AnnotatedClass {
     public static double DRIVE_GEAR_RATIO = 6.67/1;
     public static double STEER_GEAR_RATIO = 1;
 
+    public static double STEER_RAMP_RATE = 0.02;
+    public static double DRIVE_RAMP_RATE = 0.02;
+
     public static double STEER_F = 0.0;
     @MultiRobotDouble(real=12.5, sim=3.2)
     public static double STEER_P;

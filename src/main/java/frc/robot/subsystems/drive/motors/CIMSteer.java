@@ -28,6 +28,7 @@ public class CIMSteer implements SteerMotor {
     motor.configFactoryDefault();
     motor.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.Analog, 0, 0);
     motor.configFeedbackNotContinuous(false, 0);
+    motor.configOpenloopRamp(Drivetrain.STEER_RAMP_RATE);
     setPIDConstants(Constants.Drivetrain.STEER_F, Constants.Drivetrain.STEER_P, Constants.Drivetrain.STEER_I, Constants.Drivetrain.STEER_D);
     setBrakeMode(true);
   }
