@@ -48,6 +48,9 @@ public class SwerveModule implements SwerveModuleIO, Sendable  {
     steer.setAngle(targetAngle.getDegrees());
     drive.setSpeed(targetVelocity);
 
+    steer.tickPID();
+    drive.tickPID();
+
     inputs.description = this.description;
     inputs.currentAngle = steer.getAngle();
     inputs.driveAppliedVolts = drive.getAppliedVolts();
@@ -66,17 +69,10 @@ public class SwerveModule implements SwerveModuleIO, Sendable  {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.addStringProperty("description", ()->{return this.description;}, null);
-    builder.addDoubleProperty("currentAngle", ()->{return steer.getAngle();}, null);
-    builder.addDoubleProperty("driveAppliedVolts", ()->{return drive.getAppliedVolts();}, null);
-    builder.addDoubleProperty("drivePosition", ()->{return drive.getPosition();}, null);
-    builder.addDoubleProperty("driveVelocity", ()->{return drive.getVelocity();}, null);
-    builder.addDoubleProperty("steerAppliedVolts", ()->{return steer.getAppliedVolts();}, null);
-    builder.addDoubleProperty("steerVelocity", ()->{return steer.getVelocity();}, null);
     builder.addDoubleProperty("targetAngle", ()->{return targetAngle.getDegrees();}, null);
     builder.addDoubleProperty("targetVelocity", ()->{return targetVelocity;}, null);
-    builder.addDoubleProperty("driveP",  drive::getP, drive::updateP);
-    builder.addDoubleProperty("driveI",  drive::getI, drive::updateI);
-    builder.addDoubleProperty("driveD",  drive::getD, drive::updateD);
-    builder.addDoubleProperty("driveFF",  drive::getFF, drive::updateFF);
+
+    drive.initSendable(builder);
+    steer.initSendable(builder);
   }
 }

@@ -1,7 +1,5 @@
 package frc.robot.subsystems.drive;
 
-import javax.swing.plaf.synth.SynthSeparatorUI;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 

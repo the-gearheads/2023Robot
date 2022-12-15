@@ -3,13 +3,14 @@ package frc.robot.subsystems.drive.motors;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants;
 import frc.robot.Robot;
@@ -25,7 +26,8 @@ public class NEODrive implements DriveMotor {
   CANSparkMax motor;
   RelativeEncoder encoder;
   double simPos, simVel;
-  SparkMaxPIDController pid;
+  PIDController pid = new PIDController(Drivetrain.DRIVE_P, Drivetrain.DRIVE_I, Drivetrain.DRIVE_D);
+  SimpleMotorFeedforward ff = new SimpleMotorFeedforward(Drivetrain.DRIVE_KS, Drivetrain.DRIVE_KV);
 
   public NEODrive(int id, boolean invertSteer) {
     /* SparkMAX is honestly really nice and simple */
@@ -34,15 +36,10 @@ public class NEODrive implements DriveMotor {
       REVPhysicsSim.getInstance().addSparkMax(motor, DCMotor.getNEO(1));
     }
     encoder = motor.getEncoder();
-    pid = motor.getPIDController();
-    pid.setFF(Drivetrain.DRIVE_KV);
-    pid.setP(Drivetrain.DRIVE_P);
-    pid.setI(Drivetrain.DRIVE_I);
-    pid.setD(Drivetrain.DRIVE_D);
-
     encoder.setPositionConversionFactor(conversionFactor);
     encoder.setVelocityConversionFactor(conversionFactor * (1/60.0));
     motor.setInverted(invertSteer);
+
     setBrakeMode(true);
   }
 
@@ -58,8 +55,16 @@ public class NEODrive implements DriveMotor {
     return motor.getAppliedOutput();
   }
 
+  public void setVoltage(double volts) {
+    motor.setVoltage(volts);
+  }
+
+  public void tickPID() {
+    setVoltage(ff.calculate(pid.getSetpoint()) + pid.calculate(getVelocity()));
+  }
+
   public void setSpeed(double speed) {
-    pid.setReference(speed, ControlType.kVelocity);
+    pid.setSetpoint(speed);
   }
 
   public void zeroEncoders() {
@@ -88,36 +93,14 @@ public class NEODrive implements DriveMotor {
     return new FlywheelSim(LinearSystemId.identifyVelocitySystem(Drivetrain.Sim.NEODrive.kV, Drivetrain.Sim.NEODrive.kA), Drivetrain.Sim.NEODrive.motor, Constants.Drivetrain.DRIVE_GEAR_RATIO);
   }
 
-  public void updateFF(double FF) {
-    pid.setFF(FF);
+  public void initSendable(SendableBuilder b) {
+    b.addDoubleProperty("drive/vel", this::getVelocity, null);
+    b.addDoubleProperty("drive/pos", this::getPosition, null);
+    b.addDoubleProperty("drive/appliedVolts", this::getAppliedVolts, null);
+    b.addDoubleProperty("drive/pid/P", pid::getP, pid::setP);
+    b.addDoubleProperty("drive/pid/I", pid::getI, pid::setI);
+    b.addDoubleProperty("drive/pid/D", pid::getD, pid::setD);
+    b.addDoubleProperty("drive/ff/kS", ()->{ return ff.ks; }, (double kS) -> {ff = new SimpleMotorFeedforward(kS, ff.kv);});
+    b.addDoubleProperty("drive/ff/kV", ()->{ return ff.kv; }, (double kV) -> {ff = new SimpleMotorFeedforward(ff.ks, kV);});
   }
-
-  public void updateP(double P) {
-    pid.setP(P);
-  }
-
-  public void updateI(double I) {
-    pid.setI(I);
-  }
-
-  public void updateD(double D) {
-    pid.setD(D);
-  }
-
-  public double getFF() {
-    return pid.getFF();
-  }
-
-  public double getP() {
-    return pid.getP();
-  }
-
-  public double getI() {
-    return pid.getI();
-  }
-
-  public double getD() {
-    return pid.getD();
-  }
-
 }

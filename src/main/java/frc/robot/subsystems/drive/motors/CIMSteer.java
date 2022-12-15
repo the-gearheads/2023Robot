@@ -4,11 +4,13 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
+import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants;
 import frc.robot.Constants.Drivetrain;
@@ -115,4 +117,31 @@ public class CIMSteer implements SteerMotor {
   public FlywheelSim getSim() {
     return new FlywheelSim(LinearSystemId.identifyVelocitySystem(Drivetrain.Sim.CIMSteer.kV, Drivetrain.Sim.CIMSteer.kA), Drivetrain.Sim.CIMSteer.motor, Constants.Drivetrain.STEER_GEAR_RATIO);
   }
+
+  public SlotConfiguration getSlotConfig() {
+    var config = new SlotConfiguration();
+    motor.getSlotConfigs(config);
+    return config;
+  }
+
+  /* getSlotConfig() is way too slow so we make the assumption that the value is what we last set it to
+   * I am very good at writing cursed code. 
+   */
+  double lastP = Drivetrain.STEER_P;
+  double lastI = Drivetrain.STEER_I;
+  double lastD = Drivetrain.STEER_D;
+  double lastF = 0;
+
+  public void initSendable(SendableBuilder b) {
+    b.addDoubleProperty("steer/currentAngle", this::getAngle, null);
+    b.addDoubleProperty("steer/AppliedVolts", this::getAppliedVolts, null);
+    b.addDoubleProperty("steer/Velocity", this::getVelocity, null);
+
+    b.addDoubleProperty("steer/pid/P", ()->{return lastP;}, (double P)->{lastP = P; motor.config_kP(0, P);});
+    b.addDoubleProperty("steer/pid/I", ()->{return lastI;}, (double I)->{lastI = I; motor.config_kI(0, I);});
+    b.addDoubleProperty("steer/pid/D", ()->{return lastD;}, (double D)->{lastD = D; motor.config_kD(0, D);});
+    b.addDoubleProperty("steer/pid/F", ()->{return lastF;}, (double F)->{lastF = F; motor.config_kF(0, F);});
+
+  }
+
 }

@@ -65,8 +65,8 @@ public final class Constants {
     public static double DRIVE_KV = 2.7;
     public static double DRIVE_KA = 0.35632;
 
-    public static double DRIVE_P = 0.0;
-    public static double DRIVE_I = 0.0;
+    public static double DRIVE_P = 0.5;
+    public static double DRIVE_I = 0.6;
     public static double DRIVE_D = 0.0;
 
     public static Pose2d zeroPos = new Pose2d(0,0,new Rotation2d(0));
