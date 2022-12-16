@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import frc.robot.annotations.*;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -21,7 +22,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class Constants {
+public class Constants extends AnnotatedClass {
   public static boolean simReplayMode = false;
 
   public static enum RobotMode {
@@ -38,7 +39,7 @@ public final class Constants {
       return RobotMode.SIM;
     }
   }
-  public static final class Drivetrain {
+  public static class Drivetrain {
     public static int FL_DRIVE_ID = 27;
     public static int FL_STEER_ID = 34;
     public static int FR_DRIVE_ID = 15;
@@ -57,9 +58,11 @@ public final class Constants {
     public static double STEER_GEAR_RATIO = 1;
 
     public static double STEER_F = 0.0;
-    public static double STEER_P = 12.5;
+    @MultiRobotDouble(real=12.5, sim=3.2)
+    public static double STEER_P;
     public static double STEER_I = 0.0;
-    public static double STEER_D = 0.0;
+    @MultiRobotDouble(real=0.0, sim=1.0)
+    public static double STEER_D;
 
     public static double DRIVE_KS = 0.18;
     public static double DRIVE_KV = 2.7;
@@ -82,36 +85,37 @@ public final class Constants {
     public static Rotation2d RL_OFFSET = Rotation2d.fromDegrees((472.85)%360);
     public static Rotation2d RR_OFFSET = Rotation2d.fromDegrees((684.5+554+367)%360);
 
+    @NTPublish
     public static double MAX_LIN_VEL = 2;//set to 2
+    @NTPublish
     public static double MAX_ROT_VEL = 1;
 
-    public static final class Auton {
+    public static class Auton {
       public static PIDController X_PID = new PIDController(0, 0, 0);
       public static PIDController Y_PID = new PIDController(0, 0, 0);
       public static PIDController ROT_PID = new PIDController(0, 0, 0);
       public static PathConstraints CONSTRAINTS = new PathConstraints(1, 1.5);
     }
 
-    public static final class Sim {
-      public static final class CIMSteer {
+    public static class Sim {
+      public static class CIMSteer {
         public static double kV = 1;
         public static double kA = 1;
         public static DCMotor motor = DCMotor.getCIM(1);
       }
 
-      public static final class NEODrive {
+      public static class NEODrive {
         public static double kV = 1;
         public static double kA = 1;
         public static DCMotor motor = DCMotor.getNEO(1);
       }
     }
   }
-  public static final class Vision{
+  public static class Vision{
     public static double SERVO_SPEED=180/0.6;//in deg/sec
     public static double SERVO_OFFSET=0;
   }
-  public static final class Controllers {
+  public static class Controllers {
     public static double JOYSTICK_DEADBAND = 0.05;
   }
-
 }
