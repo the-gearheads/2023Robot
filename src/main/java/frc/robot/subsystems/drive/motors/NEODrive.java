@@ -43,7 +43,7 @@ public class NEODrive implements DriveMotor {
 
     setBrakeMode(true);
 
-    pid.setTolerance(0.05, 0.05);
+    pid.setTolerance(0.1, 0.1);
     motor.setOpenLoopRampRate(Drivetrain.DRIVE_RAMP_RATE);
   }
 
