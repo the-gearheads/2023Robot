@@ -10,8 +10,8 @@ public class SwerveModuleSim extends SwerveModule {
 
   private FlywheelSim rotSim, driveSim;
 
-  public SwerveModuleSim(int driveId, int steerId, Rotation2d angleOffset, String description, boolean invertSteer) {
-    super(driveId, steerId, angleOffset, description, invertSteer);
+  public SwerveModuleSim(int driveId, int steerId, Rotation2d angleOffset, boolean invertSteer, int id, String description) {
+    super(driveId, steerId, angleOffset, invertSteer, id, description);
     rotSim = steer.getSim();
     driveSim = drive.getSim();
   }

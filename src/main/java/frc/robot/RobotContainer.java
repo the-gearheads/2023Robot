@@ -43,30 +43,28 @@ public class RobotContainer {
     // Configure default teleop command
     switch(Constants.getMode()) {
       case SIM:
-      SmartDashboard.putString("/Mode", "SIM");
-      swerveSubsystem = new SwerveSubsystem(
-        new SwerveModuleSim(Drivetrain.FL_DRIVE_ID, Drivetrain.FL_STEER_ID, Drivetrain.FL_OFFSET, "FL", true),
-        new SwerveModuleSim(Drivetrain.FR_DRIVE_ID, Drivetrain.FR_STEER_ID, Drivetrain.FR_OFFSET, "FR", true),
-        new SwerveModuleSim(Drivetrain.RL_DRIVE_ID, Drivetrain.RL_STEER_ID, Drivetrain.RL_OFFSET, "RL", false),
-        new SwerveModuleSim(Drivetrain.RR_DRIVE_ID, Drivetrain.RR_STEER_ID, Drivetrain.RR_OFFSET, "RR", false)
-      );
+        SmartDashboard.putString("/Mode", "SIM");
+        swerveSubsystem = new SwerveSubsystem(
+          new SwerveModuleSim(Drivetrain.FL_DRIVE_ID, Drivetrain.FL_STEER_ID, Drivetrain.FL_OFFSET, true, 0,  "FL"),
+          new SwerveModuleSim(Drivetrain.FR_DRIVE_ID, Drivetrain.FR_STEER_ID, Drivetrain.FR_OFFSET, true, 1,  "FR"),
+          new SwerveModuleSim(Drivetrain.RL_DRIVE_ID, Drivetrain.RL_STEER_ID, Drivetrain.RL_OFFSET, false, 2, "RL"),
+          new SwerveModuleSim(Drivetrain.RR_DRIVE_ID, Drivetrain.RR_STEER_ID, Drivetrain.RR_OFFSET, false, 3, "RR")
+        );
       break;
-
       case SIM_REPLAY:
         SmartDashboard.putString("/Mode", "SIM_REPLAY");
         swerveSubsystem = new SwerveSubsystem(new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {});
         break;
-
       default:
       case REAL:
-      SmartDashboard.putString("/Mode", "REAL");
-      swerveSubsystem = new SwerveSubsystem(
-        new SwerveModule(Drivetrain.FL_DRIVE_ID, Drivetrain.FL_STEER_ID, Drivetrain.FL_OFFSET, "FL", true),
-        new SwerveModule(Drivetrain.FR_DRIVE_ID, Drivetrain.FR_STEER_ID, Drivetrain.FR_OFFSET, "FR", true),
-        new SwerveModule(Drivetrain.RL_DRIVE_ID, Drivetrain.RL_STEER_ID, Drivetrain.RL_OFFSET, "RL", false),
-        new SwerveModule(Drivetrain.RR_DRIVE_ID, Drivetrain.RR_STEER_ID, Drivetrain.RR_OFFSET, "RR", false)
-      );
-      break;
+        SmartDashboard.putString("/Mode", "REAL");
+        swerveSubsystem = new SwerveSubsystem(
+          new SwerveModule(Drivetrain.FL_DRIVE_ID, Drivetrain.FL_STEER_ID, Drivetrain.FL_OFFSET, true, 0,  "FL"),
+          new SwerveModule(Drivetrain.FR_DRIVE_ID, Drivetrain.FR_STEER_ID, Drivetrain.FR_OFFSET, true, 1,  "FR"),
+          new SwerveModule(Drivetrain.RL_DRIVE_ID, Drivetrain.RL_STEER_ID, Drivetrain.RL_OFFSET, false, 2, "RL"),
+          new SwerveModule(Drivetrain.RR_DRIVE_ID, Drivetrain.RR_STEER_ID, Drivetrain.RR_OFFSET, false, 3, "RR")
+        );
+        break;
     }
 
     swerveSubsystem.setDefaultCommand(new TeleopDrive(swerveSubsystem));

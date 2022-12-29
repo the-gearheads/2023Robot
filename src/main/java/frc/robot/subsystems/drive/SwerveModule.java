@@ -17,10 +17,10 @@ public class SwerveModule implements SwerveModuleIO, Sendable  {
   private Rotation2d targetAngle = new Rotation2d();
   private double targetVelocity;
 
-  public SwerveModule(int driveId, int steerId, Rotation2d angleOffset, String description, boolean invertSteer) {
+  public SwerveModule(int driveId, int steerId, Rotation2d angleOffset, boolean invertSteer, int id, String description) {
     drive = new NEODrive(driveId, !invertSteer);
     steer = new CIMSteer(steerId, angleOffset);
-    id = driveId;
+    this.id = id;
     this.description = description;
   }
 
@@ -64,6 +64,10 @@ public class SwerveModule implements SwerveModuleIO, Sendable  {
 
   public String getDescription() {
     return this.description;
+  }
+
+  public String getPath() {
+    return "Swerve/Wheel " + id + " (" + description + ")";
   }
 
   @Override

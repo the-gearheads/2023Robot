@@ -6,6 +6,8 @@ package frc.robot.subsystems.drive;
 
 import java.util.ArrayList;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
@@ -24,7 +26,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.drive.SwerveModuleIO.SwerveModuleInputs;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.util.Gyroscope;
 
@@ -33,7 +34,7 @@ public class SwerveSubsystem extends SubsystemBase {
   SwerveDriveKinematics kinematics = new SwerveDriveKinematics(Drivetrain.FL_POS, Drivetrain.FR_POS, Drivetrain.RL_POS,
       Drivetrain.RR_POS);
   public SwerveModuleIO[] modules;
-  public SwerveModuleInputs[] lastInputs;
+  public SwerveModuleInputsAutoLogged[] lastInputs;
   Gyroscope gyro = new Gyroscope(SPI.Port.kMXP, true);
   SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics, new Rotation2d(0));
   Field2d field = new Field2d();
@@ -55,8 +56,7 @@ public class SwerveSubsystem extends SubsystemBase {
     SmartDashboard.putData("rotPid", Drivetrain.Auton.ROT_PID);
 
     for(int i = 0; i < modules.length; i++) { 
-      String name = "/Swerve/Wheel " + i + " (" + modules[i].getDescription() + ")";
-      SmartDashboard.putData(name, (Sendable)modules[i]);
+      SmartDashboard.putData(modules[i].getPath(), (Sendable)modules[i]);
     }
 
   }
@@ -75,10 +75,11 @@ public class SwerveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     /* Get inputs for each swerve module */
-    SwerveModuleInputs[] inputs = new SwerveModuleInputs[modules.length];
+    SwerveModuleInputsAutoLogged[] inputs = new SwerveModuleInputsAutoLogged[modules.length];
     for (int i = 0; i < modules.length; i++) {
-      inputs[i] = new SwerveModuleInputs();
+      inputs[i] = new SwerveModuleInputsAutoLogged();
       modules[i].updateInputs(inputs[i]);
+      Logger.getInstance().processInputs(modules[i].getPath(), inputs[i]);
     }
     lastInputs = inputs;
 
@@ -91,7 +92,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param inputs SwerveModuleInputs containing velocities and angles
    * @return SwerveModuleStates containing velocities and angles
    */
-  public SwerveModuleState[] getStatesFromInputs(SwerveModuleInputs[] inputs) {
+  public SwerveModuleState[] getStatesFromInputs(SwerveModuleInputsAutoLogged[] inputs) {
     SwerveModuleState states[] = new SwerveModuleState[inputs.length];
     for (int i = 0; i < inputs.length; i++) {
       states[i] = new SwerveModuleState(inputs[i].driveVelocity, Rotation2d.fromDegrees(inputs[i].currentAngle));

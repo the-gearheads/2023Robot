@@ -1,6 +1,21 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2022.4.1"
+    id "com.peterabeles.gversion" version "1.10"
+}
+
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit")
+        credentials {
+            username = "Mechanical-Advantage-Bot"
+            password = "\u0067\u0068\u0070\u005f\u006e\u0056\u0051\u006a\u0055\u004f\u004c\u0061\u0079\u0066\u006e\u0078\u006e\u0037\u0051\u0049\u0054\u0042\u0032\u004c\u004a\u006d\u0055\u0070\u0073\u0031\u006d\u0037\u004c\u005a\u0030\u0076\u0062\u0070\u0063\u0051"
+        }
+    }
+}
+
+configurations.all {
+    exclude group: "edu.wpi.first.wpilibj"
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -66,6 +81,8 @@ dependencies {
     simulationRelease wpi.sim.enableRelease()
 
     testImplementation 'junit:junit:4.12'
+
+    annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:2.0.0-beta-4"
 }
 
 // Simulation configuration (e.g. environment variables).
@@ -80,6 +97,23 @@ jar {
     manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
+
+gversion {
+  srcDir       = "src/main/java/"           // path is relative to the sub-project by default
+                                            // Gradle variables can also be used
+                                            // E.g. "${project.rootDir}/module/src/main/java"
+  classPackage = "frc.robot"
+  className    = "BuildConstants"                // optional. If not specified GVersion is used
+  dateFormat   = "yyyy-MM-dd'T'HH:mm:ss'Z'" // optional. This is the default
+  timeZone     = "America/Detroit"          // optional. UTC is default
+  debug        = false                      // optional. print out extra debug information
+  language     = "java"                     // optional. Can be Java, Kotlin, YAML, or Properties. Case insensitive.
+  explicitType = false                      // optional. Force types to be explicitly printed
+  indent       = "  "                       // optional. Change how code is indented. 1 tab is default.
+  annotate     = false                      // optional. Java only. Adds @Generated annotation
+}
+
+project.compileJava.dependsOn(createVersionFile)
 
 // Configure jar and deploy tasks
 deployArtifact.jarTask = jar
