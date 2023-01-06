@@ -15,6 +15,7 @@ public class TrackAprilTags extends CommandBase {
   /** Creates a new TrackAprilTags. */
   private Vision vision;
   private Timer timer;
+  @SuppressWarnings("all")
   private SwerveSubsystem swerveSubsystem;
   public TrackAprilTags(Vision vision, SwerveSubsystem swerveSubsystem) {
     this.vision=vision;

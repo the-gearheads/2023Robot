@@ -37,6 +37,7 @@ public class Robot extends LoggedRobot {
    * initialization code.
    */
   @Override
+  @SuppressWarnings("all")
   public void robotInit() {
 
     setUseTiming(Constants.getMode() != RobotMode.SIM_REPLAY); // Run as fast as possible during replay
