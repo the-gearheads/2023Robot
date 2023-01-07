@@ -45,12 +45,13 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveSubsystem(SwerveModuleIO... modules) {
     this.modules = modules;
     gyro.reset();
-    zeroEncoders();
 
     /* Get module states to pass to odometry */
     updateInputs();
     var states = getPositionsFromInputs(lastInputs);
     odometry = new SwerveDriveOdometry(kinematics, gyro.getRotation2d(), states);
+
+    zeroEncoders();
 
     /* Initialize SmartDashboard values */
     SmartDashboard.putBoolean("/Swerve/PerformOptimizations", true);

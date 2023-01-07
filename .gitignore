@@ -3,6 +3,7 @@
 
 src/main/java/frc/robot/BuildConstants.java
 *.rlog
+*.wpilog
 
 ### C++ ###
 # Prerequisites
