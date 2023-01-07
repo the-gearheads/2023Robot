@@ -84,7 +84,7 @@ public class RobotContainer {
     System.out.println("Updating controller layout");
 
     // Clear buttons
-    CommandScheduler.getInstance().clearButtons();
+    CommandScheduler.getInstance().getActiveButtonLoop().clear();
 
     // Find new controllers
     Controllers.updateActiveControllerInstance();
