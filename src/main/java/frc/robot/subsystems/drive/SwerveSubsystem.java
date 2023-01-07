@@ -14,9 +14,11 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.SPI;
@@ -31,12 +33,12 @@ import frc.robot.util.Gyroscope;
 
 public class SwerveSubsystem extends SubsystemBase {
 
-  SwerveDriveKinematics kinematics = new SwerveDriveKinematics(Drivetrain.FL_POS, Drivetrain.FR_POS, Drivetrain.RL_POS,
-      Drivetrain.RR_POS);
+  Translation2d[] modulePositions = {Drivetrain.FL_POS, Drivetrain.FR_POS, Drivetrain.RL_POS, Drivetrain.RR_POS};
+  SwerveDriveKinematics kinematics = new SwerveDriveKinematics(modulePositions);
   public SwerveModuleIO[] modules;
   public SwerveModuleInputsAutoLogged[] lastInputs;
   Gyroscope gyro = new Gyroscope(SPI.Port.kMXP, true);
-  SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics, new Rotation2d(0));
+  SwerveDriveOdometry odometry;
   Field2d field = new Field2d();
 
   /** Creates a new SwerveSubsystem. */
@@ -44,6 +46,11 @@ public class SwerveSubsystem extends SubsystemBase {
     this.modules = modules;
     gyro.reset();
     zeroEncoders();
+
+    /* Get module states to pass to odometry */
+    updateInputs();
+    var states = getPositionsFromInputs(lastInputs);
+    odometry = new SwerveDriveOdometry(kinematics, gyro.getRotation2d(), states);
 
     /* Initialize SmartDashboard values */
     SmartDashboard.putBoolean("/Swerve/PerformOptimizations", true);
@@ -69,11 +76,10 @@ public class SwerveSubsystem extends SubsystemBase {
     for (int i = 0; i < modules.length; i++) {
       modules[i].zeroEncoders();
     }
-    odometry.resetPosition(new Pose2d(), gyro.getRotation2d());
+    odometry.resetPosition(gyro.getRotation2d(), getPositionsFromInputs(lastInputs), new Pose2d());
   }
 
-  @Override
-  public void periodic() {
+  private void updateInputs() {
     /* Get inputs for each swerve module */
     SwerveModuleInputsAutoLogged[] inputs = new SwerveModuleInputsAutoLogged[modules.length];
     for (int i = 0; i < modules.length; i++) {
@@ -82,20 +88,24 @@ public class SwerveSubsystem extends SubsystemBase {
       Logger.getInstance().processInputs(modules[i].getPath(), inputs[i]);
     }
     lastInputs = inputs;
+  }
 
-    odometry.update(gyro.getRotation2d(), getStatesFromInputs(inputs));
+  @Override
+  public void periodic() {
+    updateInputs();
+    odometry.update(gyro.getRotation2d(), getPositionsFromInputs(lastInputs));
     field.setRobotPose(getPose());
   }
 
   /**
-   * Return SwerveModuleStates for all SwerveModuleInputs
+   * Return SwerveModulePositions for all SwerveModuleInputs
    * @param inputs SwerveModuleInputs containing velocities and angles
-   * @return SwerveModuleStates containing velocities and angles
+   * @return SwerveModulePositions containing velocities and angles
    */
-  public SwerveModuleState[] getStatesFromInputs(SwerveModuleInputsAutoLogged[] inputs) {
-    SwerveModuleState states[] = new SwerveModuleState[inputs.length];
+  public SwerveModulePosition[] getPositionsFromInputs(SwerveModuleInputsAutoLogged[] inputs) {
+    SwerveModulePosition states[] = new SwerveModulePosition[inputs.length];
     for (int i = 0; i < inputs.length; i++) {
-      states[i] = new SwerveModuleState(inputs[i].driveVelocity, Rotation2d.fromDegrees(inputs[i].currentAngle));
+      states[i] = new SwerveModulePosition(inputs[i].drivePosition, Rotation2d.fromDegrees(inputs[i].currentAngle));
     }
     return states;
   }
@@ -162,7 +172,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param pose Position robot is at
    */
   public void setPose(Pose2d pose) {
-    odometry.resetPosition(pose, gyro.getRotation2d());
+    odometry.resetPosition(gyro.getRotation2d(), getPositionsFromInputs(lastInputs), pose);
   }
 
   /**

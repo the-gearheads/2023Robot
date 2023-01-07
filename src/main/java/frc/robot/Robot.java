@@ -4,12 +4,12 @@
 
 package frc.robot;
 
+import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.inputs.LoggedNetworkTables;
-import org.littletonrobotics.junction.io.ByteLogReceiver;
-import org.littletonrobotics.junction.io.ByteLogReplay;
-import org.littletonrobotics.junction.io.LogSocketServer;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.pathplanner.lib.server.PathPlannerServer;
 import com.revrobotics.REVPhysicsSim;
@@ -41,21 +41,20 @@ public class Robot extends LoggedRobot {
   public void robotInit() {
 
     setUseTiming(Constants.getMode() != RobotMode.SIM_REPLAY); // Run as fast as possible during replay
-    LoggedNetworkTables.getInstance().addTable("/SmartDashboard"); // Log & replay "SmartDashboard" values (no tables are logged by default).
     Logger.getInstance().recordMetadata("GitSHA", BuildConstants.GIT_SHA);
     Logger.getInstance().recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
     Logger.getInstance().recordMetadata("IsDirty", Boolean.toString(BuildConstants.DIRTY != 0));
     
     if (Constants.getMode() == RobotMode.REAL) {
-      Logger.getInstance().addDataReceiver(new ByteLogReceiver("/home/lvuser")); // Log to home directory
-      Logger.getInstance().addDataReceiver(new LogSocketServer(5800)); // Provide log data over the network, viewable in Advantage Scope.
+      Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
+      Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
     } else if(Constants.getMode() == RobotMode.SIM_REPLAY) {
-      String path = ByteLogReplay.promptForPath(); // Prompt the user for a file path on the command line
-      Logger.getInstance().setReplaySource(new ByteLogReplay(path)); // Read log file for replay
-      Logger.getInstance().addDataReceiver(new ByteLogReceiver(ByteLogReceiver.addPathSuffix(path, "_sim"))); // Save replay results to a new log with the "_sim" suffix
+      String path = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+      Logger.getInstance().setReplaySource(new WPILOGReader(path)); // Read replay log
+      Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(path, "_sim"))); // Save outputs to a new log
     } else { // Probably sim (non-replay)
-      Logger.getInstance().addDataReceiver(new ByteLogReceiver("./")); // Log to current directory
-      Logger.getInstance().addDataReceiver(new LogSocketServer(5800)); // Provide log data over the network, viewable in Advantage Scope.
+      Logger.getInstance().addDataReceiver(new WPILOGWriter("./")); // Log to current directory
+      Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
     }
     
     Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
