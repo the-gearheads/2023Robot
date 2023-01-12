@@ -96,6 +96,7 @@ public class SwerveSubsystem extends SubsystemBase {
     updateInputs();
     odometry.update(gyro.getRotation2d(), getPositionsFromInputs(lastInputs));
     field.setRobotPose(getPose());
+    Logger.getInstance().recordOutput("/Swerve/Pose", getPose());
   }
 
   /**

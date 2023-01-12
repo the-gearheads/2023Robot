@@ -14,6 +14,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import com.pathplanner.lib.server.PathPlannerServer;
 import com.revrobotics.REVPhysicsSim;
 
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -45,6 +46,8 @@ public class Robot extends LoggedRobot {
     Logger.getInstance().recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
     Logger.getInstance().recordMetadata("IsDirty", Boolean.toString(BuildConstants.DIRTY != 0));
     
+    new PowerDistribution();
+
     if (Constants.getMode() == RobotMode.REAL) {
       Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
       Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
