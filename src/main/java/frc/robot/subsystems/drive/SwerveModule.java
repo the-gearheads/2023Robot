@@ -35,11 +35,10 @@ public class SwerveModule implements SwerveModuleIO {
   }
 
   public void setState(SwerveModuleState state) {
-    /* We do offsetting before optimization so the wheel automatically gets reversed when the module is facing backwards */
+    /* We do offsetting before optimization so the wheel automatically gets reversed when the module is facing backwards. Downside: the robot will not work without optimizations enabled. */
     state.angle = state.angle.plus(angleOffset);
-    if(SmartDashboard.getBoolean("/Swerve/PerformOptimizations", true)){
-      state = SwerveModuleState.optimize(state, getAngle());
-    }
+    state = SwerveModuleState.optimize(state, getAngle());
+
     steer.setAngle(state.angle);
     drive.setSpeed(state.speedMetersPerSecond);
   }

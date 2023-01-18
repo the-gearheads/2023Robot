@@ -92,6 +92,13 @@ public class Constants extends AnnotatedClass {
     @NTPublish
     public static double MAX_ROT_VEL = 1;
 
+    @NTPublish
+    public static double MAX_MODULE_SPEED = 2;
+    @NTPublish
+    public static double MAX_TRANSLATIONAL_SPEED = 2;
+    @NTPublish
+    public static double MAX_ROTATIONAL_SPEED = 2;
+
     public static class Auton {
       public static PIDController X_PID = new PIDController(0, 0, 0);
       public static PIDController Y_PID = new PIDController(0, 0, 0);

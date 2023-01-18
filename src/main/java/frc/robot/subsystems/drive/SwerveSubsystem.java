@@ -53,8 +53,7 @@ public class SwerveSubsystem extends SubsystemBase {
     zeroEncoders();
 
     /* Initialize SmartDashboard values */
-    SmartDashboard.putBoolean("/Swerve/PerformOptimizations", true);
-    SmartDashboard.putBoolean("/Swerve/CoolWheelStuff", true);
+    SmartDashboard.putBoolean("/Swerve/DesaturateWheelSpeeds", true);
 
     SmartDashboard.putData(field);
 
@@ -107,6 +106,19 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   /**
+   * Return SwerveModuleStates for all SwerveModuleInputs
+   * @param inputs SwerveModuleInputs containing velocities and angles
+   * @return SwerveModuleStates containing velocities and angles
+   */
+  public SwerveModuleState[] getStatesFromInputs(SwerveModuleInputsAutoLogged[] inputs) {
+    SwerveModuleState states[] = new SwerveModuleState[inputs.length];
+    for (int i = 0; i < inputs.length; i++) {
+      states[i] = new SwerveModuleState(inputs[i].driveVelocity, Rotation2d.fromDegrees(inputs[i].steerAngle));
+    }
+    return states;
+  }
+
+  /**
    * Sets all swerve modules to have the specified velocities and angles
    * @param states
    */
@@ -116,12 +128,20 @@ public class SwerveSubsystem extends SubsystemBase {
     }
   }
 
+  private ChassisSpeeds getChassisSpeeds() {
+    var states = getStatesFromInputs(lastInputs);
+    return kinematics.toChassisSpeeds(states);
+  }
+
   /**
    * Drives the robot at the specified speeds
    * @param speeds Speeds to go
    */
   public void drive(ChassisSpeeds speeds) {
     var states = kinematics.toSwerveModuleStates(speeds);
+    if(SmartDashboard.getBoolean("/Swerve/DesaturateWheelSpeeds", true)) {
+      SwerveDriveKinematics.desaturateWheelSpeeds(states, getChassisSpeeds(), Drivetrain.MAX_MODULE_SPEED, Drivetrain.MAX_TRANSLATIONAL_SPEED, Drivetrain.MAX_ROTATIONAL_SPEED);
+    }
     setStates(states);
   }
 
