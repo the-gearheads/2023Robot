@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import frc.robot.annotations.*;
 
 /**
@@ -40,53 +41,51 @@ public class Constants extends AnnotatedClass {
     }
   }
   public static class Drivetrain {
-    public static int FL_DRIVE_ID = 27;
-    public static int FL_STEER_ID = 34;
-    public static int FR_DRIVE_ID = 15;
-    public static int FR_STEER_ID = 45;
-    public static int RL_DRIVE_ID = 6;
-    public static int RL_STEER_ID = 49;
-    public static int RR_DRIVE_ID = 5;
-    public static int RR_STEER_ID = 50;
+  
+    // Drive, then steer ids
+    public static int[] FL_IDS = {1, 2};
+    public static int[] FR_IDS = {3, 4};
+    public static int[] RL_IDS = {5, 6};
+    public static int[] RR_IDS = {7, 8};
 
-    /* Units per rotation for analog/absolute encoders on Talon SRX */
-    public static double ANALOG_UPR = 1024;
+    // Chassis relative offset (degrees), then duty cycle encoder offset (whatever units they are)
+    public static double[] FL_OFFSETS = {0, 0};
+    public static double[] FR_OFFSETS = {0, 0};
+    public static double[] RL_OFFSETS = {180, 0};
+    public static double[] RR_OFFSETS = {180, 0};
 
-    public static double WHEEL_DIAMETER = (4 * 2.54) / 100; // Convert to meters
+    public static double WHEEL_DIAMETER = Units.inchesToMeters(3);
     public static double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
-    public static double DRIVE_GEAR_RATIO = 6.67/1;
+
+    public static double DRIVE_PINION_TOOTH_COUNT = 14;
+    // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the bevel pinion
+    public static double DRIVE_GEAR_RATIO = (45.0 * 22) / (DRIVE_PINION_TOOTH_COUNT * 15);
+
+    // Throughbore encoder is directly on the output steer shaft
     public static double STEER_GEAR_RATIO = 1;
 
-    public static double STEER_RAMP_RATE = 0.02;
-    public static double DRIVE_RAMP_RATE = 0.15;
+    public static double DRIVE_POS_FACTOR = WHEEL_CIRCUMFERENCE / DRIVE_GEAR_RATIO; // rotations -> gear ratio adjusted rotations -> meters
+    public static double DRIVE_VEL_FACTOR =  WHEEL_CIRCUMFERENCE / DRIVE_GEAR_RATIO / 60.0; // rpm -> gear ratio adjusted rpm -> meters/min -> meters/sec 
 
-    public static double STEER_F = 0.0;
-    @MultiRobotDouble(real=12.5, sim=3.2)
-    public static double STEER_P;
-    public static double STEER_I = 0.0;
-    @MultiRobotDouble(real=0.0, sim=1.0)
-    public static double STEER_D;
+    public static double DRIVE_FREE_SPEED = 5676 * DRIVE_VEL_FACTOR; // Convert max neo free speed to max free wheel speed
 
-    public static double DRIVE_KS = 0.18;
-    public static double DRIVE_KV = 2.7;
-    public static double DRIVE_KA = 0.35632;
+    public static double STEER_POS_FACTOR = 2 * Math.PI; // rotations -> radians
+    public static double STEER_VEL_FACTOR = 2 * Math.PI * 60; // rpm -> rad/sec
 
-    public static double DRIVE_P = 0.5;
-    public static double DRIVE_I = 0.6;
-    public static double DRIVE_D = 0.0;
+    public static int DRIVE_CURRENT_LIMIT = 40;
+    public static int STEER_CURRENT_LIMIT = 20;
 
-    public static Pose2d zeroPos = new Pose2d(0,0,new Rotation2d(0));
+    // order: p, i, d, f
+    public static double[] DRIVE_PIDF = {0.04, 0, 0, 1 / DRIVE_FREE_SPEED};
+    public static double[] STEER_PIDF = {1, 0, 0, 0};
+
+    public static Pose2d zeroPos = new Pose2d(0, 0, new Rotation2d(0));
     public static Transform2d zeroTransform = new Transform2d(new Translation2d(0,0), new Rotation2d(0));
 
     public static Translation2d FL_POS = new Translation2d(0.3, 0.55/2);
     public static Translation2d FR_POS = new Translation2d(0.3, -0.55/2);
     public static Translation2d RL_POS = new Translation2d(-0.3, 0.55/2);
     public static Translation2d RR_POS = new Translation2d(-0.3, -0.55/2);
-
-    public static Rotation2d FL_OFFSET = Rotation2d.fromDegrees((611.718+362)%360); 
-    public static Rotation2d FR_OFFSET = Rotation2d.fromDegrees((612.77+355)%360);
-    public static Rotation2d RL_OFFSET = Rotation2d.fromDegrees((472.85)%360);
-    public static Rotation2d RR_OFFSET = Rotation2d.fromDegrees((684.5+554+367)%360);
 
     @NTPublish
     public static double MAX_LIN_VEL = 2;//set to 2

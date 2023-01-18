@@ -19,7 +19,6 @@ import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.drive.SwerveModule;
 import frc.robot.subsystems.drive.SwerveModuleIO;
-import frc.robot.subsystems.drive.SwerveModuleSim;
 import frc.robot.subsystems.vision.Vision;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -43,26 +42,20 @@ public class RobotContainer {
     switch(Constants.getMode()) {
       case SIM:
         SmartDashboard.putString("/Mode", "SIM");
-        swerveSubsystem = new SwerveSubsystem(
-          new SwerveModuleSim(Drivetrain.FL_DRIVE_ID, Drivetrain.FL_STEER_ID, Drivetrain.FL_OFFSET, true, 0,  "FL"),
-          new SwerveModuleSim(Drivetrain.FR_DRIVE_ID, Drivetrain.FR_STEER_ID, Drivetrain.FR_OFFSET, true, 1,  "FR"),
-          new SwerveModuleSim(Drivetrain.RL_DRIVE_ID, Drivetrain.RL_STEER_ID, Drivetrain.RL_OFFSET, false, 2, "RL"),
-          new SwerveModuleSim(Drivetrain.RR_DRIVE_ID, Drivetrain.RR_STEER_ID, Drivetrain.RR_OFFSET, false, 3, "RR")
-        );
-      break;
-      case SIM_REPLAY:
-        SmartDashboard.putString("/Mode", "SIM_REPLAY");
-        swerveSubsystem = new SwerveSubsystem(new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {});
-        break;
+        // removed for now
       default:
       case REAL:
         SmartDashboard.putString("/Mode", "REAL");
         swerveSubsystem = new SwerveSubsystem(
-          new SwerveModule(Drivetrain.FL_DRIVE_ID, Drivetrain.FL_STEER_ID, Drivetrain.FL_OFFSET, true, 0,  "FL"),
-          new SwerveModule(Drivetrain.FR_DRIVE_ID, Drivetrain.FR_STEER_ID, Drivetrain.FR_OFFSET, true, 1,  "FR"),
-          new SwerveModule(Drivetrain.RL_DRIVE_ID, Drivetrain.RL_STEER_ID, Drivetrain.RL_OFFSET, false, 2, "RL"),
-          new SwerveModule(Drivetrain.RR_DRIVE_ID, Drivetrain.RR_STEER_ID, Drivetrain.RR_OFFSET, false, 3, "RR")
+          new SwerveModule(0, Drivetrain.FL_IDS[0], Drivetrain.FL_IDS[1], Drivetrain.FL_OFFSETS, "FL"),
+          new SwerveModule(1, Drivetrain.FR_IDS[0], Drivetrain.FR_IDS[1], Drivetrain.FR_OFFSETS, "FR"),
+          new SwerveModule(2, Drivetrain.RL_IDS[0], Drivetrain.RL_IDS[1], Drivetrain.RL_OFFSETS, "RL"),
+          new SwerveModule(3, Drivetrain.RR_IDS[0], Drivetrain.RR_IDS[1], Drivetrain.RR_OFFSETS, "RR")
         );
+        break;
+        case SIM_REPLAY:
+          SmartDashboard.putString("/Mode", "SIM_REPLAY");
+          swerveSubsystem = new SwerveSubsystem(new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {});
         break;
     }
 

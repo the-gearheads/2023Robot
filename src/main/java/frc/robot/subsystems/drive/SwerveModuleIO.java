@@ -9,14 +9,14 @@ public interface SwerveModuleIO {
     public double driveAppliedVolts;
     public double drivePosition;
     public double driveVelocity;
+    public double driveVelocitySetpoint;
 
     public String description;
 
     public double steerAppliedVolts;
     public double steerVelocity;
-    public double currentAngle;
-    public double targetAngle;
-    public double targetVelocity;
+    public double steerAngle;
+    public double steerAngleSetpoint;
   }
 
   public default void setState(SwerveModuleState state) {}

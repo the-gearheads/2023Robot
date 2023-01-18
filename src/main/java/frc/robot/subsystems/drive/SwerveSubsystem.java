@@ -20,7 +20,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -62,11 +61,6 @@ public class SwerveSubsystem extends SubsystemBase {
     SmartDashboard.putData("xPid", Drivetrain.Auton.X_PID);
     SmartDashboard.putData("yPid", Drivetrain.Auton.Y_PID);
     SmartDashboard.putData("rotPid", Drivetrain.Auton.ROT_PID);
-
-    for(int i = 0; i < modules.length; i++) { 
-      SmartDashboard.putData(modules[i].getPath(), (Sendable)modules[i]);
-    }
-
   }
 
   /**
@@ -107,7 +101,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveModulePosition[] getPositionsFromInputs(SwerveModuleInputsAutoLogged[] inputs) {
     SwerveModulePosition states[] = new SwerveModulePosition[inputs.length];
     for (int i = 0; i < inputs.length; i++) {
-      states[i] = new SwerveModulePosition(inputs[i].drivePosition, Rotation2d.fromDegrees(inputs[i].currentAngle));
+      states[i] = new SwerveModulePosition(inputs[i].drivePosition, Rotation2d.fromDegrees(inputs[i].steerAngle));
     }
     return states;
   }
@@ -123,39 +117,11 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Like setStates, but will optimize the states before setting them if optimizations are enabled.
-   * @param states States to set
-   */
-  public void setStatesOptimized(SwerveModuleState[] states) {
-    if(SmartDashboard.getBoolean("/Swerve/PerformOptimizations", true)){
-      states = optimize(states);
-    }
-    setStates(states);
-  }
-
-  /**
-   * Optimizes swerve module states to determine whether it's worth it to flip the wheel or go the full way,
-   * based on current module positions. 
-   * @param states States you wish to optimize
-   * @return
-   */
-  public SwerveModuleState[] optimize(SwerveModuleState[] states) {
-    SwerveModuleState[] optimizedStates = new SwerveModuleState[modules.length];
-    for (int i = 0; i < modules.length; i++) {
-      optimizedStates[i] = SwerveModuleState.optimize(states[i], Rotation2d.fromDegrees(lastInputs[i].currentAngle));
-    }
-    return optimizedStates;
-  }
-
-  /**
    * Drives the robot at the specified speeds
    * @param speeds Speeds to go
    */
   public void drive(ChassisSpeeds speeds) {
     var states = kinematics.toSwerveModuleStates(speeds);
-    if(SmartDashboard.getBoolean("/Swerve/PerformOptimizations", true)){
-      states = optimize(states);
-    }
     setStates(states);
   }
 
@@ -224,7 +190,7 @@ public class SwerveSubsystem extends SubsystemBase {
             (PIDController) SmartDashboard.getData("xPid"), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
             (PIDController) SmartDashboard.getData("yPid"), // Y controller (usually the same values as X controller)
             (PIDController) SmartDashboard.getData("rotPid"), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
-            this::setStatesOptimized, // Module states consumer
+            this::setStates, // Module states consumer
             this // Requires this drive subsystem
         ),
         new InstantCommand(() -> {
