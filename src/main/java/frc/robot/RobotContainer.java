@@ -14,7 +14,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.commands.TeleopDrive;
-import frc.robot.commands.VisionServoDebug;
+import frc.robot.commands.vision.TrackAprilTags;
+import frc.robot.commands.vision.UpdatePoseEstimator;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.drive.SwerveModule;
@@ -60,7 +61,7 @@ public class RobotContainer {
     }
 
     swerveSubsystem.setDefaultCommand(new TeleopDrive(swerveSubsystem));
-    vision.setDefaultCommand(new VisionServoDebug(vision, swerveSubsystem));
+    vision.setDefaultCommand(new UpdatePoseEstimator(vision, swerveSubsystem));
     // Configure the button bindings
     updateControllers();
   }

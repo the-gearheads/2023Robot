@@ -12,6 +12,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -28,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Drivetrain;
+import frc.robot.util.AdditionalMathUtils;
 import frc.robot.util.Gyroscope;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -37,7 +39,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveModuleIO[] modules;
   public SwerveModuleInputsAutoLogged[] lastInputs;
   Gyroscope gyro = new Gyroscope(SPI.Port.kMXP, true);
-  SwerveDriveOdometry odometry;
+  SwerveDrivePoseEstimator odometry;
   Field2d field = new Field2d();
 
   /** Creates a new SwerveSubsystem. */
@@ -48,12 +50,12 @@ public class SwerveSubsystem extends SubsystemBase {
     /* Get module states to pass to odometry */
     updateInputs();
     var states = getPositionsFromInputs(lastInputs);
-    odometry = new SwerveDriveOdometry(kinematics, gyro.getRotation2d(), states);
+    odometry = new SwerveDrivePoseEstimator(kinematics, gyro.getRotation2d(), states, new Pose2d());
 
     zeroEncoders();
 
     /* Initialize SmartDashboard values */
-    SmartDashboard.putBoolean("/Swerve/DesaturateWheelSpeeds", true);
+    SmartDashboard.putBoolean("/Swerve/DesaturateWheelSpeeds", false);
 
     SmartDashboard.putData(field);
 
@@ -175,7 +177,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @return Current robot pose, as reported by odometry
    */
   public Pose2d getPose(){ 
-      return odometry.getPoseMeters();
+      return odometry.getEstimatedPosition();
   }
 
   public double getContinuousGyroAngle(){
@@ -194,6 +196,13 @@ public class SwerveSubsystem extends SubsystemBase {
       modules[i].setPIDConstants(kF, kP, kI, kD);
     }
   }
+
+  public void updateVisionMeasurement(Pose2d visionRobotPos, double timestamp){
+    // visionRobotPos=new Pose2d(visionRobotPos.getTranslation(), gyro.getRotation2d());
+    odometry.addVisionMeasurement(visionRobotPos, timestamp);
+    SmartDashboard.putString("Vision/Vision Estimated Pos", AdditionalMathUtils.pos2dToString(visionRobotPos, 2));
+  }
+
 
   /**
    * Generates a command that will follow a given trajectory
