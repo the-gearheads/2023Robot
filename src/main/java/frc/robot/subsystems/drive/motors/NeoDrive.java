@@ -47,7 +47,7 @@ public class NeoDrive {
 
   public void setSpeed(double speed) {
     setpoint = speed;
-    pid.setReference(speed, ControlType.kVelocity);
+    pid.setReference(speed, CANSparkMax.ControlType.kVelocity);
   }
 
   public void zeroEncoders() {

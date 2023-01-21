@@ -90,6 +90,13 @@ public class SwerveSubsystem extends SubsystemBase {
     odometry.update(gyro.getRotation2d(), getPositionsFromInputs(lastInputs));
     field.setRobotPose(getPose());
     Logger.getInstance().recordOutput("/Swerve/Pose", getPose());
+    var speeds = getChassisSpeeds();
+    Logger.getInstance().recordOutput("/Swerve/ChassisSpeeds/Vx", speeds.vxMetersPerSecond);
+    Logger.getInstance().recordOutput("/Swerve/ChassisSpeeds/Vy", speeds.vyMetersPerSecond);
+    Logger.getInstance().recordOutput("/Swerve/ChassisSpeeds/Rot", speeds.omegaRadiansPerSecond);
+
+    var states = getStatesFromInputs(lastInputs);
+    Logger.getInstance().recordOutput("/Swerve/ModuleStates", states);
   }
 
   /**

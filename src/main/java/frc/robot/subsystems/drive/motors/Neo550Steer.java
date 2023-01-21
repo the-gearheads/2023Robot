@@ -67,7 +67,7 @@ public class Neo550Steer {
 
   public void setAngle(Rotation2d angle) {
     setpoint = angle; 
-    pid.setReference(angle.getRadians(), ControlType.kPosition);
+    pid.setReference(angle.getRadians(), CANSparkMax.ControlType.kPosition);
   }
 
   public Rotation2d getAngle() {
