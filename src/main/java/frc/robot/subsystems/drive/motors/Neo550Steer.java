@@ -9,21 +9,27 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.Drivetrain;
+import frc.robot.util.SendableSparkMaxPID;
 
 public class Neo550Steer {
 
   CANSparkMax max;
   SparkMaxPIDController pid;
+  SendableSparkMaxPID sPid;
   SparkMaxAbsoluteEncoder encoder;
+  String path;
 
   double dutyCycleOffset;
-  Rotation2d setpoint;
+  Rotation2d setpoint = new Rotation2d();
 
-  public Neo550Steer(int id, double dutyCycleOffset) {
+  public Neo550Steer(int id, double dutyCycleOffset, String path) {
     this.dutyCycleOffset = dutyCycleOffset;
+    this.path = path;
     max = new CANSparkMax(id, MotorType.kBrushless);
     pid = max.getPIDController();
+    sPid = new SendableSparkMaxPID(pid);
     encoder = max.getAbsoluteEncoder(Type.kDutyCycle);
     configure();
   }
@@ -37,12 +43,17 @@ public class Neo550Steer {
     encoder.setPositionConversionFactor(Drivetrain.STEER_POS_FACTOR);
     encoder.setVelocityConversionFactor(Drivetrain.STEER_VEL_FACTOR);
 
+    // MaxSwerve steering encoder is inverted
+    encoder.setInverted(true);
+
     pid.setFeedbackDevice(encoder);
 
-    pid.setP(Drivetrain.STEER_PIDF[0]);
-    pid.setI(Drivetrain.STEER_PIDF[1]);
-    pid.setD(Drivetrain.STEER_PIDF[2]);
-    pid.setFF(Drivetrain.STEER_PIDF[3]);
+    sPid.setP(Drivetrain.STEER_PIDF[0]);
+    sPid.setI(Drivetrain.STEER_PIDF[1]);
+    sPid.setD(Drivetrain.STEER_PIDF[2]);
+    sPid.setFF(Drivetrain.STEER_PIDF[3]);
+
+    SmartDashboard.putData(path + "/SteerPid", sPid);
 
     /* Probably the default */
     pid.setOutputRange(-1, 1);

@@ -100,7 +100,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveModulePosition[] getPositionsFromInputs(SwerveModuleInputsAutoLogged[] inputs) {
     SwerveModulePosition states[] = new SwerveModulePosition[inputs.length];
     for (int i = 0; i < inputs.length; i++) {
-      states[i] = new SwerveModulePosition(inputs[i].drivePosition, Rotation2d.fromDegrees(inputs[i].steerAngle));
+      states[i] = new SwerveModulePosition(inputs[i].drivePosition, Rotation2d.fromRadians(inputs[i].steerAngle));
     }
     return states;
   }
@@ -113,7 +113,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveModuleState[] getStatesFromInputs(SwerveModuleInputsAutoLogged[] inputs) {
     SwerveModuleState states[] = new SwerveModuleState[inputs.length];
     for (int i = 0; i < inputs.length; i++) {
-      states[i] = new SwerveModuleState(inputs[i].driveVelocity, Rotation2d.fromDegrees(inputs[i].steerAngle));
+      states[i] = new SwerveModuleState(inputs[i].driveVelocity, Rotation2d.fromRadians(inputs[i].steerAngle));
     }
     return states;
   }

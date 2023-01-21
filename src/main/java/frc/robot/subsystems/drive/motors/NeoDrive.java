@@ -8,11 +8,13 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import frc.robot.Constants.Drivetrain;
+import frc.robot.util.SendableSparkMaxPID;
 
 public class NeoDrive {
   CANSparkMax max;
   RelativeEncoder encoder;
   SparkMaxPIDController pid;
+  SendableSparkMaxPID sPid;
 
   double setpoint;
 
@@ -20,6 +22,7 @@ public class NeoDrive {
     max = new CANSparkMax(id, MotorType.kBrushless);
     encoder = max.getEncoder();
     pid = max.getPIDController();
+    sPid = new SendableSparkMaxPID(pid);
     configure();
   }
 
@@ -33,10 +36,10 @@ public class NeoDrive {
 
     pid.setFeedbackDevice(encoder);
 
-    pid.setP(Drivetrain.DRIVE_PIDF[0]);
-    pid.setI(Drivetrain.DRIVE_PIDF[1]);
-    pid.setD(Drivetrain.DRIVE_PIDF[2]);
-    pid.setFF(Drivetrain.DRIVE_PIDF[3]);
+    sPid.setP(Drivetrain.DRIVE_PIDF[0]);
+    sPid.setI(Drivetrain.DRIVE_PIDF[1]);
+    sPid.setD(Drivetrain.DRIVE_PIDF[2]);
+    sPid.setFF(Drivetrain.DRIVE_PIDF[3]);
 
     // Probably the default
     pid.setOutputRange(-1, 1);

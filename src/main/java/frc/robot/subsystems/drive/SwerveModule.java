@@ -2,9 +2,6 @@ package frc.robot.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drive.motors.Neo550Steer;
 import frc.robot.subsystems.drive.motors.NeoDrive;
 
@@ -19,11 +16,11 @@ public class SwerveModule implements SwerveModuleIO {
   public String description;
 
   public SwerveModule(int id, int driveId, int steerId, double[] offsets, String description) {
-    drive = new NeoDrive(driveId);
-    steer = new Neo550Steer(steerId, offsets[1]);
     this.id = id;
     this.description = description;
     this.angleOffset = Rotation2d.fromDegrees(offsets[0]);
+    drive = new NeoDrive(driveId);
+    steer = new Neo550Steer(steerId, offsets[1], getPath());
   }
 
   public void zeroEncoders() {
@@ -31,7 +28,7 @@ public class SwerveModule implements SwerveModuleIO {
   }
 
   private Rotation2d getAngle() {
-    return steer.getAngle().minus(angleOffset);
+    return new Rotation2d(steer.getAngle().getRadians() - angleOffset.getRadians());
   }
 
   public void setState(SwerveModuleState state) {
@@ -57,9 +54,9 @@ public class SwerveModule implements SwerveModuleIO {
     inputs.driveVelocitySetpoint = drive.getVelocitySetpoint();
 
     inputs.steerAppliedVolts = steer.getAppliedVolts();
-    inputs.steerAngle = getAngle().getDegrees();
+    inputs.steerAngle = getAngle().getRadians();
     inputs.steerVelocity = steer.getVelocity();
-    inputs.steerAngleSetpoint = steer.getAngleSetpoint().getDegrees();
+    inputs.steerAngleSetpoint = steer.getAngleSetpoint().getRadians();
   }
 
   public String getDescription() {

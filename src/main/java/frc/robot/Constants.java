@@ -50,7 +50,7 @@ public class Constants extends AnnotatedClass {
 
     // Chassis relative offset (degrees), then duty cycle encoder offset (whatever units they are)
     public static double[] FL_OFFSETS = {0, 0};
-    public static double[] FR_OFFSETS = {0, 0};
+    public static double[] FR_OFFSETS = {0, 0.188};
     public static double[] RL_OFFSETS = {180, 0};
     public static double[] RR_OFFSETS = {180, 0};
 
