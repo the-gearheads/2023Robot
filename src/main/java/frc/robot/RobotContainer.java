@@ -4,11 +4,16 @@
 
 package frc.robot;
 
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,14 +42,21 @@ public class RobotContainer {
   private final SwerveSubsystem swerveSubsystem;
   private final Vision vision = new Vision();
 
+  public String readPipelineFile() {
+    try {
+      return Files.readString(Paths.get(Filesystem.getDeployDirectory().getAbsolutePath(), "streampath.json"), Charset.forName("UTF-8"));
+    } catch (Exception e) {
+      e.printStackTrace();
+      return "";
+    }
+  }
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure default teleop command
+    // Ideally, we publish this from vision-testing, but this is fine for now. In a deploy file because escaping quotation marks is ugly and annoying
+    NetworkTableInstance.getDefault().getStringTopic("/VisionTestingPipeline").publish().set(readPipelineFile());
     switch(Constants.getMode()) {
-      case SIM:
-        SmartDashboard.putString("/Mode", "SIM");
-        // removed for now
-      default:
       case REAL:
         SmartDashboard.putString("/Mode", "REAL");
         swerveSubsystem = new SwerveSubsystem(
@@ -54,6 +66,7 @@ public class RobotContainer {
           new SwerveModule(3, Drivetrain.RR_IDS[0], Drivetrain.RR_IDS[1], Drivetrain.RR_OFFSETS, "RR")
         );
         break;
+        default:
         case SIM_REPLAY:
           SmartDashboard.putString("/Mode", "SIM_REPLAY");
           swerveSubsystem = new SwerveSubsystem(new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {});
