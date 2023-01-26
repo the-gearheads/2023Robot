@@ -33,6 +33,9 @@ public class NeoDrive {
     encoder.setPositionConversionFactor(Drivetrain.DRIVE_POS_FACTOR);
     encoder.setVelocityConversionFactor(Drivetrain.DRIVE_VEL_FACTOR);
 
+    // TODO: 1) check if this is too noisy 2) check if this impacts other robot code that deals with encoder velocities
+    encoder.setMeasurementPeriod(10);
+
     pid.setFeedbackDevice(encoder);
 
     sPid.setP(Drivetrain.DRIVE_PIDF[0]);

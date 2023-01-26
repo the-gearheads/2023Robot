@@ -205,6 +205,26 @@ public class SwerveSubsystem extends SubsystemBase {
     }
   }
 
+  /* Gets drive motor voltages in a way that would make sense for a differential drive */
+  public double[] getDiffVoltages() {
+    return new double[] {lastInputs[0].driveAppliedVolts, lastInputs[1].driveAppliedVolts};
+  }
+
+  /* Gets drive motor positions in a way that would make sense for a differential drive */
+  public double[] getDiffPositions() {
+    return new double[] { lastInputs[0].drivePosition, lastInputs[1].drivePosition};
+  }
+    
+  /* Gets drive motor velocities in a way that would make sense for a differential drive */
+  public double[] getDiffVelocities() {
+    return new double[] { lastInputs[0].driveVelocity, lastInputs[1].driveVelocity};
+  }
+
+  /* Returns Z axis rotation speed in degrees per second */
+  public double getAngularVel() {
+    return gyro.getRate();
+  }
+  
   /**
    * Gets current odometry pose
    * @return Current robot pose, as reported by odometry
