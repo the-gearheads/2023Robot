@@ -49,6 +49,11 @@ public class NeoDrive {
     pid.setReference(speed, CANSparkMax.ControlType.kVelocity);
   }
 
+  /* Please work */
+  public void setVoltage(double volts) {
+    pid.setReference(volts, CANSparkMax.ControlType.kVoltage);
+  }
+
   public void zeroEncoders() {
     encoder.setPosition(0);
   }

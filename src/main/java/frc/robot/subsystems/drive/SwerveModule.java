@@ -31,6 +31,16 @@ public class SwerveModule implements SwerveModuleIO {
     return new Rotation2d(steer.getAngle().getRadians() - angleOffset.getRadians());
   }
 
+  /* Directly sets module angle */
+  public void setAngle(Rotation2d newAngle) {
+    steer.setAngle(newAngle.plus(angleOffset));
+  }
+
+  /* Directly sets drive motor volts, ignoring pid */
+  public void setVoltage(double volts) {
+    drive.setVoltage(volts);
+  }
+
   public void setState(SwerveModuleState state) {
     /* We do offsetting before optimization so the wheel automatically gets reversed when the module is facing backwards. Downside: the robot will not work without optimizations enabled. */
     state.angle = state.angle.plus(angleOffset);

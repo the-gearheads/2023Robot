@@ -172,6 +172,39 @@ public class SwerveSubsystem extends SubsystemBase {
     odometry.resetPosition(gyro.getRotation2d(), getPositionsFromInputs(lastInputs), pose);
   }
 
+  /* Sets all modules to zero degrees */
+  public void zeroAngles() {
+    for(var module: modules) {
+      module.setAngle(new Rotation2d(0));
+    }
+  }
+
+  /* Sets all modules into an X formation (and stops driving) */
+  public void setX() {
+    setStates(new SwerveModuleState[] {
+      // FL
+      new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+      // FR
+      new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+      // RL
+      new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+      // RR
+      new SwerveModuleState(0, Rotation2d.fromDegrees(-45))
+    });
+  }
+
+  /* Sets volts in a way that makes it drive like a differential drive */
+  public void setVolts(double leftVolts, double rightVolts) {
+    for(int i = 0; i < modules.length; i++) {
+      // If i is divisible by 2, it is on the left (because order is FL, FR, RL, RR). 0 is divisible by 2 in this implementation.
+      if(i % 2 == 0) {
+        modules[i].setVoltage(leftVolts);
+      } else {
+        modules[i].setVoltage(rightVolts);
+      }
+    }
+  }
+
   /**
    * Gets current odometry pose
    * @return Current robot pose, as reported by odometry
