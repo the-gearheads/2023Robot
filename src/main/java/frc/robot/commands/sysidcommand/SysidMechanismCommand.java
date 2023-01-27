@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.sysidcommand;
 
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Threads;
@@ -6,17 +6,17 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import java.util.ArrayList;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 import frc.robot.Robot;
-import frc.robot.subsystems.drive.SwerveSubsystem;
 
 // This is going to be slightly weird
-public class SysidCommand extends CommandBase {
-  private SwerveSubsystem drive;
+public class SysidMechanismCommand extends CommandBase {
   private ArrayList<Double> data = new ArrayList<Double>();
   /* If the test is dynamic, false if quasistatic */
   private boolean isDynamicTest;
-  /* Whether to rotate or not when doing the test */
-  private boolean rotateInTest;
+
   /* Multiplied by time for quasistatic, voltage to set for dynamic */
   private double voltCommand;
   private boolean isWrongMech;
@@ -28,10 +28,19 @@ public class SysidCommand extends CommandBase {
 
   private final int maxCapacity = 36000;
 
-  // Runs as teleop, tries to emulate the sysid interface. Note: may have potential issues due to other robot code running and taking up processing time
-  public SysidCommand(SwerveSubsystem drive) {
-    addRequirements(drive);
-    this.drive = drive;
+  private Runnable zeroEncoder;
+  private Supplier<Double> getVoltage, getVelocity, getPosition;
+  private Consumer<Double> setVoltage;
+
+
+  // Runs as auton, tries to emulate the sysid interface. Note: may have potential issues due to other robot code running and taking up processing time
+  public SysidMechanismCommand(Runnable zeroEncoder, Supplier<Double> getVoltage, Supplier<Double> getVelocity, Supplier<Double> getPosition, Consumer<Double> setVoltage) {
+
+    this.zeroEncoder = zeroEncoder;
+    this.getVelocity = getVelocity;
+    this.getPosition = getPosition;
+    this.setVoltage = setVoltage;
+    this.getVoltage = getVoltage;
 
     // Realtime priorities
     if(Robot.isReal()) {
@@ -44,15 +53,17 @@ public class SysidCommand extends CommandBase {
     data.ensureCapacity(maxCapacity);
 
     this.isDynamicTest = SmartDashboard.getString("/SysIdTestType", "") == "Dynamic";
-    this.rotateInTest = SmartDashboard.getBoolean("/SysIdRotate", false);
     this.voltCommand = SmartDashboard.getNumber("/SysIdVoltageCommand", 0);
-    this.isWrongMech = !SmartDashboard.getString("SysIdTest", "").contains("Drivetrain");
-    SmartDashboard.putBoolean("/SysIdWrongMech", isWrongMech);
+
     SmartDashboard.putNumber("/SysIdAckNumber", ackNum);
-  
+
+    var test = SmartDashboard.getString("SysIdTest", "");
+    this.isWrongMech = test.contains("Drivetrain");
+    SmartDashboard.putBoolean("/SysIdWrongMech", isWrongMech);
+
     this.startTime = Timer.getFPGATimestamp();
 
-    drive.zeroEncoders();
+    this.zeroEncoder.run();
   }
 
   @Override
@@ -66,26 +77,14 @@ public class SysidCommand extends CommandBase {
     } else {
       targetVolts = voltCommand * (Timer.getFPGATimestamp() - startTime);
     }
-    drive.setVolts(targetVolts * (rotateInTest ? -1 : 1), targetVolts);
-
-
-    var voltages = drive.getDiffVoltages();
-    var velocities = drive.getDiffVelocities();
-    var positions = drive.getDiffPositions();
+    setVoltage.accept(targetVolts);
 
     // Logging!
     data.add(Timer.getFPGATimestamp());
     // Note: due to our implementation this is probably behind by one periodic, and then maybe more if we're counting latency in other areas
-    data.add(voltages[0]);
-    data.add(voltages[1]);
-
-    data.add(positions[0]);
-    data.add(positions[1]);
-
-    data.add(velocities[0]);
-    data.add(velocities[1]);
-    data.add(drive.getContinuousGyroAngle());
-    data.add(drive.getAngularVel());
+    data.add(getVoltage.get());
+    data.add(getPosition.get());
+    data.add(getVelocity.get());
   }
 
   @Override
@@ -98,7 +97,7 @@ public class SysidCommand extends CommandBase {
     StringBuilder outputString = new StringBuilder();
     outputString.ensureCapacity(maxCapacity + 50);
     outputString.append(isDynamicTest ? "fast" : "slow");
-    outputString.append(voltCommand > 0 ? "-forward;": "-backward;");
+    outputString.append(voltCommand > 0 ? "-forward;" : "-backward;");
     for(var entry: data) {
       outputString.append(entry);
     }
@@ -106,6 +105,4 @@ public class SysidCommand extends CommandBase {
     SmartDashboard.putString("/SysIdTelemetry", outputString.toString());
     SmartDashboard.putNumber("/SysIdAckNumber", ++ackNum);
   }
-
-  
 }

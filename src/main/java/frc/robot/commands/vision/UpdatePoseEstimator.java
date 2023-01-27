@@ -33,8 +33,10 @@ public class UpdatePoseEstimator extends CommandBase {
   @Override
   public void execute() {
     boolean isAprilTagInView = vision.isConnected() && vision.hasTargets();
+
     if (isAprilTagInView) {
       Optional<EstimatedRobotPose> visionResult = vision.getEstimatedGlobalPos(swerveSubsystem.getPose());
+  
       if (Vision.isEstimatedRobotPosPresent(visionResult)) {
         Pose2d estimatedRobotPos = visionResult.get().estimatedPose.toPose2d();
         double timestamp = visionResult.get().timestampSeconds;
