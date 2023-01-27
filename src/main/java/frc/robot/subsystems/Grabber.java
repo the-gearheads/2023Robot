@@ -4,23 +4,20 @@
 
 package frc.robot.subsystems;
 
-import java.sql.Driver;
-
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Grabber extends SubsystemBase {
   public enum GrabberState {
-  OPEN, 
-  GRABBING_CUBE, // right soleniodeed is extended uwo
-  GRABBING_CONE; // Both soliendoed extended
+    OPEN, 
+    GRABBING_CUBE, // right soleniodeed is extended uwo
+    GRABBING_CONE; // Both soliendoed extended
   }
 
   GrabberState grabberState=GrabberState.OPEN;
   Solenoid right = new Solenoid(PneumaticsModuleType.REVPH, 0);
-  Solenoid left = new Solenoid(PneumaticsModuleType.REVPH, 01);
+  Solenoid left = new Solenoid(PneumaticsModuleType.REVPH, 1);
   /** Creates a new Grabber. */
   public Grabber() {}
 
@@ -29,12 +26,13 @@ public class Grabber extends SubsystemBase {
     left.set(true);
     grabberState=GrabberState.GRABBING_CONE;
   }
+
   public void grabCube() {
     right.set(true);
     left.set(false);
     grabberState = GrabberState.GRABBING_CUBE;
   }
-  
+
   public void open() {
     right.set(false);
     left.set(false);

@@ -6,10 +6,8 @@ package frc.robot.commands.vision;
 
 import java.util.Optional;
 
-import org.opencv.aruco.EstimateParameters;
 import org.photonvision.EstimatedRobotPose;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.drive.SwerveSubsystem;
@@ -24,7 +22,6 @@ public class UpdatePoseEstimator extends CommandBase {
     this.vision=vision;
     this.swerveSubsystem=swerveSubsystem;
     addRequirements(vision);
-    // Use addRequirements() here to declare subsystem dependencies.
   }
   
   // Called when the command is initially scheduled.
@@ -35,13 +32,12 @@ public class UpdatePoseEstimator extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    boolean isAprilTagInView = vision.isConnected()&&vision.hasTargets();
-    if(isAprilTagInView){
-      //update swerve pos estimator
+    boolean isAprilTagInView = vision.isConnected() && vision.hasTargets();
+    if (isAprilTagInView) {
       Optional<EstimatedRobotPose> visionResult = vision.getEstimatedGlobalPos(swerveSubsystem.getPose());
-      if(Vision.isEstimatedRobotPosPresent(visionResult)){
-        Pose2d estimatedRobotPos=visionResult.get().estimatedPose.toPose2d();
-        double timestamp=visionResult.get().timestampSeconds;
+      if (Vision.isEstimatedRobotPosPresent(visionResult)) {
+        Pose2d estimatedRobotPos = visionResult.get().estimatedPose.toPose2d();
+        double timestamp = visionResult.get().timestampSeconds;
         swerveSubsystem.updateVisionMeasurement(estimatedRobotPos, timestamp);
       }
     }
