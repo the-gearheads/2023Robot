@@ -4,15 +4,13 @@
 
 package frc.robot.commands.vision;
 
-import edu.wpi.first.math.Drake;
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
+
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
-import frc.robot.Constants.Drivetrain;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.vision.CamServo;
 import frc.robot.subsystems.vision.Vision;
@@ -40,25 +38,30 @@ public class TrackAprilTags extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    boolean isAprilTagInView = vision.isConnected()&&vision.hasTargets();
-    if(isAprilTagInView){
-      //update swerve pos estimator
-      Pair<Pose2d, Double> visionResult = vision.getEstimatedGlobalPos(swerveSubsystem.getPose());
-      swerveSubsystem.updateVisionMeasurement(visionResult.getFirst(), visionResult.getSecond());
+    boolean isAprilTagInView = vision.isConnected() && vision.hasTargets();
+    if (isAprilTagInView) {
+      // Update swerve pos estimator
+      Optional<EstimatedRobotPose> visionResult = vision.getEstimatedGlobalPos(swerveSubsystem.getPose());
 
-      //follow april tag
-      double aprilTagAngleInFrame=visionResult.getFirst().getRotation().getDegrees();
-      double desiredServoAngle = camServo.getCurrentAngle()-aprilTagAngleInFrame;
-      desiredServoAngle=MathUtil.clamp(desiredServoAngle, 0, 180);
-      // camServo.setGoal(desiredServoAngle);
+      if(Vision.isEstimatedRobotPosPresent(visionResult)){
+        Pose2d estimatedRobotPos = visionResult.get().estimatedPose.toPose2d();
+        double timestamp = visionResult.get().timestampSeconds;
+        swerveSubsystem.updateVisionMeasurement(estimatedRobotPos, timestamp);
+
+        //follow april tag
+        double aprilTagAngleInFrame = estimatedRobotPos.getRotation().getDegrees();
+        double desiredServoAngle = camServo.getCurrentAngle() - aprilTagAngleInFrame;
+        desiredServoAngle = MathUtil.clamp(desiredServoAngle, 0, 180);
+      }
+      
     }else{
       // wander();
     }
   }
 
   public void wander(){
-    if(Math.abs(camServo.getGoal()-camServo.getCurrentAngle()) < 1e-1){
-      double nextCommmandedAngle=MathUtil.applyDeadband(camServo.getGoal()-180,1e-1)==0?0:180;
+    if (Math.abs(camServo.getGoal() - camServo.getCurrentAngle()) < 1e-1){
+      double nextCommmandedAngle = MathUtil.applyDeadband(camServo.getGoal() - 180, 1e-1) == 0 ? 0 : 180;
       camServo.setGoal(nextCommmandedAngle);
     }
   }

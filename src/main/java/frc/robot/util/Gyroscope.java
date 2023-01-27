@@ -32,4 +32,9 @@ public class Gyroscope extends AHRS{
         double direction = isInverted ? -1 : 1;
         return direction * super.getAngle();
     }
+
+    public double getRate() {
+        double direction = isInverted ? -1 : 1;
+        return direction * super.getRate();
+    }
 }

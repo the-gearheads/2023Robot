@@ -1,6 +1,8 @@
 package frc.robot.subsystems.drive;
 
 import org.littletonrobotics.junction.AutoLog;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 public interface SwerveModuleIO {
@@ -22,6 +24,8 @@ public interface SwerveModuleIO {
   public default void setState(SwerveModuleState state) {}
   public default void zeroEncoders() {}
   public default void setPIDConstants(double kF, double kP, double kI, double kD) {}
+  public default void setAngle(Rotation2d angle) {}
+  public default void setVoltage(double volts) {} 
   public default void updateInputs(SwerveModuleInputs inputs) {}
   public default String getDescription() {return "";}
   public default String getPath() {return "";}

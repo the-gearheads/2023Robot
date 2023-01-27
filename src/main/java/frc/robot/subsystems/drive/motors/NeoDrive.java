@@ -3,7 +3,6 @@ package frc.robot.subsystems.drive.motors;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -34,6 +33,9 @@ public class NeoDrive {
     encoder.setPositionConversionFactor(Drivetrain.DRIVE_POS_FACTOR);
     encoder.setVelocityConversionFactor(Drivetrain.DRIVE_VEL_FACTOR);
 
+    // TODO: 1) check if this is too noisy 2) check if this impacts other robot code that deals with encoder velocities
+    encoder.setMeasurementPeriod(10);
+
     pid.setFeedbackDevice(encoder);
 
     sPid.setP(Drivetrain.DRIVE_PIDF[0]);
@@ -48,6 +50,11 @@ public class NeoDrive {
   public void setSpeed(double speed) {
     setpoint = speed;
     pid.setReference(speed, CANSparkMax.ControlType.kVelocity);
+  }
+
+  /* Please work */
+  public void setVoltage(double volts) {
+    pid.setReference(volts, CANSparkMax.ControlType.kVoltage);
   }
 
   public void zeroEncoders() {
