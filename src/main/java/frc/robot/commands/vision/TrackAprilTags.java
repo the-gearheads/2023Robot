@@ -4,6 +4,10 @@
 
 package frc.robot.commands.vision;
 
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
+
 import edu.wpi.first.math.Drake;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
@@ -43,14 +47,18 @@ public class TrackAprilTags extends CommandBase {
     boolean isAprilTagInView = vision.isConnected()&&vision.hasTargets();
     if(isAprilTagInView){
       //update swerve pos estimator
-      Pair<Pose2d, Double> visionResult = vision.getEstimatedGlobalPos(swerveSubsystem.getPose());
-      swerveSubsystem.updateVisionMeasurement(visionResult.getFirst(), visionResult.getSecond());
-
+      Optional<EstimatedRobotPose> visionResult = vision.getEstimatedGlobalPos(swerveSubsystem.getPose());
+      if(Vision.isEstimatedRobotPosPresent(visionResult)){
+        Pose2d estimatedRobotPos=visionResult.get().estimatedPose.toPose2d();
+        double timestamp=visionResult.get().timestampSeconds;
+        swerveSubsystem.updateVisionMeasurement(estimatedRobotPos, timestamp);
       //follow april tag
-      double aprilTagAngleInFrame=visionResult.getFirst().getRotation().getDegrees();
+      double aprilTagAngleInFrame=estimatedRobotPos.getRotation().getDegrees();
       double desiredServoAngle = camServo.getCurrentAngle()-aprilTagAngleInFrame;
       desiredServoAngle=MathUtil.clamp(desiredServoAngle, 0, 180);
       // camServo.setGoal(desiredServoAngle);
+      }
+      
     }else{
       // wander();
     }

@@ -4,6 +4,11 @@
 
 package frc.robot.commands.vision;
 
+import java.util.Optional;
+
+import org.opencv.aruco.EstimateParameters;
+import org.photonvision.EstimatedRobotPose;
+
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -33,8 +38,12 @@ public class UpdatePoseEstimator extends CommandBase {
     boolean isAprilTagInView = vision.isConnected()&&vision.hasTargets();
     if(isAprilTagInView){
       //update swerve pos estimator
-      Pair<Pose2d, Double> visionResult = vision.getEstimatedGlobalPos(swerveSubsystem.getPose());
-      swerveSubsystem.updateVisionMeasurement(visionResult.getFirst(), visionResult.getSecond());
+      Optional<EstimatedRobotPose> visionResult = vision.getEstimatedGlobalPos(swerveSubsystem.getPose());
+      if(Vision.isEstimatedRobotPosPresent(visionResult)){
+        Pose2d estimatedRobotPos=visionResult.get().estimatedPose.toPose2d();
+        double timestamp=visionResult.get().timestampSeconds;
+        swerveSubsystem.updateVisionMeasurement(estimatedRobotPos, timestamp);
+      }
     }
   }
 

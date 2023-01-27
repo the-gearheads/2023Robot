@@ -8,9 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
-import org.photonvision.RobotPoseEstimator;
-import org.photonvision.RobotPoseEstimator.PoseStrategy;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.Pair;
@@ -28,7 +29,7 @@ import frc.robot.Constants;
 
 public class Vision extends SubsystemBase {
   private PhotonCamera targetCam;
-  private RobotPoseEstimator robotPoseEstimator;
+  private PhotonPoseEstimator PhotonPoseEstimator;
 
   public Vision() {
 
@@ -44,21 +45,14 @@ public class Vision extends SubsystemBase {
     return targetCam.getLatestResult().hasTargets();
   }
   //Currently getEstimatedGlobalPosFromRotating CAM is not used; instead, getEstimatedGlobalPos is used. 
-  public Pair<Pose2d, Double> getEstimatedGlobalPosFromRotatingCam(Pose2d prevEstimatedRobotPose, double servoAngle) {
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPosFromRotatingCam(Pose2d prevEstimatedRobotPose, double servoAngle) {
     updateCamAngle(servoAngle);
     return getEstimatedGlobalPos(prevEstimatedRobotPose);
   }
-  public Pair<Pose2d, Double> getEstimatedGlobalPos(Pose2d prevEstimatedRobotPose) {
-    robotPoseEstimator.setReferencePose(prevEstimatedRobotPose);
-    double currentTime = Timer.getFPGATimestamp();
-    Optional<Pair<Pose3d, Double>> result = robotPoseEstimator.update();
-    if (result.isPresent() && result.get().getFirst()!=null&&result.get().getFirst().getRotation()!=null) {//the 2nd and 3rd conditions avoid nullpointer exceptions. 
-      SmartDashboard.putBoolean("Vision/ResultPresent", true);
-        return new Pair<Pose2d, Double>(result.get().getFirst().toPose2d(), currentTime - result.get().getSecond());
-    } else {
-        SmartDashboard.putBoolean("Vision/ResultPresent", false);
-        return new Pair<Pose2d, Double>(prevEstimatedRobotPose, 0.0);
-    }
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPos(Pose2d prevEstimatedRobotPose) {
+    PhotonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+    Optional<EstimatedRobotPose> result = PhotonPoseEstimator.update();
+    return result;
   }
   private void updateCamAngle(double servoAngle){
     Translation3d camTrans=Constants.Vision.robotToCam.getTranslation();
@@ -68,7 +62,11 @@ public class Vision extends SubsystemBase {
 
     var camList = new ArrayList<Pair<PhotonCamera, Transform3d>>();
     camList.add(new Pair<PhotonCamera, Transform3d>(targetCam, robotToCam));
-    this.robotPoseEstimator=new RobotPoseEstimator(Constants.Vision.atfl, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, camList);
+    this.PhotonPoseEstimator=new PhotonPoseEstimator(Constants.Vision.atfl, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, targetCam, Constants.Vision.robotToCam);
+  }
+
+  public static boolean isEstimatedRobotPosPresent(Optional<EstimatedRobotPose> estimatedRobotPos){
+    return estimatedRobotPos.isPresent() && estimatedRobotPos.get().estimatedPose!=null && estimatedRobotPos.get().estimatedPose.getRotation()!=null;
   }
 
   @Override
@@ -90,7 +88,7 @@ public class Vision extends SubsystemBase {
 
     if (referencePose == null) {
         DriverStation.reportError(
-                "[RobotPoseEstimator] Tried to use reference pose strategy without setting the reference!",
+                "[PhotonPoseEstimator] Tried to use reference pose strategy without setting the reference!",
                 false);
         return null;
     }
