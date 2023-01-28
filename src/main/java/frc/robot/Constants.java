@@ -56,10 +56,10 @@ public class Constants extends AnnotatedClass {
     public static int[] RR_IDS = {7, 8};
 
     // Chassis relative offset (degrees), then duty cycle encoder offset (whatever units they are)
-    public static double[] FL_OFFSETS = {0, 0};
-    public static double[] FR_OFFSETS = {0, 0.188};
-    public static double[] RL_OFFSETS = {180, 0};
-    public static double[] RR_OFFSETS = {180, 0};
+    public static double[] FL_OFFSETS = {-90,   0.199};//-90
+    public static double[] FR_OFFSETS = {0,   0.543};
+    public static double[] RL_OFFSETS = {180, 0.534};
+    public static double[] RR_OFFSETS = {90,   0.033};//-90
 
     public static double WHEEL_DIAMETER = Units.inchesToMeters(3);
     public static double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
@@ -128,6 +128,6 @@ public class Constants extends AnnotatedClass {
     public static AprilTagFieldLayout atfl = new AprilTagFieldLayout(atList, FieldConstants.length, FieldConstants.width);
   }
   public static class Controllers {
-    public static double JOYSTICK_DEADBAND = 0.05;
+    public static double JOYSTICK_DEADBAND = 0.1;
   }
 }
