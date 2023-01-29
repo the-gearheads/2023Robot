@@ -56,10 +56,10 @@ public class Constants extends AnnotatedClass {
     public static int[] RR_IDS = {7, 8};
 
     // Chassis relative offset (degrees), then duty cycle encoder offset (whatever units they are)
-    public static double[] FL_OFFSETS = {-90,   0.199};//-90
-    public static double[] FR_OFFSETS = {0,   0.543};
-    public static double[] RL_OFFSETS = {180, 0.534};
-    public static double[] RR_OFFSETS = {90,   0.033};//-90
+    public static final double[] FL_OFFSETS = {270,   0.199};//-90
+    public static final double[] FR_OFFSETS = {0,   0.543};
+    public static final double[] RL_OFFSETS = {180, 0.534};
+    public static final double[] RR_OFFSETS = {90,   0.033};//-90
 
     public static double WHEEL_DIAMETER = Units.inchesToMeters(3);
     public static double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
@@ -89,22 +89,22 @@ public class Constants extends AnnotatedClass {
     public static Pose2d zeroPos = new Pose2d(0, 0, new Rotation2d(0));
     public static Transform2d zeroTransform = new Transform2d(new Translation2d(0,0), new Rotation2d(0));
 
-    public static Translation2d FL_POS = new Translation2d(0.3, 0.55/2);
-    public static Translation2d FR_POS = new Translation2d(0.3, -0.55/2);
-    public static Translation2d RL_POS = new Translation2d(-0.3, 0.55/2);
-    public static Translation2d RR_POS = new Translation2d(-0.3, -0.55/2);
+    public static Translation2d FL_POS = new Translation2d(Units.inchesToMeters(12.25), Units.inchesToMeters(13.25));
+    public static Translation2d FR_POS = new Translation2d(Units.inchesToMeters(12.25), Units.inchesToMeters(-13.25));
+    public static Translation2d RL_POS = new Translation2d(Units.inchesToMeters(-12.25), Units.inchesToMeters(13.25));
+    public static Translation2d RR_POS = new Translation2d(Units.inchesToMeters(-12.25), Units.inchesToMeters(-13.25));
 
     @NTPublish
-    public static double MAX_LIN_VEL = 2;//set to 2
+    public static double MAX_LIN_VEL = 5;//set to 2
     @NTPublish
-    public static double MAX_ROT_VEL = 1;
+    public static double MAX_ROT_VEL = 5;
 
     @NTPublish
-    public static double MAX_MODULE_SPEED = 2;
+    public static double MAX_MODULE_SPEED = 5;
     @NTPublish
-    public static double MAX_TRANSLATIONAL_SPEED = 2;
+    public static double MAX_TRANSLATIONAL_SPEED = 5;
     @NTPublish
-    public static double MAX_ROTATIONAL_SPEED = 2;
+    public static double MAX_ROTATIONAL_SPEED = 5;
 
     public static class Auton {
       public static PIDController X_PID = new PIDController(0, 0, 0);

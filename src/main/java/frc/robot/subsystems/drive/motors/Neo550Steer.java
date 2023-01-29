@@ -38,7 +38,7 @@ public class Neo550Steer {
     max.setSmartCurrentLimit(Drivetrain.STEER_CURRENT_LIMIT);
     max.setIdleMode(IdleMode.kBrake);
 
-    encoder.setZeroOffset(dutyCycleOffset);
+    // encoder.setZeroOffset(dutyCycleOffset);
     encoder.setPositionConversionFactor(Drivetrain.STEER_POS_FACTOR);
     encoder.setVelocityConversionFactor(Drivetrain.STEER_VEL_FACTOR);
 
@@ -59,9 +59,9 @@ public class Neo550Steer {
 
     /* No need for angleMod360 with this */
     pid.setPositionPIDWrappingEnabled(true);
-    pid.setPositionPIDWrappingMinInput(0);
+    pid.setPositionPIDWrappingMinInput(-Math.PI);
     /* I guess the rationale behind reusing pos factor instead of just putting 2pi here is that this lets us switch to degrees with only 1 change to the factors */
-    pid.setPositionPIDWrappingMaxInput(Drivetrain.STEER_POS_FACTOR);
+    pid.setPositionPIDWrappingMaxInput(Math.PI);
   }
 
   public void setAngle(Rotation2d angle) {

@@ -1,7 +1,10 @@
 package frc.robot.subsystems.drive;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drive.motors.Neo550Steer;
 import frc.robot.subsystems.drive.motors.NeoDrive;
 
@@ -28,7 +31,7 @@ public class SwerveModule implements SwerveModuleIO {
   }
 
   private Rotation2d getAngle() {
-    return new Rotation2d(steer.getAngle().getRadians() - angleOffset.getRadians());
+    return steer.getAngle().minus(angleOffset);
   }
 
   /* Directly sets module angle */
@@ -44,6 +47,9 @@ public class SwerveModule implements SwerveModuleIO {
   public void setState(SwerveModuleState state) {
     /* We do offsetting before optimization so the wheel automatically gets reversed when the module is facing backwards. Downside: the robot will not work without optimizations enabled. */
     state.angle = state.angle.plus(angleOffset);
+    if(id==0){
+      SmartDashboard.putNumber("Setpoint before optimize", state.angle.getRadians());
+    }
     state = SwerveModuleState.optimize(state, steer.getAngle());
 
     steer.setAngle(state.angle);
@@ -64,7 +70,7 @@ public class SwerveModule implements SwerveModuleIO {
     inputs.driveVelocitySetpoint = drive.getVelocitySetpoint();
 
     inputs.steerAppliedVolts = steer.getAppliedVolts();
-    inputs.steerAngle = getAngle().getRadians();
+    inputs.steerAngle = steer.getAngle().getRadians()-angleOffset.getRadians();
     inputs.steerVelocity = steer.getVelocity();
     inputs.steerAngleSetpoint = steer.getAngleSetpoint().getRadians();
   }
