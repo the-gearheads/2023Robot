@@ -6,35 +6,31 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.SPI;
 
 public class Gyroscope extends AHRS{
-    private boolean isInverted;
+    private boolean isCounterClockwise;
     public Gyroscope(SPI.Port port){
         this(port, false);
     }
 
-    public Gyroscope(SPI.Port port, boolean isInverted){
+    public Gyroscope(SPI.Port port, boolean isCounterClockwise){
         super(port);
-        this.isInverted = isInverted;
+        this.isCounterClockwise = isCounterClockwise;
     }
-    public void setInverted(boolean isInverted){
-        this.isInverted = false;
+    public void setCounterClockwise(boolean isInverted){
+        this.isCounterClockwise = false;
     }
     public Rotation2d getRotation2d(){
-        double direction = isInverted ? 1 : -1;
+        double direction = isCounterClockwise ? 1 : -1;//This one is different because getRotation2d already negates getAngle()!!!!
         return new Rotation2d(direction * super.getRotation2d().getRadians());
     }
     public void setRotation2d(Rotation2d newRotation2d){
-        double direction = isInverted ? -1 : 1;
+        double direction = isCounterClockwise ? -1 : 1;
         double newAngle = newRotation2d.getDegrees() * direction;
         super.zeroYaw();
         super.setAngleAdjustment(newAngle);
     }
-    public double getContinuousAngle(){
-        double direction = isInverted ? -1 : 1;
-        return direction * super.getAngle();
-    }
 
     public double getRate() {
-        double direction = isInverted ? -1 : 1;
+        double direction = isCounterClockwise ? -1 : 1;
         return direction * super.getRate();
     }
 }

@@ -10,6 +10,7 @@ import com.pathplanner.lib.PathConstraints;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -118,14 +119,7 @@ public class Constants extends AnnotatedClass {
     public static double length=25;
   }
   public static class Vision{
-    public static double MAX_SERVO_SPEED=180/0.6;//in deg/sec
-    public static double SERVO_SPEED=180/12.0;
-    public static double SERVO_OFFSET=0;
     public static Transform3d robotToCam = new Transform3d(new Translation3d(Units.inchesToMeters(-9), Units.inchesToMeters(0.5), Units.inchesToMeters(20)), new Rotation3d());
-    final static AprilTag tag02 = new AprilTag(02,new Pose3d(0,0,Units.inchesToMeters(15),new Rotation3d(0,0,0)));
-    final static AprilTag tag01 = new AprilTag(01,new Pose3d(new Pose2d(0.0, FieldConstants.width / 2.0, Rotation2d.fromDegrees(0.0))));
-    public static ArrayList<AprilTag> atList = new ArrayList<AprilTag>(){{add(tag02);add(tag01);}};
-    public static AprilTagFieldLayout atfl = new AprilTagFieldLayout(atList, FieldConstants.length, FieldConstants.width);
   }
   public static class Controllers {
     public static double JOYSTICK_DEADBAND = 0.1;
