@@ -45,6 +45,9 @@ public class SwerveModule implements SwerveModuleIO {
   }
 
   public void setState(SwerveModuleState state) {
+    // create deepcopy so subsequent mutations are not percieved by SwerveKinematics
+    state=new SwerveModuleState(state.speedMetersPerSecond, state.angle);
+
     /* We do offsetting before optimization so the wheel automatically gets reversed when the module is facing backwards. Downside: the robot will not work without optimizations enabled. */
     state.angle = state.angle.plus(angleOffset);
     state = SwerveModuleState.optimize(state, steer.getAngle());

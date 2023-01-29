@@ -57,7 +57,7 @@ public class SwerveSubsystem extends SubsystemBase {
     SmartDashboard.putData("yPid", Drivetrain.Auton.Y_PID);
     SmartDashboard.putData("rotPid", Drivetrain.Auton.ROT_PID);
   }
-  
+
   @Override
   public void periodic() {
     updateInputs();
@@ -79,13 +79,6 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param states
    */
   public void setStates(SwerveModuleState[] states) {
-    // states = new SwerveModuleState[] {
-    //   new SwerveModuleState(),
-    //   new SwerveModuleState(),
-    //   new SwerveModuleState(),
-    //   new SwerveModuleState()
-    // };
-    // states = kinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 0));
     Logger.getInstance().recordOutput("/Swerve/ModStates", states);
     for (int i = 0; i < states.length; i++) {
       modules[i].setState(states[i]);
@@ -97,14 +90,10 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param speeds Speeds to go
    */
   public void drive(ChassisSpeeds speeds) {
-    speeds.vxMetersPerSecond+=1e-3;
-    speeds.vyMetersPerSecond+=1e-3;
-    speeds.omegaRadiansPerSecond+=1e-3;
-
     var states = kinematics.toSwerveModuleStates(speeds);
-    // if(SmartDashboard.getBoolean("/Swerve/DesaturateWheelSpeeds", true)) {
-    //   SwerveDriveKinematics.desaturateWheelSpeeds(states, getChassisSpeeds(), Drivetrain.MAX_MODULE_SPEED, Drivetrain.MAX_TRANSLATIONAL_SPEED, Drivetrain.MAX_ROTATIONAL_SPEED);
-    // }
+    if(SmartDashboard.getBoolean("/Swerve/DesaturateWheelSpeeds", true)) {
+      SwerveDriveKinematics.desaturateWheelSpeeds(states, getChassisSpeeds(), Drivetrain.MAX_MODULE_SPEED, Drivetrain.MAX_TRANSLATIONAL_SPEED, Drivetrain.MAX_ROTATIONAL_SPEED);
+    }
     setStates(states);
   }
 
