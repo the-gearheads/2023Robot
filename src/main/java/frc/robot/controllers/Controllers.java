@@ -3,6 +3,9 @@ package frc.robot.controllers;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class Controllers {
+
+  private Controllers() {}
+
   private static String[] lastControllerNames = new String[6];
 
   public static ControllerInterface activeController;

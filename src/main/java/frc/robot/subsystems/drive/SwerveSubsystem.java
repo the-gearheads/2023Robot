@@ -129,7 +129,6 @@ public class SwerveSubsystem extends SubsystemBase {
   }
   
   public void updateVisionMeasurement(Pose2d visionRobotPos, double timestamp){
-    // visionRobotPos=new Pose2d(visionRobotPos.getTranslation(), gyro.getRotation2d());
     odometry.addVisionMeasurement(visionRobotPos, timestamp);
     SmartDashboard.putString("Vision/Vision Estimated Pos", AdditionalMathUtils.pos2dToString(visionRobotPos, 2));
   }

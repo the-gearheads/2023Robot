@@ -1,10 +1,7 @@
 package frc.robot.subsystems.drive;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drive.motors.Neo550Steer;
 import frc.robot.subsystems.drive.motors.NeoDrive;
 
@@ -15,8 +12,8 @@ public class SwerveModule implements SwerveModuleIO {
 
   protected Rotation2d angleOffset;
   
-  public int id;
-  public String description;
+  private int id;
+  private String description;
 
   public SwerveModule(int id, int driveId, int steerId, double[] offsets, String description) {
     this.id = id;
@@ -26,6 +23,7 @@ public class SwerveModule implements SwerveModuleIO {
     steer = new Neo550Steer(steerId, offsets[1], getPath());
   }
 
+  @Override
   public void zeroEncoders() {
     drive.zeroEncoders();
   }
@@ -35,15 +33,18 @@ public class SwerveModule implements SwerveModuleIO {
   }
 
   /* Directly sets module angle */
+  @Override
   public void setAngle(Rotation2d newAngle) {
     steer.setAngle(newAngle.plus(angleOffset));
   }
 
   /* Directly sets drive motor volts, ignoring pid */
+  @Override
   public void setVoltage(double volts) {
     drive.setVoltage(volts);
   }
 
+  @Override
   public void setState(SwerveModuleState state) {
     // create deepcopy so subsequent mutations are not percieved by SwerveKinematics
     state=new SwerveModuleState(state.speedMetersPerSecond, state.angle);
@@ -61,6 +62,7 @@ public class SwerveModule implements SwerveModuleIO {
   }
 
   /* Called every periodic() */
+  @Override
   public void updateInputs(SwerveModuleInputs inputs) {
     inputs.description = this.description;
 
@@ -70,15 +72,22 @@ public class SwerveModule implements SwerveModuleIO {
     inputs.driveVelocitySetpoint = drive.getVelocitySetpoint();
 
     inputs.steerAppliedVolts = steer.getAppliedVolts();
-    inputs.steerAngle = steer.getAngle().getRadians()-angleOffset.getRadians();
+    inputs.steerAngle = getAngle().getRadians();
     inputs.steerVelocity = steer.getVelocity();
     inputs.steerAngleSetpoint = steer.getAngleSetpoint().getRadians();
   }
 
+  @Override
   public String getDescription() {
     return this.description;
   }
 
+  @Override
+  public int getId() {
+    return this.id;
+  }
+
+  @Override
   public String getPath() {
     return "Swerve/Wheel " + id + " (" + description + ")";
   }

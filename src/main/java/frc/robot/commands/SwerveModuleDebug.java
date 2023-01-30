@@ -36,7 +36,6 @@ public class SwerveModuleDebug extends CommandBase {
   public void execute() {
     double setpoint = SmartDashboard.getNumber("Left Mod Angle Setpoint", 0);
     swerve.modules[1].setState(new SwerveModuleState(0.0, Rotation2d.fromDegrees(setpoint)));
-    // SmartDashboard.putNumber("SW Angle", swerve.modules[1].getSteer().getAngle().getDegrees());
 
     double kP=SmartDashboard.getNumber("SW kP",0 );
     double kI=SmartDashboard.getNumber("SW kI",0 );

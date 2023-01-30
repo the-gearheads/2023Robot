@@ -14,14 +14,15 @@ import frc.robot.util.SendableSparkMaxPID;
 
 public class Neo550Steer {
 
-  CANSparkMax max;
-  SparkMaxPIDController pid;
-  SendableSparkMaxPID sPid;
-  SparkMaxAbsoluteEncoder encoder;
-  String path;
+  private CANSparkMax max;
+  private SparkMaxPIDController pid;
+  private SendableSparkMaxPID sPid;
+  private SparkMaxAbsoluteEncoder encoder;
+  private String path;
 
-  double dutyCycleOffset;
-  Rotation2d setpoint = new Rotation2d();
+  @SuppressWarnings("unused")
+  private double dutyCycleOffset;
+  private Rotation2d setpoint = new Rotation2d();
 
   public Neo550Steer(int id, double dutyCycleOffset, String path) {
     this.dutyCycleOffset = dutyCycleOffset;
@@ -38,7 +39,6 @@ public class Neo550Steer {
     max.setSmartCurrentLimit(Drivetrain.STEER_CURRENT_LIMIT);
     max.setIdleMode(IdleMode.kBrake);
 
-    // encoder.setZeroOffset(dutyCycleOffset);
     encoder.setPositionConversionFactor(Drivetrain.STEER_POS_FACTOR);
     encoder.setVelocityConversionFactor(Drivetrain.STEER_VEL_FACTOR);
 

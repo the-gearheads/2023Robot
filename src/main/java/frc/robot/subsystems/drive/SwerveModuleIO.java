@@ -29,4 +29,5 @@ public interface SwerveModuleIO {
   public default void updateInputs(SwerveModuleInputs inputs) {}
   public default String getDescription() {return "";}
   public default String getPath() {return "";}
+  public default int getId() {return 0;}
 }

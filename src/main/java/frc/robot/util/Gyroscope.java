@@ -15,9 +15,12 @@ public class Gyroscope extends AHRS{
         super(port);
         this.isCounterClockwise = isCounterClockwise;
     }
+    
     public void setCounterClockwise(boolean isInverted){
-        this.isCounterClockwise = false;
+        this.isCounterClockwise = isInverted;
     }
+
+    @Override
     public Rotation2d getRotation2d(){
         double direction = isCounterClockwise ? 1 : -1;//This one is different because getRotation2d already negates getAngle()!!!!
         return new Rotation2d(direction * super.getRotation2d().getRadians());
@@ -29,6 +32,7 @@ public class Gyroscope extends AHRS{
         super.setAngleAdjustment(newAngle);
     }
 
+    @Override
     public double getRate() {
         double direction = isCounterClockwise ? -1 : 1;
         return direction * super.getRate();

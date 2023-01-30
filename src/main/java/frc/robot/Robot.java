@@ -29,9 +29,8 @@ import frc.robot.Constants.RobotMode;
  * project.
  */
 public class Robot extends LoggedRobot {
-  private Command m_autonomousCommand;
-
-  private RobotContainer m_robotContainer;
+  private Command autonCommand;
+  private RobotContainer robotContainer;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -69,7 +68,7 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putData("Constants", new Constants());
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
+    robotContainer = new RobotContainer();
   }
 
   /**
@@ -86,7 +85,7 @@ public class Robot extends LoggedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    m_robotContainer.updateControllers();
+    robotContainer.updateControllers();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -99,11 +98,11 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    autonCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+    if (autonCommand != null) {
+      autonCommand.schedule();
     }
   }
 
@@ -117,8 +116,8 @@ public class Robot extends LoggedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    if (autonCommand != null) {
+      autonCommand.cancel();
     }
   }
 

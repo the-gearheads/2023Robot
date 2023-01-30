@@ -18,8 +18,6 @@ public class Grabber extends SubsystemBase {
   GrabberState grabberState=GrabberState.OPEN;
   Solenoid right = new Solenoid(PneumaticsModuleType.REVPH, 0);
   Solenoid left = new Solenoid(PneumaticsModuleType.REVPH, 1);
-  /** Creates a new Grabber. */
-  public Grabber() {}
 
   public void grabCone() {
     right.set(true);
