@@ -117,6 +117,7 @@ public class Constants extends AnnotatedClass {
   public static final class FieldConstants{
     public static double width=50;
     public static double length=25;
+    public static Pose2d GRID_8 = new Pose2d(2.8, 1.05, Rotation2d.fromDegrees(180));
   }
   public static class Vision{
     public static Transform3d robotToCam = new Transform3d(new Translation3d(Units.inchesToMeters(-9), Units.inchesToMeters(0.5), Units.inchesToMeters(20)), new Rotation3d());

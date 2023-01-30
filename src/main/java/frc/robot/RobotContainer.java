@@ -117,6 +117,11 @@ public class RobotContainer {
     PathPlannerTrajectory rightTraj = PathPlanner.loadPath("DEBUG_Forward",constraints);
     Command rightCommand = swerveSubsystem.followTrajectoryCommand(rightTraj, true, true);
     new JoystickButton(controller, XboxController.Button.kB.value).toggleOnTrue(rightCommand);
+
+    //This command puts the robot 1 meter in front of apriltag 8 (middle of bottom left grid on pathplanner picture of 2023 field)
+
+    new JoystickButton(controller, XboxController.Button.kRightBumper.value).
+    toggleOnTrue(swerveSubsystem.goTo(Constants.FieldConstants.GRID_8, constraints));
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

@@ -8,7 +8,10 @@ import java.util.ArrayList;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -178,6 +181,21 @@ public class SwerveSubsystem extends SubsystemBase {
       isFirstTrajectory=false;
     }
     return fullCommand;
+  }
+
+  public Command goTo(Pose2d endPose, PathConstraints constraints){
+    Pose2d startPose=getPose();
+    Rotation2d startHeading = endPose.minus(startPose).getTranslation().getAngle();
+    Rotation2d endHeading = startHeading.unaryMinus();
+
+    PathPoint startPoint = new PathPoint(startPose.getTranslation(), startHeading, startPose.getRotation());// position, heading(direction of travel), holonomic rotation
+    PathPoint endPoint = new PathPoint(endPose.getTranslation(), endHeading, endPose.getRotation());
+    PathPlannerTrajectory traj = PathPlanner.generatePath(
+    constraints,
+    startPoint,
+    endPoint
+    );
+    return followTrajectoryCommand(traj, true, true);
   }
 
   /* Telemetry (Advantage Kit) Related Methods (also used in odometry) */
