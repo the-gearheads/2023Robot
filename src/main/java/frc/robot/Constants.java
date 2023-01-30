@@ -19,12 +19,11 @@ import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.annotations.*;
 
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose. All constants should be declared
- * globally (i.e. public static final). Do not put anything functional in this class.
+ * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean constants. This class should not be used for any other purpose. All
+ * constants should be declared globally (i.e. public static final). Do not put anything functional in this class.
  *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity.
+ * <p>
+ * It is advised to statically import this class (or one of its inner classes) wherever the constants are needed, to reduce verbosity.
  */
 public class Constants extends AnnotatedClass {
   public static final boolean SIM_REPLAY_MODE = false;
@@ -34,19 +33,20 @@ public class Constants extends AnnotatedClass {
   }
 
   public static RobotMode getMode() {
-    if(RobotBase.isReal()) {
+    if (RobotBase.isReal()) {
       return RobotMode.REAL;
     }
-    if(SIM_REPLAY_MODE) {
+    if (SIM_REPLAY_MODE) {
       return RobotMode.SIM_REPLAY;
     } else {
       return RobotMode.SIM;
     }
   }
+
   public static final class Drivetrain {
 
     private Drivetrain() {}
-  
+
     // Drive, then steer ids
     public static final int[] FL_IDS = {1, 2};
     public static final int[] FR_IDS = {3, 4};
@@ -54,10 +54,10 @@ public class Constants extends AnnotatedClass {
     public static final int[] RR_IDS = {7, 8};
 
     // Chassis relative offset (degrees), then duty cycle encoder offset (whatever units they are)
-    public static final double[] FL_OFFSETS = {270,   0.199};//-90
-    public static final double[] FR_OFFSETS = {0,   0.543};
+    public static final double[] FL_OFFSETS = {270, 0.199};//-90
+    public static final double[] FR_OFFSETS = {0, 0.543};
     public static final double[] RL_OFFSETS = {180, 0.534};
-    public static final double[] RR_OFFSETS = {90,   0.033};//-90
+    public static final double[] RR_OFFSETS = {90, 0.033};//-90
 
     public static final double WHEEL_DIAMETER = Units.inchesToMeters(3);
     public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
@@ -70,7 +70,7 @@ public class Constants extends AnnotatedClass {
     public static final double STEER_GEAR_RATIO = 1;
 
     public static final double DRIVE_POS_FACTOR = WHEEL_CIRCUMFERENCE / DRIVE_GEAR_RATIO; // rotations -> gear ratio adjusted rotations -> meters
-    public static final double DRIVE_VEL_FACTOR =  WHEEL_CIRCUMFERENCE / DRIVE_GEAR_RATIO / 60.0; // rpm -> gear ratio adjusted rpm -> meters/min -> meters/sec 
+    public static final double DRIVE_VEL_FACTOR = WHEEL_CIRCUMFERENCE / DRIVE_GEAR_RATIO / 60.0; // rpm -> gear ratio adjusted rpm -> meters/min -> meters/sec 
 
     public static final double DRIVE_FREE_SPEED = 5676 * DRIVE_VEL_FACTOR; // Convert max neo free speed to max free wheel speed
 
@@ -85,12 +85,16 @@ public class Constants extends AnnotatedClass {
     public static final double[] STEER_PIDF = {1, 0, 0, 0};
 
     public static final Pose2d zeroPos = new Pose2d(0, 0, new Rotation2d(0));
-    public static final Transform2d zeroTransform = new Transform2d(new Translation2d(0,0), new Rotation2d(0));
+    public static final Transform2d zeroTransform = new Transform2d(new Translation2d(0, 0), new Rotation2d(0));
 
-    public static final Translation2d FL_POS = new Translation2d(Units.inchesToMeters(12.25), Units.inchesToMeters(13.25));
-    public static final Translation2d FR_POS = new Translation2d(Units.inchesToMeters(12.25), Units.inchesToMeters(-13.25));
-    public static final Translation2d RL_POS = new Translation2d(Units.inchesToMeters(-12.25), Units.inchesToMeters(13.25));
-    public static final Translation2d RR_POS = new Translation2d(Units.inchesToMeters(-12.25), Units.inchesToMeters(-13.25));
+    public static final Translation2d FL_POS =
+        new Translation2d(Units.inchesToMeters(12.25), Units.inchesToMeters(13.25));
+    public static final Translation2d FR_POS =
+        new Translation2d(Units.inchesToMeters(12.25), Units.inchesToMeters(-13.25));
+    public static final Translation2d RL_POS =
+        new Translation2d(Units.inchesToMeters(-12.25), Units.inchesToMeters(13.25));
+    public static final Translation2d RR_POS =
+        new Translation2d(Units.inchesToMeters(-12.25), Units.inchesToMeters(-13.25));
 
     @NTPublish
     public static final double MAX_LIN_VEL = 5;//set to 2
@@ -106,24 +110,30 @@ public class Constants extends AnnotatedClass {
 
     public static final class Auton {
       private Auton() {}
+
       public static final PIDController X_PID = new PIDController(0, 0, 0);
       public static final PIDController Y_PID = new PIDController(0, 0, 0);
       public static final PIDController ROT_PID = new PIDController(0, 0, 0);
       public static final PathConstraints CONSTRAINTS = new PathConstraints(1, 1.5);
     }
   }
-  public static final class FieldConstants{
+  public static final class FieldConstants {
     private FieldConstants() {}
-    public static final double WIDTH=50;
-    public static final double LENGTH=25;
+
+    public static final double WIDTH = 50;
+    public static final double LENGTH = 25;
     public static final Pose2d GRID_8 = new Pose2d(2.8, 1.05, Rotation2d.fromDegrees(180));
   }
-  public static final class Vision{
+  public static final class Vision {
     private Vision() {}
-    public static final Transform3d robotToCam = new Transform3d(new Translation3d(Units.inchesToMeters(-9), Units.inchesToMeters(0.5), Units.inchesToMeters(20)), new Rotation3d());
+
+    public static final Transform3d robotToCam = new Transform3d(
+        new Translation3d(Units.inchesToMeters(-9), Units.inchesToMeters(0.5), Units.inchesToMeters(20)),
+        new Rotation3d());
   }
   public static final class Controllers {
     private Controllers() {}
+
     public static final double JOYSTICK_DEADBAND = 0.1;
   }
 }

@@ -33,7 +33,7 @@ public class Neo550Steer {
     encoder = max.getAbsoluteEncoder(Type.kDutyCycle);
     configure();
   }
-  
+
   private void configure() {
     max.restoreFactoryDefaults();
     max.setSmartCurrentLimit(Drivetrain.STEER_CURRENT_LIMIT);
@@ -65,7 +65,7 @@ public class Neo550Steer {
   }
 
   public void setAngle(Rotation2d angle) {
-    setpoint = angle; 
+    setpoint = angle;
     pid.setReference(angle.getRadians(), CANSparkMax.ControlType.kPosition);
   }
 

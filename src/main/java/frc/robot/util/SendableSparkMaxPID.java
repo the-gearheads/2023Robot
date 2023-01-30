@@ -8,6 +8,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 public class SendableSparkMaxPID implements Sendable {
   SparkMaxPIDController pid;
   double lastP, lastI, lastD, lastFF;
+
   public SendableSparkMaxPID(SparkMaxPIDController pid) {
     this.pid = pid;
   }

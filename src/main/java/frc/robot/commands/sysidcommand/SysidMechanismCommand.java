@@ -34,7 +34,8 @@ public class SysidMechanismCommand extends CommandBase {
 
 
   // Runs as auton, tries to emulate the sysid interface. Note: may have potential issues due to other robot code running and taking up processing time
-  public SysidMechanismCommand(Runnable zeroEncoder, Supplier<Double> getVoltage, Supplier<Double> getVelocity, Supplier<Double> getPosition, Consumer<Double> setVoltage) {
+  public SysidMechanismCommand(Runnable zeroEncoder, Supplier<Double> getVoltage, Supplier<Double> getVelocity,
+      Supplier<Double> getPosition, Consumer<Double> setVoltage) {
 
     this.zeroEncoder = zeroEncoder;
     this.getVelocity = getVelocity;
@@ -43,7 +44,7 @@ public class SysidMechanismCommand extends CommandBase {
     this.getVoltage = getVoltage;
 
     // Realtime priorities
-    if(Robot.isReal()) {
+    if (Robot.isReal()) {
       // AFAIK this is already set by default
       Notifier.setHALThreadPriority(true, 40);
       // But this isn't
@@ -68,11 +69,14 @@ public class SysidMechanismCommand extends CommandBase {
 
   @Override
   public void execute() {
-    if(isWrongMech) {System.out.println("Wrong mechanism!!"); return;}
+    if (isWrongMech) {
+      System.out.println("Wrong mechanism!!");
+      return;
+    }
 
     // Set our motor speeds depending on which test is appropriate
     double targetVolts = 0;
-    if(isDynamicTest) {
+    if (isDynamicTest) {
       targetVolts = voltCommand;
     } else {
       targetVolts = voltCommand * (Timer.getFPGATimestamp() - startTime);
@@ -98,7 +102,7 @@ public class SysidMechanismCommand extends CommandBase {
     outputString.ensureCapacity(maxCapacity + 50);
     outputString.append(isDynamicTest ? "fast" : "slow");
     outputString.append(voltCommand > 0 ? "-forward;" : "-backward;");
-    for(var entry: data) {
+    for (var entry : data) {
       outputString.append(entry);
     }
 

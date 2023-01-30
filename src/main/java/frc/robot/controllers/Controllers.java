@@ -34,6 +34,6 @@ public class Controllers {
       }
     }
     // No controller found, but a NullPointerException would be far worse than any warnings
-    activeController = new SingleXboxController(0);  
+    activeController = new SingleXboxController(0);
   }
 }

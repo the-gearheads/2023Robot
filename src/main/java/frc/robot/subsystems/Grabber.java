@@ -10,19 +10,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Grabber extends SubsystemBase {
   public enum GrabberState {
-    OPEN, 
-    GRABBING_CUBE, // right soleniodeed is extended uwo
+    OPEN, GRABBING_CUBE, // right soleniodeed is extended uwo
     GRABBING_CONE; // Both soliendoed extended
   }
 
-  GrabberState grabberState=GrabberState.OPEN;
+  GrabberState grabberState = GrabberState.OPEN;
   Solenoid right = new Solenoid(PneumaticsModuleType.REVPH, 0);
   Solenoid left = new Solenoid(PneumaticsModuleType.REVPH, 1);
 
   public void grabCone() {
     right.set(true);
     left.set(true);
-    grabberState=GrabberState.GRABBING_CONE;
+    grabberState = GrabberState.GRABBING_CONE;
   }
 
   public void grabCube() {
@@ -34,7 +33,7 @@ public class Grabber extends SubsystemBase {
   public void open() {
     right.set(false);
     left.set(false);
-    grabberState=GrabberState.OPEN;
+    grabberState = GrabberState.OPEN;
   }
 
   public GrabberState getGrabberState() {

@@ -68,7 +68,7 @@ public class NeoDrive {
   public double getPosition() {
     return encoder.getPosition();
   }
-  
+
   public double getVelocity() {
     return encoder.getVelocity();
   }

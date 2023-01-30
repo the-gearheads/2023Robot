@@ -38,7 +38,7 @@ public class TeleopDrive extends CommandBase {
   @Override
   public void initialize() {
     swerveSubsystem.zeroEncoders();
-    angleSetPoint=swerveSubsystem.getPose().getRotation().getDegrees();
+    angleSetPoint = swerveSubsystem.getPose().getRotation().getDegrees();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -54,14 +54,14 @@ public class TeleopDrive extends CommandBase {
     rotSpd *= Math.abs(rotSpd) * Constants.Drivetrain.MAX_ROT_VEL;
 
     //Make sure the robot maintains its heading when we aren't toggling the rotation axis
-    if(SmartDashboard.getBoolean("Rotation PID", false)){
-      rotPIDController=new PIDController(SmartDashboard.getNumber("Rotation PID kP", 3), 0,0);
+    if (SmartDashboard.getBoolean("Rotation PID", false)) {
+      rotPIDController = new PIDController(SmartDashboard.getNumber("Rotation PID kP", 3), 0, 0);
 
-      double gyroAngle=swerveSubsystem.getPose().getRotation().getDegrees();
-      if(MathUtil.applyDeadband(rotSpd, 1E-2)==0){
-        rotSpd=rotPIDController.calculate(angleSetPoint, gyroAngle);
-      }else{
-        angleSetPoint=gyroAngle;
+      double gyroAngle = swerveSubsystem.getPose().getRotation().getDegrees();
+      if (MathUtil.applyDeadband(rotSpd, 1E-2) == 0) {
+        rotSpd = rotPIDController.calculate(angleSetPoint, gyroAngle);
+      } else {
+        angleSetPoint = gyroAngle;
       }
     }
 
@@ -70,7 +70,7 @@ public class TeleopDrive extends CommandBase {
     SmartDashboard.putNumber("ArcadeDrive/rot", rotSpd);
 
     var speeds = new ChassisSpeeds(xSpd, ySpd, rotSpd);
-    if(SmartDashboard.getBoolean("ArcadeDrive/UseFieldRelative", true)) {
+    if (SmartDashboard.getBoolean("ArcadeDrive/UseFieldRelative", true)) {
       swerveSubsystem.driveFieldRelative(speeds);
     } else {
       swerveSubsystem.drive(speeds);

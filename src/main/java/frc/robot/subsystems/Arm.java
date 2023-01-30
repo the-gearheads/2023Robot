@@ -28,6 +28,7 @@ public class Arm extends SubsystemBase {
   public double getGoal() {
     return goal;
   }
+
   public void setGoal(double newGoal) {
     goal = newGoal;
   }

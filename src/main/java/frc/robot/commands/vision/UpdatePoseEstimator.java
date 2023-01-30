@@ -19,15 +19,14 @@ public class UpdatePoseEstimator extends CommandBase {
 
   /** Creates a new UpdatePoseEstimator. */
   public UpdatePoseEstimator(Vision vision, SwerveSubsystem swerveSubsystem) {
-    this.vision=vision;
-    this.swerveSubsystem=swerveSubsystem;
+    this.vision = vision;
+    this.swerveSubsystem = swerveSubsystem;
     addRequirements(vision);
   }
-  
+
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -36,7 +35,7 @@ public class UpdatePoseEstimator extends CommandBase {
 
     if (isAprilTagInView) {
       Optional<EstimatedRobotPose> visionResult = vision.getEstimatedGlobalPos(swerveSubsystem.getPose());
-  
+
       if (Vision.isEstimatedRobotPosPresent(visionResult)) {
         Pose2d estimatedRobotPos = visionResult.get().estimatedPose.toPose2d();
         double timestamp = visionResult.get().timestampSeconds;

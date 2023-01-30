@@ -76,9 +76,10 @@ public class SwerveSubsystem extends SubsystemBase {
     Logger.getInstance().recordOutput("/Swerve/ModuleStates", states);
   }
 
-    /* Teleop-Drive Related Methods */
+  /* Teleop-Drive Related Methods */
   /**
    * Sets all swerve modules to have the specified velocities and angles
+   * 
    * @param states
    */
   public void setStates(SwerveModuleState[] states) {
@@ -90,12 +91,14 @@ public class SwerveSubsystem extends SubsystemBase {
 
   /**
    * Drives the robot at the specified speeds
+   * 
    * @param speeds Speeds to go
    */
   public void drive(ChassisSpeeds speeds) {
     var states = kinematics.toSwerveModuleStates(speeds);
-    if(SmartDashboard.getBoolean("/Swerve/DesaturateWheelSpeeds", true)) {
-      SwerveDriveKinematics.desaturateWheelSpeeds(states, getChassisSpeeds(), Drivetrain.MAX_MODULE_SPEED, Drivetrain.MAX_TRANSLATIONAL_SPEED, Drivetrain.MAX_ROTATIONAL_SPEED);
+    if (SmartDashboard.getBoolean("/Swerve/DesaturateWheelSpeeds", true)) {
+      SwerveDriveKinematics.desaturateWheelSpeeds(states, getChassisSpeeds(), Drivetrain.MAX_MODULE_SPEED,
+          Drivetrain.MAX_TRANSLATIONAL_SPEED, Drivetrain.MAX_ROTATIONAL_SPEED);
     }
     setStates(states);
   }
@@ -109,91 +112,87 @@ public class SwerveSubsystem extends SubsystemBase {
     for (int i = 0; i < modules.length; i++) {
       modules[i].zeroEncoders();
     }
-    odometry = new SwerveDrivePoseEstimator(kinematics, gyro.getRotation2d(), getPositionsFromInputs(lastInputs), new Pose2d());
+    odometry = new SwerveDrivePoseEstimator(kinematics, gyro.getRotation2d(), getPositionsFromInputs(lastInputs),
+        new Pose2d());
   }
 
   /**
    * Gets current odometry pose
+   * 
    * @return Current robot pose, as reported by odometry
    */
-  public Pose2d getPose(){ 
+  public Pose2d getPose() {
     return odometry.getEstimatedPosition();
   }
 
   /**
    * Resets the odometry pose to the given position
+   * 
    * @param pose Position robot is at
    */
   public void setPose(Pose2d pose) {
     odometry.resetPosition(gyro.getRotation2d(), getPositionsFromInputs(lastInputs), pose);
   }
-  
-  public void updateVisionMeasurement(Pose2d visionRobotPos, double timestamp){
+
+  public void updateVisionMeasurement(Pose2d visionRobotPos, double timestamp) {
     odometry.addVisionMeasurement(visionRobotPos, timestamp);
     SmartDashboard.putString("Vision/Vision Estimated Pos", AdditionalMathUtils.pos2dToString(visionRobotPos, 2));
   }
 
-    /* Auton Related Methods */
+  /* Auton Related Methods */
   /**
    * Generates a command that will follow a given trajectory
+   * 
    * @param traj The trajectory to follow
    * @param isFirstPath Reset odometry to starting position if first path
    * @param stopWhenDone Append a command to stop the robot if done
    * @return
    */
   public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath, boolean stopWhenDone) {
-    return new SequentialCommandGroup(
-        new InstantCommand(() -> {
-          // Reset odometry for the first path you run during auto
-          if (isFirstPath) {
-            this.setPose(traj.getInitialHolonomicPose());
-          }
-        }),
-        new PPSwerveControllerCommand(
-            traj,
-            this::getPose, // Pose supplier
-            this.kinematics, // SwerveDriveKinematics
-            (PIDController) SmartDashboard.getData("xPid"), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
-            (PIDController) SmartDashboard.getData("yPid"), // Y controller (usually the same values as X controller)
-            (PIDController) SmartDashboard.getData("rotPid"), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
-            this::setStates, // Module states consumer
-            this // Requires this drive subsystem
-        ),
-        new InstantCommand(() -> {
-          if (stopWhenDone) {
-            drive(new ChassisSpeeds(0, 0, 0));
-          }
-        }));
+    return new SequentialCommandGroup(new InstantCommand(() -> {
+      // Reset odometry for the first path you run during auto
+      if (isFirstPath) {
+        this.setPose(traj.getInitialHolonomicPose());
+      }
+    }), new PPSwerveControllerCommand(traj, this::getPose, // Pose supplier
+        this.kinematics, // SwerveDriveKinematics
+        (PIDController) SmartDashboard.getData("xPid"), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+        (PIDController) SmartDashboard.getData("yPid"), // Y controller (usually the same values as X controller)
+        (PIDController) SmartDashboard.getData("rotPid"), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+        this::setStates, // Module states consumer
+        this // Requires this drive subsystem
+    ), new InstantCommand(() -> {
+      if (stopWhenDone) {
+        drive(new ChassisSpeeds(0, 0, 0));
+      }
+    }));
   }
 
   /**
    * Follows an ArrayList of trajectories
+   * 
    * @param trajectories List of trajectories to follow
    * @param stopWhenDone [unimplemented] stop when done following all trajectories
    * @return
    */
   public Command followTrajectoriesCommand(ArrayList<PathPlannerTrajectory> trajectories, boolean stopWhenDone) {
     Command fullCommand = new InstantCommand();
-    boolean isFirstTrajectory=true;
-    for (PathPlannerTrajectory trajectory: trajectories) {
+    boolean isFirstTrajectory = true;
+    for (PathPlannerTrajectory trajectory : trajectories) {
       fullCommand = fullCommand.andThen(followTrajectoryCommand(trajectory, isFirstTrajectory, false));
-      isFirstTrajectory=false;
+      isFirstTrajectory = false;
     }
     return fullCommand;
   }
 
-  public Command goTo(Pose2d endPose, PathConstraints constraints){
-    Pose2d startPose=getPose();
+  public Command goTo(Pose2d endPose, PathConstraints constraints) {
+    Pose2d startPose = getPose();
     Rotation2d startHeading = endPose.minus(startPose).getTranslation().getAngle();
     Rotation2d endHeading = startHeading.unaryMinus();
 
     PathPoint startPoint = new PathPoint(startPose.getTranslation(), startHeading, startPose.getRotation());// position, heading(direction of travel), holonomic rotation
     PathPoint endPoint = new PathPoint(endPose.getTranslation(), endHeading, endPose.getRotation());
-    PathPlannerTrajectory traj = PathPlanner.generatePath(
-    constraints,
-    startPoint,
-    endPoint
-    );
+    PathPlannerTrajectory traj = PathPlanner.generatePath(constraints, startPoint, endPoint);
     return followTrajectoryCommand(traj, true, true);
   }
 
@@ -209,8 +208,9 @@ public class SwerveSubsystem extends SubsystemBase {
     lastInputs = inputs;
   }
 
-    /**
+  /**
    * Return SwerveModulePositions for all SwerveModuleInputs
+   * 
    * @param inputs SwerveModuleInputs containing velocities and angles
    * @return SwerveModulePositions containing velocities and angles
    */
@@ -224,6 +224,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   /**
    * Return SwerveModuleStates for all SwerveModuleInputs
+   * 
    * @param inputs SwerveModuleInputs containing velocities and angles
    * @return SwerveModuleStates containing velocities and angles
    */
@@ -234,14 +235,15 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     return states;
   }
-  
+
   private ChassisSpeeds getChassisSpeeds() {
     var states = getStatesFromInputs(lastInputs);
     return kinematics.toChassisSpeeds(states);
   }
 
   /**
-   * Drives, but field relative. +X is away from the driver station. 
+   * Drives, but field relative. +X is away from the driver station.
+   * 
    * @param speeds Speeds to go in each axis, field relative
    */
   public void driveFieldRelative(ChassisSpeeds speeds) {
@@ -253,23 +255,22 @@ public class SwerveSubsystem extends SubsystemBase {
   /* Sets all modules into an X formation (and stops driving) */
   public void setX() {
     setStates(new SwerveModuleState[] {
-      // FL
-      new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-      // FR
-      new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-      // RL
-      new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-      // RR
-      new SwerveModuleState(0, Rotation2d.fromDegrees(-45))
-    });
+        // FL
+        new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+        // FR
+        new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+        // RL
+        new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+        // RR
+        new SwerveModuleState(0, Rotation2d.fromDegrees(-45))});
   }
 
   /* SysId Related Methods  */
   /* Sets volts in a way that makes it drive like a differential drive */
   public void setVolts(double leftVolts, double rightVolts) {
-    for(int i = 0; i < modules.length; i++) {
+    for (int i = 0; i < modules.length; i++) {
       // If i is divisible by 2, it is on the left (because order is FL, FR, RL, RR). 0 is divisible by 2 in this implementation.
-      if(i % 2 == 0) {
+      if (i % 2 == 0) {
         modules[i].setVoltage(leftVolts);
       } else {
         modules[i].setVoltage(rightVolts);
@@ -284,12 +285,12 @@ public class SwerveSubsystem extends SubsystemBase {
 
   /* Gets drive motor positions in a way that would make sense for a differential drive */
   public double[] getDiffPositions() {
-    return new double[] { lastInputs[0].drivePosition, lastInputs[1].drivePosition};
+    return new double[] {lastInputs[0].drivePosition, lastInputs[1].drivePosition};
   }
-    
+
   /* Gets drive motor velocities in a way that would make sense for a differential drive */
   public double[] getDiffVelocities() {
-    return new double[] { lastInputs[0].driveVelocity, lastInputs[1].driveVelocity};
+    return new double[] {lastInputs[0].driveVelocity, lastInputs[1].driveVelocity};
   }
 
   /* Returns Z axis rotation speed in degrees per second */
@@ -297,18 +298,19 @@ public class SwerveSubsystem extends SubsystemBase {
     return gyro.getRate();
   }
 
-  public double getContinuousGyroAngle(){
+  public double getContinuousGyroAngle() {
     return gyro.getRotation2d().getDegrees();
   }
 
   /**
    * Sets steer pid constants for all modules
+   * 
    * @param kF F(eedforward) value
    * @param kP P(roportional) PID value
    * @param kI I(ntegral) PID value
    * @param kD D(erivitive) PID value
    */
-  public void setPIDConstants(double kF, double kP, double kI, double kD){
+  public void setPIDConstants(double kF, double kP, double kI, double kD) {
     for (int i = 0; i < modules.length; i++) {
       modules[i].setPIDConstants(kF, kP, kI, kD);
     }

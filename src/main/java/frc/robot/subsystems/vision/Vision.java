@@ -25,15 +25,16 @@ public class Vision extends SubsystemBase {
   private PhotonCamera targetCam;
   private PhotonPoseEstimator photonPoseEstimator;
 
-  public Vision() { 
+  public Vision() {
     this.targetCam = new PhotonCamera("target");
     initializePoseEstimator();
   }
 
-  public boolean isConnected(){
+  public boolean isConnected() {
     return targetCam.isConnected();
   }
-  public boolean hasTargets(){
+
+  public boolean hasTargets() {
     return targetCam.getLatestResult().hasTargets();
   }
 
@@ -42,22 +43,24 @@ public class Vision extends SubsystemBase {
     return photonPoseEstimator.update();
   }
 
-  private void initializePoseEstimator(){
+  private void initializePoseEstimator() {
     //Create camList
     Transform3d robotToCam = Constants.Vision.robotToCam;
     var camList = new ArrayList<Pair<PhotonCamera, Transform3d>>();
     camList.add(new Pair<>(targetCam, robotToCam));
 
-    AprilTagFieldLayout atfl=null;
-    try{
+    AprilTagFieldLayout atfl = null;
+    try {
       atfl = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
-    }catch(Exception e){//I really wish we could be doing this in constants.java, not here lol (if you can fix this, plz do)
+    } catch (Exception e) {//I really wish we could be doing this in constants.java, not here lol (if you can fix this, plz do)
       DriverStation.reportError("Welp, if ur reading this, imma guess ur getting a nullpointer exception.", true);
     }
-    this.photonPoseEstimator = new PhotonPoseEstimator(atfl, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, targetCam, Constants.Vision.robotToCam);
+    this.photonPoseEstimator =
+        new PhotonPoseEstimator(atfl, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, targetCam, Constants.Vision.robotToCam);
   }
 
-  public static boolean isEstimatedRobotPosPresent(Optional<EstimatedRobotPose> estimatedRobotPos){
-    return estimatedRobotPos.isPresent() && estimatedRobotPos.get().estimatedPose!=null && estimatedRobotPos.get().estimatedPose.getRotation() != null;
+  public static boolean isEstimatedRobotPosPresent(Optional<EstimatedRobotPose> estimatedRobotPos) {
+    return estimatedRobotPos.isPresent() && estimatedRobotPos.get().estimatedPose != null
+        && estimatedRobotPos.get().estimatedPose.getRotation() != null;
   }
 }
