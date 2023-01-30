@@ -172,8 +172,10 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public Command followTrajectoriesCommand(ArrayList<PathPlannerTrajectory> trajectories, boolean stopWhenDone) {
     Command fullCommand = new InstantCommand();
+    boolean isFirstTrajectory=true;
     for (PathPlannerTrajectory trajectory: trajectories) {
-      fullCommand = fullCommand.andThen(followTrajectoryCommand(trajectory, false, false));
+      fullCommand = fullCommand.andThen(followTrajectoryCommand(trajectory, isFirstTrajectory, false));
+      isFirstTrajectory=false;
     }
     return fullCommand;
   }

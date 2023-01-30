@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
@@ -21,6 +22,7 @@ import frc.robot.Constants.Drivetrain;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.vision.UpdatePoseEstimator;
 import frc.robot.controllers.Controllers;
+import frc.robot.controllers.SingleXboxController;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.drive.SwerveModule;
 import frc.robot.subsystems.drive.SwerveModuleIO;
@@ -29,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -96,6 +99,24 @@ public class RobotContainer {
     Controllers.updateActiveControllerInstance();
 
     // Put new bindings here. 
+    XboxController controller = ((SingleXboxController) Controllers.activeController).controller;
+    PathConstraints constraints = new PathConstraints(1, 0.5);
+    
+    PathPlannerTrajectory forwardTraj = PathPlanner.loadPath("DEBUG_Forward",constraints);
+    Command forwardCommand = swerveSubsystem.followTrajectoryCommand(forwardTraj, true, true);
+    new JoystickButton(controller, XboxController.Button.kY.value).toggleOnTrue(forwardCommand);
+
+    PathPlannerTrajectory backwardTraj = PathPlanner.loadPath("DEBUG_Back",constraints);
+    Command backwardCommand = swerveSubsystem.followTrajectoryCommand(backwardTraj, true, true);
+    new JoystickButton(controller, XboxController.Button.kA.value).toggleOnTrue(backwardCommand);
+
+    PathPlannerTrajectory leftTraj = PathPlanner.loadPath("DEBUG_Forward",constraints);
+    Command leftCommand = swerveSubsystem.followTrajectoryCommand(leftTraj, true, true);
+    new JoystickButton(controller, XboxController.Button.kX.value).toggleOnTrue(leftCommand);
+
+    PathPlannerTrajectory rightTraj = PathPlanner.loadPath("DEBUG_Forward",constraints);
+    Command rightCommand = swerveSubsystem.followTrajectoryCommand(rightTraj, true, true);
+    new JoystickButton(controller, XboxController.Button.kB.value).toggleOnTrue(rightCommand);
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

@@ -6,7 +6,7 @@ import frc.robot.Constants;
 
 public class SingleXboxController implements ControllerInterface {
 
-  XboxController controller;
+  public XboxController controller;
 
   public SingleXboxController(int port) {
     controller = new XboxController(port);
