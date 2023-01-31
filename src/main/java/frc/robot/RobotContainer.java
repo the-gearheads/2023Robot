@@ -82,6 +82,14 @@ public class RobotContainer {
     updateControllers();
   }
 
+  PathConstraints constraints = new PathConstraints(1, 0.5);
+
+  private Command getCommandForPath(String pathName, boolean resetOdometry) {
+    PathPlannerTrajectory path = PathPlanner.loadPath(pathName, constraints);
+    Command forwardCommand = swerveSubsystem.followTrajectoryCommand(path, true, true);
+    return forwardCommand;
+  }
+
   /**
    * Use this method to define your button->command mappings. Buttons can be created by instantiating a {@link GenericHID} or one of its subclasses
    * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
@@ -100,30 +108,20 @@ public class RobotContainer {
 
     // Put new bindings here. 
     XboxController controller = ((SingleXboxController) Controllers.activeController).controller;
-    PathConstraints constraints = new PathConstraints(1, 0.5);
 
     PathPlannerTrajectory forwardTraj = PathPlanner.loadPath("DEBUG_Forward", constraints);
     Command forwardCommand = swerveSubsystem.followTrajectoryCommand(forwardTraj, true, true);
     new JoystickButton(controller, XboxController.Button.kY.value).toggleOnTrue(forwardCommand);
 
-    PathPlannerTrajectory backwardTraj = PathPlanner.loadPath("DEBUG_Backward",constraints);
-    Command backwardCommand = swerveSubsystem.followTrajectoryCommand(backwardTraj, true, true);
-    new JoystickButton(controller, XboxController.Button.kA.value).toggleOnTrue(backwardCommand);
-
-    PathPlannerTrajectory leftTraj = PathPlanner.loadPath("DEBUG_Left",constraints);
-    Command leftCommand = swerveSubsystem.followTrajectoryCommand(leftTraj, true, true);
-    new JoystickButton(controller, XboxController.Button.kX.value).toggleOnTrue(leftCommand);
-
-    PathPlannerTrajectory rightTraj = PathPlanner.loadPath("DEBUG_Right",constraints);
-    Command rightCommand = swerveSubsystem.followTrajectoryCommand(rightTraj, true, true);
-    new JoystickButton(controller, XboxController.Button.kB.value).toggleOnTrue(rightCommand);
+    Controllers.activeController.getPPLoadDebugForwardPath().toggleOnTrue(getCommandForPath("DEBUG_Forawrd", true));
+    Controllers.activeController.getPPLoadDebugBackwardPath().toggleOnTrue(getCommandForPath("DEBUG_Backward", true));
+    Controllers.activeController.getPPLoadDebugLeftPath().toggleOnTrue(getCommandForPath("DEBUG_Left", true));
+    Controllers.activeController.getPPLoadDebugRightPath().toggleOnTrue(getCommandForPath("DEBUG_Right", true));
 
     // This command puts the robot 1 meter in front of apriltag 8 (middle of bottom left grid on pathplanner picture of 2023 field)
-    new JoystickButton(controller, XboxController.Button.kRightBumper.value).
-    toggleOnTrue(swerveSubsystem.goTo(Constants.FieldConstants.GRID_8, constraints));
+    Controllers.activeController.getPPGotoTag8().toggleOnTrue(swerveSubsystem.goTo(Constants.FieldConstants.GRID_8, constraints));
 
-    // This command puts the robot 1 meter in front of apriltag 8 (middle of bottom left grid on pathplanner picture of 2023 field)
-    new JoystickButton(controller, XboxController.Button.kLeftBumper.value).onTrue(new InstantCommand(()->{
+    Controllers.activeController.getResetPoseButton().onTrue(new InstantCommand(()->{
       swerveSubsystem.setPose(new Pose2d());
     }));
   }
