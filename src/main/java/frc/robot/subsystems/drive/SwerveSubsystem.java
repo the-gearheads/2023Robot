@@ -23,6 +23,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -195,7 +196,7 @@ public class SwerveSubsystem extends SubsystemBase {
     startPoint,
     endPoint
     );
-    return followTrajectoryCommand(traj, true, true);
+    return followTrajectoryCommand(traj, false, true);
   }
 
   /* Telemetry (Advantage Kit) Related Methods (also used in odometry) */
@@ -268,6 +269,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /* SysId Related Methods  */
   /* Sets volts in a way that makes it drive like a differential drive */
   public void setVolts(double leftVolts, double rightVolts) {
+    rightVolts *= -1;
     for(int i = 0; i < modules.length; i++) {
       // If i is divisible by 2, it is on the left (because order is FL, FR, RL, RR). 0 is divisible by 2 in this implementation.
       if(i % 2 == 0) {
@@ -280,17 +282,17 @@ public class SwerveSubsystem extends SubsystemBase {
 
   /* Gets drive motor voltages in a way that would make sense for a differential drive */
   public double[] getDiffVoltages() {
-    return new double[] {lastInputs[0].driveAppliedVolts, lastInputs[1].driveAppliedVolts};
+    return new double[] {lastInputs[0].driveAppliedVolts, -lastInputs[1].driveAppliedVolts};
   }
 
   /* Gets drive motor positions in a way that would make sense for a differential drive */
   public double[] getDiffPositions() {
-    return new double[] { lastInputs[0].drivePosition, lastInputs[1].drivePosition};
+    return new double[] { lastInputs[0].drivePosition, -lastInputs[1].drivePosition};
   }
     
   /* Gets drive motor velocities in a way that would make sense for a differential drive */
   public double[] getDiffVelocities() {
-    return new double[] { lastInputs[0].driveVelocity, lastInputs[1].driveVelocity};
+    return new double[] { lastInputs[0].driveVelocity, -lastInputs[1].driveVelocity};
   }
 
   /* Returns Z axis rotation speed in degrees per second */
@@ -298,8 +300,17 @@ public class SwerveSubsystem extends SubsystemBase {
     return gyro.getRate();
   }
 
+  /* Returns Z axis rotation speed in radians per second */
+  public double getAngularVelRad() {
+    return Units.degreesToRadians(gyro.getRate());
+  }
+
   public double getContinuousGyroAngle(){
     return gyro.getRotation2d().getDegrees();
+  }
+
+  public double getContinuousGyroAngleRad(){
+    return gyro.getRotation2d().getRadians();
   }
 
   /**

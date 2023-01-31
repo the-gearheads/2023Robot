@@ -43,12 +43,12 @@ public class SysidCommand extends CommandBase {
 
     data.ensureCapacity(maxCapacity);
 
-    this.isDynamicTest = SmartDashboard.getString("/SysIdTestType", "") == "Dynamic";
-    this.rotateInTest = SmartDashboard.getBoolean("/SysIdRotate", false);
-    this.voltCommand = SmartDashboard.getNumber("/SysIdVoltageCommand", 0);
+    this.isDynamicTest = SmartDashboard.getString("SysIdTestType", "").toLowerCase().contains("dynamic");
+    this.rotateInTest = SmartDashboard.getBoolean("SysIdRotate", false);
+    this.voltCommand = SmartDashboard.getNumber("SysIdVoltageCommand", 0);
     this.isWrongMech = !SmartDashboard.getString("SysIdTest", "").contains("Drivetrain");
-    SmartDashboard.putBoolean("/SysIdWrongMech", isWrongMech);
-    SmartDashboard.putNumber("/SysIdAckNumber", ackNum);
+    SmartDashboard.putBoolean("SysIdWrongMech", isWrongMech);
+    SmartDashboard.putNumber("SysIdAckNumber", ackNum);
   
     this.startTime = Timer.getFPGATimestamp();
 
@@ -57,7 +57,7 @@ public class SysidCommand extends CommandBase {
 
   @Override
   public void execute() {
-    if(isWrongMech) {System.out.println("Wrong mechanism!!"); return;}
+    //if(isWrongMech) {System.out.println("Wrong mechanism!!"); return;}
 
     // Set our motor speeds depending on which test is appropriate
     double targetVolts = 0;
@@ -84,8 +84,10 @@ public class SysidCommand extends CommandBase {
 
     data.add(velocities[0]);
     data.add(velocities[1]);
-    data.add(drive.getContinuousGyroAngle());
-    data.add(drive.getAngularVel());
+    data.add(drive.getContinuousGyroAngleRad());
+    data.add(drive.getAngularVelRad());
+
+    SmartDashboard.putBoolean("is being dynmaic", isDynamicTest);
   }
 
   @Override
@@ -93,7 +95,7 @@ public class SysidCommand extends CommandBase {
 
     // This was probably false initially
     Threads.setCurrentThreadPriority(false, 0);
-    SmartDashboard.putBoolean("/SysIdOverflow", data.size() > maxCapacity);
+    SmartDashboard.putBoolean("SysIdOverflow", data.size() > maxCapacity);
 
     StringBuilder outputString = new StringBuilder();
     outputString.ensureCapacity(maxCapacity + 50);
@@ -101,10 +103,12 @@ public class SysidCommand extends CommandBase {
     outputString.append(voltCommand > 0 ? "-forward;": "-backward;");
     for(var entry: data) {
       outputString.append(entry);
+      outputString.append(",");
     }
+    outputString.deleteCharAt(outputString.length()-1);
 
-    SmartDashboard.putString("/SysIdTelemetry", outputString.toString());
-    SmartDashboard.putNumber("/SysIdAckNumber", ++ackNum);
+    SmartDashboard.putString("SysIdTelemetry", outputString.toString());
+    SmartDashboard.putNumber("SysIdAckNumber", ++ackNum);
   }
 
   

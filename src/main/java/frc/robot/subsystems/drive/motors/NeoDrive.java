@@ -5,7 +5,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.util.SendableSparkMaxPID;
 
@@ -54,7 +54,9 @@ public class NeoDrive {
 
   /* Please work */
   public void setVoltage(double volts) {
-    pid.setReference(volts, CANSparkMax.ControlType.kVoltage);
+    SmartDashboard.putNumber("/Swerve/ManualVolts", volts);
+    // pid.setReference(volts, CANSparkMax.ControlType.kVoltage);
+    max.setVoltage(volts);
   }
 
   public void zeroEncoders() {

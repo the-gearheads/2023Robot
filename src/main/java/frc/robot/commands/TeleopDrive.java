@@ -37,7 +37,7 @@ public class TeleopDrive extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    swerveSubsystem.zeroEncoders();
+    //swerveSubsystem.setPose(Constants.Drivetrain.zeroPos);
     angleSetPoint=swerveSubsystem.getPose().getRotation().getDegrees();
   }
 

@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.commands.TeleopDrive;
+import frc.robot.commands.sysidcommand.SysidCommand;
 import frc.robot.commands.vision.UpdatePoseEstimator;
 import frc.robot.controllers.Controllers;
 import frc.robot.controllers.SingleXboxController;
@@ -106,20 +107,19 @@ public class RobotContainer {
     Command forwardCommand = swerveSubsystem.followTrajectoryCommand(forwardTraj, true, true);
     new JoystickButton(controller, XboxController.Button.kY.value).toggleOnTrue(forwardCommand);
 
-    PathPlannerTrajectory backwardTraj = PathPlanner.loadPath("DEBUG_Back",constraints);
+    PathPlannerTrajectory backwardTraj = PathPlanner.loadPath("DEBUG_Backward",constraints);
     Command backwardCommand = swerveSubsystem.followTrajectoryCommand(backwardTraj, true, true);
     new JoystickButton(controller, XboxController.Button.kA.value).toggleOnTrue(backwardCommand);
 
-    PathPlannerTrajectory leftTraj = PathPlanner.loadPath("DEBUG_Forward",constraints);
+    PathPlannerTrajectory leftTraj = PathPlanner.loadPath("DEBUG_Left",constraints);
     Command leftCommand = swerveSubsystem.followTrajectoryCommand(leftTraj, true, true);
     new JoystickButton(controller, XboxController.Button.kX.value).toggleOnTrue(leftCommand);
 
-    PathPlannerTrajectory rightTraj = PathPlanner.loadPath("DEBUG_Forward",constraints);
+    PathPlannerTrajectory rightTraj = PathPlanner.loadPath("DEBUG_Right",constraints);
     Command rightCommand = swerveSubsystem.followTrajectoryCommand(rightTraj, true, true);
     new JoystickButton(controller, XboxController.Button.kB.value).toggleOnTrue(rightCommand);
 
-    //This command puts the robot 1 meter in front of apriltag 8 (middle of bottom left grid on pathplanner picture of 2023 field)
-
+    // This command puts the robot 1 meter in front of apriltag 8 (middle of bottom left grid on pathplanner picture of 2023 field)
     new JoystickButton(controller, XboxController.Button.kRightBumper.value).
     toggleOnTrue(swerveSubsystem.goTo(Constants.FieldConstants.GRID_8, constraints));
   }

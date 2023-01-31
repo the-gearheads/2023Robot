@@ -75,7 +75,7 @@ public class Constants extends AnnotatedClass {
     public static double DRIVE_POS_FACTOR = WHEEL_CIRCUMFERENCE / DRIVE_GEAR_RATIO; // rotations -> gear ratio adjusted rotations -> meters
     public static double DRIVE_VEL_FACTOR =  WHEEL_CIRCUMFERENCE / DRIVE_GEAR_RATIO / 60.0; // rpm -> gear ratio adjusted rpm -> meters/min -> meters/sec 
 
-    public static double DRIVE_FREE_SPEED = 5676 * DRIVE_VEL_FACTOR; // Convert max neo free speed to max free wheel speed
+    public static double DRIVE_FREE_SPEED = 5676 * DRIVE_VEL_FACTOR * 1.2; // Convert max neo free speed to max free wheel speed
 
     public static double STEER_POS_FACTOR = 2 * Math.PI; // rotations -> radians
     public static double STEER_VEL_FACTOR = 2 * Math.PI * 60; // rpm -> rad/sec
@@ -96,21 +96,21 @@ public class Constants extends AnnotatedClass {
     public static Translation2d RR_POS = new Translation2d(Units.inchesToMeters(-12.25), Units.inchesToMeters(-13.25));
 
     @NTPublish
-    public static double MAX_LIN_VEL = 5;//set to 2
+    public static double MAX_LIN_VEL = 2;//set to 2
     @NTPublish
-    public static double MAX_ROT_VEL = 5;
+    public static double MAX_ROT_VEL = 1;
 
     @NTPublish
     public static double MAX_MODULE_SPEED = 5;
     @NTPublish
-    public static double MAX_TRANSLATIONAL_SPEED = 5;
+    public static double MAX_TRANSLATIONAL_SPEED = 2;
     @NTPublish
-    public static double MAX_ROTATIONAL_SPEED = 5;
+    public static double MAX_ROTATIONAL_SPEED = 1;
 
     public static class Auton {
-      public static PIDController X_PID = new PIDController(0, 0, 0);
-      public static PIDController Y_PID = new PIDController(0, 0, 0);
-      public static PIDController ROT_PID = new PIDController(0, 0, 0);
+      public static PIDController X_PID = new PIDController(2.5, 0, 0);
+      public static PIDController Y_PID = new PIDController(2.5, 0, 0);
+      public static PIDController ROT_PID = new PIDController(1, 0, 0);
       public static PathConstraints CONSTRAINTS = new PathConstraints(1, 1.5);
     }
   }
