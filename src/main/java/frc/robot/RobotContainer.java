@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -121,6 +121,11 @@ public class RobotContainer {
     // This command puts the robot 1 meter in front of apriltag 8 (middle of bottom left grid on pathplanner picture of 2023 field)
     new JoystickButton(controller, XboxController.Button.kRightBumper.value).
     toggleOnTrue(swerveSubsystem.goTo(Constants.FieldConstants.GRID_8, constraints));
+
+    // This command puts the robot 1 meter in front of apriltag 8 (middle of bottom left grid on pathplanner picture of 2023 field)
+    new JoystickButton(controller, XboxController.Button.kLeftBumper.value).onTrue(new InstantCommand(()->{
+      swerveSubsystem.setPose(new Pose2d());
+    }));
   }
 
   /**
