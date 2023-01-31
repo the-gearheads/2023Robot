@@ -17,14 +17,17 @@ public class SingleXboxController implements ControllerInterface {
     return MathUtil.applyDeadband(num, Constants.Controllers.JOYSTICK_DEADBAND);
   }
 
+  @Override
   public double getXMoveAxis() {
     return -deadband(controller.getLeftY());
   }
 
+  @Override
   public double getYMoveAxis() {
     return -deadband(controller.getLeftX());
   }
 
+  @Override
   public double getRotateAxis() {
     return -deadband(controller.getRightX());
   }

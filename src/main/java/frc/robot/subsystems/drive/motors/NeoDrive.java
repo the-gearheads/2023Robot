@@ -10,12 +10,12 @@ import frc.robot.Constants.Drivetrain;
 import frc.robot.util.SendableSparkMaxPID;
 
 public class NeoDrive {
-  CANSparkMax max;
-  RelativeEncoder encoder;
-  SparkMaxPIDController pid;
-  SendableSparkMaxPID sPid;
+  private CANSparkMax max;
+  private RelativeEncoder encoder;
+  private SparkMaxPIDController pid;
+  private SendableSparkMaxPID sPid;
 
-  double setpoint;
+  private double setpoint;
 
   public NeoDrive(int id) {
     max = new CANSparkMax(id, MotorType.kBrushless);
@@ -70,7 +70,7 @@ public class NeoDrive {
   public double getPosition() {
     return encoder.getPosition();
   }
-  
+
   public double getVelocity() {
     return encoder.getVelocity();
   }

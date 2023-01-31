@@ -34,7 +34,7 @@ public class SysidCommand extends CommandBase {
     this.drive = drive;
 
     // Realtime priorities
-    if(Robot.isReal()) {
+    if (Robot.isReal()) {
       // AFAIK this is already set by default
       Notifier.setHALThreadPriority(true, 40);
       // But this isn't
@@ -61,7 +61,7 @@ public class SysidCommand extends CommandBase {
 
     // Set our motor speeds depending on which test is appropriate
     double targetVolts = 0;
-    if(isDynamicTest) {
+    if (isDynamicTest) {
       targetVolts = voltCommand;
     } else {
       targetVolts = voltCommand * (Timer.getFPGATimestamp() - startTime);
@@ -100,8 +100,8 @@ public class SysidCommand extends CommandBase {
     StringBuilder outputString = new StringBuilder();
     outputString.ensureCapacity(maxCapacity + 50);
     outputString.append(isDynamicTest ? "fast" : "slow");
-    outputString.append(voltCommand > 0 ? "-forward;": "-backward;");
-    for(var entry: data) {
+    outputString.append(voltCommand > 0 ? "-forward;" : "-backward;");
+    for (var entry : data) {
       outputString.append(entry);
       outputString.append(",");
     }
@@ -111,5 +111,5 @@ public class SysidCommand extends CommandBase {
     SmartDashboard.putNumber("SysIdAckNumber", ++ackNum);
   }
 
-  
+
 }

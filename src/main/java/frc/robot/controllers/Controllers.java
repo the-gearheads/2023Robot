@@ -3,6 +3,9 @@ package frc.robot.controllers;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class Controllers {
+
+  private Controllers() {}
+
   private static String[] lastControllerNames = new String[6];
 
   public static ControllerInterface activeController;
@@ -31,6 +34,6 @@ public class Controllers {
       }
     }
     // No controller found, but a NullPointerException would be far worse than any warnings
-    activeController = new SingleXboxController(0);  
+    activeController = new SingleXboxController(0);
   }
 }

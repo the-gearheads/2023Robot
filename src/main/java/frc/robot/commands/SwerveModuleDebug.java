@@ -16,7 +16,7 @@ public class SwerveModuleDebug extends CommandBase {
   /** Creates a new SwerveModuleDebug. */
   public SwerveModuleDebug(SwerveSubsystem swerve) {
     addRequirements(swerve);
-    this.swerve=swerve;
+    this.swerve = swerve;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -24,11 +24,11 @@ public class SwerveModuleDebug extends CommandBase {
   @Override
   public void initialize() {
     SmartDashboard.putNumber("SW Angle Setpoint", 0);
-    SmartDashboard.putNumber("SW kP",0 );
-    SmartDashboard.putNumber("SW kI",0 );
-    SmartDashboard.putNumber("SW kD",0 );
+    SmartDashboard.putNumber("SW kP", 0);
+    SmartDashboard.putNumber("SW kI", 0);
+    SmartDashboard.putNumber("SW kD", 0);
 
-    
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -36,11 +36,10 @@ public class SwerveModuleDebug extends CommandBase {
   public void execute() {
     double setpoint = SmartDashboard.getNumber("Left Mod Angle Setpoint", 0);
     swerve.modules[1].setState(new SwerveModuleState(0.0, Rotation2d.fromDegrees(setpoint)));
-    // SmartDashboard.putNumber("SW Angle", swerve.modules[1].getSteer().getAngle().getDegrees());
 
-    double kP=SmartDashboard.getNumber("SW kP",0 );
-    double kI=SmartDashboard.getNumber("SW kI",0 );
-    double kD=SmartDashboard.getNumber("SW kD",0 );
+    double kP = SmartDashboard.getNumber("SW kP", 0);
+    double kI = SmartDashboard.getNumber("SW kI", 0);
+    double kD = SmartDashboard.getNumber("SW kD", 0);
     swerve.modules[1].setPIDConstants(kP, kI, kD, setpoint);
   }
 

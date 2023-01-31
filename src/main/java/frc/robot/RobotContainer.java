@@ -35,10 +35,9 @@ import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and button mappings) should be declared here.
+ * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot} periodic methods (other than the scheduler calls). Instead, the structure of the robot (including subsystems, commands, and button mappings) should
+ * be declared here.
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
@@ -47,7 +46,8 @@ public class RobotContainer {
 
   public String readPipelineFile() {
     try {
-      return Files.readString(Paths.get(Filesystem.getDeployDirectory().getAbsolutePath(), "streampath.json"), Charset.forName("UTF-8"));
+      return Files.readString(Paths.get(Filesystem.getDeployDirectory().getAbsolutePath(), "streampath.json"),
+          Charset.forName("UTF-8"));
     } catch (Exception e) {
       e.printStackTrace();
       return "";
@@ -59,20 +59,20 @@ public class RobotContainer {
     // Configure default teleop command
     // Ideally, we publish this from vision-testing, but this is fine for now. In a deploy file because escaping quotation marks is ugly and annoying
     NetworkTableInstance.getDefault().getStringTopic("/VisionTestingPipeline").publish().set(readPipelineFile());
-    switch(Constants.getMode()) {
+    switch (Constants.getMode()) {
       case REAL:
         SmartDashboard.putString("/Mode", "REAL");
         swerveSubsystem = new SwerveSubsystem(
-          new SwerveModule(0, Drivetrain.FL_IDS[0], Drivetrain.FL_IDS[1], Drivetrain.FL_OFFSETS, "FL"),
-          new SwerveModule(1, Drivetrain.FR_IDS[0], Drivetrain.FR_IDS[1], Drivetrain.FR_OFFSETS, "FR"),
-          new SwerveModule(2, Drivetrain.RL_IDS[0], Drivetrain.RL_IDS[1], Drivetrain.RL_OFFSETS, "RL"),
-          new SwerveModule(3, Drivetrain.RR_IDS[0], Drivetrain.RR_IDS[1], Drivetrain.RR_OFFSETS, "RR")
-        );
+            new SwerveModule(0, Drivetrain.FL_IDS[0], Drivetrain.FL_IDS[1], Drivetrain.FL_OFFSETS, "FL"),
+            new SwerveModule(1, Drivetrain.FR_IDS[0], Drivetrain.FR_IDS[1], Drivetrain.FR_OFFSETS, "FR"),
+            new SwerveModule(2, Drivetrain.RL_IDS[0], Drivetrain.RL_IDS[1], Drivetrain.RL_OFFSETS, "RL"),
+            new SwerveModule(3, Drivetrain.RR_IDS[0], Drivetrain.RR_IDS[1], Drivetrain.RR_OFFSETS, "RR"));
         break;
-        default:
-        case SIM_REPLAY:
-          SmartDashboard.putString("/Mode", "SIM_REPLAY");
-          swerveSubsystem = new SwerveSubsystem(new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {});
+      default:
+      case SIM_REPLAY:
+        SmartDashboard.putString("/Mode", "SIM_REPLAY");
+        swerveSubsystem = new SwerveSubsystem(new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {},
+            new SwerveModuleIO() {});
         break;
     }
 
@@ -83,14 +83,13 @@ public class RobotContainer {
   }
 
   /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   * Use this method to define your button->command mappings. Buttons can be created by instantiating a {@link GenericHID} or one of its subclasses
+   * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   public void updateControllers() {
     // Do nothing if controller layout hasn't changed.
-    if(!Controllers.didControllersChange()) return; 
+    if (!Controllers.didControllersChange())
+      return;
     System.out.println("Updating controller layout");
 
     // Clear buttons
@@ -102,8 +101,8 @@ public class RobotContainer {
     // Put new bindings here. 
     XboxController controller = ((SingleXboxController) Controllers.activeController).controller;
     PathConstraints constraints = new PathConstraints(1, 0.5);
-    
-    PathPlannerTrajectory forwardTraj = PathPlanner.loadPath("DEBUG_Forward",constraints);
+
+    PathPlannerTrajectory forwardTraj = PathPlanner.loadPath("DEBUG_Forward", constraints);
     Command forwardCommand = swerveSubsystem.followTrajectoryCommand(forwardTraj, true, true);
     new JoystickButton(controller, XboxController.Button.kY.value).toggleOnTrue(forwardCommand);
 
@@ -123,20 +122,23 @@ public class RobotContainer {
     new JoystickButton(controller, XboxController.Button.kRightBumper.value).
     toggleOnTrue(swerveSubsystem.goTo(Constants.FieldConstants.GRID_8, constraints));
   }
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    ArrayList<PathPlannerTrajectory> trajectories = new ArrayList<PathPlannerTrajectory>(){{
-      add(PathPlanner.loadPath("Forward2Meters", Drivetrain.Auton.CONSTRAINTS));
-      add(PathPlanner.loadPath("Right2Meters", Drivetrain.Auton.CONSTRAINTS));
-      add(PathPlanner.loadPath("DiagonalDown2Left2", Drivetrain.Auton.CONSTRAINTS));
-    }};
+    ArrayList<PathPlannerTrajectory> trajectories = new ArrayList<PathPlannerTrajectory>() {
+      {
+        add(PathPlanner.loadPath("Forward2Meters", Drivetrain.Auton.CONSTRAINTS));
+        add(PathPlanner.loadPath("Right2Meters", Drivetrain.Auton.CONSTRAINTS));
+        add(PathPlanner.loadPath("DiagonalDown2Left2", Drivetrain.Auton.CONSTRAINTS));
+      }
+    };
     return new RepeatCommand(new InstantCommand(() -> {
       // Reset odometry for the first path you run during auto
-          swerveSubsystem.setPose(trajectories.get(0).getInitialHolonomicPose());
-      }).andThen(swerveSubsystem.followTrajectoriesCommand(trajectories, true)));
+      swerveSubsystem.setPose(trajectories.get(0).getInitialHolonomicPose());
+    }).andThen(swerveSubsystem.followTrajectoriesCommand(trajectories, true)));
   }
 }
