@@ -31,8 +31,8 @@ public class TeleopDrive extends CommandBase {
     swerveSubsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
-    SmartDashboard.putBoolean("ArcadeDrive/UseFieldRelative", false);
-    SmartDashboard.putBoolean("ArcadeDrive/ExponentialJoystickControl", false);
+    SmartDashboard.putBoolean("TeleopDrive/UseFieldRelative", false);
+    SmartDashboard.putBoolean("TeleopDrive/ExponentialJoystickControl", false);
     SmartDashboard.putBoolean("Rotation PID", false);
     SmartDashboard.putNumber("Rotation PID kP", 1);
   }
@@ -51,7 +51,7 @@ public class TeleopDrive extends CommandBase {
     var ySpd = Controllers.activeController.getYMoveAxis();
     var rotSpd = Controllers.activeController.getRotateAxis();
 
-    boolean useExponentialJoystickControl = SmartDashboard.getBoolean("ArcadeDrive/ExponentialJoystickControl", false);
+    boolean useExponentialJoystickControl = SmartDashboard.getBoolean("TeleopDrive/ExponentialJoystickControl", false);
     if(useExponentialJoystickControl){
       Pair<Double, Double> xyPair = AdditionalMathUtils.poseExp(xSpd, ySpd);
       xSpd=xyPair.getFirst();
@@ -75,12 +75,12 @@ public class TeleopDrive extends CommandBase {
       }
     }
 
-    SmartDashboard.putNumber("ArcadeDrive/xSpd", xSpd);
-    SmartDashboard.putNumber("ArcadeDrive/ySpd", ySpd);
-    SmartDashboard.putNumber("ArcadeDrive/rot", rotSpd);
+    SmartDashboard.putNumber("TeleopDrive/xSpd", xSpd);
+    SmartDashboard.putNumber("TeleopDrive/ySpd", ySpd);
+    SmartDashboard.putNumber("TeleopDrive/rot", rotSpd);
 
     var speeds = new ChassisSpeeds(xSpd, ySpd, rotSpd);
-    if (SmartDashboard.getBoolean("ArcadeDrive/UseFieldRelative", true)) {
+    if (SmartDashboard.getBoolean("TeleopDrive/UseFieldRelative", true)) {
       swerveSubsystem.driveFieldRelative(speeds);
     } else {
       swerveSubsystem.drive(speeds);
