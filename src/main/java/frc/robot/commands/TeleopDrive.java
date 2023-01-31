@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -12,11 +13,12 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.SwerveSubsystem;
+import frc.robot.util.AdditionalMathUtils;
 
 /** An example command that uses an example subsystem. */
 public class TeleopDrive extends CommandBase {
   private final SwerveSubsystem swerveSubsystem;
-  private PIDController rotPIDController = new PIDController(3, 0, 0);
+  private PIDController rotPIDController = new PIDController(1, 0, 0);
   private double angleSetPoint;
 
 
@@ -30,8 +32,9 @@ public class TeleopDrive extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
     SmartDashboard.putBoolean("ArcadeDrive/UseFieldRelative", false);
+    SmartDashboard.putBoolean("ArcadeDrive/ExponentialJoystickControl", false);
     SmartDashboard.putBoolean("Rotation PID", false);
-    SmartDashboard.putNumber("Rotation PID kP", 3);
+    SmartDashboard.putNumber("Rotation PID kP", 1);
   }
 
   // Called when the command is initially scheduled.
@@ -48,14 +51,21 @@ public class TeleopDrive extends CommandBase {
     var ySpd = Controllers.activeController.getYMoveAxis();
     var rotSpd = Controllers.activeController.getRotateAxis();
 
-    //Quadratic axis control
-    xSpd *= Math.abs(xSpd) * Constants.Drivetrain.MAX_LIN_VEL;
-    ySpd *= Math.abs(ySpd) * Constants.Drivetrain.MAX_LIN_VEL;
-    rotSpd *= Math.abs(rotSpd) * Constants.Drivetrain.MAX_ROT_VEL;
+    boolean useExponentialJoystickControl = SmartDashboard.getBoolean("ArcadeDrive/ExponentialJoystickControl", false);
+    if(useExponentialJoystickControl){
+      Pair<Double, Double> xyPair = AdditionalMathUtils.poseExp(xSpd, ySpd);
+      xSpd=xyPair.getFirst();
+      ySpd=xyPair.getSecond();
+    }else{
+      //Quadratic axis control
+      xSpd *= Math.abs(xSpd) * Constants.Drivetrain.MAX_LIN_VEL;
+      ySpd *= Math.abs(ySpd) * Constants.Drivetrain.MAX_LIN_VEL;
+      rotSpd *= Math.abs(rotSpd) * Constants.Drivetrain.MAX_ROT_VEL;
+    }
 
     //Make sure the robot maintains its heading when we aren't toggling the rotation axis
     if (SmartDashboard.getBoolean("Rotation PID", false)) {
-      rotPIDController = new PIDController(SmartDashboard.getNumber("Rotation PID kP", 3), 0, 0);
+      rotPIDController = new PIDController(SmartDashboard.getNumber("Rotation PID kP", 1), 0, 0);
 
       double gyroAngle = swerveSubsystem.getPose().getRotation().getDegrees();
       if (MathUtil.applyDeadband(rotSpd, 1E-2) == 0) {
