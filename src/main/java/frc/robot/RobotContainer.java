@@ -14,6 +14,7 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -86,6 +87,12 @@ public class RobotContainer {
 
   private Command getCommandForPath(String pathName, boolean resetOdometry) {
     PathPlannerTrajectory path = PathPlanner.loadPath(pathName, constraints);
+    DriverStation.reportError("Failed to load path: " + pathName, true);
+    if(path == null) {
+      return new InstantCommand(()->{
+        DriverStation.reportError("Tried to execute path that failed to load! Path name: " + pathName, true);
+      });
+    }
     Command forwardCommand = swerveSubsystem.followTrajectoryCommand(path, true, true);
     return forwardCommand;
   }
@@ -113,7 +120,7 @@ public class RobotContainer {
     Command forwardCommand = swerveSubsystem.followTrajectoryCommand(forwardTraj, true, true);
     new JoystickButton(controller, XboxController.Button.kY.value).toggleOnTrue(forwardCommand);
 
-    Controllers.activeController.getPPLoadDebugForwardPath().toggleOnTrue(getCommandForPath("DEBUG_Forawrd", true));
+    Controllers.activeController.getPPLoadDebugForwardPath().toggleOnTrue(getCommandForPath("DEBUG_Forward", true));
     Controllers.activeController.getPPLoadDebugBackwardPath().toggleOnTrue(getCommandForPath("DEBUG_Backward", true));
     Controllers.activeController.getPPLoadDebugLeftPath().toggleOnTrue(getCommandForPath("DEBUG_Left", true));
     Controllers.activeController.getPPLoadDebugRightPath().toggleOnTrue(getCommandForPath("DEBUG_Right", true));
