@@ -1,5 +1,6 @@
 package frc.robot.util;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 
 public class AdditionalMathUtils {
@@ -15,5 +16,16 @@ public class AdditionalMathUtils {
     return "X="  + round(pos.getX(), places) + 
          "; Y="  + round(pos.getY(), places) + 
          "; Deg="+ round(pos.getRotation().getDegrees(), places);
+  }
+
+  /* Pose exp for teleop drive. Takes in controller x and y axises and outputs pose exped ones */
+  public static Pair<Double, Double> poseExp(double x, double y) {
+    // java doesn't have an exponent operator apparently
+    double mag = Math.sqrt(x*x + y*y);
+    double angle = Math.atan2(y, x);
+
+    mag *= Math.abs(mag);
+
+    return new Pair<>(Math.cos(angle) * mag, Math.sin(angle) * mag);
   }
 }
