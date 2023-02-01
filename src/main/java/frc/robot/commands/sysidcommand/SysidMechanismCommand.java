@@ -53,14 +53,14 @@ public class SysidMechanismCommand extends CommandBase {
 
     data.ensureCapacity(maxCapacity);
 
-    this.isDynamicTest = SmartDashboard.getString("/SysIdTestType", "") == "Dynamic";
-    this.voltCommand = SmartDashboard.getNumber("/SysIdVoltageCommand", 0);
+    this.isDynamicTest = SmartDashboard.getString("SysIdTestType", "").toLowerCase().contains("dynamic");
+    this.voltCommand = SmartDashboard.getNumber("SysIdVoltageCommand", 0);
 
-    SmartDashboard.putNumber("/SysIdAckNumber", ackNum);
+    SmartDashboard.putNumber("SysIdAckNumber", ackNum);
 
     var test = SmartDashboard.getString("SysIdTest", "");
     this.isWrongMech = test.contains("Drivetrain");
-    SmartDashboard.putBoolean("/SysIdWrongMech", isWrongMech);
+    SmartDashboard.putBoolean("SysIdWrongMech", isWrongMech);
 
     this.startTime = Timer.getFPGATimestamp();
 
@@ -96,7 +96,7 @@ public class SysidMechanismCommand extends CommandBase {
 
     // This was probably false initially
     Threads.setCurrentThreadPriority(false, 0);
-    SmartDashboard.putBoolean("/SysIdOverflow", data.size() > maxCapacity);
+    SmartDashboard.putBoolean("SysIdOverflow", data.size() > maxCapacity);
 
     StringBuilder outputString = new StringBuilder();
     outputString.ensureCapacity(maxCapacity + 50);
@@ -104,9 +104,11 @@ public class SysidMechanismCommand extends CommandBase {
     outputString.append(voltCommand > 0 ? "-forward;" : "-backward;");
     for (var entry : data) {
       outputString.append(entry);
+      outputString.append(",");
     }
+    outputString.deleteCharAt(outputString.length()-1);
 
-    SmartDashboard.putString("/SysIdTelemetry", outputString.toString());
-    SmartDashboard.putNumber("/SysIdAckNumber", ++ackNum);
+    SmartDashboard.putString("SysIdTelemetry", outputString.toString());
+    SmartDashboard.putNumber("SysIdAckNumber", ++ackNum);
   }
 }

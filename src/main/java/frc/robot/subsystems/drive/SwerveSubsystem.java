@@ -113,6 +113,8 @@ public class SwerveSubsystem extends SubsystemBase {
     for (int i = 0; i < modules.length; i++) {
       modules[i].zeroEncoders();
     }
+    // Needed to update lastInputs to be accurate
+    updateInputs();
     odometry = new SwerveDrivePoseEstimator(kinematics, gyro.getRotation2d(), getPositionsFromInputs(lastInputs),
         new Pose2d());
   }
