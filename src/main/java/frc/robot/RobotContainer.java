@@ -87,8 +87,8 @@ public class RobotContainer {
 
   private Command getCommandForPath(String pathName, boolean resetOdometry) {
     PathPlannerTrajectory path = PathPlanner.loadPath(pathName, constraints);
-    DriverStation.reportError("Failed to load path: " + pathName, true);
     if(path == null) {
+      DriverStation.reportError("Failed to load path: " + pathName, true);
       return new InstantCommand(()->{
         DriverStation.reportError("Tried to execute path that failed to load! Path name: " + pathName, true);
       });
