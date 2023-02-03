@@ -30,6 +30,9 @@ public class SingleXboxController implements ControllerInterface {
 
   @Override
   public double getRotateAxis() {
+    if(Constants.getMode()==Constants.RobotMode.SIM){
+      return -deadband(controller.getRawAxis(2));
+    }
     return -deadband(controller.getRightX());
   }
 

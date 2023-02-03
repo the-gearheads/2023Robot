@@ -1,11 +1,11 @@
-package frc.robot.util;
+package frc.robot.subsystems.drive.gyro;
 
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.SPI;
 
-public class Gyroscope extends AHRS {
+public class Gyroscope extends AHRS implements GyroIO{
     private boolean isCounterClockwise;
 
     public Gyroscope(SPI.Port port) {

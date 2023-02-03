@@ -9,13 +9,16 @@ public class AdditionalMathUtils {
 
   // More or less https://stackoverflow.com/a/5295202 but could be easily reimplemented
   public static double round(double num, int places) {
-    return ((int) (num * Math.pow(10, places))) / Math.pow(10, places);
+    return ((int) (num * Math.pow(10, places))) / (double) Math.pow(10, places);
   }
 
   public static String pos2dToString(Pose2d pos, int places) {
-    return "X="  + round(pos.getX(), places) + 
-         "; Y="  + round(pos.getY(), places) + 
-         "; Deg="+ round(pos.getRotation().getDegrees(), places);
+    // return "X="  + round(pos.getX(), places) + 
+    //      "; Y="  + round(pos.getY(), places) + 
+    //      "; Deg="+ round(pos.getRotation().getDegrees(), places);
+    return "X="  + pos.getX() + 
+    "; Y="  + pos.getY() + 
+    "; Deg="+ pos.getRotation().getDegrees();
   }
 
   /* Pose exp for teleop drive. Takes in controller x and y axises and outputs pose exped ones */

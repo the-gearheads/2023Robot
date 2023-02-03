@@ -109,9 +109,9 @@ public class Constants extends AnnotatedClass {
     public static double MAX_ROTATIONAL_SPEED = 1;
 
     public static class Auton {
-      public static PIDController X_PID = new PIDController(2.5, 0, 0);
-      public static PIDController Y_PID = new PIDController(2.5, 0, 0);
-      public static PIDController ROT_PID = new PIDController(1, 0, 0);
+      public static PIDController X_PID = new PIDController(2.5, 0, 0);//0.5
+      public static PIDController Y_PID = new PIDController(2.5, 0, 0);//0.5
+      public static PIDController ROT_PID = new PIDController(0.5, 0, 0);
       public static PathConstraints CONSTRAINTS = new PathConstraints(1, 1.5);
     }
   }
@@ -120,7 +120,7 @@ public class Constants extends AnnotatedClass {
 
     public static final double WIDTH = 50;
     public static final double LENGTH = 25;
-    public static final Pose2d GRID_8 = new Pose2d(2.8, 1.05, Rotation2d.fromDegrees(180));
+    public static final Pose2d GRID_8 = new Pose2d(1.85, 0.6, Rotation2d.fromDegrees(-180));
   }
   public static final class Vision {
     private Vision() {}

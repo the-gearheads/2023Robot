@@ -13,6 +13,7 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -28,6 +29,7 @@ import frc.robot.controllers.SingleXboxController;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.drive.SwerveModule;
 import frc.robot.subsystems.drive.SwerveModuleIO;
+import frc.robot.subsystems.drive.SwerveModuleSim;
 import frc.robot.subsystems.vision.Vision;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -69,6 +71,14 @@ public class RobotContainer {
             new SwerveModule(2, Drivetrain.RL_IDS[0], Drivetrain.RL_IDS[1], Drivetrain.RL_OFFSETS, "RL"),
             new SwerveModule(3, Drivetrain.RR_IDS[0], Drivetrain.RR_IDS[1], Drivetrain.RR_OFFSETS, "RR"));
         break;
+      case SIM:
+        SmartDashboard.putString("/Mode", "SIM");
+        swerveSubsystem = new SwerveSubsystem(
+            new SwerveModuleSim(0, Drivetrain.FL_IDS[0], Drivetrain.FL_IDS[1], Drivetrain.FL_OFFSETS, "FL"),
+            new SwerveModuleSim(1, Drivetrain.FR_IDS[0], Drivetrain.FR_IDS[1], Drivetrain.FR_OFFSETS, "FR"),
+            new SwerveModuleSim(2, Drivetrain.RL_IDS[0], Drivetrain.RL_IDS[1], Drivetrain.RL_OFFSETS, "RL"),
+            new SwerveModuleSim(3, Drivetrain.RR_IDS[0], Drivetrain.RR_IDS[1], Drivetrain.RR_OFFSETS, "RR"));
+        break;
       default:
       case SIM_REPLAY:
         SmartDashboard.putString("/Mode", "SIM_REPLAY");
@@ -83,17 +93,17 @@ public class RobotContainer {
     updateControllers();
   }
 
-  PathConstraints constraints = new PathConstraints(1, 0.5);
+  PathConstraints constraints = new PathConstraints(3, 2);
 
   private Command getCommandForPath(String pathName, boolean resetOdometry) {
-    PathPlannerTrajectory path = PathPlanner.loadPath(pathName, constraints);
-    DriverStation.reportError("Failed to load path: " + pathName, true);
+    PathPlannerTrajectory path = PathPlanner.loadPath(pathName, new PathConstraints(1, 0.5));
     if(path == null) {
+      DriverStation.reportError("Failed to load path: " + pathName, true);
       return new InstantCommand(()->{
         DriverStation.reportError("Tried to execute path that failed to load! Path name: " + pathName, true);
       });
     }
-    Command forwardCommand = swerveSubsystem.followTrajectoryCommand(path, true, true);
+    Command forwardCommand = swerveSubsystem.followTrajectoryCommand(path, resetOdometry, true);
     return forwardCommand;
   }
 
@@ -120,8 +130,10 @@ public class RobotContainer {
     Command forwardCommand = swerveSubsystem.followTrajectoryCommand(forwardTraj, true, true);
     new JoystickButton(controller, XboxController.Button.kY.value).toggleOnTrue(forwardCommand);
 
-    Controllers.activeController.getPPLoadDebugForwardPath().toggleOnTrue(getCommandForPath("DEBUG_Forward", true));
-    Controllers.activeController.getPPLoadDebugBackwardPath().toggleOnTrue(getCommandForPath("DEBUG_Backward", true));
+    Controllers.activeController.getPPLoadDebugForwardPath().toggleOnTrue(getCommandForPath("Start_To_Game_Piece_1", true));
+    Controllers.activeController.getPPLoadDebugBackwardPath().toggleOnTrue(getCommandForPath("Game_Piece_1_To_Score", true));
+    // Controllers.activeController.getPPLoadDebugForwardPath().toggleOnTrue(getCommandForPath("DEBUG_Forward", true));
+    // Controllers.activeController.getPPLoadDebugBackwardPath().toggleOnTrue(getCommandForPath("DEBUG_Backward", true));
     Controllers.activeController.getPPLoadDebugLeftPath().toggleOnTrue(getCommandForPath("DEBUG_Left", true));
     Controllers.activeController.getPPLoadDebugRightPath().toggleOnTrue(getCommandForPath("DEBUG_Right", true));
 
@@ -129,7 +141,7 @@ public class RobotContainer {
     Controllers.activeController.getPPGotoTag8().toggleOnTrue(swerveSubsystem.goTo(Constants.FieldConstants.GRID_8, constraints));
 
     Controllers.activeController.getResetPoseButton().onTrue(new InstantCommand(()->{
-      swerveSubsystem.setPose(new Pose2d());
+      swerveSubsystem.setPose(new Pose2d(3,0.38,Rotation2d.fromDegrees(90)));
     }));
   }
 

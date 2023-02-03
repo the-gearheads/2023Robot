@@ -58,10 +58,14 @@ public class TeleopDrive extends CommandBase {
       ySpd=xyPair.getSecond();
     }else{
       //Quadratic axis control
-      xSpd *= Math.abs(xSpd) * Constants.Drivetrain.MAX_LIN_VEL;
-      ySpd *= Math.abs(ySpd) * Constants.Drivetrain.MAX_LIN_VEL;
-      rotSpd *= Math.abs(rotSpd) * Constants.Drivetrain.MAX_ROT_VEL;
+      xSpd *= Math.abs(xSpd);
+      ySpd *= Math.abs(ySpd);
+      rotSpd *= Math.abs(rotSpd);
     }
+
+    xSpd *= Constants.Drivetrain.MAX_LIN_VEL;
+    ySpd *= Constants.Drivetrain.MAX_LIN_VEL;
+    rotSpd *= Constants.Drivetrain.MAX_ROT_VEL;
 
     //Make sure the robot maintains its heading when we aren't toggling the rotation axis
     if (SmartDashboard.getBoolean("Rotation PID", false)) {

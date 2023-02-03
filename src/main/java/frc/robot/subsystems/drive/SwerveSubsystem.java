@@ -13,7 +13,7 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
-
+import com.revrobotics.REVPhysicsSim;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -31,9 +31,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.Drivetrain;
+import frc.robot.subsystems.drive.gyro.GyroIO;
+import frc.robot.subsystems.drive.gyro.GyroSim;
+import frc.robot.subsystems.drive.gyro.Gyroscope;
 import frc.robot.util.AdditionalMathUtils;
-import frc.robot.util.Gyroscope;
 
 public class SwerveSubsystem extends SubsystemBase {
 
@@ -41,12 +44,17 @@ public class SwerveSubsystem extends SubsystemBase {
   final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(modulePositions);
   public SwerveModuleIO[] modules;
   public SwerveModuleInputsAutoLogged[] lastInputs;
-  Gyroscope gyro = new Gyroscope(SPI.Port.kMXP, true);
+  GyroIO gyro;
   SwerveDrivePoseEstimator odometry;
   Field2d field = new Field2d();
 
   /** Creates a new SwerveSubsystem. */
   public SwerveSubsystem(SwerveModuleIO... modules) {
+    if(Constants.getMode()==Constants.RobotMode.REAL){
+      this.gyro= new Gyroscope(SPI.Port.kMXP, true);
+    }else{
+      this.gyro= new GyroSim();
+    }
     this.modules = modules;
     /* Get module states to pass to odometry */
     updateInputs();
@@ -75,6 +83,15 @@ public class SwerveSubsystem extends SubsystemBase {
 
     var states = getStatesFromInputs(lastInputs);
     Logger.getInstance().recordOutput("/Swerve/ModuleStates", states);
+  }
+
+  public void simulationPeriodic(){
+    if(Constants.getMode()==Constants.RobotMode.SIM){
+      ChassisSpeeds chassisSpeeds = getChassisSpeeds();
+      double deltaAngle = chassisSpeeds.omegaRadiansPerSecond*0.02;
+      Rotation2d newRot = gyro.getRotation2d().plus(Rotation2d.fromRadians(deltaAngle));
+      gyro.setRotation2d(newRot);
+    }
   }
 
   /* Teleop-Drive Related Methods */
@@ -191,7 +208,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public Command goTo(Pose2d endPose, PathConstraints constraints) {
     Pose2d startPose = getPose();
     Rotation2d startHeading = endPose.minus(startPose).getTranslation().getAngle();
-    Rotation2d endHeading = startHeading.unaryMinus();
+    Rotation2d endHeading = startHeading;
 
     PathPoint startPoint = new PathPoint(startPose.getTranslation(), startHeading, startPose.getRotation());// position, heading(direction of travel), holonomic rotation
     PathPoint endPoint = new PathPoint(endPose.getTranslation(), endHeading, endPose.getRotation());
