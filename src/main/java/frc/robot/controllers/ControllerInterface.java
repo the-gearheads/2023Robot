@@ -42,4 +42,9 @@ public interface ControllerInterface {
   public default Trigger getResetPoseButton() {
     return new Trigger(()->false);
   }
+
+  /* Button to set wheels into X formation */
+  public default Trigger getSetWheelXButton() {
+    return new Trigger(()->false);
+  }
 }

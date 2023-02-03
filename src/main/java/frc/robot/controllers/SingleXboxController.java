@@ -57,4 +57,8 @@ public class SingleXboxController implements ControllerInterface {
     return new JoystickButton(controller, XboxController.Button.kLeftBumper.value);
   }
 
+  /* Probably should change to something better but all the good buttons are used by the debug stuff */
+  public Trigger getSetWheelXButton() {
+    return new JoystickButton(controller, XboxController.Button.kStart.value);
+  }
 }
