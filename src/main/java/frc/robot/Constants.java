@@ -109,9 +109,9 @@ public class Constants extends AnnotatedClass {
     public static double MAX_ROTATIONAL_SPEED = 1;
 
     public static class Auton {
-      public static PIDController X_PID = new PIDController(2.5, 0, 0);//0.5
-      public static PIDController Y_PID = new PIDController(2.5, 0, 0);//0.5
-      public static PIDController ROT_PID = new PIDController(0.5, 0, 0);
+      public static PIDController X_PID = new PIDController(5, 0, 0);//0.5
+      public static PIDController Y_PID = new PIDController(5, 0, 0);//0.5
+      public static PIDController ROT_PID = new PIDController(1.5, 0, 0);
       public static PathConstraints CONSTRAINTS = new PathConstraints(1, 1.5);
     }
   }
@@ -126,7 +126,7 @@ public class Constants extends AnnotatedClass {
     private Vision() {}
 
     public static final Transform3d robotToCam = new Transform3d(
-        new Translation3d(Units.inchesToMeters(-9), Units.inchesToMeters(0.5), Units.inchesToMeters(20)),
+        new Translation3d(0.4, -0.005, 13),
         new Rotation3d());
   }
   public static final class Controllers {

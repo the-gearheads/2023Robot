@@ -93,7 +93,7 @@ public class RobotContainer {
     updateControllers();
   }
 
-  PathConstraints constraints = new PathConstraints(3, 2);
+  PathConstraints constraints = new PathConstraints(1, 0.5);
 
   private Command getCommandForPath(String pathName, boolean resetOdometry) {
     PathPlannerTrajectory path = PathPlanner.loadPath(pathName, new PathConstraints(1, 0.5));
@@ -134,11 +134,13 @@ public class RobotContainer {
     Controllers.activeController.getPPLoadDebugBackwardPath().toggleOnTrue(getCommandForPath("Game_Piece_1_To_Score", true));
     // Controllers.activeController.getPPLoadDebugForwardPath().toggleOnTrue(getCommandForPath("DEBUG_Forward", true));
     // Controllers.activeController.getPPLoadDebugBackwardPath().toggleOnTrue(getCommandForPath("DEBUG_Backward", true));
-    Controllers.activeController.getPPLoadDebugLeftPath().toggleOnTrue(getCommandForPath("DEBUG_Left", true));
-    Controllers.activeController.getPPLoadDebugRightPath().toggleOnTrue(getCommandForPath("DEBUG_Right", true));
+    // Controllers.activeController.getPPLoadDebugLeftPath().toggleOnTrue(getCommandForPath("DEBUG_Left", true));
+    // Controllers.activeController.getPPLoadDebugRightPath().toggleOnTrue(getCommandForPath("DEBUG_Right", true));
 
     // This command puts the robot 1 meter in front of apriltag 8 (middle of bottom left grid on pathplanner picture of 2023 field)
-    Controllers.activeController.getPPGotoTag8().toggleOnTrue(swerveSubsystem.goTo(Constants.FieldConstants.GRID_8, constraints));
+    Controllers.activeController.getPPGotoTag8().onTrue(new InstantCommand(()->{
+      swerveSubsystem.goTo(Constants.FieldConstants.GRID_8, constraints).schedule();
+    }));
 
     Controllers.activeController.getResetPoseButton().onTrue(new InstantCommand(()->{
       swerveSubsystem.setPose(new Pose2d(3,0.38,Rotation2d.fromDegrees(90)));
