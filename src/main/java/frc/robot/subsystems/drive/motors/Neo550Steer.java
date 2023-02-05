@@ -5,6 +5,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -62,6 +63,20 @@ public class Neo550Steer {
     pid.setPositionPIDWrappingMinInput(-Math.PI);
     /* I guess the rationale behind reusing pos factor instead of just putting 2pi here is that this lets us switch to degrees with only 1 change to the factors */
     pid.setPositionPIDWrappingMaxInput(Math.PI);
+
+    /* Set periodic status intervals */
+  
+    /* Status 0 governs applied output, faults, and whether is a follower. We don't care about that super much, so we increase it */
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    /* We don't care about our motor position, only what the encoder reads */
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 65535);
+    /* Don't have an analog sensor */
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
+    /* Don't have an alternate encoder */
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 65535);
+    /* We -really- care about our duty cycle encoder readings though. THE DEFAULT WAS 200MS */
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
   }
 
   public void setAngle(Rotation2d angle) {
