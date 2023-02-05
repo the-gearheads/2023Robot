@@ -53,12 +53,12 @@ public class NeoDrive {
     /* Send our velocity more frequently */
     max.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 10);
     /* Don't have an analog encoder */
-    max.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 500);
     /* Don't have an alternate encoder */
-    max.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 65535);
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500);
     /* Don't have a duty cycle encoder */
-    max.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
-    max.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 65535);
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 500);
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 500);
   }
 
   public void setSpeed(double speed) {

@@ -69,11 +69,11 @@ public class Neo550Steer {
     /* Status 0 governs applied output, faults, and whether is a follower. We don't care about that super much, so we increase it */
     max.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
     /* We don't care about our motor position, only what the encoder reads */
-    max.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 65535);
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500);
     /* Don't have an analog sensor */
-    max.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 500);
     /* Don't have an alternate encoder */
-    max.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 65535);
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500);
     /* We -really- care about our duty cycle encoder readings though. THE DEFAULT WAS 200MS */
     max.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
     max.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
