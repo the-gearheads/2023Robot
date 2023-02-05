@@ -118,15 +118,15 @@ public class Constants extends AnnotatedClass {
   public static final class FieldConstants {
     private FieldConstants() {}
 
-    public static final double WIDTH = 50;
-    public static final double LENGTH = 25;
-    public static final Pose2d GRID_8 = new Pose2d(1.85, 0.6, Rotation2d.fromDegrees(-180));
+    public static final double WIDTH = 8.02;
+    public static final double LENGTH = 50;
+    public static final Pose2d GRID_8 = new Pose2d(1.9, 4.9, Rotation2d.fromDegrees(-180));
   }
   public static final class Vision {
     private Vision() {}
 
     public static final Transform3d robotToCam = new Transform3d(
-        new Translation3d(0.4, -0.005, 13),
+        new Translation3d(0.4, -0.005, 0.13),
         new Rotation3d());
   }
   public static final class Controllers {

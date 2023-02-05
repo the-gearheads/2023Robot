@@ -24,6 +24,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -44,7 +45,7 @@ public class SwerveSubsystem extends SubsystemBase {
   final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(modulePositions);
   public SwerveModuleIO[] modules;
   public SwerveModuleInputsAutoLogged[] lastInputs;
-  GyroIO gyro;
+  public GyroIO gyro;
   SwerveDrivePoseEstimator odometry;
   Field2d field = new Field2d();
 
@@ -172,7 +173,15 @@ public class SwerveSubsystem extends SubsystemBase {
     return new SequentialCommandGroup(new InstantCommand(() -> {
       // Reset odometry for the first path you run during auto
       if (isFirstPath) {
-        this.setPose(traj.getInitialHolonomicPose());
+        Pose2d initPose = traj.getInitialHolonomicPose();
+        if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+          // Create a new state so that we don't overwrite the original
+          Translation2d newTranslation = 
+              new Translation2d(initPose.getX(), Constants.FieldConstants.WIDTH - initPose.getY());
+          Rotation2d newHeading = initPose.getRotation().times(-1);
+          initPose = new Pose2d(newTranslation, newHeading);
+        }
+        this.setPose(initPose);
       }
     }), new PPSwerveControllerCommand(traj, this::getPose, // Pose supplier
         this.kinematics, // SwerveDriveKinematics
@@ -180,6 +189,7 @@ public class SwerveSubsystem extends SubsystemBase {
         (PIDController) SmartDashboard.getData("yPid"), // Y controller (usually the same values as X controller)
         (PIDController) SmartDashboard.getData("rotPid"), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
         this::setStates, // Module states consumer
+        true,
         this // Requires this drive subsystem
     ), new InstantCommand(() -> {
       if (stopWhenDone) {

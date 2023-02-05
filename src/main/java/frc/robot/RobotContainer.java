@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.sysidcommand.SysidCommand;
+import frc.robot.commands.vision.DoNotUpdatePoseEstimator;
 import frc.robot.commands.vision.UpdatePoseEstimator;
 import frc.robot.controllers.Controllers;
 import frc.robot.controllers.SingleXboxController;
@@ -34,6 +35,8 @@ import frc.robot.subsystems.vision.Vision;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -93,10 +96,9 @@ public class RobotContainer {
     updateControllers();
   }
 
-  PathConstraints constraints = new PathConstraints(1, 0.5);
 
-  private Command getCommandForPath(String pathName, boolean resetOdometry) {
-    PathPlannerTrajectory path = PathPlanner.loadPath(pathName, new PathConstraints(1, 0.5));
+  private Command getCommandForPath(String pathName, boolean resetOdometry, PathConstraints constraints) {
+    PathPlannerTrajectory path = PathPlanner.loadPath(pathName, constraints);
     if(path == null) {
       DriverStation.reportError("Failed to load path: " + pathName, true);
       return new InstantCommand(()->{
@@ -126,15 +128,17 @@ public class RobotContainer {
     // Put new bindings here. 
     XboxController controller = ((SingleXboxController) Controllers.activeController).controller;
 
+    PathConstraints constraints = new PathConstraints(7, 3);
+
     PathPlannerTrajectory forwardTraj = PathPlanner.loadPath("DEBUG_Forward", constraints);
     Command forwardCommand = swerveSubsystem.followTrajectoryCommand(forwardTraj, true, true);
     new JoystickButton(controller, XboxController.Button.kY.value).toggleOnTrue(forwardCommand);
 
-    Controllers.activeController.getPPLoadDebugForwardPath().toggleOnTrue(getCommandForPath("Start_To_Game_Piece_1", true));
-    Controllers.activeController.getPPLoadDebugBackwardPath().toggleOnTrue(getCommandForPath("Game_Piece_1_To_Score", true));
+    Controllers.activeController.getPPLoadDebugForwardPath().toggleOnTrue(getCommandForPath("Start_To_Game_Piece_1", true, constraints).alongWith(new DoNotUpdatePoseEstimator(vision)));
+    Controllers.activeController.getPPLoadDebugBackwardPath().toggleOnTrue(getCommandForPath("Game_Piece_1_To_Start", true, constraints).alongWith(new UpdatePoseEstimator(vision, swerveSubsystem)));
     // Controllers.activeController.getPPLoadDebugForwardPath().toggleOnTrue(getCommandForPath("DEBUG_Forward", true));
     // Controllers.activeController.getPPLoadDebugBackwardPath().toggleOnTrue(getCommandForPath("DEBUG_Backward", true));
-    // Controllers.activeController.getPPLoadDebugLeftPath().toggleOnTrue(getCommandForPath("DEBUG_Left", true));
+    Controllers.activeController.getPPLoadDebugLeftPath().toggleOnTrue(getCommandForPath("DEBUG_Left", true, constraints));
     // Controllers.activeController.getPPLoadDebugRightPath().toggleOnTrue(getCommandForPath("DEBUG_Right", true));
 
     // This command puts the robot 1 meter in front of apriltag 8 (middle of bottom left grid on pathplanner picture of 2023 field)
@@ -153,16 +157,21 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    ArrayList<PathPlannerTrajectory> trajectories = new ArrayList<PathPlannerTrajectory>() {
-      {
-        add(PathPlanner.loadPath("Forward2Meters", Drivetrain.Auton.CONSTRAINTS));
-        add(PathPlanner.loadPath("Right2Meters", Drivetrain.Auton.CONSTRAINTS));
-        add(PathPlanner.loadPath("DiagonalDown2Left2", Drivetrain.Auton.CONSTRAINTS));
-      }
-    };
-    return new RepeatCommand(new InstantCommand(() -> {
-      // Reset odometry for the first path you run during auto
-      swerveSubsystem.setPose(trajectories.get(0).getInitialHolonomicPose());
-    }).andThen(swerveSubsystem.followTrajectoriesCommand(trajectories, true)));
+    PathConstraints constraints1 = new PathConstraints(7, 3);
+    PathConstraints constraints3 = new PathConstraints(4, 2);
+    PathConstraints constraints2 = new PathConstraints(2, 1);
+
+    Command startToGamePiece = getCommandForPath("Start_To_Game_Piece_1", true, constraints1);
+    Command gamePieceToStart = getCommandForPath("Game_Piece_1_To_Start", false, constraints3);
+    Command startToChargingStation = getCommandForPath("Start_To_Charging_Station", false, constraints2);
+    Command updateVision = new UpdatePoseEstimator(vision, swerveSubsystem);
+    Command DONTupdateVision1 = new DoNotUpdatePoseEstimator(vision);
+    Command DONTupdateVision2 = new DoNotUpdatePoseEstimator(vision);
+    return new ParallelRaceGroup(startToGamePiece, updateVision)
+    .andThen(new ParallelRaceGroup(gamePieceToStart))
+    .andThen(new ParallelRaceGroup(startToChargingStation))
+    .andThen(new InstantCommand(()->{
+      swerveSubsystem.setX();
+    }));
   }
 }

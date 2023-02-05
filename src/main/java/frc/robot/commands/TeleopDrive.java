@@ -34,14 +34,14 @@ public class TeleopDrive extends CommandBase {
     SmartDashboard.putBoolean("TeleopDrive/UseFieldRelative", false);
     SmartDashboard.putBoolean("TeleopDrive/ExponentialJoystickControl", false);
     SmartDashboard.putBoolean("Rotation PID", false);
-    SmartDashboard.putNumber("Rotation PID kP", 1);
+    SmartDashboard.putNumber("Rotation PID kP", 1.5);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     //swerveSubsystem.setPose(Constants.Drivetrain.zeroPos);
-    angleSetPoint=swerveSubsystem.getPose().getRotation().getDegrees();
+    angleSetPoint=swerveSubsystem.getPose().getRotation().getRadians();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -71,9 +71,9 @@ public class TeleopDrive extends CommandBase {
     if (SmartDashboard.getBoolean("Rotation PID", false)) {
       rotPIDController = new PIDController(SmartDashboard.getNumber("Rotation PID kP", 1), 0, 0);
 
-      double gyroAngle = swerveSubsystem.getPose().getRotation().getDegrees();
+      double gyroAngle = swerveSubsystem.gyro.getRotation2d().getRadians();
       if (MathUtil.applyDeadband(rotSpd, 1E-2) == 0) {
-        rotSpd = rotPIDController.calculate(angleSetPoint, gyroAngle);
+        rotSpd = -rotPIDController.calculate(angleSetPoint, gyroAngle);
       } else {
         angleSetPoint = gyroAngle;
       }
