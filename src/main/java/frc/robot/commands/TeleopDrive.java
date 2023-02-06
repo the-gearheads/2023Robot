@@ -51,6 +51,11 @@ public class TeleopDrive extends CommandBase {
     var ySpd = Controllers.activeController.getYMoveAxis();
     var rotSpd = Controllers.activeController.getRotateAxis();
 
+    if(Controllers.activeController.getSetWheelXButton().getAsBoolean()) {
+      swerveSubsystem.setX();
+      return;
+    }
+
     boolean useExponentialJoystickControl = SmartDashboard.getBoolean("TeleopDrive/ExponentialJoystickControl", false);
     if(useExponentialJoystickControl){
       Pair<Double, Double> xyPair = AdditionalMathUtils.poseExp(xSpd, ySpd);

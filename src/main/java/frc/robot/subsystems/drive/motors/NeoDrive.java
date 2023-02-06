@@ -6,6 +6,8 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
+
 import frc.robot.Constants.Drivetrain;
 import frc.robot.util.SendableSparkMaxPID;
 
@@ -45,6 +47,18 @@ public class NeoDrive {
 
     // Probably the default
     pid.setOutputRange(-1, 1);
+
+    /* Set periodic frame periods */
+  
+    /* Send our velocity more frequently */
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 10);
+    /* Don't have an analog encoder */
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 500);
+    /* Don't have an alternate encoder */
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500);
+    /* Don't have a duty cycle encoder */
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 500);
+    max.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 500);
   }
 
   public void setSpeed(double speed) {
