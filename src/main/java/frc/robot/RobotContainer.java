@@ -139,7 +139,9 @@ public class RobotContainer {
     // Controllers.activeController.getPPLoadDebugForwardPath().toggleOnTrue(getCommandForPath("DEBUG_Forward", true));
     // Controllers.activeController.getPPLoadDebugBackwardPath().toggleOnTrue(getCommandForPath("DEBUG_Backward", true));
     Controllers.activeController.getPPLoadDebugLeftPath().toggleOnTrue(getCommandForPath("DEBUG_Left", true, constraints));
-    // Controllers.activeController.getPPLoadDebugRightPath().toggleOnTrue(getCommandForPath("DEBUG_Right", true));
+    Controllers.activeController.getPPLoadDebugRightPath().whileTrue(new RepeatCommand(new InstantCommand(()->{
+      swerveSubsystem.setX();
+    })));
 
     // This command puts the robot 1 meter in front of apriltag 8 (middle of bottom left grid on pathplanner picture of 2023 field)
     Controllers.activeController.getPPGotoTag8().onTrue(new InstantCommand(()->{
