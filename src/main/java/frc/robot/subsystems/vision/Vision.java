@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.vision;
 
+import java.sql.Driver;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -16,6 +17,7 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -60,12 +62,22 @@ public class Vision extends SubsystemBase {
   }
 
   public void periodic(){
+    // Set AprilTagFieldLayout Alliance Color
+    if(DriverStation.getAlliance() == DriverStation.Alliance.Blue){
+      this.photonPoseEstimator.getFieldTags().setOrigin(OriginPosition.kBlueAllianceWallRightSide);
+    }else{
+      this.photonPoseEstimator.getFieldTags().setOrigin(OriginPosition.kRedAllianceWallRightSide);
+    }
+
+    // Update Vision Estimate
     if(this.shouldSetVisionPose.value && isPoseEstimateValid()){
       Optional<EstimatedRobotPose> visionResult = getVisionPose(this.getPose.get());
       Pose2d estimatedRobotPos = visionResult.get().estimatedPose.toPose2d();
       estimatedRobotPos = averageVisionPose(estimatedRobotPos);
       double timestamp = visionResult.get().timestampSeconds;
       this.setVisionPose.accept(estimatedRobotPos, timestamp);
+    }else{
+      averageVisionPose(this.getPose.get());
     }
   }
 
@@ -86,6 +98,7 @@ public class Vision extends SubsystemBase {
     PhotonTrackedTarget best_target = targetCam.getLatestResult().getBestTarget();
     boolean isBestTargetPresent = best_target != null;
 
+    // first set of conditions to satisfy
     if (isConnected && hasTargets && isEstimatePresent && isBestTargetPresent) {
       double ambiguity = best_target.getPoseAmbiguity();
       double deltaTime = Timer.getFPGATimestamp() - visionResult.get().timestampSeconds;
@@ -93,6 +106,7 @@ public class Vision extends SubsystemBase {
       best_target.getBestCameraToTarget()
       .getTranslation().toTranslation2d().getDistance(new Translation2d());
 
+      // second set of conditions to satisfy
       if(ambiguity < 5e-2 && distance < 2 && deltaTime < 0.5){
         SmartDashboard.putBoolean("Vision/Is Updating", true);
         return false;
