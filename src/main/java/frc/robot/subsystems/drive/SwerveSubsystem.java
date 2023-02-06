@@ -155,7 +155,7 @@ public class SwerveSubsystem extends SubsystemBase {
     odometry.resetPosition(gyro.getRotation2d(), getPositionsFromInputs(lastInputs), pose);
   }
 
-  public void updateVisionMeasurement(Pose2d visionRobotPos, double timestamp) {
+  public void setVisionPose(Pose2d visionRobotPos, double timestamp) {
     odometry.addVisionMeasurement(visionRobotPos, timestamp);
     SmartDashboard.putString("Vision/Vision Estimated Pos", AdditionalMathUtils.pos2dToString(visionRobotPos, 2));
   }

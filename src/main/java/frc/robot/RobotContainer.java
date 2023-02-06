@@ -23,8 +23,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.sysidcommand.SysidCommand;
-import frc.robot.commands.vision.DoNotUpdatePoseEstimator;
-import frc.robot.commands.vision.UpdatePoseEstimator;
 import frc.robot.controllers.Controllers;
 import frc.robot.controllers.SingleXboxController;
 import frc.robot.subsystems.drive.SwerveSubsystem;
@@ -32,6 +30,7 @@ import frc.robot.subsystems.drive.SwerveModule;
 import frc.robot.subsystems.drive.SwerveModuleIO;
 import frc.robot.subsystems.drive.SwerveModuleSim;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.Vision.ShouldSetVisionPose;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -48,7 +47,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem swerveSubsystem;
-  private final Vision vision = new Vision();
+  private final Vision vision;
 
   public String readPipelineFile() {
     try {
@@ -91,7 +90,8 @@ public class RobotContainer {
     }
 
     swerveSubsystem.setDefaultCommand(new TeleopDrive(swerveSubsystem));
-    vision.setDefaultCommand(new UpdatePoseEstimator(vision, swerveSubsystem));
+    
+    vision = new Vision(swerveSubsystem::getPose, swerveSubsystem::setVisionPose);
     // Configure the button bindings
     updateControllers();
   }
@@ -134,8 +134,18 @@ public class RobotContainer {
     Command forwardCommand = swerveSubsystem.followTrajectoryCommand(forwardTraj, true, true);
     new JoystickButton(controller, XboxController.Button.kY.value).toggleOnTrue(forwardCommand);
 
-    Controllers.activeController.getPPLoadDebugForwardPath().toggleOnTrue(getCommandForPath("Start_To_Game_Piece_1", true, constraints).alongWith(new DoNotUpdatePoseEstimator(vision)));
-    Controllers.activeController.getPPLoadDebugBackwardPath().toggleOnTrue(getCommandForPath("Game_Piece_1_To_Start", true, constraints).alongWith(new UpdatePoseEstimator(vision, swerveSubsystem)));
+    Controllers.activeController.getPPLoadDebugForwardPath()
+    .toggleOnTrue(getCommandForPath("Start_To_Game_Piece_1", true, constraints)
+    .alongWith(new InstantCommand(()->{
+      vision.setShouldSetVisionPose(ShouldSetVisionPose.UPDATE);
+    })));
+
+    Controllers.activeController.getPPLoadDebugBackwardPath()
+    .toggleOnTrue(getCommandForPath("Game_Piece_1_To_Start", true, constraints)
+    .alongWith(new InstantCommand(()->{
+      vision.setShouldSetVisionPose(ShouldSetVisionPose.DONT_UPDATE);
+    })));
+
     // Controllers.activeController.getPPLoadDebugForwardPath().toggleOnTrue(getCommandForPath("DEBUG_Forward", true));
     // Controllers.activeController.getPPLoadDebugBackwardPath().toggleOnTrue(getCommandForPath("DEBUG_Backward", true));
     Controllers.activeController.getPPLoadDebugLeftPath().toggleOnTrue(getCommandForPath("DEBUG_Left", true, constraints));
@@ -166,9 +176,15 @@ public class RobotContainer {
     Command startToGamePiece = getCommandForPath("Start_To_Game_Piece_1", true, constraints1);
     Command gamePieceToStart = getCommandForPath("Game_Piece_1_To_Start", false, constraints3);
     Command startToChargingStation = getCommandForPath("Start_To_Charging_Station", false, constraints2);
-    Command updateVision = new UpdatePoseEstimator(vision, swerveSubsystem);
-    Command DONTupdateVision1 = new DoNotUpdatePoseEstimator(vision);
-    Command DONTupdateVision2 = new DoNotUpdatePoseEstimator(vision);
+    Command updateVision = new InstantCommand(()->{
+      vision.setShouldSetVisionPose(ShouldSetVisionPose.UPDATE);
+    });
+    Command DONTupdateVision1 = new InstantCommand(()->{
+      vision.setShouldSetVisionPose(ShouldSetVisionPose.DONT_UPDATE);
+    });
+    Command DONTupdateVision2 = new InstantCommand(()->{
+      vision.setShouldSetVisionPose(ShouldSetVisionPose.DONT_UPDATE);
+    });
     return new ParallelRaceGroup(startToGamePiece, updateVision)
     .andThen(new ParallelRaceGroup(gamePieceToStart))
     .andThen(new ParallelRaceGroup(startToChargingStation))

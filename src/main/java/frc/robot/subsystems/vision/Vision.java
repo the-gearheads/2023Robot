@@ -6,19 +6,24 @@ package frc.robot.subsystems.vision;
 
 import java.util.ArrayList;
 import java.util.Optional;
-
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-
+import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -29,26 +34,81 @@ public class Vision extends SubsystemBase {
   LinearFilter xFilter = LinearFilter.movingAverage(5);
   LinearFilter yFilter = LinearFilter.movingAverage(5);
   LinearFilter rotFilter = LinearFilter.movingAverage(5);
+  private BiConsumer<Pose2d, Double> setVisionPose;
+  private Supplier<Pose2d> getPose;
 
-  public Vision() {
+  public enum ShouldSetVisionPose{
+    UPDATE(true),DONT_UPDATE(false);
+    public final boolean value;
+
+    ShouldSetVisionPose(boolean value) {
+      this.value = value;
+    }
+  }
+  private ShouldSetVisionPose shouldSetVisionPose;
+
+  public Vision(Supplier<Pose2d> getPose, BiConsumer<Pose2d, Double> setVisionPose) {
+    this(getPose, setVisionPose, ShouldSetVisionPose.UPDATE);
+  }
+
+  public Vision(Supplier<Pose2d> getPose, BiConsumer<Pose2d, Double> setVisionPose, ShouldSetVisionPose shouldSetVisionPose) {
+    this.shouldSetVisionPose = shouldSetVisionPose;
+    this.getPose = getPose;
+    this.setVisionPose=setVisionPose;
     this.targetCam = new PhotonCamera("target");
     initializePoseEstimator();
   }
 
-  public boolean isConnected() {
-    return targetCam.isConnected();
+  public void periodic(){
+    if(this.shouldSetVisionPose.value && isPoseEstimateValid()){
+      Optional<EstimatedRobotPose> visionResult = getVisionPose(this.getPose.get());
+      Pose2d estimatedRobotPos = visionResult.get().estimatedPose.toPose2d();
+      estimatedRobotPos = averageVisionPose(estimatedRobotPos);
+      double timestamp = visionResult.get().timestampSeconds;
+      this.setVisionPose.accept(estimatedRobotPos, timestamp);
+    }
   }
 
-  public boolean hasTargets() {
-    return targetCam.getLatestResult().hasTargets();
+  public void setShouldSetVisionPose(ShouldSetVisionPose shouldSetVisionPose){
+    this.shouldSetVisionPose = shouldSetVisionPose; 
   }
 
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPos(Pose2d prevEstimatedRobotPose) {
+  boolean isPoseEstimateValid(){
+    boolean isConnected = targetCam.isConnected();
+    boolean hasTargets = targetCam.getLatestResult().hasTargets();
+
+    Optional<EstimatedRobotPose> visionResult = getVisionPose(this.getPose.get());
+    boolean isEstimatePresent = Vision.isVisionPosePresent(visionResult);
+    
+    PhotonTrackedTarget best_target = targetCam.getLatestResult().getBestTarget();
+    boolean isBestTargetPresent = best_target != null;
+
+    if (isConnected && hasTargets && isEstimatePresent && isBestTargetPresent) {
+      double ambiguity = best_target.getPoseAmbiguity();
+      double deltaTime = Timer.getFPGATimestamp() - visionResult.get().timestampSeconds;
+      double distance = 
+      best_target.getBestCameraToTarget()
+      .getTranslation().toTranslation2d().getDistance(new Translation2d());
+
+      if(ambiguity < 5e-2 && distance < 2 && deltaTime < 0.5){
+        SmartDashboard.putBoolean("Vision/Is Updating", true);
+        return false;
+      }
+    }
+    SmartDashboard.putBoolean("Vision/Is Updating", false);
+    return false;
+  }
+  public static boolean isVisionPosePresent(Optional<EstimatedRobotPose> estimatedRobotPos) {
+    return estimatedRobotPos.isPresent() && estimatedRobotPos.get().estimatedPose != null
+        && estimatedRobotPos.get().estimatedPose.getRotation() != null;
+  }
+
+  public Optional<EstimatedRobotPose> getVisionPose(Pose2d prevEstimatedRobotPose) {
     photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
     return photonPoseEstimator.update();
   }
 
-  public Pose2d averagePos(Pose2d currentEstimate){
+  public Pose2d averageVisionPose(Pose2d currentEstimate){
     double x = xFilter.calculate(currentEstimate.getX());
     double y = yFilter.calculate(currentEstimate.getY());
 
@@ -72,10 +132,5 @@ public class Vision extends SubsystemBase {
     }
     this.photonPoseEstimator =
         new PhotonPoseEstimator(atfl, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, targetCam, Constants.Vision.robotToCam);
-  }
-
-  public static boolean isEstimatedRobotPosPresent(Optional<EstimatedRobotPose> estimatedRobotPos) {
-    return estimatedRobotPos.isPresent() && estimatedRobotPos.get().estimatedPose != null
-        && estimatedRobotPos.get().estimatedPose.getRotation() != null;
   }
 }
