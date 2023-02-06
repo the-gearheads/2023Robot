@@ -33,9 +33,9 @@ public class Vision extends SubsystemBase {
   public PhotonCamera targetCam;
   private PhotonPoseEstimator photonPoseEstimator;
 
-  LinearFilter xFilter = LinearFilter.movingAverage(5);
-  LinearFilter yFilter = LinearFilter.movingAverage(5);
-  LinearFilter rotFilter = LinearFilter.movingAverage(5);
+  LinearFilter xFilter = LinearFilter.movingAverage(10);
+  LinearFilter yFilter = LinearFilter.movingAverage(10);
+  LinearFilter rotFilter = LinearFilter.movingAverage(10);
   private BiConsumer<Pose2d, Double> setVisionPose;
   private Supplier<Pose2d> getPose;
 
@@ -59,6 +59,8 @@ public class Vision extends SubsystemBase {
     this.setVisionPose=setVisionPose;
     this.targetCam = new PhotonCamera("target");
     initializePoseEstimator();
+
+    SmartDashboard.putBoolean("2nd Level Vision Filtering", false);
   }
 
   public void periodic(){
@@ -76,8 +78,11 @@ public class Vision extends SubsystemBase {
       estimatedRobotPos = averageVisionPose(estimatedRobotPos);
       double timestamp = visionResult.get().timestampSeconds;
       this.setVisionPose.accept(estimatedRobotPos, timestamp);
+
+      SmartDashboard.putBoolean("Vision/Is Updating", true);
     }else{
       averageVisionPose(this.getPose.get());
+      SmartDashboard.putBoolean("Vision/Is Updating", false);
     }
   }
 
@@ -106,13 +111,14 @@ public class Vision extends SubsystemBase {
       best_target.getBestCameraToTarget()
       .getTranslation().toTranslation2d().getDistance(new Translation2d());
 
+      boolean shouldFilter = SmartDashboard.getBoolean("2nd Level Vision Filtering", false);
+
       // second set of conditions to satisfy
-      if(ambiguity < 5e-2 && distance < 2 && deltaTime < 0.5){
-        SmartDashboard.putBoolean("Vision/Is Updating", true);
+      if((ambiguity < 5e-2 && distance < 2 && deltaTime < 0.5)
+        || !shouldFilter){
         return false;
       }
     }
-    SmartDashboard.putBoolean("Vision/Is Updating", false);
     return false;
   }
   public static boolean isVisionPosePresent(Optional<EstimatedRobotPose> estimatedRobotPos) {
