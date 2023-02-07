@@ -17,7 +17,7 @@ import frc.robot.Constants.AUTON;
 import frc.robot.subsystems.drive.Swerve;
 
 public class AutonChooser {
-    private HashMap<String, Command> choices;
+    private HashMap<String, Command> autons;
     private Swerve swerve;//necessary to create PPSwerveCommand instances
     private SendableChooser<Command> chooser;
     private final String defaultChoice="";
@@ -26,26 +26,26 @@ public class AutonChooser {
         this.swerve=swerve;
         this.chooser = new SendableChooser<>();
 
-        initializeChoices();
-        populateChoices();
-        setDefault();
+        initializeAutons();
+        populateChooser();
+        setDefaultAuton();
         SmartDashboard.putData(chooser);
     }
 
-    public void populateChoices(){
-        for (Map.Entry<String,Command> choice : choices.entrySet()) {
-            chooser.addOption(choice.getKey(), choice.getValue());
+    public void populateChooser(){
+        for (Map.Entry<String,Command> auton : autons.entrySet()) {
+            chooser.addOption(auton.getKey(), auton.getValue());
         }
     }
 
-    public void setDefault(){
-        if(choices.containsKey(defaultChoice)){//set default
-            chooser.setDefaultOption(defaultChoice, choices.get(defaultChoice));
+    public void setDefaultAuton(){
+        if(autons.containsKey(defaultChoice)){//set default
+            chooser.setDefaultOption(defaultChoice, autons.get(defaultChoice));
         }else{//Otherwise, set default to first choice
             DriverStation.reportError("Default Auton Not Defined", false);
-            if(choices.size()>0){
-                Map.Entry<String,Command> firstChoice = choices.entrySet().iterator().next();
-                chooser.setDefaultOption(firstChoice.getKey(), firstChoice.getValue());
+            if(autons.size()>0){
+                Map.Entry<String,Command> firstAuton = autons.entrySet().iterator().next();
+                chooser.setDefaultOption(firstAuton.getKey(), firstAuton.getValue());
             }else{
                 DriverStation.reportError("No Autons Defined", false);
                 
@@ -53,30 +53,30 @@ public class AutonChooser {
         }
     }
 
-    public Command getSelectedChoice(){
-        Command selectedChoice = chooser.getSelected();
-        if(selectedChoice==null){
+    public Command getSelectedAuton(){
+        Command selectedAuton = chooser.getSelected();
+        if(selectedAuton==null){
             DriverStation.reportError("Selected Auton is null", false);
-            if(choices.size()>0){
-                Map.Entry<String,Command> firstChoice = choices.entrySet().iterator().next();
-                selectedChoice = firstChoice.getValue();
+            if(autons.size()>0){
+                Map.Entry<String,Command> firstAuton = autons.entrySet().iterator().next();
+                selectedAuton = firstAuton.getValue();
             }else{
                 DriverStation.reportError("No Autons Defined", false);
-                selectedChoice = new PrintCommand("No Auton Selected");
+                selectedAuton = new PrintCommand("No Auton Selected");
             }
         }
-        return selectedChoice;
+        return selectedAuton;
     }
 
-    public void initializeChoices(){//Here we define auton choices
-        choices = new HashMap<String, Command>();
+    public void initializeAutons(){//Here we define auton choices
+        autons = new HashMap<String, Command>();
 
         //Left Most Cone Node -> Left Most Game Piece -> Left Most Cone Node -> Charging Station 
         Command leftSide2ConesChargingStation = getCommandForPath("Start_To_Game_Piece_1", true, AUTON.FAST_CONSTRAINTS)
         .andThen(getCommandForPath("Game_Piece_1_To_Start", false, AUTON.MID_CONSTRAINTS))
         .andThen(getCommandForPath("Start_To_Charging_Station", false, AUTON.SLOW_CONSTRAINTS))
         .andThen(new InstantCommand(()->{swerve.setX();}));
-        choices.put("Left, 2 Cones, Charging Station", leftSide2ConesChargingStation);
+        autons.put("Left, 2 Cones, Charging Station", leftSide2ConesChargingStation);
     }
 
 
