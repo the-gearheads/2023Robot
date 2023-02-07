@@ -13,7 +13,6 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
-import com.revrobotics.REVPhysicsSim;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -39,8 +38,9 @@ import frc.robot.Constants;
 import frc.robot.Constants.DRIVE;
 import frc.robot.Constants.AUTON;
 import frc.robot.subsystems.drive.gyro.GyroIO;
+import frc.robot.subsystems.drive.gyro.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.drive.gyro.GyroSim;
-import frc.robot.subsystems.drive.gyro.Gyroscope;
+import frc.robot.subsystems.drive.gyro.Gyro;
 import frc.robot.util.AdditionalMathUtils;
 
 public class Swerve extends SubsystemBase {
@@ -49,17 +49,26 @@ public class Swerve extends SubsystemBase {
   final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(modulePositions);
   public SwerveModuleIO[] modules;
   public SwerveModuleInputsAutoLogged[] lastInputs;
+  public GyroIOInputsAutoLogged lastGyroInputs;
   public GyroIO gyro;
   SwerveDrivePoseEstimator odometry;
   Field2d field = new Field2d();
 
   /** Creates a new SwerveSubsystem. */
-  public Swerve(SwerveModuleIO... modules) {
-    if(Constants.getMode()==Constants.RobotMode.REAL){
-      this.gyro= new Gyroscope(SPI.Port.kMXP, true);
-    }else{
-      this.gyro= new GyroSim();
+  public Swerve(GyroIO gyro, SwerveModuleIO... modules) {
+    this.gyro = gyro;
+    switch(Constants.getMode()) {
+      case REAL:
+        this.gyro = new Gyro(SPI.Port.kMXP, true);
+        break;
+      case SIM:
+        this.gyro = new GyroSim();
+        break;
+      case SIM_REPLAY:
+        this.gyro = new GyroIO() {};
+        break;
     }
+
     this.modules = modules;
     /* Get module states to pass to odometry */
     updateInputs();
@@ -78,25 +87,26 @@ public class Swerve extends SubsystemBase {
   @Override
   public void periodic() {
     updateInputs();
-    odometry.update(gyro.getRotation2d(), getPositionsFromInputs(lastInputs));
+    odometry.update(getRotation(), getPositionsFromInputs(lastInputs));
     field.setRobotPose(getPose());
-    Logger.getInstance().recordOutput("/Swerve/Pose", getPose());
+    Logger.getInstance().recordOutput("Swerve/Pose", getPose());
     var speeds = getChassisSpeeds();
-    Logger.getInstance().recordOutput("/Swerve/ChassisSpeeds/Vx", speeds.vxMetersPerSecond);
-    Logger.getInstance().recordOutput("/Swerve/ChassisSpeeds/Vy", speeds.vyMetersPerSecond);
-    Logger.getInstance().recordOutput("/Swerve/ChassisSpeeds/Rot", speeds.omegaRadiansPerSecond);
+    Logger.getInstance().recordOutput("Swerve/ChassisSpeeds/Vx", speeds.vxMetersPerSecond);
+    Logger.getInstance().recordOutput("Swerve/ChassisSpeeds/Vy", speeds.vyMetersPerSecond);
+    Logger.getInstance().recordOutput("Swerve/ChassisSpeeds/Rot", speeds.omegaRadiansPerSecond);
 
     var states = getStatesFromInputs(lastInputs);
-    Logger.getInstance().recordOutput("/Swerve/ModuleStates", states);
+    Logger.getInstance().recordOutput("Swerve/ModuleStates", states);
   }
 
   public void simulationPeriodic(){
-    if(Constants.getMode()==Constants.RobotMode.SIM){
-      ChassisSpeeds chassisSpeeds = getChassisSpeeds();
-      double deltaAngle = chassisSpeeds.omegaRadiansPerSecond*0.02;
-      Rotation2d newRot = gyro.getRotation2d().plus(Rotation2d.fromRadians(deltaAngle));
-      gyro.setRotation2d(newRot);
-    }
+    /* Sim replay is in sim but this doesn't apply to that */
+    if(Constants.getMode() != Constants.RobotMode.SIM) return;
+
+    ChassisSpeeds chassisSpeeds = getChassisSpeeds();
+    double deltaAngle = chassisSpeeds.omegaRadiansPerSecond*0.02;
+    Rotation2d newRot = getRotation().plus(Rotation2d.fromRadians(deltaAngle));
+    gyro.setRotation2d(newRot);
   }
 
   /* Teleop-Drive Related Methods */
@@ -137,7 +147,7 @@ public class Swerve extends SubsystemBase {
     }
     // Needed to update lastInputs to be accurate
     updateInputs();
-    odometry = new SwerveDrivePoseEstimator(kinematics, gyro.getRotation2d(), getPositionsFromInputs(lastInputs),
+    odometry = new SwerveDrivePoseEstimator(kinematics, getRotation(), getPositionsFromInputs(lastInputs),
         new Pose2d());
   }
 
@@ -156,7 +166,7 @@ public class Swerve extends SubsystemBase {
    * @param pose Position robot is at
    */
   public void setPose(Pose2d pose) {
-    odometry.resetPosition(gyro.getRotation2d(), getPositionsFromInputs(lastInputs), pose);
+    odometry.resetPosition(getRotation(), getPositionsFromInputs(lastInputs), pose);
   }
 
   public void setVisionPose(Pose2d visionRobotPos, double timestamp) {
@@ -249,6 +259,10 @@ public class Swerve extends SubsystemBase {
       Logger.getInstance().processInputs(modules[i].getPath(), inputs[i]);
     }
     lastInputs = inputs;
+
+    GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+    Logger.getInstance().processInputs("Gyro", gyroInputs);
+    lastGyroInputs = gyroInputs;
   }
 
   /**
@@ -345,22 +359,26 @@ public class Swerve extends SubsystemBase {
     return new double[] { lastInputs[0].driveVelocity, -lastInputs[1].driveVelocity};
   }
 
+  public Rotation2d getRotation() {
+    return new Rotation2d(lastGyroInputs.angleRadians);
+  }
+
   /* Returns Z axis rotation speed in degrees per second */
   public double getAngularVel() {
-    return gyro.getRate();
+    return lastGyroInputs.angleRate;
   }
 
   /* Returns Z axis rotation speed in radians per second */
   public double getAngularVelRad() {
-    return Units.degreesToRadians(gyro.getRate());
+    return Units.degreesToRadians(getAngularVel());
   }
 
   public double getContinuousGyroAngle(){
-    return gyro.getRotation2d().getDegrees();
+    return getRotation().getDegrees();
   }
 
   public double getContinuousGyroAngleRad(){
-    return gyro.getRotation2d().getRadians();
+    return getRotation().getRadians();
   }
 
   /**

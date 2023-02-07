@@ -76,7 +76,7 @@ public class TeleopDrive extends CommandBase {
     if (SmartDashboard.getBoolean("Rotation PID", false)) {
       rotPIDController = new PIDController(SmartDashboard.getNumber("Rotation PID kP", 1), 0, 0);
 
-      double gyroAngle = swerve.gyro.getRotation2d().getRadians();
+      double gyroAngle = swerve.getContinuousGyroAngleRad();
       if (MathUtil.applyDeadband(rotSpd, 1E-2) == 0) {
         rotSpd = -rotPIDController.calculate(angleSetPoint, gyroAngle);
       } else {

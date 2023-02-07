@@ -7,7 +7,6 @@ package frc.robot;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -18,28 +17,25 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.AUTON;
 import frc.robot.Constants.DRIVE;
 import frc.robot.commands.drive.TeleopDrive;
-import frc.robot.commands.sysidcommand.SysidCommand;
 import frc.robot.controllers.Controllers;
-import frc.robot.controllers.SingleXboxController;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.AutonChooser;
 import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.Vision.ShouldSetVisionPose;
 import frc.robot.subsystems.drive.SwerveModule;
 import frc.robot.subsystems.drive.SwerveModuleIO;
 import frc.robot.subsystems.drive.SwerveModuleSim;
+import frc.robot.subsystems.drive.gyro.Gyro;
+import frc.robot.subsystems.drive.gyro.GyroIO;
+import frc.robot.subsystems.drive.gyro.GyroSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very little robot logic should actually be handled in
@@ -49,6 +45,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Swerve swerve;
+  @SuppressWarnings("unused")
   private final Vision vision;
   private final AutonChooser autonChooser;
 
@@ -71,6 +68,7 @@ public class RobotContainer {
       case REAL:
         SmartDashboard.putString("/Mode", "REAL");
         swerve = new Swerve(
+            new Gyro(SPI.Port.kMXP, true),
             new SwerveModule(0, DRIVE.FL_IDS[0], DRIVE.FL_IDS[1], DRIVE.FL_OFFSETS, "FL"),
             new SwerveModule(1, DRIVE.FR_IDS[0], DRIVE.FR_IDS[1], DRIVE.FR_OFFSETS, "FR"),
             new SwerveModule(2, DRIVE.RL_IDS[0], DRIVE.RL_IDS[1], DRIVE.RL_OFFSETS, "RL"),
@@ -79,6 +77,7 @@ public class RobotContainer {
       case SIM:
         SmartDashboard.putString("/Mode", "SIM");
         swerve = new Swerve(
+            new GyroSim(),
             new SwerveModuleSim(0, DRIVE.FL_IDS[0], DRIVE.FL_IDS[1], DRIVE.FL_OFFSETS, "FL"),
             new SwerveModuleSim(1, DRIVE.FR_IDS[0], DRIVE.FR_IDS[1], DRIVE.FR_OFFSETS, "FR"),
             new SwerveModuleSim(2, DRIVE.RL_IDS[0], DRIVE.RL_IDS[1], DRIVE.RL_OFFSETS, "RL"),
@@ -87,7 +86,11 @@ public class RobotContainer {
       default:
       case SIM_REPLAY:
         SmartDashboard.putString("/Mode", "SIM_REPLAY");
-        swerve = new Swerve(new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {},
+        swerve = new Swerve(
+            new GyroIO() {},
+            new SwerveModuleIO() {},
+            new SwerveModuleIO() {},
+            new SwerveModuleIO() {},
             new SwerveModuleIO() {});
         break;
     }

@@ -4,15 +4,19 @@
 
 package frc.robot.subsystems.drive.gyro;
 
+import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /** Add your docs here. */
 public interface GyroIO {
-    public Rotation2d getRotation2d();
 
-    public void setRotation2d(Rotation2d newRotation2d);
+    @AutoLog
+    public class GyroIOInputs {
+        public double angleRadians;
+        public double angleRate;
+    }
 
-    public double getRate();
-
-    public void zeroYaw();
+    public default void setRotation2d(Rotation2d newRotation2d) {};
+    public default void zeroYaw() {};
+    public default void updateInputs(GyroIOInputs inputs) {};
 }

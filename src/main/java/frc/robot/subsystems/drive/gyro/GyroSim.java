@@ -5,7 +5,6 @@
 package frc.robot.subsystems.drive.gyro;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 /** Add your docs here. */
 public class GyroSim implements GyroIO{
@@ -28,5 +27,10 @@ public class GyroSim implements GyroIO{
 
     public void zeroYaw(){
         rot=new Rotation2d();
+    }
+
+    public void updateInputs(GyroIOInputs inputs) {
+        inputs.angleRadians = rot.getRadians();
+        inputs.angleRadians = getRate();
     }
 }
