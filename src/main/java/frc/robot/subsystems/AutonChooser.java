@@ -25,6 +25,7 @@ public class AutonChooser {
     public AutonChooser(Swerve swerve){
         this.swerve=swerve;
         this.chooser = new SendableChooser<>();
+        this.autons = new HashMap<>();
 
         initializeAutons();
         populateChooser();
@@ -69,8 +70,6 @@ public class AutonChooser {
     }
 
     public void initializeAutons(){//Here we define auton choices
-        autons = new HashMap<String, Command>();
-
         //Left Most Cone Node -> Left Most Game Piece -> Left Most Cone Node -> Charging Station 
         Command leftSide2ConesChargingStation = getCommandForPath("Start_To_Game_Piece_1", true, AUTON.FAST_CONSTRAINTS)
         .andThen(getCommandForPath("Game_Piece_1_To_Start", false, AUTON.MID_CONSTRAINTS))
