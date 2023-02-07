@@ -12,12 +12,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.controllers.Controllers;
-import frc.robot.subsystems.drive.SwerveSubsystem;
+import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.AdditionalMathUtils;
 
 /** An example command that uses an example subsystem. */
 public class TeleopDrive extends CommandBase {
-  private final SwerveSubsystem swerveSubsystem;
+  private final Swerve swerve;
   private PIDController rotPIDController = new PIDController(1, 0, 0);
   private double angleSetPoint;
 
@@ -25,12 +25,12 @@ public class TeleopDrive extends CommandBase {
   /**
    * Creates a new ExampleCommand.
    *
-   * @param subsystem The subsystem used by this command.
+   * @param swerve The subsystem used by this command.
    */
-  public TeleopDrive(SwerveSubsystem subsystem) {
-    swerveSubsystem = subsystem;
+  public TeleopDrive(Swerve swerve) {
+    this.swerve = swerve;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(subsystem);
+    addRequirements(swerve);
     SmartDashboard.putBoolean("TeleopDrive/UseFieldRelative", false);
     SmartDashboard.putBoolean("TeleopDrive/ExponentialJoystickControl", false);
     SmartDashboard.putBoolean("Rotation PID", false);
@@ -41,7 +41,7 @@ public class TeleopDrive extends CommandBase {
   @Override
   public void initialize() {
     //swerveSubsystem.setPose(Constants.Drivetrain.zeroPos);
-    angleSetPoint=swerveSubsystem.getPose().getRotation().getRadians();
+    angleSetPoint=swerve.getPose().getRotation().getRadians();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -52,7 +52,7 @@ public class TeleopDrive extends CommandBase {
     var rotSpd = Controllers.activeController.getRotateAxis();
 
     if(Controllers.activeController.getSetWheelXButton().getAsBoolean()) {
-      swerveSubsystem.setX();
+      swerve.setX();
       return;
     }
 
@@ -76,7 +76,7 @@ public class TeleopDrive extends CommandBase {
     if (SmartDashboard.getBoolean("Rotation PID", false)) {
       rotPIDController = new PIDController(SmartDashboard.getNumber("Rotation PID kP", 1), 0, 0);
 
-      double gyroAngle = swerveSubsystem.gyro.getRotation2d().getRadians();
+      double gyroAngle = swerve.gyro.getRotation2d().getRadians();
       if (MathUtil.applyDeadband(rotSpd, 1E-2) == 0) {
         rotSpd = -rotPIDController.calculate(angleSetPoint, gyroAngle);
       } else {
@@ -90,16 +90,16 @@ public class TeleopDrive extends CommandBase {
 
     var speeds = new ChassisSpeeds(xSpd, ySpd, rotSpd);
     if (SmartDashboard.getBoolean("TeleopDrive/UseFieldRelative", true)) {
-      swerveSubsystem.driveFieldRelative(speeds);
+      swerve.driveFieldRelative(speeds);
     } else {
-      swerveSubsystem.drive(speeds);
+      swerve.drive(speeds);
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    swerveSubsystem.drive(new ChassisSpeeds());
+    swerve.drive(new ChassisSpeeds());
   }
 
   // Returns true when the command should end.

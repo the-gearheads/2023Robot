@@ -13,12 +13,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.drive.SwerveSubsystem;
+import frc.robot.subsystems.drive.Swerve;
 
 public class GridAlign extends CommandBase {
     private PhotonPoseEstimator photonPoseEstimator;
     private AprilTagFieldLayout atfl;
-    private SwerveSubsystem swerveSubsystem;
+    private Swerve swerveSubsystem;
     private NodePlace nodePlace;
     private Pose2d destPose;
 
@@ -35,9 +35,9 @@ public class GridAlign extends CommandBase {
         }
     }
 
-    public GridAlign(Vision vision, SwerveSubsystem swerveSubsystem, NodePlace nodePlace) {
+    public GridAlign(Vision vision, Swerve swerve, NodePlace nodePlace) {
         this.atfl = vision.getAtfl();
-        this.swerveSubsystem = swerveSubsystem;
+        this.swerveSubsystem = swerve;
         this.nodePlace = nodePlace;
     }
 
