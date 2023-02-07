@@ -91,7 +91,7 @@ public class RobotContainer {
 
     swerveSubsystem.setDefaultCommand(new TeleopDrive(swerveSubsystem));
     
-    vision = new Vision(swerveSubsystem::getPose, swerveSubsystem::setVisionPose);
+    vision = new Vision(swerveSubsystem);
     // Configure the button bindings
     updateControllers();
   }

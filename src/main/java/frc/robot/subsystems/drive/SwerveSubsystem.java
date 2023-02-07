@@ -14,6 +14,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import com.revrobotics.REVPhysicsSim;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -23,6 +24,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
@@ -160,6 +163,11 @@ public class SwerveSubsystem extends SubsystemBase {
     SmartDashboard.putString("Vision/Vision Estimated Pos", AdditionalMathUtils.pos2dToString(visionRobotPos, 2));
   }
 
+  public void setVisionPose(Pose2d visionRobotPos, double timestamp, Matrix<N3, N1> stDevs) {
+    odometry.addVisionMeasurement(visionRobotPos, timestamp, stDevs);
+    SmartDashboard.putString("Vision/Vision Estimated Pos", AdditionalMathUtils.pos2dToString(visionRobotPos, 2));
+  }
+
   /* Auton Related Methods */
   /**
    * Generates a command that will follow a given trajectory
@@ -270,7 +278,7 @@ public class SwerveSubsystem extends SubsystemBase {
     return states;
   }
 
-  private ChassisSpeeds getChassisSpeeds() {
+  public ChassisSpeeds getChassisSpeeds() {
     var states = getStatesFromInputs(lastInputs);
     return kinematics.toChassisSpeeds(states);
   }

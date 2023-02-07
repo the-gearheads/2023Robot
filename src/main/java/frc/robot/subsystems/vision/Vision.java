@@ -15,19 +15,26 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonTrackedTarget;
+import com.google.flatbuffers.FlexBuffers.Vector;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.drive.SwerveSubsystem;
 
 public class Vision extends SubsystemBase {
   public PhotonCamera targetCam;
@@ -36,8 +43,6 @@ public class Vision extends SubsystemBase {
   LinearFilter xFilter = LinearFilter.movingAverage(10);
   LinearFilter yFilter = LinearFilter.movingAverage(10);
   LinearFilter rotFilter = LinearFilter.movingAverage(10);
-  private BiConsumer<Pose2d, Double> setVisionPose;
-  private Supplier<Pose2d> getPose;
 
   public enum ShouldSetVisionPose{
     UPDATE(true),DONT_UPDATE(false);
@@ -48,19 +53,20 @@ public class Vision extends SubsystemBase {
     }
   }
   private ShouldSetVisionPose shouldSetVisionPose;
+  private SwerveSubsystem swerve;
 
-  public Vision(Supplier<Pose2d> getPose, BiConsumer<Pose2d, Double> setVisionPose) {
-    this(getPose, setVisionPose, ShouldSetVisionPose.UPDATE);
+  public Vision(SwerveSubsystem swerve) {
+    this(swerve, ShouldSetVisionPose.UPDATE);
   }
 
-  public Vision(Supplier<Pose2d> getPose, BiConsumer<Pose2d, Double> setVisionPose, ShouldSetVisionPose shouldSetVisionPose) {
+  public Vision(SwerveSubsystem swerve, ShouldSetVisionPose shouldSetVisionPose) {
     this.shouldSetVisionPose = shouldSetVisionPose;
-    this.getPose = getPose;
-    this.setVisionPose=setVisionPose;
+    this.swerve=swerve;
     this.targetCam = new PhotonCamera("target");
     initializePoseEstimator();
 
-    SmartDashboard.putBoolean("2nd Level Vision Filtering", false);
+    SmartDashboard.putBoolean("Vision/2nd Level Vision Filtering", false);
+    SmartDashboard.putBoolean("Vision/Vary Vision StDev By Chassis Spd", true);
   }
 
   public void periodic(){
@@ -73,15 +79,27 @@ public class Vision extends SubsystemBase {
 
     // Update Vision Estimate
     if(this.shouldSetVisionPose.value && isPoseEstimateValid()){
-      Optional<EstimatedRobotPose> visionResult = getVisionPose(this.getPose.get());
+      Optional<EstimatedRobotPose> visionResult = getVisionPose(this.swerve.getPose());
       Pose2d estimatedRobotPos = visionResult.get().estimatedPose.toPose2d();
       estimatedRobotPos = averageVisionPose(estimatedRobotPos);
       double timestamp = visionResult.get().timestampSeconds;
-      this.setVisionPose.accept(estimatedRobotPos, timestamp);
+
+      //Vary St Devs based on Chassis Spd
+      double visionStDev = 0.9; 
+      boolean shouldVaryStDev = SmartDashboard.putBoolean("Vision/Vary Vision StDev By Chassis Spd", true);
+      if(shouldVaryStDev){
+        ChassisSpeeds vels = this.swerve.getChassisSpeeds();
+        double spds = Math.hypot(vels.vxMetersPerSecond, vels.vyMetersPerSecond);
+        if(spds>1.5){
+          visionStDev=1.5;
+        }
+      }
+      Matrix<N3, N1> stDevs = VecBuilder.fill(visionStDev, visionStDev, visionStDev);
+      this.swerve.setVisionPose(estimatedRobotPos, timestamp, stDevs);
 
       SmartDashboard.putBoolean("Vision/Is Updating", true);
     }else{
-      averageVisionPose(this.getPose.get());
+      averageVisionPose(this.swerve.getPose());
       SmartDashboard.putBoolean("Vision/Is Updating", false);
     }
   }
@@ -97,7 +115,7 @@ public class Vision extends SubsystemBase {
     boolean isConnected = targetCam.isConnected();
     boolean hasTargets = targetCam.getLatestResult().hasTargets();
 
-    Optional<EstimatedRobotPose> visionResult = getVisionPose(this.getPose.get());
+    Optional<EstimatedRobotPose> visionResult = getVisionPose(this.swerve.getPose());
     boolean isEstimatePresent = Vision.isVisionPosePresent(visionResult);
     
     PhotonTrackedTarget best_target = targetCam.getLatestResult().getBestTarget();
@@ -111,12 +129,12 @@ public class Vision extends SubsystemBase {
       best_target.getBestCameraToTarget()
       .getTranslation().toTranslation2d().getDistance(new Translation2d());
 
-      boolean shouldFilter = SmartDashboard.getBoolean("2nd Level Vision Filtering", false);
+      boolean shouldFilter = SmartDashboard.getBoolean("Vision/2nd Level Vision Filtering", false);
 
       // second set of conditions to satisfy
       if((ambiguity < 5e-2 && distance < 2 && deltaTime < 0.5)
         || !shouldFilter){
-        return false;
+        return true;
       }
     }
     return false;
