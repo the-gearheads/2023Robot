@@ -34,7 +34,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.drive.SwerveSubsystem;
+import frc.robot.subsystems.drive.Swerve;
 
 public class Vision extends SubsystemBase {
   public PhotonCamera targetCam;
@@ -53,13 +53,13 @@ public class Vision extends SubsystemBase {
     }
   }
   private ShouldSetVisionPose shouldSetVisionPose;
-  private SwerveSubsystem swerve;
+  private Swerve swerve;
 
-  public Vision(SwerveSubsystem swerve) {
+  public Vision(Swerve swerve) {
     this(swerve, ShouldSetVisionPose.UPDATE);
   }
 
-  public Vision(SwerveSubsystem swerve, ShouldSetVisionPose shouldSetVisionPose) {
+  public Vision(Swerve swerve, ShouldSetVisionPose shouldSetVisionPose) {
     this.shouldSetVisionPose = shouldSetVisionPose;
     this.swerve=swerve;
     this.targetCam = new PhotonCamera("target");

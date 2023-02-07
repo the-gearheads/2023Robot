@@ -26,7 +26,8 @@ import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.sysidcommand.SysidCommand;
 import frc.robot.controllers.Controllers;
 import frc.robot.controllers.SingleXboxController;
-import frc.robot.subsystems.drive.SwerveSubsystem;
+import frc.robot.subsystems.drive.Swerve;
+import frc.robot.subsystems.AutonChooser;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Vision.ShouldSetVisionPose;
 import frc.robot.subsystems.drive.SwerveModule;
@@ -47,8 +48,9 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem swerveSubsystem;
+  private final Swerve swerve;
   private final Vision vision;
+  private final AutonChooser autonChooser;
 
   public String readPipelineFile() {
     try {
@@ -68,7 +70,7 @@ public class RobotContainer {
     switch (Constants.getMode()) {
       case REAL:
         SmartDashboard.putString("/Mode", "REAL");
-        swerveSubsystem = new SwerveSubsystem(
+        swerve = new Swerve(
             new SwerveModule(0, DRIVE.FL_IDS[0], DRIVE.FL_IDS[1], DRIVE.FL_OFFSETS, "FL"),
             new SwerveModule(1, DRIVE.FR_IDS[0], DRIVE.FR_IDS[1], DRIVE.FR_OFFSETS, "FR"),
             new SwerveModule(2, DRIVE.RL_IDS[0], DRIVE.RL_IDS[1], DRIVE.RL_OFFSETS, "RL"),
@@ -76,7 +78,7 @@ public class RobotContainer {
         break;
       case SIM:
         SmartDashboard.putString("/Mode", "SIM");
-        swerveSubsystem = new SwerveSubsystem(
+        swerve = new Swerve(
             new SwerveModuleSim(0, DRIVE.FL_IDS[0], DRIVE.FL_IDS[1], DRIVE.FL_OFFSETS, "FL"),
             new SwerveModuleSim(1, DRIVE.FR_IDS[0], DRIVE.FR_IDS[1], DRIVE.FR_OFFSETS, "FR"),
             new SwerveModuleSim(2, DRIVE.RL_IDS[0], DRIVE.RL_IDS[1], DRIVE.RL_OFFSETS, "RL"),
@@ -85,14 +87,15 @@ public class RobotContainer {
       default:
       case SIM_REPLAY:
         SmartDashboard.putString("/Mode", "SIM_REPLAY");
-        swerveSubsystem = new SwerveSubsystem(new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {},
+        swerve = new Swerve(new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {},
             new SwerveModuleIO() {});
         break;
     }
 
-    swerveSubsystem.setDefaultCommand(new TeleopDrive(swerveSubsystem));
+    swerve.setDefaultCommand(new TeleopDrive(swerve));
     
-    vision = new Vision(swerveSubsystem);
+    vision = new Vision(swerve);
+    autonChooser = new AutonChooser(swerve);
     // Configure the button bindings
     updateControllers();
   }
@@ -106,7 +109,7 @@ public class RobotContainer {
         DriverStation.reportError("Tried to execute path that failed to load! Path name: " + pathName, true);
       });
     }
-    Command forwardCommand = swerveSubsystem.followTrajectoryCommand(path, resetOdometry, true);
+    Command forwardCommand = swerve.followTrajectoryCommand(path, resetOdometry, true);
     return forwardCommand;
   }
 
@@ -135,11 +138,11 @@ public class RobotContainer {
 
     // This command puts the robot 1 meter in front of apriltag 8 (middle of bottom left grid on pathplanner picture of 2023 field)
     Controllers.activeController.getPPGotoTag8().onTrue(new InstantCommand(()->{
-      swerveSubsystem.goTo(Constants.FIELD_CONSTANTS.DEBUG_GO_TO_DEST, AUTON.SLOW_CONSTRAINTS).schedule();
+      swerve.goTo(Constants.FIELD_CONSTANTS.DEBUG_GO_TO_DEST, AUTON.SLOW_CONSTRAINTS).schedule();
     }));
 
     Controllers.activeController.getResetPoseButton().onTrue(new InstantCommand(()->{
-      swerveSubsystem.setPose(new Pose2d(3,0.38,Rotation2d.fromDegrees(90)));
+      swerve.setPose(new Pose2d(3,0.38,Rotation2d.fromDegrees(90)));
     }));
   }
 
@@ -149,24 +152,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-
-    Command startToGamePiece = getCommandForPath("Start_To_Game_Piece_1", true, AUTON.FAST_CONSTRAINTS);
-    Command gamePieceToStart = getCommandForPath("Game_Piece_1_To_Start", false, AUTON.MID_CONSTRAINTS);
-    Command startToChargingStation = getCommandForPath("Start_To_Charging_Station", false, AUTON.SLOW_CONSTRAINTS);
-    Command updateVision = new InstantCommand(()->{
-      vision.setShouldSetVisionPose(ShouldSetVisionPose.UPDATE);
-    });
-    Command DONTupdateVision1 = new InstantCommand(()->{
-      vision.setShouldSetVisionPose(ShouldSetVisionPose.DONT_UPDATE);
-    });
-    Command DONTupdateVision2 = new InstantCommand(()->{
-      vision.setShouldSetVisionPose(ShouldSetVisionPose.DONT_UPDATE);
-    });
-    return new ParallelRaceGroup(startToGamePiece, updateVision)
-    .andThen(new ParallelRaceGroup(gamePieceToStart))
-    .andThen(new ParallelRaceGroup(startToChargingStation))
-    .andThen(new InstantCommand(()->{
-      swerveSubsystem.setX();
-    }));
+    return autonChooser.getSelectedChoice();
   }
 }
