@@ -73,6 +73,9 @@ public class Vision extends SubsystemBase {
     this.shouldSetVisionPose = shouldSetVisionPose; 
   }
 
+  public AprilTagFieldLayout getAtfl() {
+    return photonPoseEstimator.getFieldTags();
+  }
   boolean isPoseEstimateValid(){
     boolean isConnected = targetCam.isConnected();
     boolean hasTargets = targetCam.getLatestResult().hasTargets();
