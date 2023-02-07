@@ -43,10 +43,7 @@ public class Constants extends AnnotatedClass {
     }
   }
 
-  public static final class Drivetrain {
-
-    private Drivetrain() {}
-
+  public static final class DRIVE {
     // Drive, then steer ids
     public static final int[] FL_IDS = {1, 2};
     public static final int[] FR_IDS = {3, 4};
@@ -84,9 +81,6 @@ public class Constants extends AnnotatedClass {
     public static final double[] DRIVE_PIDF = {0.04, 0, 0, 1 / DRIVE_FREE_SPEED};
     public static final double[] STEER_PIDF = {1, 0, 0, 0};
 
-    public static final Pose2d zeroPos = new Pose2d(0, 0, new Rotation2d(0));
-    public static final Transform2d zeroTransform = new Transform2d(new Translation2d(0, 0), new Rotation2d(0));
-
     public static final Translation2d FL_POS =
         new Translation2d(Units.inchesToMeters(12.25), Units.inchesToMeters(13.25));
     public static final Translation2d FR_POS =
@@ -107,31 +101,28 @@ public class Constants extends AnnotatedClass {
     public static double MAX_TRANSLATIONAL_SPEED = 2;
     @NTPublish
     public static double MAX_ROTATIONAL_SPEED = 1;
-
-    public static class Auton {
-      public static PIDController X_PID = new PIDController(5, 0, 0);//0.5
-      public static PIDController Y_PID = new PIDController(5, 0, 0);//0.5
-      public static PIDController ROT_PID = new PIDController(1.5, 0, 0);
-      public static PathConstraints CONSTRAINTS = new PathConstraints(1, 1.5);
-    }
   }
-  public static final class FieldConstants {
-    private FieldConstants() {}
 
+  public static class AUTON {
+    public static PIDController X_PID = new PIDController(5, 0, 0);//0.5
+    public static PIDController Y_PID = new PIDController(5, 0, 0);//0.5
+    public static PIDController ROT_PID = new PIDController(1.5, 0, 0);
+    public static PathConstraints SLOW_CONSTRAINTS = new PathConstraints(2, 1);
+    public static PathConstraints MID_CONSTRAINTS = new PathConstraints(4, 2);
+    public static PathConstraints FAST_CONSTRAINTS = new PathConstraints(7, 3);
+  }
+  public static final class FIELD_CONSTANTS {
     public static final double WIDTH = 8.02;
-    public static final double LENGTH = 50;
-    public static final Pose2d GRID_8 = new Pose2d(1.9, 4.9, Rotation2d.fromDegrees(-180));
+    public static final double LENGTH = 15.8496;
+    public static final Pose2d DEBUG_GO_TO_DEST = new Pose2d(1.9, 4.9, Rotation2d.fromDegrees(-180));
   }
-  public static final class Vision {
-    private Vision() {}
-
-    public static final Transform3d robotToCam = new Transform3d(
+  
+  public static final class VISION {
+    public static final Transform3d ROBOT_TO_CAM = new Transform3d(
         new Translation3d(0.4, -0.005, 0.13),
         new Rotation3d());
   }
-  public static final class Controllers {
-    private Controllers() {}
-
+  public static final class CONTROLLERS {
     public static final double JOYSTICK_DEADBAND = 0.1;
   }
 }

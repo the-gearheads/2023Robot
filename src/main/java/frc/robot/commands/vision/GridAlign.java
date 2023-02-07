@@ -1,4 +1,4 @@
-package frc.robot.subsystems.vision;
+package frc.robot.commands.vision;
 
 import java.util.ArrayList;
 import org.photonvision.PhotonPoseEstimator;
@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 
 public class GridAlign extends CommandBase {
@@ -75,7 +76,7 @@ public class GridAlign extends CommandBase {
         this.destPose = closestIdPose.plus(new Transform2d(nodePlace.val, Rotation2d.fromDegrees(180)));
     }
     public void end(){
-        swerveSubsystem.goTo(destPose, Constants.Drivetrain.Auton.CONSTRAINTS).schedule();
+        swerveSubsystem.goTo(destPose, Constants.AUTON.SLOW_CONSTRAINTS).schedule();
     }
     public boolean isFinished(){
         return true;

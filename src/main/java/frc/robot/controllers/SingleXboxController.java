@@ -15,7 +15,7 @@ public class SingleXboxController implements ControllerInterface {
   }
 
   private double deadband(double num) {
-    return MathUtil.applyDeadband(num, Constants.Controllers.JOYSTICK_DEADBAND);
+    return MathUtil.applyDeadband(num, Constants.CONTROLLERS.JOYSTICK_DEADBAND);
   }
 
   @Override

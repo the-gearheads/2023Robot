@@ -68,9 +68,9 @@ public class TeleopDrive extends CommandBase {
       rotSpd *= Math.abs(rotSpd);
     }
 
-    xSpd *= Constants.Drivetrain.MAX_LIN_VEL;
-    ySpd *= Constants.Drivetrain.MAX_LIN_VEL;
-    rotSpd *= Constants.Drivetrain.MAX_ROT_VEL;
+    xSpd *= Constants.DRIVE.MAX_LIN_VEL;
+    ySpd *= Constants.DRIVE.MAX_LIN_VEL;
+    rotSpd *= Constants.DRIVE.MAX_ROT_VEL;
 
     //Make sure the robot maintains its heading when we aren't toggling the rotation axis
     if (SmartDashboard.getBoolean("Rotation PID", false)) {

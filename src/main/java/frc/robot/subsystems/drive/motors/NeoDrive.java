@@ -8,7 +8,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
-import frc.robot.Constants.Drivetrain;
+import frc.robot.Constants.DRIVE;
 import frc.robot.util.SendableSparkMaxPID;
 
 public class NeoDrive {
@@ -29,21 +29,21 @@ public class NeoDrive {
 
   private void configure() {
     max.restoreFactoryDefaults();
-    max.setSmartCurrentLimit(Drivetrain.DRIVE_CURRENT_LIMIT);
+    max.setSmartCurrentLimit(DRIVE.DRIVE_CURRENT_LIMIT);
     max.setIdleMode(IdleMode.kBrake);
 
-    encoder.setPositionConversionFactor(Drivetrain.DRIVE_POS_FACTOR);
-    encoder.setVelocityConversionFactor(Drivetrain.DRIVE_VEL_FACTOR);
+    encoder.setPositionConversionFactor(DRIVE.DRIVE_POS_FACTOR);
+    encoder.setVelocityConversionFactor(DRIVE.DRIVE_VEL_FACTOR);
 
     // TODO: 1) check if this is too noisy 2) check if this impacts other robot code that deals with encoder velocities
     encoder.setMeasurementPeriod(10);
 
     pid.setFeedbackDevice(encoder);
 
-    sPid.setP(Drivetrain.DRIVE_PIDF[0]);
-    sPid.setI(Drivetrain.DRIVE_PIDF[1]);
-    sPid.setD(Drivetrain.DRIVE_PIDF[2]);
-    sPid.setFF(Drivetrain.DRIVE_PIDF[3]);
+    sPid.setP(DRIVE.DRIVE_PIDF[0]);
+    sPid.setI(DRIVE.DRIVE_PIDF[1]);
+    sPid.setD(DRIVE.DRIVE_PIDF[2]);
+    sPid.setFF(DRIVE.DRIVE_PIDF[3]);
 
     // Probably the default
     pid.setOutputRange(-1, 1);

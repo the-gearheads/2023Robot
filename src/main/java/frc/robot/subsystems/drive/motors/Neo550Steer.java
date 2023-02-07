@@ -10,7 +10,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.Drivetrain;
+import frc.robot.Constants.DRIVE;
 import frc.robot.util.SendableSparkMaxPID;
 
 public class Neo550Steer {
@@ -37,21 +37,21 @@ public class Neo550Steer {
 
   private void configure() {
     max.restoreFactoryDefaults();
-    max.setSmartCurrentLimit(Drivetrain.STEER_CURRENT_LIMIT);
+    max.setSmartCurrentLimit(DRIVE.STEER_CURRENT_LIMIT);
     max.setIdleMode(IdleMode.kBrake);
 
-    encoder.setPositionConversionFactor(Drivetrain.STEER_POS_FACTOR);
-    encoder.setVelocityConversionFactor(Drivetrain.STEER_VEL_FACTOR);
+    encoder.setPositionConversionFactor(DRIVE.STEER_POS_FACTOR);
+    encoder.setVelocityConversionFactor(DRIVE.STEER_VEL_FACTOR);
 
     // MaxSwerve steering encoder is inverted
     encoder.setInverted(true);
 
     pid.setFeedbackDevice(encoder);
 
-    sPid.setP(Drivetrain.STEER_PIDF[0]);
-    sPid.setI(Drivetrain.STEER_PIDF[1]);
-    sPid.setD(Drivetrain.STEER_PIDF[2]);
-    sPid.setFF(Drivetrain.STEER_PIDF[3]);
+    sPid.setP(DRIVE.STEER_PIDF[0]);
+    sPid.setI(DRIVE.STEER_PIDF[1]);
+    sPid.setD(DRIVE.STEER_PIDF[2]);
+    sPid.setFF(DRIVE.STEER_PIDF[3]);
 
     SmartDashboard.putData(path + "/SteerPid", sPid);
 

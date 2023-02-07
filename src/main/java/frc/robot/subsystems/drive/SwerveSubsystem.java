@@ -36,7 +36,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.Drivetrain;
+import frc.robot.Constants.DRIVE;
+import frc.robot.Constants.AUTON;
 import frc.robot.subsystems.drive.gyro.GyroIO;
 import frc.robot.subsystems.drive.gyro.GyroSim;
 import frc.robot.subsystems.drive.gyro.Gyroscope;
@@ -44,7 +45,7 @@ import frc.robot.util.AdditionalMathUtils;
 
 public class SwerveSubsystem extends SubsystemBase {
 
-  Translation2d[] modulePositions = {Drivetrain.FL_POS, Drivetrain.FR_POS, Drivetrain.RL_POS, Drivetrain.RR_POS};
+  Translation2d[] modulePositions = {DRIVE.FL_POS, DRIVE.FR_POS, DRIVE.RL_POS, DRIVE.RR_POS};
   final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(modulePositions);
   public SwerveModuleIO[] modules;
   public SwerveModuleInputsAutoLogged[] lastInputs;
@@ -69,9 +70,9 @@ public class SwerveSubsystem extends SubsystemBase {
 
     SmartDashboard.putData(field);
 
-    SmartDashboard.putData("xPid", Drivetrain.Auton.X_PID);
-    SmartDashboard.putData("yPid", Drivetrain.Auton.Y_PID);
-    SmartDashboard.putData("rotPid", Drivetrain.Auton.ROT_PID);
+    SmartDashboard.putData("xPid", AUTON.X_PID);
+    SmartDashboard.putData("yPid", AUTON.Y_PID);
+    SmartDashboard.putData("rotPid", AUTON.ROT_PID);
   }
 
   @Override
@@ -119,8 +120,8 @@ public class SwerveSubsystem extends SubsystemBase {
   public void drive(ChassisSpeeds speeds) {
     var states = kinematics.toSwerveModuleStates(speeds);
     if (SmartDashboard.getBoolean("/Swerve/DesaturateWheelSpeeds", true)) {
-      SwerveDriveKinematics.desaturateWheelSpeeds(states, getChassisSpeeds(), Drivetrain.MAX_MODULE_SPEED,
-          Drivetrain.MAX_TRANSLATIONAL_SPEED, Drivetrain.MAX_ROTATIONAL_SPEED);
+      SwerveDriveKinematics.desaturateWheelSpeeds(states, getChassisSpeeds(), DRIVE.MAX_MODULE_SPEED,
+          DRIVE.MAX_TRANSLATIONAL_SPEED, DRIVE.MAX_ROTATIONAL_SPEED);
     }
     setStates(states);
   }
@@ -185,7 +186,7 @@ public class SwerveSubsystem extends SubsystemBase {
         if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
           // Create a new state so that we don't overwrite the original
           Translation2d newTranslation = 
-              new Translation2d(initPose.getX(), Constants.FieldConstants.WIDTH - initPose.getY());
+              new Translation2d(initPose.getX(), Constants.FIELD_CONSTANTS.WIDTH - initPose.getY());
           Rotation2d newHeading = initPose.getRotation().times(-1);
           initPose = new Pose2d(newTranslation, newHeading);
         }
