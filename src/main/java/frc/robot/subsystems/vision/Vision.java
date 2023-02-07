@@ -86,12 +86,12 @@ public class Vision extends SubsystemBase {
 
       //Vary St Devs based on Chassis Spd
       double visionStDev = 0.9; 
-      boolean shouldVaryStDev = SmartDashboard.putBoolean("Vision/Vary Vision StDev By Chassis Spd", true);
+      boolean shouldVaryStDev = SmartDashboard.getBoolean("Vision/Vary Vision StDev By Chassis Spd", true);
       if(shouldVaryStDev){
         ChassisSpeeds vels = this.swerve.getChassisSpeeds();
         double spds = Math.hypot(vels.vxMetersPerSecond, vels.vyMetersPerSecond);
         if(spds>1.5){
-          visionStDev=1.5;
+          visionStDev=3;
         }
       }
       Matrix<N3, N1> stDevs = VecBuilder.fill(visionStDev, visionStDev, visionStDev);
@@ -132,7 +132,9 @@ public class Vision extends SubsystemBase {
       boolean shouldFilter = SmartDashboard.getBoolean("Vision/2nd Level Vision Filtering", false);
 
       // second set of conditions to satisfy
-      if((ambiguity < 5e-2 && distance < 2 && deltaTime < 0.5)
+      if((ambiguity < 5e-2 
+      // && distance < 2
+       && deltaTime < 0.5)
         || !shouldFilter){
         return true;
       }

@@ -125,33 +125,14 @@ public class RobotContainer {
     // Find new controllers
     Controllers.updateActiveControllerInstance();
 
-    // Put new bindings here. 
-    XboxController controller = ((SingleXboxController) Controllers.activeController).controller;
-
-    PathConstraints constraints = new PathConstraints(7, 3);
-
-    PathPlannerTrajectory forwardTraj = PathPlanner.loadPath("DEBUG_Forward", constraints);
-    Command forwardCommand = swerveSubsystem.followTrajectoryCommand(forwardTraj, true, true);
-    new JoystickButton(controller, XboxController.Button.kY.value).toggleOnTrue(forwardCommand);
+    // Put new bindings here.
+    PathConstraints constraints = new PathConstraints(2, 1);
 
     Controllers.activeController.getPPLoadDebugForwardPath()
-    .toggleOnTrue(getCommandForPath("Start_To_Game_Piece_1", true, constraints)
-    .alongWith(new InstantCommand(()->{
-      vision.setShouldSetVisionPose(ShouldSetVisionPose.UPDATE);
-    })));
+    .toggleOnTrue(getCommandForPath("Start_To_Game_Piece_1", true, constraints));
 
     Controllers.activeController.getPPLoadDebugBackwardPath()
-    .toggleOnTrue(getCommandForPath("Game_Piece_1_To_Start", true, constraints)
-    .alongWith(new InstantCommand(()->{
-      vision.setShouldSetVisionPose(ShouldSetVisionPose.DONT_UPDATE);
-    })));
-
-    // Controllers.activeController.getPPLoadDebugForwardPath().toggleOnTrue(getCommandForPath("DEBUG_Forward", true));
-    // Controllers.activeController.getPPLoadDebugBackwardPath().toggleOnTrue(getCommandForPath("DEBUG_Backward", true));
-    Controllers.activeController.getPPLoadDebugLeftPath().toggleOnTrue(getCommandForPath("DEBUG_Left", true, constraints));
-    Controllers.activeController.getPPLoadDebugRightPath().whileTrue(new RepeatCommand(new InstantCommand(()->{
-      swerveSubsystem.setX();
-    })));
+    .toggleOnTrue(getCommandForPath("Game_Piece_1_To_Start", true, constraints));
 
     // This command puts the robot 1 meter in front of apriltag 8 (middle of bottom left grid on pathplanner picture of 2023 field)
     Controllers.activeController.getPPGotoTag8().onTrue(new InstantCommand(()->{

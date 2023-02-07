@@ -296,20 +296,23 @@ public class SwerveSubsystem extends SubsystemBase {
 
   /* Sets all modules into an X formation (and stops driving) */
   public void setX() {
-    modules[0].setAngle(Rotation2d.fromDegrees(45));
-    modules[1].setAngle(Rotation2d.fromDegrees(-45));
-    modules[2].setAngle(Rotation2d.fromDegrees(-45));
-    modules[3].setAngle(Rotation2d.fromDegrees(45));
+    // for(var module: modules) {
+    //   module.setState(new SwerveModuleState());
+    // }
+    // modules[0].setAngle(Rotation2d.fromDegrees(45));
+    // modules[1].setAngle(Rotation2d.fromDegrees(-45));
+    // modules[2].setAngle(Rotation2d.fromDegrees(-45));
+    // modules[3].setAngle(Rotation2d.fromDegrees(45));
 
-    // setStates(new SwerveModuleState[] {
-    //     // FL
-    //     new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-    //     // FR
-    //     new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-    //     // RL
-    //     new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-    //     // RR
-    //     new SwerveModuleState(0, Rotation2d.fromDegrees(-45))});
+    setStates(new SwerveModuleState[] {
+        // FL
+        new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+        // FR
+        new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+        // RL
+        new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+        // RR
+        new SwerveModuleState(0, Rotation2d.fromDegrees(45))});
   }
 
   /* SysId Related Methods  */
