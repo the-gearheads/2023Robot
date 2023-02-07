@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 
-public class SingleXboxController implements ControllerInterface {
+public class SingleXboxController {
 
   public XboxController controller;
 
@@ -18,17 +18,14 @@ public class SingleXboxController implements ControllerInterface {
     return MathUtil.applyDeadband(num, Constants.CONTROLLERS.JOYSTICK_DEADBAND);
   }
 
-  @Override
   public double getXMoveAxis() {
     return -deadband(controller.getLeftY());
   }
 
-  @Override
   public double getYMoveAxis() {
     return -deadband(controller.getLeftX());
   }
 
-  @Override
   public double getRotateAxis() {
     if(Constants.getMode()==Constants.RobotMode.SIM){
       return -deadband(controller.getRawAxis(2));

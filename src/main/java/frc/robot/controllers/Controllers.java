@@ -8,7 +8,7 @@ public class Controllers {
 
   private static String[] lastControllerNames = new String[6];
 
-  public static ControllerInterface activeController;
+  public static SingleXboxController activeController;
 
   /** Returns true if the connected controllers have changed since last called. */
   public static boolean didControllersChange() {
