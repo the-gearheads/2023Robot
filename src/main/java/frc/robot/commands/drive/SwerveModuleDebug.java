@@ -8,13 +8,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.drive.SwerveSubsystem;
+import frc.robot.subsystems.drive.Swerve;
 
 public class SwerveModuleDebug extends CommandBase {
-  private SwerveSubsystem swerve;
+  private Swerve swerve;
 
   /** Creates a new SwerveModuleDebug. */
-  public SwerveModuleDebug(SwerveSubsystem swerve) {
+  public SwerveModuleDebug(Swerve swerve) {
     addRequirements(swerve);
     this.swerve = swerve;
     // Use addRequirements() here to declare subsystem dependencies.

@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.util;
 
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

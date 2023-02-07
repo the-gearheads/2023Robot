@@ -7,11 +7,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import java.util.ArrayList;
 import frc.robot.Robot;
-import frc.robot.subsystems.drive.SwerveSubsystem;
+import frc.robot.subsystems.drive.Swerve;
 
 // This is going to be slightly weird
 public class SysidCommand extends CommandBase {
-  private SwerveSubsystem drive;
+  private Swerve drive;
   private ArrayList<Double> data = new ArrayList<Double>();
   /* If the test is dynamic, false if quasistatic */
   private boolean isDynamicTest;
@@ -29,7 +29,7 @@ public class SysidCommand extends CommandBase {
   private final int maxCapacity = 36000;
 
   // Runs as auton, tries to emulate the sysid interface. Note: may have potential issues due to other robot code running and taking up processing time
-  public SysidCommand(SwerveSubsystem drive) {
+  public SysidCommand(Swerve drive) {
     addRequirements(drive);
     this.drive = drive;
 

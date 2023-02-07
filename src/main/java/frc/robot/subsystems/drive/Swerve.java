@@ -43,7 +43,7 @@ import frc.robot.subsystems.drive.gyro.GyroSim;
 import frc.robot.subsystems.drive.gyro.Gyroscope;
 import frc.robot.util.AdditionalMathUtils;
 
-public class SwerveSubsystem extends SubsystemBase {
+public class Swerve extends SubsystemBase {
 
   Translation2d[] modulePositions = {DRIVE.FL_POS, DRIVE.FR_POS, DRIVE.RL_POS, DRIVE.RR_POS};
   final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(modulePositions);
@@ -54,7 +54,7 @@ public class SwerveSubsystem extends SubsystemBase {
   Field2d field = new Field2d();
 
   /** Creates a new SwerveSubsystem. */
-  public SwerveSubsystem(SwerveModuleIO... modules) {
+  public Swerve(SwerveModuleIO... modules) {
     if(Constants.getMode()==Constants.RobotMode.REAL){
       this.gyro= new Gyroscope(SPI.Port.kMXP, true);
     }else{

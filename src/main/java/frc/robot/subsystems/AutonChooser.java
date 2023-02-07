@@ -77,6 +77,10 @@ public class AutonChooser {
         .andThen(getCommandForPath("Start_To_Charging_Station", false, AUTON.SLOW_CONSTRAINTS))
         .andThen(new InstantCommand(()->{swerve.setX();}));
         autons.put("Left, 2 Cones, Charging Station", leftSide2ConesChargingStation);
+
+        //Forward 1 Meter
+        Command debugForward = getCommandForPath("Debug_Forward", true, AUTON.SLOW_CONSTRAINTS);
+        autons.put("Debug Forward", debugForward); 
     }
 
 

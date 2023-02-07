@@ -8,16 +8,16 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.drive.SwerveSubsystem;
+import frc.robot.subsystems.drive.Swerve;
 
 public class SteerMotorDebug extends CommandBase {//Currently only affects FL Steer Motor
-  private SwerveSubsystem swerveSubsystem;
+  private Swerve swerveSubsystem;
 
   /** Creates a new SteerMotorDebug. */
-  public SteerMotorDebug(SwerveSubsystem swerveSubsystem) {
-    this.swerveSubsystem = swerveSubsystem;
-    addRequirements(swerveSubsystem);
-    double currentAngle = swerveSubsystem.lastInputs[0].steerAngleSetpoint;
+  public SteerMotorDebug(Swerve swerve) {
+    this.swerveSubsystem = swerve;
+    addRequirements(swerve);
+    double currentAngle = swerve.lastInputs[0].steerAngleSetpoint;
     SmartDashboard.putNumber("Desired Steer Motor Angle", currentAngle);
 
 
