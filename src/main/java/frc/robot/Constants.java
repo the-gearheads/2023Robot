@@ -31,6 +31,13 @@ public class Constants extends AnnotatedClass {
   public static enum RobotMode {
     SIM, SIM_REPLAY, REAL
   }
+public static class ARM {
+
+  @NTPublish
+  public static double VELOCITY = 1;
+  public static double POSE_TOLERANCE = 0.01;
+
+}
 
   public static RobotMode getMode() {
     if (RobotBase.isReal()) {
