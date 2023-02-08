@@ -5,7 +5,9 @@
 package frc.robot.subsystems;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -19,6 +21,8 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -76,10 +80,26 @@ public class Vision extends SubsystemBase {
 
     // Update Vision Estimate
     if (this.shouldSetVisionPose.value && isPoseEstimateValid()) {
-      Optional<EstimatedRobotPose> visionResult = getVisionPose(this.swerve.getPose());
+      var swervePose = swerve.getPose();
+      var swervePose3d = new Pose3d(swervePose.getX(), swervePose.getY(), 0, new Rotation3d(0, 0, swervePose.getRotation().getRadians()));  
+      Optional<EstimatedRobotPose> visionResult = getVisionPose(swervePose);
       Pose2d estimatedRobotPos = visionResult.get().estimatedPose.toPose2d();
       estimatedRobotPos = averageVisionPose(estimatedRobotPos);
       double timestamp = visionResult.get().timestampSeconds;
+
+      /* Log all tag poses */
+      List<Pose3d> tagPoses = new ArrayList<>();
+      List<Integer> tagIds = new ArrayList<>();
+      for (var target : targetCam.getLatestResult().getTargets()) {
+        tagPoses.add(swervePose3d.transformBy(target.getBestCameraToTarget()));
+        tagIds.add(target.getFiducialId());
+      }
+      var tagPosesArray = tagPoses.toArray(new Pose3d[tagPoses.size()]);
+      /* May be slightly cursed */
+      var tagIdsArray = tagIds.stream().mapToLong(Long::valueOf).toArray();
+
+      Logger.getInstance().recordOutput("Vision/TagPoses", tagPosesArray);
+      Logger.getInstance().recordOutput("Vision/TagIds", tagIdsArray);
 
       //Vary St Devs based on Chassis Spd
       double visionStDev = 0.9;

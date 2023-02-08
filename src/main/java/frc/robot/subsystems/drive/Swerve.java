@@ -21,10 +21,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
@@ -52,6 +54,8 @@ public class Swerve extends SubsystemBase {
   public GyroIOInputsAutoLogged lastGyroInputs;
   public GyroIO gyro;
   SwerveDrivePoseEstimator odometry;
+  /* Regular odometry object so we can compare vision-aided odometry with regular odometry in telemetry */
+  SwerveDriveOdometry wheelOdometry;
   Field2d field = new Field2d();
 
   /** Creates a new SwerveSubsystem. */
@@ -88,15 +92,22 @@ public class Swerve extends SubsystemBase {
   public void periodic() {
     updateInputs();
     odometry.update(getRotation(), getPositionsFromInputs(lastInputs));
+    wheelOdometry.update(getRotation(), getPositionsFromInputs(lastInputs));
+
     field.setRobotPose(getPose());
-    Logger.getInstance().recordOutput("Swerve/Pose", getPose());
+    field.getObject("Wheels").setPose(wheelOdometry.getPoseMeters());
+
+    Logger.getInstance().recordOutput("Swerve/Field/Robot", getPose());
+    Logger.getInstance().recordOutput("Swerve/Field/Wheels", wheelOdometry.getPoseMeters());
+    Logger.getInstance().recordOutput("Swerve/Field/Vision", field.getObject("Vision").getPose());
+
     var speeds = getChassisSpeeds();
     Logger.getInstance().recordOutput("Swerve/ChassisSpeeds/Vx", speeds.vxMetersPerSecond);
     Logger.getInstance().recordOutput("Swerve/ChassisSpeeds/Vy", speeds.vyMetersPerSecond);
     Logger.getInstance().recordOutput("Swerve/ChassisSpeeds/Rot", speeds.omegaRadiansPerSecond);
 
     var states = getStatesFromInputs(lastInputs);
-    Logger.getInstance().recordOutput("Swerve/ModuleStates", states);
+    Logger.getInstance().recordOutput("Swerve/CurrentModuleStates", states);
   }
 
   public void simulationPeriodic(){
@@ -116,7 +127,7 @@ public class Swerve extends SubsystemBase {
    * @param states
    */
   public void setStates(SwerveModuleState[] states) {
-    Logger.getInstance().recordOutput("/Swerve/ModStates", states);
+    Logger.getInstance().recordOutput("/Swerve/TargetModuleStates", states);
     for (int i = 0; i < states.length; i++) {
       modules[i].setState(states[i]);
     }
@@ -149,6 +160,8 @@ public class Swerve extends SubsystemBase {
     updateInputs();
     odometry = new SwerveDrivePoseEstimator(kinematics, getRotation(), getPositionsFromInputs(lastInputs),
         new Pose2d());
+    wheelOdometry = new SwerveDriveOdometry(kinematics, getRotation(), getPositionsFromInputs(lastInputs),
+        new Pose2d());
   }
 
   /**
@@ -167,16 +180,17 @@ public class Swerve extends SubsystemBase {
    */
   public void setPose(Pose2d pose) {
     odometry.resetPosition(getRotation(), getPositionsFromInputs(lastInputs), pose);
+    wheelOdometry.resetPosition(getRotation(), getPositionsFromInputs(lastInputs), pose);
   }
 
   public void setVisionPose(Pose2d visionRobotPos, double timestamp) {
     odometry.addVisionMeasurement(visionRobotPos, timestamp);
-    SmartDashboard.putString("Vision/Vision Estimated Pos", AdditionalMathUtils.pos2dToString(visionRobotPos, 2));
+    field.getObject("Vision").setPose(visionRobotPos);
   }
 
   public void setVisionPose(Pose2d visionRobotPos, double timestamp, Matrix<N3, N1> stDevs) {
     odometry.addVisionMeasurement(visionRobotPos, timestamp, stDevs);
-    SmartDashboard.putString("Vision/Vision Estimated Pos", AdditionalMathUtils.pos2dToString(visionRobotPos, 2));
+    field.getObject("Vision").setPose(visionRobotPos);
   }
 
   /* Auton Related Methods */
@@ -201,9 +215,12 @@ public class Swerve extends SubsystemBase {
           initPose = new Pose2d(newTranslation, newHeading);
         }
         this.setPose(initPose);
+        var allianceTraj = PathPlannerTrajectory.transformTrajectoryForAlliance(traj, DriverStation.getAlliance());
+        field.getObject("CurrentTrajectory").setTrajectory(allianceTraj);
+        Logger.getInstance().recordOutput("Swerve/Field/CurrentTrajectory", allianceTraj);
       }
     }), new PPSwerveControllerCommand(traj, this::getPose, // Pose supplier
-        this.kinematics, // SwerveDriveKinematics
+        this.kinematics, // SwerveDriveKinematicsSS
         (PIDController) SmartDashboard.getData("xPid"), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
         (PIDController) SmartDashboard.getData("yPid"), // Y controller (usually the same values as X controller)
         (PIDController) SmartDashboard.getData("rotPid"), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
@@ -214,6 +231,8 @@ public class Swerve extends SubsystemBase {
       if (stopWhenDone) {
         drive(new ChassisSpeeds(0, 0, 0));
       }
+      field.getObject("CurrentTrajectory").setTrajectory(new Trajectory());
+      Logger.getInstance().recordOutput("Swerve/Field/CurrentTrajectory", new Trajectory());
     }));
   }
 
