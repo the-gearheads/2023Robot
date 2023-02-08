@@ -1,6 +1,8 @@
 package frc.robot.controllers;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.Constants;
 
 public class Controllers {
 
@@ -8,7 +10,8 @@ public class Controllers {
 
   private static String[] lastControllerNames = new String[6];
 
-  public static ControllerInterface activeController;
+  public static DriveController driveController;
+  public static OperatorController operatorController;
 
   /** Returns true if the connected controllers have changed since last called. */
   public static boolean didControllersChange() {
@@ -26,14 +29,33 @@ public class Controllers {
   }
 
   public static void updateActiveControllerInstance() {
-    /* Just find the first Xbox controller */
+    // Defaults, since a NullPointerException would be far worse than any warnings
+    driveController = new DriveController() {};
+    operatorController = new OperatorController() {};
+
+    boolean foundOperatorController = false;
+    boolean foundDriveController = false;
+    
     for (int i = 0; i < DriverStation.kJoystickPorts; i++) {
-      if (!DriverStation.getJoystickName(i).equals("")) {
-        activeController = new SingleXboxController(i);
-        return;
+      String joyName = DriverStation.getJoystickName(i);
+      if (joyName.equals("")) continue;
+      if(!foundOperatorController && joyName.toLowerCase().contains("logitech")) {
+        System.out.println("Found logitech operator controller on port " + i);
+        operatorController = new LogitechOperatorController(i);
+        foundOperatorController = true;
+        continue;
+      }
+
+      // Fallback
+      if(!foundDriveController) {
+        System.out.println("Found xbox drive controller controller on port " + i);
+        driveController = new XboxDriveController(i);
+        foundDriveController = true;
       }
     }
-    // No controller found, but a NullPointerException would be far worse than any warnings
-    activeController = new SingleXboxController(0);
+  }
+
+  public static double deadband(double num) {
+    return MathUtil.applyDeadband(num, Constants.CONTROLLERS.JOYSTICK_DEADBAND);
   }
 }

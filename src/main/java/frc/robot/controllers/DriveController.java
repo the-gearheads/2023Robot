@@ -2,7 +2,7 @@ package frc.robot.controllers;
 
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-public interface ControllerInterface {
+public interface DriveController {
 
   /** Axis used for moving forwards and backwards. Value between -1 and 1 */
   public default double getXMoveAxis() {

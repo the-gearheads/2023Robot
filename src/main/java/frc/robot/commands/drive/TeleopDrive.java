@@ -47,11 +47,11 @@ public class TeleopDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    var xSpd = Controllers.activeController.getXMoveAxis();
-    var ySpd = Controllers.activeController.getYMoveAxis();
-    var rotSpd = Controllers.activeController.getRotateAxis();
+    var xSpd = Controllers.driveController.getXMoveAxis();
+    var ySpd = Controllers.driveController.getYMoveAxis();
+    var rotSpd = Controllers.driveController.getRotateAxis();
 
-    if(Controllers.activeController.getSetWheelXButton().getAsBoolean()) {
+    if(Controllers.driveController.getSetWheelXButton().getAsBoolean()) {
       swerve.setX();
       return;
     }

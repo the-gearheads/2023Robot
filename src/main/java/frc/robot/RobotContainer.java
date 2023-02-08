@@ -133,18 +133,18 @@ public class RobotContainer {
     Controllers.updateActiveControllerInstance();
 
     // Put new bindings here.
-    Controllers.activeController.getPPLoadDebugForwardPath()
+    Controllers.driveController.getPPLoadDebugForwardPath()
     .toggleOnTrue(getCommandForPath("Start_To_Game_Piece_1", true, AUTON.SLOW_CONSTRAINTS));
 
-    Controllers.activeController.getPPLoadDebugBackwardPath()
+    Controllers.driveController.getPPLoadDebugBackwardPath()
     .toggleOnTrue(getCommandForPath("Game_Piece_1_To_Start", true, AUTON.SLOW_CONSTRAINTS));
 
     // This command puts the robot 1 meter in front of apriltag 8 (middle of bottom left grid on pathplanner picture of 2023 field)
-    Controllers.activeController.getPPGotoTag8().onTrue(new InstantCommand(()->{
+    Controllers.driveController.getPPGotoTag8().onTrue(new InstantCommand(()->{
       swerve.goTo(Constants.FIELD_CONSTANTS.DEBUG_GO_TO_DEST, AUTON.SLOW_CONSTRAINTS).schedule();
     }));
 
-    Controllers.activeController.getResetPoseButton().onTrue(new InstantCommand(()->{
+    Controllers.driveController.getResetPoseButton().onTrue(new InstantCommand(()->{
       swerve.setPose(new Pose2d(3,0.38,Rotation2d.fromDegrees(90)));
     }));
   }
