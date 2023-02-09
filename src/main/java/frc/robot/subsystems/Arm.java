@@ -22,13 +22,13 @@ public class Arm extends SubsystemBase {
   private PIDController pid = new PIDController(0, 0, 0);
   private ArmFeedforward ff = new ArmFeedforward(0, 0, 0);
 
-  public enum ControlMode{
+  public enum ArmControlMode{
     VEL, POS;
   }
-  public ControlMode controlMode;
+  public ArmControlMode controlMode;
   
   public Arm() {
-    controlMode=ControlMode.VEL;
+    controlMode=ArmControlMode.VEL;
     configure();
   }
 

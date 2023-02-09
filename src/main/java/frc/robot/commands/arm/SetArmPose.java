@@ -7,7 +7,7 @@ package frc.robot.commands.arm;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Arm.ControlMode;
+import frc.robot.subsystems.Arm.ArmControlMode;
 
 public class SetArmPose extends CommandBase {
   private Arm arm;
@@ -38,7 +38,7 @@ public class SetArmPose extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    this.arm.controlMode = ControlMode.POS;
+    this.arm.controlMode = ArmControlMode.POS;
     this.arm.setGoal(this.armPose.val);
   }
 

@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Arm.ControlMode;
+import frc.robot.subsystems.Arm.ArmControlMode;
 
 public class JoystickArmControl extends CommandBase {
   private Arm arm;
@@ -23,7 +23,7 @@ public class JoystickArmControl extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    this.arm.controlMode = ControlMode.POS;
+    this.arm.controlMode = ArmControlMode.POS;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
