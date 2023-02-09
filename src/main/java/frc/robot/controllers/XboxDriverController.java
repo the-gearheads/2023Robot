@@ -5,11 +5,11 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 
-public class XboxDriveController implements DriverController {
+public class XboxDriverController implements DriverController {
 
   public XboxController controller;
 
-  public XboxDriveController(int port) {
+  public XboxDriverController(int port) {
     controller = new XboxController(port);
   }
 

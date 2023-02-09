@@ -49,7 +49,7 @@ public class Controllers {
       // Fallback
       if(!foundDriveController) {
         System.out.println("Found xbox drive controller controller on port " + i);
-        driverController = new XboxDriveController(i);
+        driverController = new XboxDriverController(i);
         foundDriveController = true;
       }
     }
