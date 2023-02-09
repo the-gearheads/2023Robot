@@ -10,7 +10,7 @@ public class Controllers {
 
   private static String[] lastControllerNames = new String[6];
 
-  public static DriveController driveController;
+  public static DriverController driverController;
   public static OperatorController operatorController;
 
   /** Returns true if the connected controllers have changed since last called. */
@@ -30,7 +30,7 @@ public class Controllers {
 
   public static void updateActiveControllerInstance() {
     // Defaults, since a NullPointerException would be far worse than any warnings
-    driveController = new DriveController() {};
+    driverController = new DriverController() {};
     operatorController = new OperatorController() {};
 
     boolean foundOperatorController = false;
@@ -49,7 +49,7 @@ public class Controllers {
       // Fallback
       if(!foundDriveController) {
         System.out.println("Found xbox drive controller controller on port " + i);
-        driveController = new XboxDriveController(i);
+        driverController = new XboxDriverController(i);
         foundDriveController = true;
       }
     }
