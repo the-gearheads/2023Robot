@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import java.util.ResourceBundle.Control;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -21,7 +22,13 @@ public class Arm extends SubsystemBase {
   private PIDController pid = new PIDController(0, 0, 0);
   private ArmFeedforward ff = new ArmFeedforward(0, 0, 0);
 
+  public enum ControlMode{
+    VEL, POS;
+  }
+  public ControlMode controlMode;
+  
   public Arm() {
+    controlMode=ControlMode.VEL;
     configure();
   }
 
@@ -47,10 +54,23 @@ public class Arm extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    // This method will be called once per scheduler run4
     double currentPose = encoder.getPosition();
-    double pidval = pid.calculate(currentPose, goal);
-    double ffval = ff.calculate(currentPose, 0);
-    motor.setVoltage(pidval + ffval);
+
+    switch(controlMode){
+      case POS:
+      {
+        double pidval = pid.calculate(currentPose, goal);
+        double ffval = ff.calculate(currentPose, 0);
+        motor.setVoltage(pidval + ffval);
+      }
+        break;
+      case VEL:
+      {
+        double ffval = ff.calculate(currentPose, goal);
+        motor.setVoltage(ffval);
+      }
+        break;
+    }
   }
 }
