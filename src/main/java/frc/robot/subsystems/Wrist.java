@@ -29,8 +29,8 @@ public class Wrist extends SubsystemBase {
     private double min;
 
     private WristState(double min, double max){
-      this.min=min;
-      this.max=max;
+      this.min=Units.degreesToRadians(min);
+      this.max=Units.degreesToRadians(max);
     }
 
   }
@@ -52,6 +52,14 @@ public class Wrist extends SubsystemBase {
     return encoder.getPosition();
   }
 
+  public double getWrappedPosition() {
+    double currentPose = getPosition();  // any number
+    double wrappedPose = currentPose;
+    wrappedPose%=2*Math.PI;
+    wrappedPose=wrappedPose>0?wrappedPose:wrappedPose+2*Math.PI; // wil be 0-360, robot wont go backward if goal is 359 and pos is 1
+    return wrappedPose;
+  }
+
   private void configure() {
     motor.restoreFactoryDefaults();
     motor.setInverted(false);
@@ -62,23 +70,23 @@ public class Wrist extends SubsystemBase {
   }
   @Override
   public void periodic() {
+    updateGoal();
+
     // This method will be called once per scheduler run
-    double currentPose = encoder.getPosition();
+    double currentPose = getWrappedPosition();
     double pidval = pid.calculate(currentPose, goal);
-    double ffval = ff.calculate(currentPose, 0);
-    motor.setVoltage(pidval + ffval);
+    double ffval = ff.calculate(currentPose+Math.PI/2, 0);
+    motor.setVoltage(pidval + ffval);    
+  }
 
-    // check what range the arm is in and set the wrist accordingly
-    double armDeg = arm.getPosition();
-    armDeg%=360;
-    armDeg=armDeg>0?armDeg:armDeg+360;
-
-    if ((WristState.FORWARD.min <= armDeg && armDeg <= WristState.FORWARD.max) || 
-        WristState.FORWARD2.min <= armDeg && armDeg <= WristState.FORWARD2.max) {
+  public void updateGoal(){    // check what range the arm is in and set the wrist accordingly
+    double armWrappedPos = arm.getWrappedPosition();
+    if ((WristState.FORWARD.min <= armWrappedPos && armWrappedPos <= WristState.FORWARD.max) || 
+        WristState.FORWARD2.min <= armWrappedPos && armWrappedPos <= WristState.FORWARD2.max) {
       setGoal(90);
-    } else if (WristState.LINEAR.min <= armDeg && armDeg <= WristState.LINEAR.max) {
-      setGoal(armDeg);
-    } else if (WristState.UP.min <= armDeg && armDeg <= WristState.UP.max) {
+    } else if (WristState.LINEAR.min <= armWrappedPos && armWrappedPos <= WristState.LINEAR.max) {
+      setGoal(armWrappedPos);
+    } else if (WristState.UP.min <= armWrappedPos && armWrappedPos <= WristState.UP.max) {
       setGoal(0);
     }
   }
