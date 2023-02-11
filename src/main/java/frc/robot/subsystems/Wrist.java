@@ -10,6 +10,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -23,7 +24,7 @@ public class Wrist extends SubsystemBase {
   private Arm arm;
 
   public enum WristState{//assuming arm pointing completely upwards is 0 degrees; increasing counterclockwise; range [-pi, pi]
-    UP(-90, 60), LINEAR(61, 110), FORWARD(-91, 109);
+    UP(150, 200), LINEAR(110, 150), FORWARD(0, 110), FORWARD2(270, 360);  // second forward needed because area covered passes through 0
     private double max;
     private double min;
 
@@ -68,14 +69,17 @@ public class Wrist extends SubsystemBase {
     motor.setVoltage(pidval + ffval);
 
     // check what range the arm is in and set the wrist accordingly
-    double armPose = Units.radiansToDegrees(arm.getPosition()) % 360; // I don't know what this is in i wish debugging was easier with this stupid dumb roboticriov2
+    double armDeg = arm.getPosition();
+    armDeg%=360;
+    armDeg=armDeg>0?armDeg:armDeg+360;
 
-    if (WristState.UP.min <= armPose && armPose <= WristState.UP.max) {
-      setGoal(0);
-    } else if (WristState.LINEAR.min <= armPose && armPose <= WristState.LINEAR.max) {
-      setGoal(armPose);
-    } else if (WristState.FORWARD.min <= armPose && armPose <= WristState.FORWARD.max) {
+    if ((WristState.FORWARD.min <= armDeg && armDeg <= WristState.FORWARD.max) || 
+        WristState.FORWARD2.min <= armDeg && armDeg <= WristState.FORWARD2.max) {
       setGoal(90);
+    } else if (WristState.LINEAR.min <= armDeg && armDeg <= WristState.LINEAR.max) {
+      setGoal(armDeg);
+    } else if (WristState.UP.min <= armDeg && armDeg <= WristState.UP.max) {
+      setGoal(0);
     }
   }
 }

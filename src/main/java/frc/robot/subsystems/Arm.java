@@ -57,11 +57,23 @@ public class Arm extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run4
-    double currentPose = encoder.getPosition();
+    double currentPose = encoder.getPosition();  // any number
 
     switch(controlMode){
       case POS:
       {
+        double wrappedPose = currentPose;
+        wrappedPose%=360;
+        wrappedPose=wrappedPose>0?wrappedPose:wrappedPose+360; // wil be 0-360, robot wont go backward if goal is 359 and pos is 1
+        // goal is 0-360?
+        double negGoal = -(360 - goal);
+        if ((negGoal - wrappedPose) < (goal - wrappedPose)) {
+          // if its faster to go backwards instead of loop all the way around ^
+          double pidval = pid.calculate(wrappedPose, negGoal);
+          double ffval = ff.calculate(wrappedPose, 0);
+          motor.setVoltage(pidval + ffval);  
+        } 
+        
         double pidval = pid.calculate(currentPose, goal);
         double ffval = ff.calculate(currentPose, 0);
         motor.setVoltage(pidval + ffval);
