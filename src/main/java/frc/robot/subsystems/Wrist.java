@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.Function;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
@@ -22,18 +23,6 @@ public class Wrist extends SubsystemBase {
   private PIDController pid = new PIDController(0, 0, 0);
   private ArmFeedforward ff = new ArmFeedforward(0, 0, 0);
   private Arm arm;
-
-  public enum WristState{//assuming arm pointing completely upwards is 0 degrees; increasing counterclockwise; range [-pi, pi]
-    UP(150, 200), LINEAR(110, 150), FORWARD(0, 110), FORWARD2(270, 360);  // second forward needed because area covered passes through 0
-    private double max;
-    private double min;
-
-    private WristState(double min, double max){
-      this.min=Units.degreesToRadians(min);
-      this.max=Units.degreesToRadians(max);
-    }
-
-  }
 
   public Wrist(Arm arm) {
     this.arm = arm;
@@ -74,20 +63,35 @@ public class Wrist extends SubsystemBase {
 
     // This method will be called once per scheduler run
     double currentPose = getWrappedPosition();
-    double pidval = pid.calculate(currentPose, goal);
+    double closerGoal = getClosestGoal(goal);
+    double pidval = pid.calculate(currentPose, closerGoal);
     double ffval = ff.calculate(currentPose+Math.PI/2, 0);
-    motor.setVoltage(pidval + ffval);    
+    motor.setVoltage(pidval + ffval);
   }
+
+  public double getClosestGoal(double goal) {
+    double pose = getPosition();
+    double difference = goal - pose;
+    double mod = difference % 360;
+    if (Math.abs(mod) <= 180) {
+        return pose + mod;
+    } else {
+        if (difference < 0) {
+            return pose + mod + 360;
+        } else {
+            return pose + mod - 360;
+        }
+    }
+}
 
   public void updateGoal(){    // check what range the arm is in and set the wrist accordingly
     double armWrappedPos = arm.getWrappedPosition();
-    if ((WristState.FORWARD.min <= armWrappedPos && armWrappedPos <= WristState.FORWARD.max) || 
-        WristState.FORWARD2.min <= armWrappedPos && armWrappedPos <= WristState.FORWARD2.max) {
-      setGoal(90);
-    } else if (WristState.LINEAR.min <= armWrappedPos && armWrappedPos <= WristState.LINEAR.max) {
-      setGoal(armWrappedPos);
-    } else if (WristState.UP.min <= armWrappedPos && armWrappedPos <= WristState.UP.max) {
-      setGoal(0);
+    for(WristState wristState : WristState.values()){
+      if(wristState.inRange(armWrappedPos)){
+        double goal = wristState.getWristGoal(armWrappedPos);
+        setGoal(goal);
+        break;
+      }
     }
   }
 }
