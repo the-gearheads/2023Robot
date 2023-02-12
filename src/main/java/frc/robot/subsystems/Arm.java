@@ -85,7 +85,7 @@ public class Arm extends SubsystemBase {
   }
 
   public double getClosestGoal(double goal) {
-    double pose = getPosition();
+    double pose = getWrappedPosition();
     double difference = goal - pose;
     double mod = difference % (2 * Math.PI);
     if (Math.abs(mod) <= Math.PI) {
