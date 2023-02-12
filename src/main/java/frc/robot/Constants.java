@@ -34,7 +34,7 @@ public class Constants extends AnnotatedClass {
 public static class ARM {
 
   @NTPublish
-  public static double VELOCITY = 1;
+  public static double VELOCITY = 0.5;
   public static double POSE_TOLERANCE = 0.01;
 
 }

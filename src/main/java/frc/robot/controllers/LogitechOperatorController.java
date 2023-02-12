@@ -17,7 +17,7 @@ public class LogitechOperatorController implements OperatorController {
   }
 
   public Trigger armGoTo1ndNode() {
-    return new JoystickButton(joy, 2);
+    return new JoystickButton(joy, 6);
   }
   public Trigger armGoTo2ndNode() {
     return new JoystickButton(joy, 5);
@@ -32,7 +32,7 @@ public class LogitechOperatorController implements OperatorController {
     return new JoystickButton(joy, 3);
   }
   public Trigger armGoToGroundPickUpNode() {
-    return new JoystickButton(joy, 6);
+    return new JoystickButton(joy, 2);
   }
   public Trigger setArmByJoystick() {
     return new Trigger(()->{

@@ -15,11 +15,11 @@ public class SetArmPose extends CommandBase {
   private ArmPose armPose;
 
   public enum ArmPose {
-    FLOOR(-60),
-    HIGH_NODE(-20),
+    FLOOR(-65),
+    HIGH_NODE(0),
     MID_NODE(-40),
     LOW_NODE(-60),
-    FEEDER_STATION(-180),
+    FEEDER_STATION(-190),
     INSIDE_ROBOT(-90);
 
     double val;

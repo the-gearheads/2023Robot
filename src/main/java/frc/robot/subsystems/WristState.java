@@ -7,11 +7,9 @@ public enum WristState{
     //These values are ALL WRONG
     //arm 0 deg is positive x axis
 
-    LEFT(-225, -140, 270),
+    LEFT(-225, -140, -90),
     UP(-140,-70,90),
-    LINEAR(-70,-50,(Double armPos)->{
-        return armPos;
-    }),
+    LINEAR(-70,-50,-90),
     RIGHT(-50,45, 0);
 
     private Function<Double, Double> getWristGoalLambda;
