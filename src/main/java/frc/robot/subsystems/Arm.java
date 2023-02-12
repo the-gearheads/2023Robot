@@ -37,8 +37,8 @@ public class Arm extends SubsystemBase {
   private CANSparkMax motor = new CANSparkMax(0, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
   private PIDController pid = new PIDController(7, 0, 0);
-  private PIDController velPid = new PIDController(5, 0, 0);
-  private ArmFeedforward ff = new ArmFeedforward(0.2, 0.7, 4);
+  private PIDController velPid = new PIDController(3, 0, 0);
+  private ArmFeedforward ff = new ArmFeedforward(0.1, 0.45, 4);
   private final DCMotor m_armGearbox = DCMotor.getNEO(1);
 
   private static final double m_armReduction = 200;
@@ -53,7 +53,10 @@ public class Arm extends SubsystemBase {
 
   public final Mechanism2d m_mech2d = new Mechanism2d(60, 60);
   public final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 30, 30);
-  private final MechanismLigament2d m_armTower = m_armPivot.append(new MechanismLigament2d("ArmTower", 30, -90,10.0,new Color8Bit(Color.kBlack)));
+  private final MechanismLigament2d m_armTower = m_armPivot.append(new MechanismLigament2d("ArmTower", 30, -90,10.0,new Color8Bit(Color.kDarkGray)));
+  public final MechanismRoot2d m_chassisPivot = m_mech2d.getRoot("Chassisivot", 15, 2);
+  private final MechanismLigament2d m_chassis = m_chassisPivot.append(new MechanismLigament2d("Chassis", 20, 0,100.0,new Color8Bit(Color.kDarkRed)));
+
   public final MechanismLigament2d m_arm =
       m_armPivot.append(new MechanismLigament2d("Arm", 20, Units.radiansToDegrees(m_armSim.getAngleRads()),10.0,new Color8Bit(Color.kGray)));
 
@@ -156,7 +159,7 @@ public class Arm extends SubsystemBase {
       }
         break;
       case VEL: {
-        if((getPosition()>Units.degreesToRadians(45) && goal>0) || (getPosition()<-Units.degreesToRadians(225) && goal<0)){
+        if((getPosition()>Units.degreesToRadians(0) && goal>0) || (getPosition()<-Units.degreesToRadians(180) && goal<0)){
           setVoltage(0);
           return;
         }

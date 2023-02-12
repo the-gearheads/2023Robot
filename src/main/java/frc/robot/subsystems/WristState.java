@@ -6,12 +6,13 @@ import edu.wpi.first.math.util.Units;
 public enum WristState{
     //These values are ALL WRONG
     //arm 0 deg is positive x axis
-    UP(150,200, 0),
-    LINEAR(110,150,(Double armPos)->{
+
+    LEFT(-225, -120, 180),
+    UP(-120,-70,90),
+    LINEAR(-70,-50,(Double armPos)->{
         return armPos;
     }),
-    LEFT(0, 110, 90),
-    RIGHT(200,360,270);
+    RIGHT(-50,45, 0);
 
     private Function<Double, Double> getWristGoalLambda;
     private double min;
@@ -21,7 +22,7 @@ public enum WristState{
         return currentWrappedPos>=min && currentWrappedPos<=max;
     }
     public double getWristGoal(double currentWrappedPos){
-        return this.getWristGoalLambda.apply(currentWrappedPos);
+        return (this.getWristGoalLambda.apply(currentWrappedPos));
     }
     private WristState(double min, double max, double goal){
         this(min, max, (Double pos)->{

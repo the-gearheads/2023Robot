@@ -108,7 +108,7 @@ public class RobotContainer {
     vision = new Vision(swerve);
     autonChooser = new AutonChooser(swerve);
     arm = new Arm();
-    // this.wrist=new Wrist(arm);
+    this.wrist=new Wrist(arm);
     arm.setDefaultCommand(new JoystickArmControl(arm));
     // Configure the button binding
     updateControllers();

@@ -26,21 +26,23 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.RobotMode;
 
 public class Wrist extends SubsystemBase {
   /** Creates a new Wrist. */
   private double goal;
   private CANSparkMax motor = new CANSparkMax(20, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
-  private PIDController pid = new PIDController(0, 0, 0);
-  private ArmFeedforward ff = new ArmFeedforward(0, 0, 0);
+  private PIDController pid = new PIDController(20, 0, 0);
+  private ArmFeedforward ff = new ArmFeedforward(0, 0.005, 0);
   private Arm arm;
 
 
   private final DCMotor m_armGearbox = DCMotor.getNEO(1);
 
   private static final double m_armReduction = 200;
-  private static final double m_armMass = 8.0; // Kilograms
+  private static final double m_armMass = 2.0; // Kilograms
   private static final double m_armLength = Units.inchesToMeters(30);
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
   // to 255 degrees (rotated down in the back).
@@ -54,8 +56,9 @@ public class Wrist extends SubsystemBase {
   private double simVolts;
 
   public void simulationPeriodic() {
-    double pivot_x=30+(arm.m_arm.getLength())*Math.cos(arm.m_arm.getAngle());
-    double pivot_y=30+(arm.m_arm.getLength())*Math.sin(arm.m_arm.getAngle());
+    double armPos = arm.getPosition();
+    double pivot_x=30+(arm.m_arm.getLength())*Math.cos(armPos);
+    double pivot_y=30+(arm.m_arm.getLength())*Math.sin(armPos);
     m_armPivot.setPosition(pivot_x,pivot_y);
     // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)
@@ -88,15 +91,10 @@ public class Wrist extends SubsystemBase {
   }
 
   public double getPosition() {
+    if (Constants.getMode() == RobotMode.SIM) {
+      return m_armSim.getAngleRads();
+    }
     return encoder.getPosition();
-  }
-
-  public double getWrappedPosition() {
-    double currentPose = getPosition();  // any number
-    double wrappedPose = currentPose;
-    wrappedPose%=2*Math.PI;
-    wrappedPose=wrappedPose>0?wrappedPose:wrappedPose+2*Math.PI; // wil be 0-2*Math.PI, robot wont go backward if goal is 359 and pos is 1
-    return wrappedPose;
   }
 
   private void configure() {
@@ -113,33 +111,17 @@ public class Wrist extends SubsystemBase {
 
     // This method will be called once per scheduler run
     double currentPose = getPosition();
-    // double closerGoal = getClosestGoal(goal);
     double pidval = pid.calculate(currentPose, goal);
     double ffval = ff.calculate(currentPose, 0);
     motor.setVoltage(pidval + ffval);
     this.simVolts=pidval+ffval;
   }
 
-  public double getClosestGoal(double goal) {
-    double pose = getPosition();
-    double difference = goal - pose;
-    double mod = difference % (2*Math.PI);
-    if (Math.abs(mod) <= Math.PI/2) {
-        return pose + mod;
-    } else {
-        if (difference < 0) {
-            return pose + mod + 2*Math.PI;
-        } else {
-            return pose + mod - 2*Math.PI;
-        }
-    }
-}
-
   public void updateGoal(){    // check what range the arm is in and set the wrist accordingly
-    double armWrappedPos = arm.getWrappedPosition();
+    double armPos = arm.getPosition();
     for(WristState wristState : WristState.values()){
-      if(wristState.inRange(armWrappedPos)){
-        double goal = wristState.getWristGoal(armWrappedPos);
+      if(wristState.inRange(armPos)){
+        double goal = wristState.getWristGoal(armPos);
         setGoal(goal);
         break;
       }
