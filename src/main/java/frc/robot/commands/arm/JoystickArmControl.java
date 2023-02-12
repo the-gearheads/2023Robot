@@ -4,6 +4,7 @@
 
 package frc.robot.commands.arm;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.controllers.Controllers;
@@ -23,13 +24,15 @@ public class JoystickArmControl extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    this.arm.controlMode = ArmControlMode.POS;
+    this.arm.controlMode = ArmControlMode.VEL;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    this.arm.controlMode = ArmControlMode.VEL;
     double axis = Controllers.operatorController.getArmAxis();
+    SmartDashboard.putNumber("Arm Axis", axis);
     axis *= Math.abs(axis);
     double armvel = axis * Constants.ARM.VELOCITY;
     this.arm.setGoal(armvel);

@@ -3,7 +3,9 @@ package frc.robot.subsystems;
 import java.util.function.Function;
 import edu.wpi.first.math.util.Units;
 
-public enum WristState{//assuming arm pointing completely upwards is 0 degrees; increasing counterclockwise; range [-pi, pi]
+public enum WristState{
+    //These values are ALL WRONG
+    //arm 0 deg is positive x axis
     UP(150,200, 0),
     LINEAR(110,150,(Double armPos)->{
         return armPos;

@@ -4,6 +4,7 @@
 
 package frc.robot.commands.arm;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Arm;
@@ -14,17 +15,17 @@ public class SetArmPose extends CommandBase {
   private ArmPose armPose;
 
   public enum ArmPose {
-    FLOOR(0),
-    HIGH_NODE(5),
-    MID_NODE(3),
-    LOW_NODE(3),
-    FEEDER_STATION(1),
-    INSIDE_ROBOT(1);
+    FLOOR(-30),
+    HIGH_NODE(-195),
+    MID_NODE(-180),
+    LOW_NODE(-165),
+    FEEDER_STATION(0),
+    INSIDE_ROBOT(-90);
 
     double val;
 
     private ArmPose(double val){
-      this.val=val;
+      this.val=Units.degreesToRadians(val);
     }
 
   }
@@ -33,6 +34,7 @@ public class SetArmPose extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     this.arm = arm;
     this.armPose = armPose;
+    addRequirements(arm);
   }
 
   // Called when the command is initially scheduled.
