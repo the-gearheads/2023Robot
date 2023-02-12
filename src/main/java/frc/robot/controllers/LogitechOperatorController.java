@@ -36,7 +36,12 @@ public class LogitechOperatorController implements OperatorController {
   }
   public Trigger setArmByJoystick() {
     return new Trigger(()->{
-      return Math.abs(getArmAxis())>0.2;
+      if(Math.abs(getArmAxis())>0.2){
+        if(Math.random()>0.5){
+          return true;
+        }
+      }
+      return false;
     });
   }
 }
