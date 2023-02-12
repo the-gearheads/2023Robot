@@ -131,35 +131,38 @@ public class Arm extends SubsystemBase {
     encoder.setZeroOffset(0);
   }
 
+  private void setVoltage(double volts){
+    motor.setVoltage(volts);
+    if(Constants.getMode()==RobotMode.SIM){
+      this.simVolts=volts;
+    }
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler 
-    double wrappedPose = getWrappedPosition();
+    double pose = getPosition();
     double vel = encoder.getVelocity();
 
     if (Constants.getMode() == RobotMode.SIM) {
-      wrappedPose = m_armSim.getAngleRads();
+      pose = m_armSim.getAngleRads();
       vel = m_armSim.getVelocityRadPerSec();
     }
-    double closestGoal = getClosestGoal(goal);
     switch (controlMode) {
       case POS: {
-        double pidval = pid.calculate(wrappedPose, goal);
-        double ffval = ff.calculate(wrappedPose, 0); // ff wants 0 parallel to floor in pos x
-        motor.setVoltage(pidval + ffval);
-        this.simVolts = ffval + pidval;
+        double pidval = pid.calculate(pose, goal);
+        double ffval = ff.calculate(pose, 0); // ff wants 0 parallel to floor in pos x
+        setVoltage(ffval+pidval);
       }
         break;
       case VEL: {
         if((getPosition()>Units.degreesToRadians(45) && goal>0) || (getPosition()<-Units.degreesToRadians(225) && goal<0)){
-          motor.setVoltage(0);
-          this.simVolts=0;
+          setVoltage(0);
           return;
         }
-        double ffval = ff.calculate(wrappedPose, goal);
+        double ffval = ff.calculate(pose, goal);
         double pidval = velPid.calculate(vel, goal);
-        motor.setVoltage(ffval + pidval);
-        this.simVolts = ffval + pidval;
+        setVoltage(ffval+pidval);
       }
         break;
     }
