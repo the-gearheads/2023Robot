@@ -33,6 +33,7 @@ import frc.robot.subsystems.AutonChooser;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.Arm.ArmControlMode;
+import frc.robot.subsystems.RgbLed.LEDS;
 import frc.robot.subsystems.drive.SwerveModule;
 import frc.robot.subsystems.drive.SwerveModuleIO;
 import frc.robot.subsystems.drive.SwerveModuleSim;
@@ -56,6 +57,7 @@ public class RobotContainer {
   private final AutonChooser autonChooser;
   private final Arm arm;
   private Wrist wrist;
+  private LEDS leds;
 
   public String readPipelineFile() {
     try {
@@ -110,6 +112,7 @@ public class RobotContainer {
     arm = new Arm();
     this.wrist=new Wrist(arm);
     arm.setDefaultCommand(new JoystickArmControl(arm));
+    leds = new LEDS(0, 50);
     // Configure the button binding
     updateControllers();
   }
@@ -161,7 +164,10 @@ public class RobotContainer {
 
     Controllers.operatorController.armGoTo1ndNode().onTrue(new SetArmPose(arm, ArmPose.LOW_NODE));
     Controllers.operatorController.armGoTo2ndNode().onTrue(new SetArmPose(arm, ArmPose.MID_NODE));
-    Controllers.operatorController.armGoTo3ndNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
+    // Controllers.operatorController.armGoTo3ndNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
+    Controllers.operatorController.armGoTo3ndNode().onTrue(new InstantCommand(()->{
+      leds.updateStrips(leds.whiteBuffer);
+    }));
     Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
     Controllers.operatorController.armGoToGroundPickUpNode().onTrue(new SetArmPose(arm, ArmPose.FLOOR));
     Controllers.operatorController.armGoToInsideRobotNode().onTrue(new SetArmPose(arm, ArmPose.INSIDE_ROBOT));
