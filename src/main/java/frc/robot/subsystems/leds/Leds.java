@@ -1,7 +1,5 @@
 package frc.robot.subsystems.leds;
 
-import java.util.function.Consumer;
-import com.ctre.phoenix.motion.BuffTrajPointStreamJNI;
 
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
@@ -10,9 +8,7 @@ import com.ctre.phoenix.motion.BuffTrajPointStreamJNI;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.simulation.AddressableLEDSim;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.LEDS;
 
 public class Leds extends SubsystemBase {
@@ -41,7 +37,7 @@ public class Leds extends SubsystemBase {
     startLED();
   }
 
-  public void setState(LedState newState){
+  public void setState(LedState newState) {
     this.state = newState;
   }
 

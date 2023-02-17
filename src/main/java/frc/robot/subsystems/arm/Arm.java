@@ -4,35 +4,17 @@
 
 package frc.robot.subsystems.arm;
 
-import java.util.ResourceBundle.Control;
-import org.opencv.core.Mat;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.ARM;
-import frc.robot.Constants.RobotMode;
 
 public class Arm extends SubsystemBase {
   /** Creates a new arm. */
@@ -42,7 +24,7 @@ public class Arm extends SubsystemBase {
   private ProfiledPIDController pid = new ProfiledPIDController(7, 0, 0, ARM.armConstraints);
   private PIDController velPid = new PIDController(3, 0, 0);
   private ArmFeedforward ff = new ArmFeedforward(0.1, 0.45, 4);
-  
+
   public enum ArmControlMode {
     VEL, POS;
   }
@@ -81,7 +63,7 @@ public class Arm extends SubsystemBase {
     return encoder.getPosition();
   }
 
-  public double getVelocity(){
+  public double getVelocity() {
     return encoder.getVelocity();
   }
 
@@ -113,6 +95,7 @@ public class Arm extends SubsystemBase {
 
     switch (controlMode) {
       case POS: {
+        pid.reset(pose, vel);
         double pidval = pid.calculate(pose, goal);
         double ffval = ff.calculate(pid.getSetpoint().position, pid.getSetpoint().velocity); // ff wants 0 parallel to floor in pos x
         setVoltage(ffval + pidval);

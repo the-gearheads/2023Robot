@@ -14,12 +14,10 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.RobotMode;
 
 public class ArmSim extends Arm {
   private double simVolts = 0;
+
   /** Creates a new ArmSim. */
   public ArmSim() {
     super();
@@ -45,7 +43,7 @@ public class ArmSim extends Arm {
   }
 
   @Override
-  public double getVelocity(){
+  public double getVelocity() {
     return m_armSim.getVelocityRadPerSec();
   }
 
@@ -54,7 +52,7 @@ public class ArmSim extends Arm {
     this.simVolts = volts;
   }
 
-  
+
   // Setting The Scenery
   private final DCMotor m_armGearbox = DCMotor.getNEO(1);
 

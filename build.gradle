@@ -143,6 +143,7 @@ spotless {
             exclude '**/build/**', '**/build-*/**', '**/bin/generated-sources/**'
         }
         toggleOffOn()
+        removeUnusedImports()
         eclipse().configFile('.vscode/formatting.xml')
     }
     groovyGradle {

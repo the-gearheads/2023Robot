@@ -36,7 +36,6 @@ import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmSim;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristSim;
-import frc.robot.subsystems.arm.Arm.ArmControlMode;
 import frc.robot.subsystems.drive.SwerveModule;
 import frc.robot.subsystems.drive.SwerveModuleIO;
 import frc.robot.subsystems.drive.SwerveModuleSim;
@@ -95,16 +94,16 @@ public class RobotContainer {
                 new SwerveModuleSim(1, DRIVE.FR_IDS[0], DRIVE.FR_IDS[1], DRIVE.FR_OFFSETS, "FR"),
                 new SwerveModuleSim(2, DRIVE.RL_IDS[0], DRIVE.RL_IDS[1], DRIVE.RL_OFFSETS, "RL"),
                 new SwerveModuleSim(3, DRIVE.RR_IDS[0], DRIVE.RR_IDS[1], DRIVE.RR_OFFSETS, "RR"));
-        arm = new ArmSim(); 
-        wrist = new WristSim((ArmSim) arm); 
+        arm = new ArmSim();
+        wrist = new WristSim((ArmSim) arm);
         break;
       default:
       case SIM_REPLAY:
         SmartDashboard.putString("/Mode", "SIM_REPLAY");
         swerve = new Swerve(new GyroIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {},
             new SwerveModuleIO() {});
-        arm = new ArmSim();  
-        wrist = new WristSim((ArmSim) arm); 
+        arm = new ArmSim();
+        wrist = new WristSim((ArmSim) arm);
         break;
     }
 
@@ -112,7 +111,7 @@ public class RobotContainer {
     autonChooser = new AutonChooser(swerve);
     leds = new Leds();
     // Configure the button binding
-    
+
     swerve.setDefaultCommand(new TeleopDrive(swerve));
     arm.setDefaultCommand(new JoystickArmControl(arm));
     updateControllers();
