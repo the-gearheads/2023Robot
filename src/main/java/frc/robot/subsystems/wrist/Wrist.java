@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.RobotMode;
 import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.MechRootWrapper;
 
 public class Wrist extends SubsystemBase {
   /** Creates a new Wrist. */
@@ -40,52 +41,9 @@ public class Wrist extends SubsystemBase {
   private ArmFeedforward ff = new ArmFeedforward(0, 0.005, 0);
   private Arm arm;
 
-
-  private final DCMotor simMotor = DCMotor.getNEO(1);
-
-  private static final double m_armReduction = 200;
-  private static final double m_armMass = 2.0; // Kilograms
-  private static final double m_armLength = Units.inchesToMeters(30);
-  // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
-  // to 255 degrees (rotated down in the back).
-  private final SingleJointedArmSim sim =
-      new SingleJointedArmSim(simMotor, m_armReduction, SingleJointedArmSim.estimateMOI(m_armLength, m_armMass),
-          m_armLength, Units.degreesToRadians(-1e10), Units.degreesToRadians(1e10), true, VecBuilder.fill(0.001) // Add noise with a std-dev of 1 tick
-      );
-
-  private final MechRootWrapper simPivot;
-  private final MechanismLigament2d simLig;
-  private final Cone simCone;
-  private double simVolts;
-
-  public void simulationPeriodic() {
-    double armPos = arm.getPosition();
-    double pivot_x = 30 + (arm.m_arm.getLength()) * Math.cos(armPos);
-    double pivot_y = 30 + (arm.m_arm.getLength()) * Math.sin(armPos);
-    simPivot.setPosition(pivot_x, pivot_y);
-    // In this method, we update our simulation of what our arm is doing
-    // First, we set our "inputs" (voltages)
-    sim.setInput(this.simVolts);
-
-    // Next, we update it. The standard loop time is 20ms.
-    sim.update(0.020);
-
-    // SimBattery estimates loaded battery voltages
-    // Update the Mechanism Arm angle based on the simulated arm angle
-    simLig.setAngle(Units.radiansToDegrees(sim.getAngleRads()));
-    simCone.update(new Rotation2d(sim.getAngleRads()));
-    SmartDashboard.putNumber("Wrist Vel", sim.getVelocityRadPerSec());
-  }
-
-
   public Wrist(Arm arm) {
     this.arm = arm;
     configure();
-
-    simPivot = new MechRootWrapper(this.arm.m_mech2d, "WristPivot", 50, 30);
-    simCone = new Cone(simPivot, new Pose2d(5, 0, new Rotation2d(180)));
-    simLig = simPivot.append(new MechanismLigament2d("Wrist", 10.0, Units.radiansToDegrees(sim.getAngleRads()), 10.0,
-        new Color8Bit(Color.kBlue)));
   }
 
   public double getGoal() {
@@ -97,9 +55,6 @@ public class Wrist extends SubsystemBase {
   }
 
   public double getPosition() {
-    if (Constants.getMode() == RobotMode.SIM) {
-      return sim.getAngleRads();
-    }
     return encoder.getPosition();
   }
 
@@ -112,9 +67,8 @@ public class Wrist extends SubsystemBase {
     encoder.setZeroOffset(0);
   }
 
-  private void setVoltage(double pidval, double ffval) {
-    motor.setVoltage(pidval + ffval);
-    this.simVolts = pidval + ffval;
+  public void setVoltage(double volts) {
+    motor.setVoltage(volts);
   }
 
   @Override
@@ -125,7 +79,7 @@ public class Wrist extends SubsystemBase {
     double currentPose = getPosition();
     double pidval = pid.calculate(currentPose, goal);
     double ffval = ff.calculate(currentPose, 0);
-    setVoltage(pidval, ffval);
+    setVoltage(ffval+pidval);
   }
 
   public void updateGoal() { // check what range the arm is in and set the wrist accordingly
