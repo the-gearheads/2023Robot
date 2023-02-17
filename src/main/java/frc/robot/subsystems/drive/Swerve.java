@@ -43,7 +43,6 @@ import frc.robot.subsystems.drive.gyro.GyroIO;
 import frc.robot.subsystems.drive.gyro.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.drive.gyro.GyroSim;
 import frc.robot.subsystems.drive.gyro.Gyro;
-import frc.robot.util.AdditionalMathUtils;
 
 public class Swerve extends SubsystemBase {
 
