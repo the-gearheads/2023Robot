@@ -51,10 +51,11 @@ public class ArmSim extends Arm {
 
   @Override
   public void setVoltage(double volts) {
-    motor.setVoltage(volts);
+    this.simVolts = volts;
   }
 
   
+  // Setting The Scenery
   private final DCMotor m_armGearbox = DCMotor.getNEO(1);
 
   private static final double m_armReduction = 200;
