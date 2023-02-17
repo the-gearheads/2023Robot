@@ -93,7 +93,7 @@ public class Arm extends SubsystemBase {
   public Arm() {
     controlMode = ArmControlMode.VEL;
     configure();
-    SmartDashboard.putData("Arm Sim", m_mech2d);
+    SmartDashboard.putData("Arm", m_mech2d);
   }
 
   public double getClosestGoal(double goal) {

@@ -7,6 +7,7 @@ package frc.robot.commands.arm;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Arm.ArmControlMode;
 
@@ -51,6 +52,10 @@ public class SetArmPose extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    if(Controllers.operatorController.setArmByJoystick().getAsBoolean()) {
+      return true;
+    }
+
     double goal = this.arm.getGoal();
     double currentPose = this.arm.getPosition();
     double poseError = goal-currentPose;

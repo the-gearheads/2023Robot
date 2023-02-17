@@ -110,7 +110,7 @@ public class RobotContainer {
     vision = new Vision(swerve);
     autonChooser = new AutonChooser(swerve);
     arm = new Arm();
-    this.wrist=new Wrist(arm);
+    wrist = new Wrist(arm);
     arm.setDefaultCommand(new JoystickArmControl(arm));
     leds = new LEDS(0, 50);
     // Configure the button binding
@@ -171,8 +171,6 @@ public class RobotContainer {
     Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
     Controllers.operatorController.armGoToGroundPickUpNode().onTrue(new SetArmPose(arm, ArmPose.FLOOR));
     Controllers.operatorController.armGoToInsideRobotNode().onTrue(new SetArmPose(arm, ArmPose.INSIDE_ROBOT));
-
-    Controllers.operatorController.setArmByJoystick().onTrue(new JoystickArmControl(arm));
   }
 
   /**
