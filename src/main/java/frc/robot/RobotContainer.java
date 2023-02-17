@@ -77,8 +77,7 @@ public class RobotContainer {
     switch (Constants.getMode()) {
       case REAL:
         SmartDashboard.putString("/Mode", "REAL");
-        swerve = new Swerve(
-            new Gyro(SPI.Port.kMXP, true),
+        swerve = new Swerve(new Gyro(SPI.Port.kMXP, true),
             new SwerveModule(0, DRIVE.FL_IDS[0], DRIVE.FL_IDS[1], DRIVE.FL_OFFSETS, "FL"),
             new SwerveModule(1, DRIVE.FR_IDS[0], DRIVE.FR_IDS[1], DRIVE.FR_OFFSETS, "FR"),
             new SwerveModule(2, DRIVE.RL_IDS[0], DRIVE.RL_IDS[1], DRIVE.RL_OFFSETS, "RL"),
@@ -86,27 +85,22 @@ public class RobotContainer {
         break;
       case SIM:
         SmartDashboard.putString("/Mode", "SIM");
-        swerve = new Swerve(
-            new GyroSim(),
-            new SwerveModuleSim(0, DRIVE.FL_IDS[0], DRIVE.FL_IDS[1], DRIVE.FL_OFFSETS, "FL"),
-            new SwerveModuleSim(1, DRIVE.FR_IDS[0], DRIVE.FR_IDS[1], DRIVE.FR_OFFSETS, "FR"),
-            new SwerveModuleSim(2, DRIVE.RL_IDS[0], DRIVE.RL_IDS[1], DRIVE.RL_OFFSETS, "RL"),
-            new SwerveModuleSim(3, DRIVE.RR_IDS[0], DRIVE.RR_IDS[1], DRIVE.RR_OFFSETS, "RR"));
+        swerve =
+            new Swerve(new GyroSim(), new SwerveModuleSim(0, DRIVE.FL_IDS[0], DRIVE.FL_IDS[1], DRIVE.FL_OFFSETS, "FL"),
+                new SwerveModuleSim(1, DRIVE.FR_IDS[0], DRIVE.FR_IDS[1], DRIVE.FR_OFFSETS, "FR"),
+                new SwerveModuleSim(2, DRIVE.RL_IDS[0], DRIVE.RL_IDS[1], DRIVE.RL_OFFSETS, "RL"),
+                new SwerveModuleSim(3, DRIVE.RR_IDS[0], DRIVE.RR_IDS[1], DRIVE.RR_OFFSETS, "RR"));
         break;
       default:
       case SIM_REPLAY:
         SmartDashboard.putString("/Mode", "SIM_REPLAY");
-        swerve = new Swerve(
-            new GyroIO() {},
-            new SwerveModuleIO() {},
-            new SwerveModuleIO() {},
-            new SwerveModuleIO() {},
+        swerve = new Swerve(new GyroIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {}, new SwerveModuleIO() {},
             new SwerveModuleIO() {});
         break;
     }
 
     swerve.setDefaultCommand(new TeleopDrive(swerve));
-    
+
     vision = new Vision(swerve);
     autonChooser = new AutonChooser(swerve);
     arm = new Arm();
@@ -120,9 +114,9 @@ public class RobotContainer {
 
   private Command getCommandForPath(String pathName, boolean resetOdometry, PathConstraints constraints) {
     PathPlannerTrajectory path = PathPlanner.loadPath(pathName, constraints);
-    if(path == null) {
+    if (path == null) {
       DriverStation.reportError("Failed to load path: " + pathName, true);
-      return new InstantCommand(()->{
+      return new InstantCommand(() -> {
         DriverStation.reportError("Tried to execute path that failed to load! Path name: " + pathName, true);
       });
     }
@@ -148,24 +142,24 @@ public class RobotContainer {
 
     // Put new bindings here.
     Controllers.driverController.getPPLoadDebugForwardPath()
-    .toggleOnTrue(getCommandForPath("Start_To_Game_Piece_1", true, AUTON.SLOW_CONSTRAINTS));
+        .toggleOnTrue(getCommandForPath("Start_To_Game_Piece_1", true, AUTON.SLOW_CONSTRAINTS));
 
     Controllers.driverController.getPPLoadDebugBackwardPath()
-    .toggleOnTrue(getCommandForPath("Game_Piece_1_To_Start", true, AUTON.SLOW_CONSTRAINTS));
+        .toggleOnTrue(getCommandForPath("Game_Piece_1_To_Start", true, AUTON.SLOW_CONSTRAINTS));
 
     // This command puts the robot 1 meter in front of apriltag 8 (middle of bottom left grid on pathplanner picture of 2023 field)
-    Controllers.driverController.getPPGotoTag8().onTrue(new InstantCommand(()->{
+    Controllers.driverController.getPPGotoTag8().onTrue(new InstantCommand(() -> {
       swerve.goTo(Constants.FIELD_CONSTANTS.DEBUG_GO_TO_DEST, AUTON.SLOW_CONSTRAINTS).schedule();
     }));
 
-    Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(()->{
-      swerve.setPose(new Pose2d(3,0.38,Rotation2d.fromDegrees(90)));
+    Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(() -> {
+      swerve.setPose(new Pose2d(3, 0.38, Rotation2d.fromDegrees(90)));
     }));
 
     Controllers.operatorController.armGoTo1ndNode().onTrue(new SetArmPose(arm, ArmPose.LOW_NODE));
     Controllers.operatorController.armGoTo2ndNode().onTrue(new SetArmPose(arm, ArmPose.MID_NODE));
     // Controllers.operatorController.armGoTo3ndNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
-    Controllers.operatorController.armGoTo3ndNode().onTrue(new InstantCommand(()->{
+    Controllers.operatorController.armGoTo3ndNode().onTrue(new InstantCommand(() -> {
       leds.updateStrips(leds.whiteBuffer);
     }));
     Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));

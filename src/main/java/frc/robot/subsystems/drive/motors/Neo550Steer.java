@@ -65,7 +65,7 @@ public class Neo550Steer {
     pid.setPositionPIDWrappingMaxInput(Math.PI);
 
     /* Set periodic status intervals */
-  
+
     /* Status 0 governs applied output, faults, and whether is a follower. We don't care about that super much, so we increase it */
     max.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
     /* We don't care about our motor position, only what the encoder reads */

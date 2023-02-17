@@ -41,7 +41,7 @@ public class TeleopDrive extends CommandBase {
   @Override
   public void initialize() {
     //swerveSubsystem.setPose(Constants.Drivetrain.zeroPos);
-    angleSetPoint=swerve.getPose().getRotation().getRadians();
+    angleSetPoint = swerve.getPose().getRotation().getRadians();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -51,17 +51,17 @@ public class TeleopDrive extends CommandBase {
     var ySpd = Controllers.driverController.getYMoveAxis();
     var rotSpd = Controllers.driverController.getRotateAxis();
 
-    if(Controllers.driverController.getSetWheelXButton().getAsBoolean()) {
+    if (Controllers.driverController.getSetWheelXButton().getAsBoolean()) {
       swerve.setX();
       return;
     }
 
     boolean useExponentialJoystickControl = SmartDashboard.getBoolean("TeleopDrive/ExponentialJoystickControl", false);
-    if(useExponentialJoystickControl){
+    if (useExponentialJoystickControl) {
       Pair<Double, Double> xyPair = AdditionalMathUtils.poseExp(xSpd, ySpd);
-      xSpd=xyPair.getFirst();
-      ySpd=xyPair.getSecond();
-    }else{
+      xSpd = xyPair.getFirst();
+      ySpd = xyPair.getSecond();
+    } else {
       //Quadratic axis control
       xSpd *= Math.abs(xSpd);
       ySpd *= Math.abs(ySpd);

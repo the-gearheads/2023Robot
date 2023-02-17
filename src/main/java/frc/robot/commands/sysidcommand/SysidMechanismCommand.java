@@ -106,7 +106,7 @@ public class SysidMechanismCommand extends CommandBase {
       outputString.append(entry);
       outputString.append(",");
     }
-    outputString.deleteCharAt(outputString.length()-1);
+    outputString.deleteCharAt(outputString.length() - 1);
 
     SmartDashboard.putString("SysIdTelemetry", outputString.toString());
     SmartDashboard.putNumber("SysIdAckNumber", ++ackNum);

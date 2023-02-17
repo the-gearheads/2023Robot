@@ -9,7 +9,7 @@ public class AutonAction extends CommandBase {
   protected AutonAction() {}
 
   public void compose(AtomicReference<Command> ref, boolean isFirst) {
-    if(isFirst) {
+    if (isFirst) {
       ref.set(this);
     } else {
       ref.set(ref.get().andThen(this));

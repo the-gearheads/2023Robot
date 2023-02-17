@@ -20,7 +20,7 @@ public class JoystickArmControl extends CommandBase {
     this.arm = arm;
     addRequirements(arm);
   }
-  
+
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {

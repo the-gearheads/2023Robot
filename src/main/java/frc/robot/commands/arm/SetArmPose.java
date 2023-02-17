@@ -16,20 +16,16 @@ public class SetArmPose extends CommandBase {
   private ArmPose armPose;
 
   public enum ArmPose {
-    FLOOR(-65),
-    HIGH_NODE(0),
-    MID_NODE(-40),
-    LOW_NODE(-60),
-    FEEDER_STATION(-190),
-    INSIDE_ROBOT(-90);
+    FLOOR(-65), HIGH_NODE(0), MID_NODE(-40), LOW_NODE(-60), FEEDER_STATION(-190), INSIDE_ROBOT(-90);
 
     double val;
 
-    private ArmPose(double val){
-      this.val=Units.degreesToRadians(val);
+    private ArmPose(double val) {
+      this.val = Units.degreesToRadians(val);
     }
 
   }
+
   /** Creates a new SetArmPos. */
   public SetArmPose(Arm arm, ArmPose armPose) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -52,13 +48,13 @@ public class SetArmPose extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(Controllers.operatorController.setArmByJoystick().getAsBoolean()) {
+    if (Controllers.operatorController.setArmByJoystick().getAsBoolean()) {
       return true;
     }
 
     double goal = this.arm.getGoal();
     double currentPose = this.arm.getPosition();
-    double poseError = goal-currentPose;
+    double poseError = goal - currentPose;
     poseError = Math.abs(poseError);
     return poseError < Constants.ARM.POSE_TOLERANCE;
   }

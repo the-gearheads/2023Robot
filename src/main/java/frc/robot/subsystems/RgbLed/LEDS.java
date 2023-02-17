@@ -13,7 +13,7 @@ public class LEDS extends SubsystemBase {
   /** Creates a new LEDS. */
   private AddressableLED ledStrip;
   private AddressableLEDSim ledSim;
-   
+
   // one buffer for all the live shit, one for no lights
   public AddressableLEDBuffer yellowBuffer;
   public AddressableLEDBuffer whiteBuffer;
@@ -22,13 +22,13 @@ public class LEDS extends SubsystemBase {
   // Assuming that both strips are the same length - therefore we can use one buffer
   private int length = 0;
 
-  public LEDS(int port , int stripLength) {
+  public LEDS(int port, int stripLength) {
     ledStrip = new AddressableLED(port);
     length = stripLength;
     ledStrip.setLength(length);
 
     ledSim = new AddressableLEDSim(ledStrip);
-    
+
     // initialize buffers
     greenBuffer = new AddressableLEDBuffer(length);
     whiteBuffer = new AddressableLEDBuffer(length);
@@ -53,7 +53,7 @@ public class LEDS extends SubsystemBase {
   public void startStrips() {
     ledStrip.start();
   }
-  
+
   // fill null buffer with (0, 0, 0)
   public void fillYellowBuffer() {
     for (int i = 0; i < yellowBuffer.getLength(); i++) {
@@ -82,6 +82,6 @@ public class LEDS extends SubsystemBase {
   @Override
   public void periodic() {
 
-    }
   }
+}
 

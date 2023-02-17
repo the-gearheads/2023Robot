@@ -10,13 +10,15 @@ import edu.wpi.first.math.geometry.Rotation2d;
 /** Add your docs here. */
 public interface GyroIO {
 
-    @AutoLog
-    public class GyroIOInputs {
-        public double angleRadians;
-        public double angleRate;
-    }
+  @AutoLog
+  public class GyroIOInputs {
+    public double angleRadians;
+    public double angleRate;
+  }
 
-    public default void setRotation2d(Rotation2d newRotation2d) {};
-    public default void zeroYaw() {};
-    public default void updateInputs(GyroIOInputs inputs) {};
+  public default void setRotation2d(Rotation2d newRotation2d) {};
+
+  public default void zeroYaw() {};
+
+  public default void updateInputs(GyroIOInputs inputs) {};
 }

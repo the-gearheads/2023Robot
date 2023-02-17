@@ -59,9 +59,9 @@ public class Wrist extends SubsystemBase {
 
   public void simulationPeriodic() {
     double armPos = arm.getPosition();
-    double pivot_x=30+(arm.m_arm.getLength())*Math.cos(armPos);
-    double pivot_y=30+(arm.m_arm.getLength())*Math.sin(armPos);
-    simPivot.setPosition(pivot_x,pivot_y);
+    double pivot_x = 30 + (arm.m_arm.getLength()) * Math.cos(armPos);
+    double pivot_y = 30 + (arm.m_arm.getLength()) * Math.sin(armPos);
+    simPivot.setPosition(pivot_x, pivot_y);
     // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)
     sim.setInput(this.simVolts);
@@ -81,9 +81,10 @@ public class Wrist extends SubsystemBase {
     this.arm = arm;
     configure();
 
-    simPivot= new MechRootWrapper(this.arm.m_mech2d, "WristPivot", 50, 30);
-    simCone = new Cone(simPivot, new Pose2d(5,0, new Rotation2d(180)));
-    simLig=simPivot.append(new MechanismLigament2d("Wrist", 10.0, Units.radiansToDegrees(sim.getAngleRads()),10.0,new Color8Bit(Color.kBlue)));
+    simPivot = new MechRootWrapper(this.arm.m_mech2d, "WristPivot", 50, 30);
+    simCone = new Cone(simPivot, new Pose2d(5, 0, new Rotation2d(180)));
+    simLig = simPivot.append(new MechanismLigament2d("Wrist", 10.0, Units.radiansToDegrees(sim.getAngleRads()), 10.0,
+        new Color8Bit(Color.kBlue)));
   }
 
   public double getGoal() {
@@ -112,8 +113,9 @@ public class Wrist extends SubsystemBase {
 
   private void setVoltage(double pidval, double ffval) {
     motor.setVoltage(pidval + ffval);
-    this.simVolts=pidval+ffval;
+    this.simVolts = pidval + ffval;
   }
+
   @Override
   public void periodic() {
     updateGoal();
@@ -125,10 +127,10 @@ public class Wrist extends SubsystemBase {
     setVoltage(pidval, ffval);
   }
 
-  public void updateGoal(){    // check what range the arm is in and set the wrist accordingly
+  public void updateGoal() { // check what range the arm is in and set the wrist accordingly
     double armPos = arm.getPosition();
-    for(WristState wristState : WristState.values()){
-      if(wristState.inRange(armPos)){
+    for (WristState wristState : WristState.values()) {
+      if (wristState.inRange(armPos)) {
         double goal = wristState.getWristGoal(armPos);
         setGoal(goal);
         return;

@@ -7,30 +7,31 @@ package frc.robot.subsystems.drive.gyro;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /** Add your docs here. */
-public class GyroSim implements GyroIO{
-    private Rotation2d rot;
+public class GyroSim implements GyroIO {
+  private Rotation2d rot;
 
-    public GyroSim(){
-        this.rot = new Rotation2d();
-    }
-    public Rotation2d getRotation2d(){
-        return rot;
-    }
+  public GyroSim() {
+    this.rot = new Rotation2d();
+  }
 
-    public void setRotation2d(Rotation2d newRotation2d){
-        rot= newRotation2d;
-    }
+  public Rotation2d getRotation2d() {
+    return rot;
+  }
 
-    public double getRate(){
-        return 0;
-    }
+  public void setRotation2d(Rotation2d newRotation2d) {
+    rot = newRotation2d;
+  }
 
-    public void zeroYaw(){
-        rot=new Rotation2d();
-    }
+  public double getRate() {
+    return 0;
+  }
 
-    public void updateInputs(GyroIOInputs inputs) {
-        inputs.angleRadians = rot.getRadians();
-        inputs.angleRadians = getRate();
-    }
+  public void zeroYaw() {
+    rot = new Rotation2d();
+  }
+
+  public void updateInputs(GyroIOInputs inputs) {
+    inputs.angleRadians = rot.getRadians();
+    inputs.angleRadians = getRate();
+  }
 }

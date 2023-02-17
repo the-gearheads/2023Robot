@@ -32,13 +32,13 @@ public class Constants extends AnnotatedClass {
   public static enum RobotMode {
     SIM, SIM_REPLAY, REAL
   }
-public static class ARM {
+  public static class ARM {
 
-  @NTPublish
-  public static double VELOCITY = 0.5;
-  public static double POSE_TOLERANCE = 0.01;
-  public static Constraints armConstraints = new Constraints(7,3);
-}
+    @NTPublish
+    public static double VELOCITY = 0.5;
+    public static double POSE_TOLERANCE = 0.01;
+    public static Constraints armConstraints = new Constraints(7, 3);
+  }
 
   public static RobotMode getMode() {
     if (RobotBase.isReal()) {
@@ -124,11 +124,10 @@ public static class ARM {
     public static final double LENGTH = 15.8496;
     public static final Pose2d DEBUG_GO_TO_DEST = new Pose2d(1.9, 4.9, Rotation2d.fromDegrees(-180));
   }
-  
+
   public static final class VISION {
-    public static final Transform3d ROBOT_TO_CAM = new Transform3d(
-        new Translation3d(0.4, -0.005, 0.13),
-        new Rotation3d());
+    public static final Transform3d ROBOT_TO_CAM =
+        new Transform3d(new Translation3d(0.4, -0.005, 0.13), new Rotation3d());
   }
   public static final class CONTROLLERS {
     public static final double JOYSTICK_DEADBAND = 0.1;

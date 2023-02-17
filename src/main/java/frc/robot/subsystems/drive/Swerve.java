@@ -61,7 +61,7 @@ public class Swerve extends SubsystemBase {
   /** Creates a new SwerveSubsystem. */
   public Swerve(GyroIO gyro, SwerveModuleIO... modules) {
     this.gyro = gyro;
-    switch(Constants.getMode()) {
+    switch (Constants.getMode()) {
       case REAL:
         this.gyro = new Gyro(SPI.Port.kMXP, true);
         break;
@@ -110,12 +110,13 @@ public class Swerve extends SubsystemBase {
     Logger.getInstance().recordOutput("Swerve/CurrentModuleStates", states);
   }
 
-  public void simulationPeriodic(){
+  public void simulationPeriodic() {
     /* Sim replay is in sim but this doesn't apply to that */
-    if(Constants.getMode() != Constants.RobotMode.SIM) return;
+    if (Constants.getMode() != Constants.RobotMode.SIM)
+      return;
 
     ChassisSpeeds chassisSpeeds = getChassisSpeeds();
-    double deltaAngle = chassisSpeeds.omegaRadiansPerSecond*0.02;
+    double deltaAngle = chassisSpeeds.omegaRadiansPerSecond * 0.02;
     Rotation2d newRot = getRotation().plus(Rotation2d.fromRadians(deltaAngle));
     gyro.setRotation2d(newRot);
   }
@@ -158,10 +159,10 @@ public class Swerve extends SubsystemBase {
     }
     // Needed to update lastInputs to be accurate
     updateInputs();
-    odometry = new SwerveDrivePoseEstimator(kinematics, getRotation(), getPositionsFromInputs(lastInputs),
-        new Pose2d());
-    wheelOdometry = new SwerveDriveOdometry(kinematics, getRotation(), getPositionsFromInputs(lastInputs),
-        new Pose2d());
+    odometry =
+        new SwerveDrivePoseEstimator(kinematics, getRotation(), getPositionsFromInputs(lastInputs), new Pose2d());
+    wheelOdometry =
+        new SwerveDriveOdometry(kinematics, getRotation(), getPositionsFromInputs(lastInputs), new Pose2d());
   }
 
   /**
@@ -209,7 +210,7 @@ public class Swerve extends SubsystemBase {
         Pose2d initPose = traj.getInitialHolonomicPose();
         if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
           // Create a new state so that we don't overwrite the original
-          Translation2d newTranslation = 
+          Translation2d newTranslation =
               new Translation2d(initPose.getX(), Constants.FIELD_CONSTANTS.WIDTH - initPose.getY());
           Rotation2d newHeading = initPose.getRotation().times(-1);
           initPose = new Pose2d(newTranslation, newHeading);
@@ -225,8 +226,7 @@ public class Swerve extends SubsystemBase {
         (PIDController) SmartDashboard.getData("yPid"), // Y controller (usually the same values as X controller)
         (PIDController) SmartDashboard.getData("rotPid"), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
         this::setStates, // Module states consumer
-        true,
-        this // Requires this drive subsystem
+        true, this // Requires this drive subsystem
     ), new InstantCommand(() -> {
       if (stopWhenDone) {
         drive(new ChassisSpeeds(0, 0, 0));
@@ -260,11 +260,7 @@ public class Swerve extends SubsystemBase {
 
     PathPoint startPoint = new PathPoint(startPose.getTranslation(), startHeading, startPose.getRotation());// position, heading(direction of travel), holonomic rotation
     PathPoint endPoint = new PathPoint(endPose.getTranslation(), endHeading, endPose.getRotation());
-    PathPlannerTrajectory traj = PathPlanner.generatePath(
-    constraints,
-    startPoint,
-    endPoint
-    );
+    PathPlannerTrajectory traj = PathPlanner.generatePath(constraints, startPoint, endPoint);
     return followTrajectoryCommand(traj, false, true);
   }
 
@@ -353,7 +349,7 @@ public class Swerve extends SubsystemBase {
   /* Sets volts in a way that makes it drive like a differential drive */
   public void setVolts(double leftVolts, double rightVolts) {
     rightVolts *= -1;
-    for(int i = 0; i < modules.length; i++) {
+    for (int i = 0; i < modules.length; i++) {
       // If i is divisible by 2, it is on the left (because order is FL, FR, RL, RR). 0 is divisible by 2 in this implementation.
       if (i % 2 == 0) {
         modules[i].setVoltage(leftVolts);
@@ -370,12 +366,12 @@ public class Swerve extends SubsystemBase {
 
   /* Gets drive motor positions in a way that would make sense for a differential drive */
   public double[] getDiffPositions() {
-    return new double[] { lastInputs[0].drivePosition, -lastInputs[1].drivePosition};
+    return new double[] {lastInputs[0].drivePosition, -lastInputs[1].drivePosition};
   }
 
   /* Gets drive motor velocities in a way that would make sense for a differential drive */
   public double[] getDiffVelocities() {
-    return new double[] { lastInputs[0].driveVelocity, -lastInputs[1].driveVelocity};
+    return new double[] {lastInputs[0].driveVelocity, -lastInputs[1].driveVelocity};
   }
 
   public Rotation2d getRotation() {
@@ -392,11 +388,11 @@ public class Swerve extends SubsystemBase {
     return Units.degreesToRadians(getAngularVel());
   }
 
-  public double getContinuousGyroAngle(){
+  public double getContinuousGyroAngle() {
     return getRotation().getDegrees();
   }
 
-  public double getContinuousGyroAngleRad(){
+  public double getContinuousGyroAngleRad() {
     return getRotation().getRadians();
   }
 

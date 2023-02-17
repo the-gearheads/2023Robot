@@ -35,12 +35,13 @@ public class Controllers {
 
     boolean foundOperatorController = false;
     boolean foundDriveController = false;
-    
+
     for (int i = 0; i < DriverStation.kJoystickPorts; i++) {
       String joyName = DriverStation.getJoystickName(i);
-      if (joyName.equals("")) continue;
-      if(!foundOperatorController && (joyName.toLowerCase().contains("logitech") ||
-                                      joyName.toLowerCase().contains("keyboard") )) {
+      if (joyName.equals(""))
+        continue;
+      if (!foundOperatorController
+          && (joyName.toLowerCase().contains("logitech") || joyName.toLowerCase().contains("keyboard"))) {
         System.out.println("Found logitech operator controller on port " + i);
         operatorController = new LogitechOperatorController(i);
         foundOperatorController = true;
@@ -48,7 +49,7 @@ public class Controllers {
       }
 
       // Fallback
-      if(!foundDriveController) {
+      if (!foundDriveController) {
         System.out.println("Found xbox drive controller controller on port " + i);
         driverController = new XboxDriverController(i);
         foundDriveController = true;

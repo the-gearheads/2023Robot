@@ -140,7 +140,7 @@ spotless {
     java {
         target fileTree('.') {
             include '**/*.java'
-            exclude '**/build/**', '**/build-*/**'
+            exclude '**/build/**', '**/build-*/**', '**/bin/generated-sources/**'
         }
         toggleOffOn()
         eclipse().configFile('.vscode/formatting.xml')

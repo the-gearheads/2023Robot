@@ -13,7 +13,7 @@ public class AutonPath {
   }
 
   public void compose(AtomicReference<Command> cmd, boolean isFirst) {
-    if(isFirst) {
+    if (isFirst) {
       cmd.set(ref.get());
     } else {
       cmd.set(cmd.get().andThen(ref.get()));

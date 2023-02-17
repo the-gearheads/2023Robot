@@ -49,7 +49,7 @@ public class SysidCommand extends CommandBase {
     this.isWrongMech = !SmartDashboard.getString("SysIdTest", "").contains("Drivetrain");
     SmartDashboard.putBoolean("SysIdWrongMech", isWrongMech);
     SmartDashboard.putNumber("SysIdAckNumber", ackNum);
-  
+
     this.startTime = Timer.getFPGATimestamp();
 
     drive.zeroEncoders();
@@ -105,7 +105,7 @@ public class SysidCommand extends CommandBase {
       outputString.append(entry);
       outputString.append(",");
     }
-    outputString.deleteCharAt(outputString.length()-1);
+    outputString.deleteCharAt(outputString.length() - 1);
 
     SmartDashboard.putString("SysIdTelemetry", outputString.toString());
     SmartDashboard.putNumber("SysIdAckNumber", ++ackNum);

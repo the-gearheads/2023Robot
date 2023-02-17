@@ -49,7 +49,7 @@ public class NeoDrive {
     pid.setOutputRange(-1, 1);
 
     /* Set periodic frame periods */
-  
+
     /* Send our velocity more frequently */
     max.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 10);
     /* Don't have an analog encoder */

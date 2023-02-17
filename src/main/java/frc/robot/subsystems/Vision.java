@@ -81,7 +81,8 @@ public class Vision extends SubsystemBase {
     // Update Vision Estimate
     if (this.shouldSetVisionPose.value && isPoseEstimateValid()) {
       var swervePose = swerve.getPose();
-      var swervePose3d = new Pose3d(swervePose.getX(), swervePose.getY(), 0, new Rotation3d(0, 0, swervePose.getRotation().getRadians()));  
+      var swervePose3d = new Pose3d(swervePose.getX(), swervePose.getY(), 0,
+          new Rotation3d(0, 0, swervePose.getRotation().getRadians()));
       Optional<EstimatedRobotPose> visionResult = getVisionPose(swervePose);
       Pose2d estimatedRobotPos = visionResult.get().estimatedPose.toPose2d();
       estimatedRobotPos = averageVisionPose(estimatedRobotPos);

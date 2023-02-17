@@ -12,7 +12,7 @@ public class SwerveModuleSim extends SwerveModule {
 
   public SwerveModuleSim(int id, int driveId, int steerId, double[] offsets, String description) {
     super(id, driveId, steerId, offsets, description);
-    angle=new Rotation2d();
+    angle = new Rotation2d();
   }
 
   /* (non-Javadoc)
@@ -27,18 +27,18 @@ public class SwerveModuleSim extends SwerveModule {
     /* We do offsetting before optimization so the wheel automatically gets reversed when the module is facing backwards. Downside: the robot will not work without optimizations enabled. */
     // state = SwerveModuleState.optimize(state, steer.getAngle());
 
-    this.angle=state.angle;
-    this.driveVel=state.speedMetersPerSecond;
-    this.drivePos+=this.driveVel*0.02;
+    this.angle = state.angle;
+    this.driveVel = state.speedMetersPerSecond;
+    this.drivePos += this.driveVel * 0.02;
   }
 
-    /* Called every periodic() */
-    @Override
-    public void updateInputs(SwerveModuleInputs inputs) {
-      super.updateInputs(inputs);
-      SmartDashboard.putNumber("We reached here", this.drivePos);
-      inputs.drivePosition = this.drivePos;
-      inputs.driveVelocity = this.driveVel;
-      inputs.steerAngle = this.angle.getRadians();
-    }
+  /* Called every periodic() */
+  @Override
+  public void updateInputs(SwerveModuleInputs inputs) {
+    super.updateInputs(inputs);
+    SmartDashboard.putNumber("We reached here", this.drivePos);
+    inputs.drivePosition = this.drivePos;
+    inputs.driveVelocity = this.driveVel;
+    inputs.steerAngle = this.angle.getRadians();
+  }
 }

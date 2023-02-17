@@ -25,7 +25,7 @@ public class XboxDriverController implements DriverController {
 
   @Override
   public double getRotateAxis() {
-    if(Constants.getMode()==Constants.RobotMode.SIM){
+    if (Constants.getMode() == Constants.RobotMode.SIM) {
       return -Controllers.deadband(controller.getRawAxis(2));
     }
     return -Controllers.deadband(controller.getRightX());

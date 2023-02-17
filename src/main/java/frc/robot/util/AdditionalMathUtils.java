@@ -16,15 +16,13 @@ public class AdditionalMathUtils {
     // return "X="  + round(pos.getX(), places) + 
     //      "; Y="  + round(pos.getY(), places) + 
     //      "; Deg="+ round(pos.getRotation().getDegrees(), places);
-    return "X="  + pos.getX() + 
-    "; Y="  + pos.getY() + 
-    "; Deg="+ pos.getRotation().getDegrees();
+    return "X=" + pos.getX() + "; Y=" + pos.getY() + "; Deg=" + pos.getRotation().getDegrees();
   }
 
   /* Pose exp for teleop drive. Takes in controller x and y axises and outputs pose exped ones */
   public static Pair<Double, Double> poseExp(double x, double y) {
     // java doesn't have an exponent operator apparently
-    double mag = Math.sqrt(x*x + y*y);
+    double mag = Math.sqrt(x * x + y * y);
     double angle = Math.atan2(y, x);
 
     mag *= Math.abs(mag);
