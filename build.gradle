@@ -2,6 +2,7 @@ plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2023.3.2"
     id "com.peterabeles.gversion" version "1.10"
+    id 'com.diffplug.spotless' version '6.15.0'
 }
 
 repositories {
@@ -106,18 +107,18 @@ jar {
 }
 
 gversion {
-  srcDir       = "src/main/java/"           // path is relative to the sub-project by default
-                                            // Gradle variables can also be used
-                                            // E.g. "${project.rootDir}/module/src/main/java"
-  classPackage = "frc.robot"
-  className    = "BuildConstants"                // optional. If not specified GVersion is used
-  dateFormat   = "yyyy-MM-dd'T'HH:mm:ss'Z'" // optional. This is the default
-  timeZone     = "America/Detroit"          // optional. UTC is default
-  debug        = false                      // optional. print out extra debug information
-  language     = "java"                     // optional. Can be Java, Kotlin, YAML, or Properties. Case insensitive.
-  explicitType = false                      // optional. Force types to be explicitly printed
-  indent       = "  "                       // optional. Change how code is indented. 1 tab is default.
-  annotate     = false                      // optional. Java only. Adds @Generated annotation
+    srcDir       = "src/main/java/"           // path is relative to the sub-project by default
+    // Gradle variables can also be used
+    // E.g. "${project.rootDir}/module/src/main/java"
+    classPackage = "frc.robot"
+    className    = "BuildConstants"                // optional. If not specified GVersion is used
+    dateFormat   = "yyyy-MM-dd'T'HH:mm:ss'Z'" // optional. This is the default
+    timeZone     = "America/Detroit"          // optional. UTC is default
+    debug        = false                      // optional. print out extra debug information
+    language     = "java"                     // optional. Can be Java, Kotlin, YAML, or Properties. Case insensitive.
+    explicitType = false                      // optional. Force types to be explicitly printed
+    indent       = "  "                       // optional. Change how code is indented. 1 tab is default.
+    annotate     = false                      // optional. Java only. Adds @Generated annotation
 }
 
 project.compileJava.dependsOn(createVersionFile)
@@ -130,4 +131,44 @@ wpi.java.configureTestTasks(test)
 // Configure string concat to always inline compile
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
+}
+
+spotless {
+    java {
+        target fileTree('.') {
+            include '**/*.java'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        toggleOffOn()
+        eclipse().configFile('.vscode/formatting.xml')
+    }
+    groovyGradle {
+        target fileTree('.') {
+            include '**/*.gradle'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        greclipse()
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    format 'xml', {
+        target fileTree('.') {
+            include '**/*.xml'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        eclipseWtp('xml')
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
+    format 'misc', {
+        target fileTree('.') {
+            include '**/*.md', '**/.gitignore'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
 }
