@@ -132,4 +132,9 @@ public class Constants extends AnnotatedClass {
   public static final class CONTROLLERS {
     public static final double JOYSTICK_DEADBAND = 0.1;
   }
+
+  public static final class LEDS {
+    public static final int port = 0;
+    public static final int length = 3;
+  }
 }

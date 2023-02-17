@@ -30,7 +30,8 @@ import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.AutonChooser;
 import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.Leds;
+import frc.robot.subsystems.leds.LedState;
+import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Wrist;
 import frc.robot.subsystems.arm.Arm.ArmControlMode;
@@ -106,7 +107,7 @@ public class RobotContainer {
     arm = new Arm();
     wrist = new Wrist(arm);
     arm.setDefaultCommand(new JoystickArmControl(arm));
-    leds = new Leds(0, 50);
+    leds = new Leds();
     // Configure the button binding
     updateControllers();
   }
@@ -160,7 +161,7 @@ public class RobotContainer {
     Controllers.operatorController.armGoTo2ndNode().onTrue(new SetArmPose(arm, ArmPose.MID_NODE));
     // Controllers.operatorController.armGoTo3ndNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
     Controllers.operatorController.armGoTo3ndNode().onTrue(new InstantCommand(() -> {
-      leds.updateStrips(leds.whiteBuffer);
+      leds.setState(LedState.WHITE);
     }));
     Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
     Controllers.operatorController.armGoToGroundPickUpNode().onTrue(new SetArmPose(arm, ArmPose.FLOOR));
