@@ -3,6 +3,7 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "2023.3.2"
     id "com.peterabeles.gversion" version "1.10"
     id 'com.diffplug.spotless' version '6.15.0'
+    id 'org.barfuin.gradle.taskinfo' version '2.1.0'
 }
 
 repositories {
@@ -134,6 +135,7 @@ tasks.withType(JavaCompile) {
 }
 
 spotless {
+    enforceCheck = false
     java {
         target fileTree('.') {
             include '**/*.java'
