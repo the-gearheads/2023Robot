@@ -22,11 +22,18 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.AUTON;
 import frc.robot.Constants.DRIVE;
+import frc.robot.commands.arm.JoystickArmControl;
+import frc.robot.commands.arm.SetArmPose;
+import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.AutonChooser;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.RgbLed.LEDS;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.Wrist;
+import frc.robot.subsystems.arm.Arm.ArmControlMode;
 import frc.robot.subsystems.drive.SwerveModule;
 import frc.robot.subsystems.drive.SwerveModuleIO;
 import frc.robot.subsystems.drive.SwerveModuleSim;
@@ -48,6 +55,9 @@ public class RobotContainer {
   @SuppressWarnings("unused")
   private final Vision vision;
   private final AutonChooser autonChooser;
+  private final Arm arm;
+  private Wrist wrist;
+  private LEDS leds;
 
   public String readPipelineFile() {
     try {
@@ -99,7 +109,11 @@ public class RobotContainer {
     
     vision = new Vision(swerve);
     autonChooser = new AutonChooser(swerve);
-    // Configure the button bindings
+    arm = new Arm();
+    wrist = new Wrist(arm);
+    arm.setDefaultCommand(new JoystickArmControl(arm));
+    leds = new LEDS(0, 50);
+    // Configure the button binding
     updateControllers();
   }
 
@@ -147,6 +161,16 @@ public class RobotContainer {
     Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(()->{
       swerve.setPose(new Pose2d(3,0.38,Rotation2d.fromDegrees(90)));
     }));
+
+    Controllers.operatorController.armGoTo1ndNode().onTrue(new SetArmPose(arm, ArmPose.LOW_NODE));
+    Controllers.operatorController.armGoTo2ndNode().onTrue(new SetArmPose(arm, ArmPose.MID_NODE));
+    // Controllers.operatorController.armGoTo3ndNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
+    Controllers.operatorController.armGoTo3ndNode().onTrue(new InstantCommand(()->{
+      leds.updateStrips(leds.whiteBuffer);
+    }));
+    Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
+    Controllers.operatorController.armGoToGroundPickUpNode().onTrue(new SetArmPose(arm, ArmPose.FLOOR));
+    Controllers.operatorController.armGoToInsideRobotNode().onTrue(new SetArmPose(arm, ArmPose.INSIDE_ROBOT));
   }
 
   /**

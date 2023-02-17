@@ -1,15 +1,16 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.arm;
 
 import java.util.function.Function;
 import edu.wpi.first.math.util.Units;
 
-public enum WristState{//assuming arm pointing completely upwards is 0 degrees; increasing counterclockwise; range [-pi, pi]
-    UP(150,200, 0),
-    LINEAR(110,150,(Double armPos)->{
-        return armPos;
-    }),
-    LEFT(0, 110, 90),
-    RIGHT(200,360,270);
+public enum WristState{
+    //These values are ALL WRONG
+    //arm 0 deg is positive x axis
+
+    LEFT(-225, -140, -90),
+    UP(-140,-70,90),
+    LINEAR(-70,-50,-90),
+    RIGHT(-50,45, 0);
 
     private Function<Double, Double> getWristGoalLambda;
     private double min;

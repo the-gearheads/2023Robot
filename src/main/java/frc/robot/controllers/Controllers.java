@@ -39,7 +39,8 @@ public class Controllers {
     for (int i = 0; i < DriverStation.kJoystickPorts; i++) {
       String joyName = DriverStation.getJoystickName(i);
       if (joyName.equals("")) continue;
-      if(!foundOperatorController && joyName.toLowerCase().contains("logitech")) {
+      if(!foundOperatorController && (joyName.toLowerCase().contains("logitech") ||
+                                      joyName.toLowerCase().contains("keyboard") )) {
         System.out.println("Found logitech operator controller on port " + i);
         operatorController = new LogitechOperatorController(i);
         foundOperatorController = true;

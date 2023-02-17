@@ -27,5 +27,7 @@
   ],
   "java.test.defaultConfig": "WPIlibUnitTests",
   "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:disable",
-  "java.format.settings.url": ".vscode/formatting.xml"
+  "java.format.settings.url": ".vscode/formatting.xml",
+  "java.jdt.ls.java.home": "C:\\Users\\Public\\wpilib\\2023\\jdk",
+  "java.home": "C:\\Users\\Public\\wpilib\\2023\\jdk"
 }

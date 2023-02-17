@@ -4,27 +4,29 @@
 
 package frc.robot.commands.arm;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Arm.ArmControlMode;
+import frc.robot.controllers.Controllers;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.Arm.ArmControlMode;
 
 public class SetArmPose extends CommandBase {
   private Arm arm;
   private ArmPose armPose;
 
   public enum ArmPose {
-    FLOOR(0),
-    HIGH_NODE(5),
-    MID_NODE(3),
-    LOW_NODE(3),
-    FEEDER_STATION(1),
-    INSIDE_ROBOT(1);
+    FLOOR(-65),
+    HIGH_NODE(0),
+    MID_NODE(-40),
+    LOW_NODE(-60),
+    FEEDER_STATION(-190),
+    INSIDE_ROBOT(-90);
 
     double val;
 
     private ArmPose(double val){
-      this.val=val;
+      this.val=Units.degreesToRadians(val);
     }
 
   }
@@ -33,6 +35,7 @@ public class SetArmPose extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     this.arm = arm;
     this.armPose = armPose;
+    addRequirements(arm);
   }
 
   // Called when the command is initially scheduled.
@@ -49,6 +52,10 @@ public class SetArmPose extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    if(Controllers.operatorController.setArmByJoystick().getAsBoolean()) {
+      return true;
+    }
+
     double goal = this.arm.getGoal();
     double currentPose = this.arm.getPosition();
     double poseError = goal-currentPose;
