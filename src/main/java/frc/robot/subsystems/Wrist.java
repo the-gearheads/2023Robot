@@ -109,6 +109,11 @@ public class Wrist extends SubsystemBase {
     encoder.setVelocityConversionFactor(2 * Math.PI);
     encoder.setZeroOffset(0);
   }
+
+  private void setVoltage(double pidval, double ffval) {
+    motor.setVoltage(pidval + ffval);
+    this.simVolts=pidval+ffval;
+  }
   @Override
   public void periodic() {
     updateGoal();
@@ -117,8 +122,7 @@ public class Wrist extends SubsystemBase {
     double currentPose = getPosition();
     double pidval = pid.calculate(currentPose, goal);
     double ffval = ff.calculate(currentPose, 0);
-    motor.setVoltage(pidval + ffval);
-    this.simVolts=pidval+ffval;
+    setVoltage(pidval, ffval);
   }
 
   public void updateGoal(){    // check what range the arm is in and set the wrist accordingly
@@ -127,7 +131,7 @@ public class Wrist extends SubsystemBase {
       if(wristState.inRange(armPos)){
         double goal = wristState.getWristGoal(armPos);
         setGoal(goal);
-        break;
+        return;
       }
     }
   }

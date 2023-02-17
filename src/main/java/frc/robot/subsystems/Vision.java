@@ -191,6 +191,6 @@ public class Vision extends SubsystemBase {
       atfl.setOrigin(AprilTagFieldLayout.OriginPosition.kRedAllianceWallRightSide);
     }
     this.photonPoseEstimator =
-        new PhotonPoseEstimator(atfl, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, targetCam, Constants.VISION.ROBOT_TO_CAM);
+        new PhotonPoseEstimator(atfl, PoseStrategy.MULTI_TAG_PNP, targetCam, Constants.VISION.ROBOT_TO_CAM);
   }
 }

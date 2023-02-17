@@ -25,8 +25,6 @@ public interface OperatorController {
     return new Trigger(()->false);
   }
   public default Trigger setArmByJoystick() {
-    return new Trigger(()->{
-      return false;
-    });
+    return new Trigger(()->false);
   }
 }

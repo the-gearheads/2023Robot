@@ -20,7 +20,7 @@ public enum WristState{
         return currentWrappedPos>=min && currentWrappedPos<=max;
     }
     public double getWristGoal(double currentWrappedPos){
-        return (this.getWristGoalLambda.apply(currentWrappedPos));
+        return this.getWristGoalLambda.apply(currentWrappedPos);
     }
     private WristState(double min, double max, double goal){
         this(min, max, (Double pos)->{

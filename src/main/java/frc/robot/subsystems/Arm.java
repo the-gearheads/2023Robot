@@ -78,7 +78,6 @@ public class Arm extends SubsystemBase {
     // Next, we update it. The standard loop time is 20ms.
     m_armSim.update(0.020);
 
-    // SimBattery estimates loaded battery voltages
     // Update the Mechanism Arm angle based on the simulated arm angle
     m_arm.setAngle(Units.radiansToDegrees(m_armSim.getAngleRads()));
     SmartDashboard.putNumber("Arm Vel", m_armSim.getVelocityRadPerSec());
