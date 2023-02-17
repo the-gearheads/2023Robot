@@ -37,70 +37,21 @@ import frc.robot.Constants.RobotMode;
 public class Arm extends SubsystemBase {
   /** Creates a new arm. */
   private double goal = 0;
-  private CANSparkMax motor = new CANSparkMax(0, MotorType.kBrushless);
+  protected CANSparkMax motor = new CANSparkMax(0, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
   private ProfiledPIDController pid = new ProfiledPIDController(7, 0, 0, ARM.armConstraints);
   private PIDController velPid = new PIDController(3, 0, 0);
   private ArmFeedforward ff = new ArmFeedforward(0.1, 0.45, 4);
-  private final DCMotor m_armGearbox = DCMotor.getNEO(1);
-
-  private static final double m_armReduction = 200;
-  private static final double m_armMass = 8.0; // Kilograms
-  private static final double m_armLength = Units.inchesToMeters(20);
-  // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
-  // to 255 degrees (rotated down in the back).
-  private final SingleJointedArmSim m_armSim =
-      new SingleJointedArmSim(m_armGearbox, m_armReduction, SingleJointedArmSim.estimateMOI(m_armLength, m_armMass),
-          m_armLength, Units.degreesToRadians(-1e10), Units.degreesToRadians(1e10), true, VecBuilder.fill(0.001) // Add noise with a std-dev of 1 tick
-      );
-
-  public final Mechanism2d m_mech2d = new Mechanism2d(60, 60);
-  public final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 30, 30);
-  private final MechanismLigament2d m_armTower =
-      m_armPivot.append(new MechanismLigament2d("ArmTower", 30, -90, 10.0, new Color8Bit(Color.kDarkGray)));
-
-  public final MechanismRoot2d m_chassisPivot = m_mech2d.getRoot("ChassisPivot", 15, 2);
-  private final MechanismLigament2d m_chassis =
-      m_chassisPivot.append(new MechanismLigament2d("Chassis", 20, 0, 100.0, new Color8Bit(Color.kDarkRed)));
-
-  public final MechanismRoot2d feederPivot = m_mech2d.getRoot("Feeder Pivot", 5, 25);
-  private final MechanismLigament2d feeder =
-      feederPivot.append(new MechanismLigament2d("Feeder", 10, 0, 30.0, new Color8Bit(Color.kWhite)));
-
-  // public final MechanismRoot2d midNodePivot = m_mech2d.getRoot("Mid Node Pivot", 50, 0);
-  // private final MechanismLigament2d midNode = midNodePivot.append(new MechanismLigament2d("Mid Node", 13, 90,30.0,new Color8Bit(Color.kWhite)));
-
-  public final MechanismRoot2d highNodePivot = m_mech2d.getRoot("High Node Pivot", 55, 0);
-  private final MechanismLigament2d highNode =
-      highNodePivot.append(new MechanismLigament2d("High Node", 25, 90, 30.0, new Color8Bit(Color.kWhite)));
-
-  public final MechanismLigament2d m_arm = m_armPivot.append(new MechanismLigament2d("Arm", 20,
-      Units.radiansToDegrees(m_armSim.getAngleRads()), 10.0, new Color8Bit(Color.kGray)));
-
-  public void simulationPeriodic() {
-    // In this method, we update our simulation of what our arm is doing
-    // First, we set our "inputs" (voltages)
-    m_armSim.setInput(this.simVolts);
-
-    // Next, we update it. The standard loop time is 20ms.
-    m_armSim.update(0.020);
-
-    // Update the Mechanism Arm angle based on the simulated arm angle
-    m_arm.setAngle(Units.radiansToDegrees(m_armSim.getAngleRads()));
-    SmartDashboard.putNumber("Arm Vel", m_armSim.getVelocityRadPerSec());
-  }
-
+  
   public enum ArmControlMode {
     VEL, POS;
   }
 
   public ArmControlMode controlMode;
-  private double simVolts = 0;
 
   public Arm() {
     controlMode = ArmControlMode.VEL;
     configure();
-    SmartDashboard.putData("Arm", m_mech2d);
   }
 
   public double getClosestGoal(double goal) {
@@ -127,10 +78,11 @@ public class Arm extends SubsystemBase {
   }
 
   public double getPosition() {
-    if (Constants.getMode() == RobotMode.SIM) {
-      return m_armSim.getAngleRads();
-    }
     return encoder.getPosition();
+  }
+
+  public double getVelocity(){
+    return encoder.getVelocity();
   }
 
   public double getWrappedPosition() {
@@ -150,23 +102,15 @@ public class Arm extends SubsystemBase {
     encoder.setZeroOffset(0);
   }
 
-  private void setVoltage(double volts) {
+  public void setVoltage(double volts) {
     motor.setVoltage(volts);
-    if (Constants.getMode() == RobotMode.SIM) {
-      this.simVolts = volts;
-    }
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler 
-    double pose = getPosition();
-    double vel = encoder.getVelocity();
+    var pose = getPosition();
+    var vel = getVelocity();
 
-    if (Constants.getMode() == RobotMode.SIM) {
-      pose = m_armSim.getAngleRads();
-      vel = m_armSim.getVelocityRadPerSec();
-    }
     switch (controlMode) {
       case POS: {
         double pidval = pid.calculate(pose, goal);
