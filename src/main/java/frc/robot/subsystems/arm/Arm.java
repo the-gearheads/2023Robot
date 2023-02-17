@@ -14,7 +14,9 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
@@ -29,6 +31,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.ARM;
 import frc.robot.Constants.RobotMode;
 
 public class Arm extends SubsystemBase {
@@ -36,7 +39,7 @@ public class Arm extends SubsystemBase {
   private double goal = 0;
   private CANSparkMax motor = new CANSparkMax(0, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
-  private PIDController pid = new PIDController(7, 0, 0);
+  private ProfiledPIDController pid = new ProfiledPIDController(7, 0, 0, ARM.armConstraints);
   private PIDController velPid = new PIDController(3, 0, 0);
   private ArmFeedforward ff = new ArmFeedforward(0.1, 0.45, 4);
   private final DCMotor m_armGearbox = DCMotor.getNEO(1);
@@ -163,7 +166,7 @@ public class Arm extends SubsystemBase {
     switch (controlMode) {
       case POS: {
         double pidval = pid.calculate(pose, goal);
-        double ffval = ff.calculate(pose, 0); // ff wants 0 parallel to floor in pos x
+        double ffval = ff.calculate(pid.getSetpoint().position, pid.getSetpoint().velocity); // ff wants 0 parallel to floor in pos x
         setVoltage(ffval+pidval);
       }
         break;

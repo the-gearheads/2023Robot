@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.annotations.*;
@@ -36,7 +37,7 @@ public static class ARM {
   @NTPublish
   public static double VELOCITY = 0.5;
   public static double POSE_TOLERANCE = 0.01;
-
+  public static Constraints armConstraints = new Constraints(7,3);
 }
 
   public static RobotMode getMode() {
