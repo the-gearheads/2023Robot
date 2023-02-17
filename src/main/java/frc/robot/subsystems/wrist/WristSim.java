@@ -15,7 +15,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.subsystems.arm.ArmSim;
-import frc.robot.subsystems.arm.MechRootWrapper;
+import frc.robot.util.sim.Cone;
+import frc.robot.util.sim.MechRootWrapper;
 
 /** Add your docs here. */
 public class WristSim extends Wrist{
