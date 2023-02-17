@@ -33,7 +33,7 @@ import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.leds.LedState;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.arm.Wrist;
+import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.arm.Arm.ArmControlMode;
 import frc.robot.subsystems.drive.SwerveModule;
 import frc.robot.subsystems.drive.SwerveModuleIO;

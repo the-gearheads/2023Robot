@@ -1,4 +1,4 @@
-package frc.robot.subsystems.arm;
+package frc.robot.subsystems.wrist;
 
 import java.util.function.Function;
 import edu.wpi.first.math.util.Units;
