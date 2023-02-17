@@ -8,8 +8,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.controllers.Controllers;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Arm.ArmControlMode;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.Arm.ArmControlMode;
 
 public class SetArmPose extends CommandBase {
   private Arm arm;
