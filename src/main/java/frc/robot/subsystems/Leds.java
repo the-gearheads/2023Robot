@@ -1,4 +1,5 @@
-package frc.robot.subsystems.RgbLed;
+package frc.robot.subsystems;
+
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -9,7 +10,7 @@ import edu.wpi.first.wpilibj.simulation.AddressableLEDSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class LEDS extends SubsystemBase {
+public class Leds extends SubsystemBase {
   /** Creates a new LEDS. */
   private AddressableLED ledStrip;
   private AddressableLEDSim ledSim;
@@ -22,7 +23,7 @@ public class LEDS extends SubsystemBase {
   // Assuming that both strips are the same length - therefore we can use one buffer
   private int length = 0;
 
-  public LEDS(int port, int stripLength) {
+  public Leds(int port, int stripLength) {
     ledStrip = new AddressableLED(port);
     length = stripLength;
     ledStrip.setLength(length);
