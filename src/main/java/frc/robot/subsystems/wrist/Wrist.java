@@ -7,6 +7,7 @@ package frc.robot.subsystems.wrist;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -56,6 +57,18 @@ public class Wrist extends SubsystemBase {
     encoder.setPositionConversionFactor(2 * Math.PI);
     encoder.setVelocityConversionFactor(2 * Math.PI);
     encoder.setZeroOffset(0);
+
+    /* Status 0 governs applied output, faults, and whether is a follower. Not important for this. */
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    /* Integrated motor position isn't important here. */
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500);
+    /* Don't have an analog sensor */
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 500);
+    /* Don't have an alternate encoder */
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500);
+    /* Have a duty cycle encoder */
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
   }
 
   public void setVoltage(double volts) {
