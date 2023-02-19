@@ -29,6 +29,7 @@ import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.AutonChooser;
+import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.leds.LedState;
 import frc.robot.subsystems.leds.Leds;
@@ -59,6 +60,7 @@ public class RobotContainer {
   private final AutonChooser autonChooser;
   private final Arm arm;
   private Wrist wrist;
+  private Grabber grabber;
   private Leds leds;
 
   public String readPipelineFile() {
@@ -107,6 +109,7 @@ public class RobotContainer {
         break;
     }
 
+    grabber = new Grabber();
     vision = new Vision(swerve);
     autonChooser = new AutonChooser(swerve);
     leds = new Leds();
@@ -168,7 +171,7 @@ public class RobotContainer {
     Controllers.operatorController.armGoTo3ndNode().onTrue(new InstantCommand(() -> {
       leds.setState(LedState.WHITE);
     }));
-    Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
+    // Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
     Controllers.operatorController.armGoToGroundPickUpNode().onTrue(new SetArmPose(arm, ArmPose.FLOOR));
     Controllers.operatorController.armGoToInsideRobotNode().onTrue(new SetArmPose(arm, ArmPose.INSIDE_ROBOT));
   }

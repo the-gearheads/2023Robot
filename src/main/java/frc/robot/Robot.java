@@ -43,8 +43,6 @@ public class Robot extends LoggedRobot {
     Logger.getInstance().recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
     Logger.getInstance().recordMetadata("IsDirty", Boolean.toString(BuildConstants.DIRTY != 0));
 
-    new PowerDistribution();
-
     if (Constants.getMode() == RobotMode.REAL) {
       Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
       Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables

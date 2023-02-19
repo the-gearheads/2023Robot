@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.Constants.ARM_PLOT;
 import frc.robot.subsystems.arm.ArmSim;
 import frc.robot.util.sim.Cone;
 import frc.robot.util.sim.MechRootWrapper;
@@ -27,10 +28,10 @@ public class WristSim extends Wrist {
     super(arm);
     this.armSim = arm;
 
-    simPivot = new MechRootWrapper(this.armSim.m_mech2d, "WristPivot", 50, 30);
-    simCone = new Cone(simPivot, new Pose2d(5, 0, new Rotation2d(180)));
-    simLig = simPivot.append(new MechanismLigament2d("Wrist", 10.0, Units.radiansToDegrees(sim.getAngleRads()), 10.0,
-        new Color8Bit(Color.kBlue)));
+  simPivot = new MechRootWrapper(this.armSim.m_mech2d, "WristPivot", 0, 0);
+  simLig = simPivot.append(new MechanismLigament2d("Wrist", ARM_PLOT.WRIST_LENGTH, Units.radiansToDegrees(sim.getAngleRads()), 10.0,
+  new Color8Bit(Color.kBlue)));
+  simCone = new Cone(simPivot, new Pose2d(5, 0, new Rotation2d(180)));;
   }
 
   @Override
@@ -45,8 +46,8 @@ public class WristSim extends Wrist {
 
   public void simulationPeriodic() {
     double armPos = armSim.getPosition();
-    double pivot_x = 30 + (armSim.m_arm.getLength()) * Math.cos(armPos);
-    double pivot_y = 30 + (armSim.m_arm.getLength()) * Math.sin(armPos);
+    double pivot_x = ARM_PLOT.ARM_PIVOT_X + (armSim.m_arm.getLength()) * Math.cos(armPos);
+    double pivot_y = ARM_PLOT.ARM_PIVOT_Y + (armSim.m_arm.getLength()) * Math.sin(armPos);
     simPivot.setPosition(pivot_x, pivot_y);
     // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)
@@ -65,14 +66,9 @@ public class WristSim extends Wrist {
   //Setting up the Scenery:
   private final DCMotor simMotor = DCMotor.getNEO(1);
 
-  private static final double m_armReduction = 200;
-  private static final double m_armMass = 2.0; // Kilograms
-  private static final double m_armLength = Units.inchesToMeters(30);
-  // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
-  // to 255 degrees (rotated down in the back).
   private final SingleJointedArmSim sim =
-      new SingleJointedArmSim(simMotor, m_armReduction, SingleJointedArmSim.estimateMOI(m_armLength, m_armMass),
-          m_armLength, Units.degreesToRadians(-1e10), Units.degreesToRadians(1e10), true, VecBuilder.fill(0.001) // Add noise with a std-dev of 1 tick
+      new SingleJointedArmSim(simMotor, ARM_PLOT.WRIST_REDUCTION, SingleJointedArmSim.estimateMOI(ARM_PLOT.WRIST_LENGTH, ARM_PLOT.WRIST_MASS),
+          ARM_PLOT.WRIST_LENGTH, Units.degreesToRadians(-1e10), Units.degreesToRadians(1e10), true, VecBuilder.fill(0.001) // Add noise with a std-dev of 1 tick
       );
 
   private final MechRootWrapper simPivot;

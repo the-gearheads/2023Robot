@@ -12,16 +12,19 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.arm.Arm;
 
 public class Wrist extends SubsystemBase {
   /** Creates a new Wrist. */
   private double goal;
-  private CANSparkMax motor = new CANSparkMax(20, MotorType.kBrushless);
+  private CANSparkMax motor = new CANSparkMax(10, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
-  private PIDController pid = new PIDController(20, 0, 0);
-  private ArmFeedforward ff = new ArmFeedforward(0, 0.005, 0);
+  private PIDController pid = new PIDController(4, 0, 0);
+  private ArmFeedforward ff = new ArmFeedforward(0.2, 0.5, 0);
   private Arm arm;
+  private double iHateThis;
+  private double lastNakedEncoderOutput;
 
   public Wrist(Arm arm) {
     this.arm = arm;
@@ -37,13 +40,19 @@ public class Wrist extends SubsystemBase {
   }
 
   public double getPosition() {
-    return encoder.getPosition();
-  }
+    var nakedEncoderOutput = encoder.getPosition();
+    if (nakedEncoderOutput-lastNakedEncoderOutput > 2){
+      iHateThis-=Math.PI*2;
+    }else if(nakedEncoderOutput - lastNakedEncoderOutput < -2){
+      iHateThis+=Math.PI*2;
+    }
+    lastNakedEncoderOutput = nakedEncoderOutput;
+    return nakedEncoderOutput - Constants.ARM.ANGLE_OFFSET + iHateThis;  }
 
   private void configure() {
     motor.restoreFactoryDefaults();
     motor.setInverted(false);
-    motor.setIdleMode(IdleMode.kBrake);
+    motor.setIdleMode(IdleMode.kCoast);
     encoder.setPositionConversionFactor(2 * Math.PI);
     encoder.setVelocityConversionFactor(2 * Math.PI);
     encoder.setZeroOffset(0);
