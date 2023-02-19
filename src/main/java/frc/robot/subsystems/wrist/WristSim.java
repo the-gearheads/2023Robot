@@ -28,10 +28,10 @@ public class WristSim extends Wrist {
     super(arm);
     this.armSim = arm;
 
-  simPivot = new MechRootWrapper(this.armSim.m_mech2d, "WristPivot", 0, 0);
-  simLig = simPivot.append(new MechanismLigament2d("Wrist", ARM_PLOT.WRIST_LENGTH, Units.radiansToDegrees(sim.getAngleRads()), 10.0,
-  new Color8Bit(Color.kBlue)));
-  simCone = new Cone(simPivot, new Pose2d(5, 0, new Rotation2d(180)));;
+    simPivot = new MechRootWrapper(this.armSim.m_mech2d, "WristPivot", 0, 0);
+    simLig = simPivot.append(new MechanismLigament2d("Wrist", ARM_PLOT.WRIST_LENGTH,
+        Units.radiansToDegrees(sim.getAngleRads()), 10.0, new Color8Bit(Color.kBlue)));
+    simCone = new Cone(simPivot, new Pose2d(5, 0, new Rotation2d(180)));;
   }
 
   @Override
@@ -66,10 +66,10 @@ public class WristSim extends Wrist {
   //Setting up the Scenery:
   private final DCMotor simMotor = DCMotor.getNEO(1);
 
-  private final SingleJointedArmSim sim =
-      new SingleJointedArmSim(simMotor, ARM_PLOT.WRIST_REDUCTION, SingleJointedArmSim.estimateMOI(ARM_PLOT.WRIST_LENGTH, ARM_PLOT.WRIST_MASS),
-          ARM_PLOT.WRIST_LENGTH, Units.degreesToRadians(-1e10), Units.degreesToRadians(1e10), true, VecBuilder.fill(0.001) // Add noise with a std-dev of 1 tick
-      );
+  private final SingleJointedArmSim sim = new SingleJointedArmSim(simMotor, ARM_PLOT.WRIST_REDUCTION,
+      SingleJointedArmSim.estimateMOI(ARM_PLOT.WRIST_LENGTH, ARM_PLOT.WRIST_MASS), ARM_PLOT.WRIST_LENGTH,
+      Units.degreesToRadians(-1e10), Units.degreesToRadians(1e10), true, VecBuilder.fill(0.001) // Add noise with a std-dev of 1 tick
+  );
 
   private final MechRootWrapper simPivot;
   private final MechanismLigament2d simLig;

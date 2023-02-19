@@ -36,11 +36,11 @@ public class Constants extends AnnotatedClass {
     @NTPublish
     public static double VELOCITY = 2;
     public static double POSE_TOLERANCE = 0.01;
-    public static double ANGLE_OFFSET = Math.PI/2;
+    public static double ANGLE_OFFSET = Math.PI / 2;
     public static Constraints ARM_CONSTRAINTS = new Constraints(5, 2);
   }
 
-  public static class ARM_PLOT{
+  public static class ARM_PLOT {
     public static double PLOT_HEIGHT = 90;
     public static double PLOT_WIDTH = 130;
 
@@ -49,10 +49,10 @@ public class Constants extends AnnotatedClass {
     public static double WRIST_LENGTH = 11.5;
     public static double CHASSIS_LENGTH = 30;
 
-    public static double ARM_PIVOT_X = PLOT_WIDTH/2;
+    public static double ARM_PIVOT_X = PLOT_WIDTH / 2;
     public static double ARM_PIVOT_Y = ARM_TOWER_LENGTH;
-    
-    public static double CHASSIS_X = ARM_PIVOT_X-24;//the chassis extends 24 inches behind the arm tower
+
+    public static double CHASSIS_X = ARM_PIVOT_X - 24;//the chassis extends 24 inches behind the arm tower
     public static double CHASSIS_Y = 0;
 
     public static double ARM_REDUCTION = 200;

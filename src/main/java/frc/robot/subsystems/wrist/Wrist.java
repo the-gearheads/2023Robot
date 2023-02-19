@@ -42,13 +42,14 @@ public class Wrist extends SubsystemBase {
 
   public double getPosition() {
     var nakedEncoderOutput = encoder.getPosition();
-    if (nakedEncoderOutput-lastNakedEncoderOutput > 2){
-      iHateThis-=Math.PI*2;
-    }else if(nakedEncoderOutput - lastNakedEncoderOutput < -2){
-      iHateThis+=Math.PI*2;
+    if (nakedEncoderOutput - lastNakedEncoderOutput > 2) {
+      iHateThis -= Math.PI * 2;
+    } else if (nakedEncoderOutput - lastNakedEncoderOutput < -2) {
+      iHateThis += Math.PI * 2;
     }
     lastNakedEncoderOutput = nakedEncoderOutput;
-    return nakedEncoderOutput - Constants.ARM.ANGLE_OFFSET + iHateThis;  }
+    return nakedEncoderOutput - Constants.ARM.ANGLE_OFFSET + iHateThis;
+  }
 
   private void configure() {
     motor.restoreFactoryDefaults();

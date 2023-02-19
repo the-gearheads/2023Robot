@@ -68,16 +68,17 @@ public class ArmSim extends Arm {
       );
 
   public final Mechanism2d m_mech2d = new Mechanism2d(ARM_PLOT.PLOT_WIDTH, ARM_PLOT.PLOT_HEIGHT);
-  
-  public final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", ARM_PLOT.ARM_PIVOT_X, ARM_PLOT.ARM_PIVOT_Y);
-  private final MechanismLigament2d m_armTower =
-      m_armPivot.append(new MechanismLigament2d("ArmTower", ARM_PLOT.ARM_TOWER_LENGTH, -90, 10.0, new Color8Bit(Color.kDarkGray)));    
-  public final MechanismLigament2d m_arm = m_armPivot.append(new MechanismLigament2d("Arm", ARM_PLOT.ARM_LENGTH,
-  Units.radiansToDegrees(m_armSim.getAngleRads()), 10.0, new Color8Bit(Color.kGray)));
 
-  public final MechanismRoot2d m_chassisPivot = m_mech2d.getRoot("ChassisPivot", ARM_PLOT.CHASSIS_X, ARM_PLOT.CHASSIS_Y);
-  private final MechanismLigament2d m_chassis =
-      m_chassisPivot.append(new MechanismLigament2d("Chassis", ARM_PLOT.CHASSIS_LENGTH, 0, 100.0, new Color8Bit(Color.kDarkRed)));
+  public final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", ARM_PLOT.ARM_PIVOT_X, ARM_PLOT.ARM_PIVOT_Y);
+  private final MechanismLigament2d m_armTower = m_armPivot.append(
+      new MechanismLigament2d("ArmTower", ARM_PLOT.ARM_TOWER_LENGTH, -90, 10.0, new Color8Bit(Color.kDarkGray)));
+  public final MechanismLigament2d m_arm = m_armPivot.append(new MechanismLigament2d("Arm", ARM_PLOT.ARM_LENGTH,
+      Units.radiansToDegrees(m_armSim.getAngleRads()), 10.0, new Color8Bit(Color.kGray)));
+
+  public final MechanismRoot2d m_chassisPivot =
+      m_mech2d.getRoot("ChassisPivot", ARM_PLOT.CHASSIS_X, ARM_PLOT.CHASSIS_Y);
+  private final MechanismLigament2d m_chassis = m_chassisPivot
+      .append(new MechanismLigament2d("Chassis", ARM_PLOT.CHASSIS_LENGTH, 0, 100.0, new Color8Bit(Color.kDarkRed)));
 
   public final MechanismRoot2d feederPivot = m_mech2d.getRoot("Feeder Pivot", 5, 25);
   private final MechanismLigament2d feeder =
