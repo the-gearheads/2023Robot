@@ -24,24 +24,24 @@ public class JoystickArmControl extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    this.arm.controlMode = ArmControlMode.VEL;
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    this.arm.controlMode = ArmControlMode.VEL;
+    arm.setControlMode(ArmControlMode.VEL);
     double axis = Controllers.operatorController.getArmAxis();
     SmartDashboard.putNumber("Arm Axis", axis);
     axis *= Math.abs(axis);
     double armvel = axis * Constants.ARM.VELOCITY;
-    this.arm.setGoal(armvel);
+    arm.setGoal(armvel);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    this.arm.setGoal(0);
+    arm.setGoal(0);
   }
 
   // Returns true when the command should end.

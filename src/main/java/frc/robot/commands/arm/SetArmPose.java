@@ -26,7 +26,11 @@ public class SetArmPose extends CommandBase {
 
   }
 
-  /** Creates a new SetArmPos. */
+  /**
+   * Sets arm to a given pose
+   * 
+   * @param armPose Desired arm pose
+   */
   public SetArmPose(Arm arm, ArmPose armPose) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.arm = arm;
@@ -37,8 +41,8 @@ public class SetArmPose extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    this.arm.controlMode = ArmControlMode.POS;
-    this.arm.setGoal(this.armPose.val);
+    arm.setControlMode(ArmControlMode.POS);
+    arm.setGoal(armPose.val);
   }
 
   // Called once the command ends or is interrupted.
@@ -52,8 +56,8 @@ public class SetArmPose extends CommandBase {
       return true;
     }
 
-    double goal = this.arm.getGoal();
-    double currentPose = this.arm.getPosition();
+    double goal = arm.getGoal();
+    double currentPose = arm.getPosition();
     double poseError = goal - currentPose;
     poseError = Math.abs(poseError);
     return poseError < Constants.ARM.POSE_TOLERANCE;

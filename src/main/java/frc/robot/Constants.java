@@ -31,36 +31,6 @@ public class Constants extends AnnotatedClass {
   public static enum RobotMode {
     SIM, SIM_REPLAY, REAL
   }
-  public static class ARM {
-
-    @NTPublish
-    public static double VELOCITY = 2;
-    public static double POSE_TOLERANCE = 0.01;
-    public static double ANGLE_OFFSET = Math.PI / 2;
-    public static Constraints ARM_CONSTRAINTS = new Constraints(5, 2);
-  }
-
-  public static class ARM_PLOT {
-    public static double PLOT_HEIGHT = 90;
-    public static double PLOT_WIDTH = 130;
-
-    public static double ARM_TOWER_LENGTH = 49;
-    public static double ARM_LENGTH = 39;
-    public static double WRIST_LENGTH = 11.5;
-    public static double CHASSIS_LENGTH = 30;
-
-    public static double ARM_PIVOT_X = PLOT_WIDTH / 2;
-    public static double ARM_PIVOT_Y = ARM_TOWER_LENGTH;
-
-    public static double CHASSIS_X = ARM_PIVOT_X - 24;//the chassis extends 24 inches behind the arm tower
-    public static double CHASSIS_Y = 0;
-
-    public static double ARM_REDUCTION = 200;
-    public static double WRIST_REDUCTION = 80;
-
-    public static double ARM_MASS = Units.lbsToKilograms(6);
-    public static double WRIST_MASS = Units.lbsToKilograms(3.5);
-  }
 
   public static RobotMode getMode() {
     if (RobotBase.isReal()) {
@@ -71,6 +41,53 @@ public class Constants extends AnnotatedClass {
     } else {
       return RobotMode.SIM;
     }
+  }
+
+  public static class ARM {
+    public static final int ARM_ID = 9;
+    public static final double[] ARM_POS_PID = {1, 0, 0};
+    public static final double[] ARM_VEL_PID = {0.5, 0, 0};
+    public static final double[] ARM_FF = {0.1, 0.5, 3};
+
+    @NTPublish
+    public static double VELOCITY = 2;
+    public static final double POSE_TOLERANCE = 0.01;
+    public static final double ANGLE_OFFSET = Math.PI / 2;
+    public static final Constraints ARM_CONSTRAINTS = new Constraints(5, 2);
+  }
+
+  public static final class ARM_PLOT {
+    public static final double PLOT_HEIGHT = 90;
+    public static final double PLOT_WIDTH = 130;
+
+    public static final double ARM_TOWER_LENGTH = 49;
+    public static final double ARM_LENGTH = 39;
+    public static final double WRIST_LENGTH = 11.5;
+    public static final double CHASSIS_LENGTH = 30;
+
+    public static final double ARM_PIVOT_X = PLOT_WIDTH / 2;
+    public static final double ARM_PIVOT_Y = ARM_TOWER_LENGTH;
+
+    public static final double CHASSIS_X = ARM_PIVOT_X - 24;//the chassis extends 24 inches behind the arm tower
+    public static final double CHASSIS_Y = 0;
+
+    public static final double ARM_REDUCTION = 200;
+    public static final double WRIST_REDUCTION = 80;
+
+    public static final double ARM_MASS = Units.lbsToKilograms(6);
+    public static final double WRIST_MASS = Units.lbsToKilograms(3.5);
+  }
+
+  public static final class WRIST {
+    public static final int WRIST_ID = 10;
+    public static final double[] WRIST_PID = {4, 0, 0};
+    public static final double[] WRIST_FF = {0.2, 0.5, 0};
+  }
+
+  public static final class GRABBER {
+    /* Compressor min and max pressures */
+    public static final double MIN_PRESSURE = 100;
+    public static final double MAX_PRESSURE = 120;
   }
 
   public static final class DRIVE {
@@ -156,7 +173,7 @@ public class Constants extends AnnotatedClass {
   }
 
   public static final class LEDS {
-    public static final int port = 0;
-    public static final int length = 3;
+    public static final int PORT = 0;
+    public static final int LENGTH = 3;
   }
 }

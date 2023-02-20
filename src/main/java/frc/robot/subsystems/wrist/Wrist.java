@@ -14,15 +14,16 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.WRIST;
 import frc.robot.subsystems.arm.Arm;
 
 public class Wrist extends SubsystemBase {
   /** Creates a new Wrist. */
   private double goal;
-  private CANSparkMax motor = new CANSparkMax(10, MotorType.kBrushless);
+  private CANSparkMax motor = new CANSparkMax(WRIST.WRIST_ID, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
-  private PIDController pid = new PIDController(4, 0, 0);
-  private ArmFeedforward ff = new ArmFeedforward(0.2, 0.5, 0);
+  private PIDController pid = new PIDController(WRIST.WRIST_PID[0], WRIST.WRIST_PID[1], WRIST.WRIST_PID[2]);
+  private ArmFeedforward ff = new ArmFeedforward(WRIST.WRIST_FF[0], WRIST.WRIST_FF[1], WRIST.WRIST_FF[2]);
   private Arm arm;
   private double iHateThis;
   private double lastNakedEncoderOutput;
@@ -40,6 +41,7 @@ public class Wrist extends SubsystemBase {
     goal = newGoal;
   }
 
+  // [Possibly a] HACK: Manually wrap absolute encoder position if dP > 2 as there are no apis to do this for us
   public double getPosition() {
     var nakedEncoderOutput = encoder.getPosition();
     if (nakedEncoderOutput - lastNakedEncoderOutput > 2) {
@@ -80,7 +82,6 @@ public class Wrist extends SubsystemBase {
   public void periodic() {
     updateGoal();
 
-    // This method will be called once per scheduler run
     double currentPose = getPosition();
     double pidval = pid.calculate(currentPose, goal);
     double ffval = ff.calculate(currentPose, 0);
@@ -91,8 +92,7 @@ public class Wrist extends SubsystemBase {
     double armPos = arm.getPosition();
     for (WristState wristState : WristState.values()) {
       if (wristState.inRange(armPos)) {
-        double goal = wristState.getWristGoal(armPos);
-        setGoal(goal);
+        setGoal(wristState.getWristGoal(armPos));
         return;
       }
     }

@@ -16,23 +16,23 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.ARM;
 
 public class Arm extends SubsystemBase {
   /** Creates a new arm. */
   private double goal = 0;
-  protected CANSparkMax motor = new CANSparkMax(9, MotorType.kBrushless);
+  protected CANSparkMax motor = new CANSparkMax(ARM.ARM_ID, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
-  private ProfiledPIDController pid = new ProfiledPIDController(1, 0, 0, ARM.ARM_CONSTRAINTS);
-  private PIDController velPid = new PIDController(0.5, 0, 0);
-  private ArmFeedforward ff = new ArmFeedforward(0.1, 0.5, 3);
+  private ProfiledPIDController pid =
+      new ProfiledPIDController(ARM.ARM_POS_PID[0], ARM.ARM_POS_PID[1], ARM.ARM_POS_PID[2], ARM.ARM_CONSTRAINTS);
+  private PIDController velPid = new PIDController(ARM.ARM_VEL_PID[0], ARM.ARM_VEL_PID[1], ARM.ARM_VEL_PID[2]);
+  private ArmFeedforward ff = new ArmFeedforward(ARM.ARM_FF[0], ARM.ARM_FF[1], ARM.ARM_FF[2]);
 
   public enum ArmControlMode {
     VEL, POS;
   }
 
-  public ArmControlMode controlMode;
+  private ArmControlMode controlMode;
   private double lastPos;
   private double lastNakedEncoderOutput;
   private double iHateThis;
@@ -49,20 +49,13 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putData("arm vPid", velPid);
   }
 
-  // public double getClosestGoal(double goal) {
-  //   double pose = getWrappedPosition();
-  //   double difference = goal - pose;
-  //   double mod = difference % (2 * Math.PI);
-  //   if (Math.abs(mod) <= Math.PI) {
-  //     return pose + mod;
-  //   } else {
-  //     if (difference < 0) {
-  //       return pose + mod + 2 * Math.PI;
-  //     } else {
-  //       return pose + mod - 2 * Math.PI;
-  //     }
-  //   }
-  // }
+  public void setControlMode(ArmControlMode mode) {
+    pid.reset(getPosition(), getVelocity());
+    velPid.reset();
+    /* A velocity goal carrying over to a position goal (or vice versa) would be bad */
+    setGoal(0);
+    controlMode = mode;
+  }
 
   public double getGoal() {
     return goal;
@@ -72,7 +65,7 @@ public class Arm extends SubsystemBase {
     goal = newGoal;
   }
 
-  // WHY DONT THEY SUPPORT CONTINUOUS ENCODER VALUES
+  // [Possibly a] HACK: Manually wrap absolute encoder position if dP > 2 as there are no apis to do this for us
   public double getPosition() {
     var nakedEncoderOutput = encoder.getPosition();
     if (nakedEncoderOutput - lastNakedEncoderOutput > 2) {
@@ -81,20 +74,12 @@ public class Arm extends SubsystemBase {
       iHateThis += Math.PI * 2;
     }
     lastNakedEncoderOutput = nakedEncoderOutput;
-    return nakedEncoderOutput - Constants.ARM.ANGLE_OFFSET + iHateThis;
+    return nakedEncoderOutput - ARM.ANGLE_OFFSET + iHateThis;
   }
 
   public double getVelocity() {
     return encoder.getVelocity();
   }
-
-  // public double getWrappedPosition() {
-  //   double currentPose = getPosition(); // any number
-  //   double wrappedPose = currentPose;
-  //   wrappedPose %= 2 * Math.PI;
-  //   wrappedPose = wrappedPose > 0 ? wrappedPose : wrappedPose + 2 * Math.PI; // wil be 0-2*Math.PI, robot wont go backward if goal is 359 and pos is 1
-  //   return wrappedPose;
-  // }
 
   private void configure() {
     motor.restoreFactoryDefaults();
@@ -143,7 +128,6 @@ public class Arm extends SubsystemBase {
       SmartDashboard.putNumber("arm ffval", ffval);
       SmartDashboard.putNumber("pidval", pidval);
     } else if (controlMode == ArmControlMode.VEL) {
-      pid.reset(pose, vel);
       if ((getPosition() > Units.degreesToRadians(0) && goal > 0)
           || (getPosition() < -Units.degreesToRadians(180) && goal < 0)) {
         setVoltage(0);

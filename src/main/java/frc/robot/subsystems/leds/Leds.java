@@ -24,9 +24,9 @@ public class Leds extends SubsystemBase {
   // Assuming that both strips are the same length - therefore we can use one buffer
 
   public Leds() {
-    buffer = new AddressableLEDBuffer(LEDS.length);
+    buffer = new AddressableLEDBuffer(LEDS.LENGTH);
 
-    ledStrip = new AddressableLED(LEDS.port);
+    ledStrip = new AddressableLED(LEDS.PORT);
     ledStrip.setLength(buffer.getLength());
 
     ledSim = new AddressableLEDSim(ledStrip);

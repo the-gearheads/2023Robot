@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.GRABBER;
 
 public class Grabber extends SubsystemBase {
   public enum GrabberState {
@@ -24,7 +25,7 @@ public class Grabber extends SubsystemBase {
   Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
 
   public Grabber() {
-    compressor.enableAnalog(100, 120);
+    compressor.enableAnalog(GRABBER.MIN_PRESSURE, GRABBER.MAX_PRESSURE);
   }
 
   public void grabCone() {
