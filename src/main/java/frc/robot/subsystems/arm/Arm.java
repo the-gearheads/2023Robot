@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.arm;
 
+import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -32,7 +33,11 @@ public class Arm extends SubsystemBase {
   private SendableArmFeedforward ff = new SendableArmFeedforward(ARM.ARM_FF[0], ARM.ARM_FF[1], ARM.ARM_FF[2]);
 
   public enum ArmControlMode {
-    VEL, POS;
+    VEL("Velocity"), POS("Position");
+    public final String name;
+    private ArmControlMode(String name) {
+      this.name = name;
+    }
   }
 
   private ArmControlMode controlMode;
@@ -113,20 +118,17 @@ public class Arm extends SubsystemBase {
     var pose = getPosition();
     var vel = getVelocity();
 
-    SmartDashboard.putNumber("arm/pose", Units.radiansToDegrees(pose));
-    SmartDashboard.putNumber("arm/vel", vel);
-    SmartDashboard.putNumber("arm/posegoal", poseGoal);
-    SmartDashboard.putNumber("arm/velgoal", velGoal);
-
+    Logger.getInstance().recordOutput("Arm/CurrentPose", pose);
+    Logger.getInstance().recordOutput("Arm/CurrentVel", vel);
+    Logger.getInstance().recordOutput("Arm/Pose/Goal", poseGoal);
+    Logger.getInstance().recordOutput("Arm/Vel/Goal", velGoal);
+    Logger.getInstance().recordOutput("Arm/ControlMode", controlMode.name);
+    Logger.getInstance().recordOutput("Arm/Pose/Setpoint", pid.getSetpoint().position);
 
     if(controlMode == ArmControlMode.VEL && MathUtil.applyDeadband(velGoal, 0.1) != 0) {
-      // vel control
       velControl();
-      SmartDashboard.putBoolean("arm/mode==POS", false);
     } else {
-      // pos control
       posControl();
-      SmartDashboard.putBoolean("arm/mode==POS", true);
     }
   }
 
@@ -134,12 +136,12 @@ public class Arm extends SubsystemBase {
     var pose = getPosition();
     double pidval = pid.calculate(pose, poseGoal);
     double ffval = ff.calculate(pid.getSetpoint().position, pid.getSetpoint().velocity); // ff wants 0 parallel to floor in pos x
-    setVoltage(ffval + pidval);
-
     
-    SmartDashboard.putNumber("arm/ffval", ffval);
-    SmartDashboard.putNumber("arm/pidval", pidval);
-    SmartDashboard.putNumber("arm/setpoint", pid.getSetpoint().position);
+    Logger.getInstance().recordOutput("Arm/Pose/FFval", ffval);
+    Logger.getInstance().recordOutput("Arm/Pose/PIDval", pidval);
+    Logger.getInstance().recordOutput("Arm/Appliedvolts", pidval + ffval);
+
+    setVoltage(ffval + pidval);
   }
 
   public void velControl(){
@@ -163,6 +165,10 @@ public class Arm extends SubsystemBase {
 
     double ffval = ff.calculate(pose, velGoal);
     double pidval = velPid.calculate(vel, velGoal);
+
+    Logger.getInstance().recordOutput("Arm/Pose/FFval", ffval);
+    Logger.getInstance().recordOutput("Arm/Pose/PIDval", pidval);
+    Logger.getInstance().recordOutput("Arm/Appliedvolts", pidval + ffval);
     
     setVoltage(ffval + pidval);
     setPoseGoal(pose);

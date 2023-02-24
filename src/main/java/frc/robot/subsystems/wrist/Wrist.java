@@ -4,13 +4,13 @@
 
 package frc.robot.subsystems.wrist;
 
+import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,8 +27,6 @@ public class Wrist extends SubsystemBase {
   private PIDController pid = new PIDController(WRIST.WRIST_PID[0], WRIST.WRIST_PID[1], WRIST.WRIST_PID[2]);
   private SendableArmFeedforward ff = new SendableArmFeedforward(WRIST.WRIST_FF[0], WRIST.WRIST_FF[1], WRIST.WRIST_FF[2]);
   private Arm arm;
-  private double iHateThis;
-  private double lastNakedEncoderOutput;
 
   public Wrist(Arm arm) {
     this.arm = arm;
@@ -47,17 +45,8 @@ public class Wrist extends SubsystemBase {
     goal = newGoal;
   }
 
-  // [Possibly a] HACK: Manually wrap absolute encoder position if dP > 2 as there are no apis to do this for us
   public double getPosition() {
-    var nakedEncoderOutput = encoder.getPosition();
-    // if (nakedEncoderOutput - lastNakedEncoderOutput > 2) {
-    //   iHateThis -= Math.PI * 2;
-    // } else if (nakedEncoderOutput - lastNakedEncoderOutput < -2) {
-    //   iHateThis += Math.PI * 2;
-    // }
-    // lastNakedEncoderOutput = nakedEncoderOutput;
-    // return nakedEncoderOutput - Constants.ARM.ANGLE_OFFSET + iHateThis;
-    return nakedEncoderOutput + Constants.WRIST.ANGLE_OFFSET;
+    return encoder.getPosition() + Constants.WRIST.ANGLE_OFFSET;
   }
 
   private void configure() {
@@ -81,6 +70,7 @@ public class Wrist extends SubsystemBase {
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
   }
 
+  // TODO: temp
   public void setVoltage(double volts) {
     // motor.setVoltage(volts);
   }
@@ -88,11 +78,20 @@ public class Wrist extends SubsystemBase {
   @Override
   public void periodic() {
     // updateGoal();
-    setGoal(SmartDashboard.getNumber("Wrist/set goal", 0));
-    SmartDashboard.putNumber("Wrist/pos", getPosition());
     double currentPose = getPosition();
+
+    setGoal(SmartDashboard.getNumber("Wrist/set goal", 0));
+    SmartDashboard.putNumber("Wrist/pos", currentPose);
+
     double pidval = pid.calculate(currentPose, goal);
     double ffval = ff.calculate(currentPose, 0);
+
+    Logger.getInstance().recordOutput("Wrist/Pose", currentPose);
+    Logger.getInstance().recordOutput("Wrist/Vel", encoder.getVelocity());
+    Logger.getInstance().recordOutput("Wrist/PIDVal", pidval);
+    Logger.getInstance().recordOutput("Wrist/FFVal", ffval);
+    Logger.getInstance().recordOutput("Wrist/Appliedvolts", pidval + ffval);
+
     setVoltage(ffval + pidval);
   }
 
