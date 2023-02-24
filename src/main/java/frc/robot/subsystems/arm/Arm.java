@@ -15,7 +15,6 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ARM;
@@ -34,7 +33,9 @@ public class Arm extends SubsystemBase {
 
   public enum ArmControlMode {
     VEL("Velocity"), POS("Position");
+
     public final String name;
+
     private ArmControlMode(String name) {
       this.name = name;
     }
@@ -125,18 +126,18 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/ControlMode", controlMode.name);
     Logger.getInstance().recordOutput("Arm/Pose/Setpoint", pid.getSetpoint().position);
 
-    if(controlMode == ArmControlMode.VEL && MathUtil.applyDeadband(velGoal, 0.1) != 0) {
+    if (controlMode == ArmControlMode.VEL && MathUtil.applyDeadband(velGoal, 0.1) != 0) {
       velControl();
     } else {
       posControl();
     }
   }
 
-  public void posControl(){
+  public void posControl() {
     var pose = getPosition();
     double pidval = pid.calculate(pose, poseGoal);
     double ffval = ff.calculate(pid.getSetpoint().position, pid.getSetpoint().velocity); // ff wants 0 parallel to floor in pos x
-    
+
     Logger.getInstance().recordOutput("Arm/Pose/FFval", ffval);
     Logger.getInstance().recordOutput("Arm/Pose/PIDval", pidval);
     Logger.getInstance().recordOutput("Arm/Appliedvolts", pidval + ffval);
@@ -144,23 +145,22 @@ public class Arm extends SubsystemBase {
     setVoltage(ffval + pidval);
   }
 
-  public void velControl(){
+  public void velControl() {
     var pose = getPosition();
     var vel = getVelocity();
 
     /* Don't let ourselves go outside [-180, 0]  */
-    if (((getPosition() > ARM.MAX_ANGLE) && velGoal < 0)
-    ||  ((getPosition() < ARM.MIN_ANGLE) && velGoal < 0)) {
+    if (((getPosition() > ARM.MAX_ANGLE) && velGoal < 0) || ((getPosition() < ARM.MIN_ANGLE) && velGoal < 0)) {
       setVoltage(0);
       return;
     }
 
-    if((getPosition() + velGoal*0.02 > ARM.MAX_ANGLE)){
-      velGoal = (0 - getPosition())/0.02;
-      velGoal=0;
-    }else if((getPosition() + velGoal*0.02 < ARM.MIN_ANGLE)){
-      velGoal = (-Math.PI - getPosition())/0.02;
-      velGoal=0;
+    if ((getPosition() + velGoal * 0.02 > ARM.MAX_ANGLE)) {
+      velGoal = (0 - getPosition()) / 0.02;
+      velGoal = 0;
+    } else if ((getPosition() + velGoal * 0.02 < ARM.MIN_ANGLE)) {
+      velGoal = (-Math.PI - getPosition()) / 0.02;
+      velGoal = 0;
     }
 
     double ffval = ff.calculate(pose, velGoal);
@@ -169,7 +169,7 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Pose/FFval", ffval);
     Logger.getInstance().recordOutput("Arm/Pose/PIDval", pidval);
     Logger.getInstance().recordOutput("Arm/Appliedvolts", pidval + ffval);
-    
+
     setVoltage(ffval + pidval);
     setPoseGoal(pose);
     pid.reset(getPosition(), getVelocity());

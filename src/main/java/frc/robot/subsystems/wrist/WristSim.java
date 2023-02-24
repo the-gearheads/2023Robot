@@ -52,7 +52,7 @@ public class WristSim extends Wrist {
     simPivot.setPosition(pivot_x, pivot_y);
     // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)
-    sim.setInput(MathUtil.clamp(this.simVolts,-12,12));
+    sim.setInput(MathUtil.clamp(this.simVolts, -12, 12));
 
     // Next, we update it. The standard loop time is 20ms.
     sim.update(0.020);
