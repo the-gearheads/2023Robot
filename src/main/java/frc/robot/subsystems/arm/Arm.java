@@ -7,11 +7,11 @@ package frc.robot.subsystems.arm;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.util.Units;
@@ -36,9 +36,6 @@ public class Arm extends SubsystemBase {
   }
 
   private ArmControlMode controlMode;
-  private double lastPos;
-  private double lastNakedEncoderOutput;
-  private double iHateThis;
 
   public Arm() {
     controlMode = ArmControlMode.VEL;
@@ -73,18 +70,8 @@ public class Arm extends SubsystemBase {
     velGoal = newGoal;
   }
 
-  // [Possibly a] HACK: Manually wrap absolute encoder position if dP > 2 as there are no apis to do this for us
   public double getPosition() {
-    var nakedEncoderOutput = encoder.getPosition();
-    // if (nakedEncoderOutput - lastNakedEncoderOutput > 2) {
-    //   iHateThis -= Math.PI * 2;
-    // } else if (nakedEncoderOutput - lastNakedEncoderOutput < -2) {
-    //   iHateThis += Math.PI * 2;
-    // }
-    // lastNakedEncoderOutput = nakedEncoderOutput;
-    // return nakedEncoderOutput - ARM.ANGLE_OFFSET + iHateThis;
-    return nakedEncoderOutput + ARM.ANGLE_OFFSET;
-    // return encoder.getPosition();
+    return encoder.getPosition() + ARM.ANGLE_OFFSET;
   }
 
   public double getVelocity() {
@@ -98,6 +85,11 @@ public class Arm extends SubsystemBase {
     motor.setIdleMode(IdleMode.kBrake);
     encoder.setPositionConversionFactor(2 * Math.PI);
     encoder.setVelocityConversionFactor(2 * Math.PI);
+
+    motor.setSoftLimit(SoftLimitDirection.kForward, (float) ARM.MAX_ANGLE);
+    motor.setSoftLimit(SoftLimitDirection.kReverse, (float) ARM.MIN_ANGLE);
+    motor.enableSoftLimit(SoftLimitDirection.kForward, true);
+    motor.enableSoftLimit(SoftLimitDirection.kReverse, true);
 
     /* Status 0 governs applied output, faults, and whether is a follower. Not important for this. */
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
@@ -155,16 +147,16 @@ public class Arm extends SubsystemBase {
     var vel = getVelocity();
 
     /* Don't let ourselves go outside [-180, 0]  */
-    if (((getPosition() > Units.degreesToRadians(20)) && velGoal < 0)
-    ||  ((getPosition() < -Units.degreesToRadians(200)) && velGoal < 0)) {
+    if (((getPosition() > ARM.MAX_ANGLE) && velGoal < 0)
+    ||  ((getPosition() < ARM.MIN_ANGLE) && velGoal < 0)) {
       setVoltage(0);
       return;
     }
 
-    if((getPosition() + velGoal*0.02 > Units.degreesToRadians(20))){
+    if((getPosition() + velGoal*0.02 > ARM.MAX_ANGLE)){
       velGoal = (0 - getPosition())/0.02;
       velGoal=0;
-    }else if((getPosition() + velGoal*0.02 < -Units.degreesToRadians(200))){
+    }else if((getPosition() + velGoal*0.02 < ARM.MIN_ANGLE)){
       velGoal = (-Math.PI - getPosition())/0.02;
       velGoal=0;
     }

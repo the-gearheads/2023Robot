@@ -54,6 +54,8 @@ public class Constants extends AnnotatedClass {
     public static final double POSE_TOLERANCE = 0.01;
     public static final double ANGLE_OFFSET = -(3.0/2)*Math.PI;
     public static final Constraints ARM_CONSTRAINTS = new Constraints(5, 2);
+    public static final double MAX_ANGLE = Units.degreesToRadians(20);
+    public static final double MIN_ANGLE = Units.degreesToRadians(-200);
   }
 
   public static final class ARM_PLOT {
