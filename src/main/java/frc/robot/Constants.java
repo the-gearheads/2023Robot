@@ -52,7 +52,7 @@ public class Constants extends AnnotatedClass {
     @NTPublish
     public static double VELOCITY = 2;
     public static final double POSE_TOLERANCE = 0.01;
-    public static final double ANGLE_OFFSET = Math.PI / 2;
+    public static final double ANGLE_OFFSET = -(3.0/2)*Math.PI;
     public static final Constraints ARM_CONSTRAINTS = new Constraints(5, 2);
   }
 
@@ -80,8 +80,9 @@ public class Constants extends AnnotatedClass {
 
   public static final class WRIST {
     public static final int WRIST_ID = 10;
-    public static final double[] WRIST_PID = {4, 0, 0};
-    public static final double[] WRIST_FF = {0.2, 0.5, 0};
+    public static final double[] WRIST_PID = {10, 0, 0};
+    public static final double[] WRIST_FF = {0, 0.5, 0};
+    public static final double ANGLE_OFFSET = -Math.PI;
   }
 
   public static final class GRABBER {

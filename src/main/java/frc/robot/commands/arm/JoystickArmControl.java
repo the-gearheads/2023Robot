@@ -35,13 +35,13 @@ public class JoystickArmControl extends CommandBase {
     SmartDashboard.putNumber("Arm Axis", axis);
     axis *= Math.abs(axis);
     double armvel = axis * Constants.ARM.VELOCITY;
-    arm.setGoal(armvel);
+    arm.setVelGoal(armvel);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    arm.setGoal(0);
+    arm.setVelGoal(0);
   }
 
   // Returns true when the command should end.

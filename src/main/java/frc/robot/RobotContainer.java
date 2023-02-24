@@ -167,11 +167,11 @@ public class RobotContainer {
 
     Controllers.operatorController.armGoTo1ndNode().onTrue(new SetArmPose(arm, ArmPose.LOW_NODE));
     Controllers.operatorController.armGoTo2ndNode().onTrue(new SetArmPose(arm, ArmPose.MID_NODE));
-    // Controllers.operatorController.armGoTo3ndNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
+    Controllers.operatorController.armGoTo3ndNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
     Controllers.operatorController.armGoTo3ndNode().onTrue(new InstantCommand(() -> {
       leds.setState(LedState.WHITE);
     }));
-    // Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
+    Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
     Controllers.operatorController.armGoToGroundPickUpNode().onTrue(new SetArmPose(arm, ArmPose.FLOOR));
     Controllers.operatorController.armGoToInsideRobotNode().onTrue(new SetArmPose(arm, ArmPose.INSIDE_ROBOT));
   }

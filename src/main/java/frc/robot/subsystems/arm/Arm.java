@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -17,16 +18,18 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ARM;
+import frc.robot.util.SendableArmFeedforward;
 
 public class Arm extends SubsystemBase {
   /** Creates a new arm. */
-  private double goal = 0;
+  private double poseGoal = 0;
+  private double velGoal = 0;
   protected CANSparkMax motor = new CANSparkMax(ARM.ARM_ID, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
   private ProfiledPIDController pid =
       new ProfiledPIDController(ARM.ARM_POS_PID[0], ARM.ARM_POS_PID[1], ARM.ARM_POS_PID[2], ARM.ARM_CONSTRAINTS);
   private PIDController velPid = new PIDController(ARM.ARM_VEL_PID[0], ARM.ARM_VEL_PID[1], ARM.ARM_VEL_PID[2]);
-  private ArmFeedforward ff = new ArmFeedforward(ARM.ARM_FF[0], ARM.ARM_FF[1], ARM.ARM_FF[2]);
+  private SendableArmFeedforward ff = new SendableArmFeedforward(ARM.ARM_FF[0], ARM.ARM_FF[1], ARM.ARM_FF[2]);
 
   public enum ArmControlMode {
     VEL, POS;
@@ -41,40 +44,47 @@ public class Arm extends SubsystemBase {
     controlMode = ArmControlMode.VEL;
     configure();
 
-    SmartDashboard.putNumber("arm ks", 0.1);
-    SmartDashboard.putNumber("arm kg", 0.5);
-    SmartDashboard.putNumber("arm kv", 2);
-
-    SmartDashboard.putData("arm pPid", pid);
-    SmartDashboard.putData("arm vPid", velPid);
+    SmartDashboard.putData("arm/pPid", pid);
+    SmartDashboard.putData("arm/vPid", velPid);
+    SmartDashboard.putData("arm/ff", ff);
+    setPoseGoal(getPosition());
+    pid.reset(getPosition(), getVelocity());
   }
 
   public void setControlMode(ArmControlMode mode) {
-    pid.reset(getPosition(), getVelocity());
+    // pid.reset(getPosition(), getVelocity());
     velPid.reset();
-    /* A velocity goal carrying over to a position goal (or vice versa) would be bad */
-    setGoal(0);
     controlMode = mode;
   }
 
-  public double getGoal() {
-    return goal;
+  public double getPoseGoal() {
+    return poseGoal;
   }
 
-  public void setGoal(double newGoal) {
-    goal = newGoal;
+  public void setPoseGoal(double newGoal) {
+    poseGoal = newGoal;
+  }
+
+  public double getVelGoal() {
+    return velGoal;
+  }
+
+  public void setVelGoal(double newGoal) {
+    velGoal = newGoal;
   }
 
   // [Possibly a] HACK: Manually wrap absolute encoder position if dP > 2 as there are no apis to do this for us
   public double getPosition() {
     var nakedEncoderOutput = encoder.getPosition();
-    if (nakedEncoderOutput - lastNakedEncoderOutput > 2) {
-      iHateThis -= Math.PI * 2;
-    } else if (nakedEncoderOutput - lastNakedEncoderOutput < -2) {
-      iHateThis += Math.PI * 2;
-    }
-    lastNakedEncoderOutput = nakedEncoderOutput;
-    return nakedEncoderOutput - ARM.ANGLE_OFFSET + iHateThis;
+    // if (nakedEncoderOutput - lastNakedEncoderOutput > 2) {
+    //   iHateThis -= Math.PI * 2;
+    // } else if (nakedEncoderOutput - lastNakedEncoderOutput < -2) {
+    //   iHateThis += Math.PI * 2;
+    // }
+    // lastNakedEncoderOutput = nakedEncoderOutput;
+    // return nakedEncoderOutput - ARM.ANGLE_OFFSET + iHateThis;
+    return nakedEncoderOutput + ARM.ANGLE_OFFSET;
+    // return encoder.getPosition();
   }
 
   public double getVelocity() {
@@ -84,6 +94,7 @@ public class Arm extends SubsystemBase {
   private void configure() {
     motor.restoreFactoryDefaults();
     motor.setInverted(false);
+    encoder.setInverted(false);
     motor.setIdleMode(IdleMode.kBrake);
     encoder.setPositionConversionFactor(2 * Math.PI);
     encoder.setVelocityConversionFactor(2 * Math.PI);
@@ -107,35 +118,62 @@ public class Arm extends SubsystemBase {
 
   @Override
   public void periodic() {
-    double ks = SmartDashboard.getNumber("arm ks", 0);
-    double kg = SmartDashboard.getNumber("arm kg", 0);
-    double kv = SmartDashboard.getNumber("arm kv", 0);
-
-    ff = new ArmFeedforward(ks, kg, kv);
-
     var pose = getPosition();
     var vel = getVelocity();
 
+    SmartDashboard.putNumber("arm/pose", Units.radiansToDegrees(pose));
+    SmartDashboard.putNumber("arm/vel", vel);
+    SmartDashboard.putNumber("arm/posegoal", poseGoal);
+    SmartDashboard.putNumber("arm/velgoal", velGoal);
 
-    SmartDashboard.putNumber("Arm Pose", pose);
-    SmartDashboard.putNumber("arm vel", vel);
-    SmartDashboard.putNumber("Arm Goal", goal);
-    SmartDashboard.putBoolean("Arm Control Mode == POS", controlMode == ArmControlMode.POS);
-    if (controlMode == ArmControlMode.POS) {
-      double pidval = pid.calculate(pose, goal);
-      double ffval = ff.calculate(pid.getSetpoint().position, pid.getSetpoint().velocity); // ff wants 0 parallel to floor in pos x
-      setVoltage(ffval + pidval);
-      SmartDashboard.putNumber("arm ffval", ffval);
-      SmartDashboard.putNumber("pidval", pidval);
-    } else if (controlMode == ArmControlMode.VEL) {
-      if ((getPosition() > Units.degreesToRadians(0) && goal > 0)
-          || (getPosition() < -Units.degreesToRadians(180) && goal < 0)) {
-        setVoltage(0);
-        return;
-      }
-      double ffval = ff.calculate(pose, goal);
-      double pidval = velPid.calculate(vel, goal);
-      setVoltage(ffval + pidval);
+
+    if(controlMode == ArmControlMode.VEL && MathUtil.applyDeadband(velGoal, 0.1) != 0) {
+      // vel control
+      velControl();
+      SmartDashboard.putBoolean("arm/mode==POS", false);
+    } else {
+      // pos control
+      posControl();
+      SmartDashboard.putBoolean("arm/mode==POS", true);
     }
+  }
+
+  public void posControl(){
+    var pose = getPosition();
+    double pidval = pid.calculate(pose, poseGoal);
+    double ffval = ff.calculate(pid.getSetpoint().position, pid.getSetpoint().velocity); // ff wants 0 parallel to floor in pos x
+    setVoltage(ffval + pidval);
+
+    
+    SmartDashboard.putNumber("arm/ffval", ffval);
+    SmartDashboard.putNumber("arm/pidval", pidval);
+    SmartDashboard.putNumber("arm/setpoint", pid.getSetpoint().position);
+  }
+
+  public void velControl(){
+    var pose = getPosition();
+    var vel = getVelocity();
+
+    /* Don't let ourselves go outside [-180, 0]  */
+    if (((getPosition() > Units.degreesToRadians(20)) && velGoal < 0)
+    ||  ((getPosition() < -Units.degreesToRadians(200)) && velGoal < 0)) {
+      setVoltage(0);
+      return;
+    }
+
+    if((getPosition() + velGoal*0.02 > Units.degreesToRadians(20))){
+      velGoal = (0 - getPosition())/0.02;
+      velGoal=0;
+    }else if((getPosition() + velGoal*0.02 < -Units.degreesToRadians(200))){
+      velGoal = (-Math.PI - getPosition())/0.02;
+      velGoal=0;
+    }
+
+    double ffval = ff.calculate(pose, velGoal);
+    double pidval = velPid.calculate(vel, velGoal);
+    
+    setVoltage(ffval + pidval);
+    setPoseGoal(pose);
+    pid.reset(getPosition(), getVelocity());
   }
 }

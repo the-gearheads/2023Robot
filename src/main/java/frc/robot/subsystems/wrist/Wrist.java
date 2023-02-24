@@ -12,10 +12,12 @@ import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.WRIST;
 import frc.robot.subsystems.arm.Arm;
+import frc.robot.util.SendableArmFeedforward;
 
 public class Wrist extends SubsystemBase {
   /** Creates a new Wrist. */
@@ -23,7 +25,7 @@ public class Wrist extends SubsystemBase {
   private CANSparkMax motor = new CANSparkMax(WRIST.WRIST_ID, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
   private PIDController pid = new PIDController(WRIST.WRIST_PID[0], WRIST.WRIST_PID[1], WRIST.WRIST_PID[2]);
-  private ArmFeedforward ff = new ArmFeedforward(WRIST.WRIST_FF[0], WRIST.WRIST_FF[1], WRIST.WRIST_FF[2]);
+  private SendableArmFeedforward ff = new SendableArmFeedforward(WRIST.WRIST_FF[0], WRIST.WRIST_FF[1], WRIST.WRIST_FF[2]);
   private Arm arm;
   private double iHateThis;
   private double lastNakedEncoderOutput;
@@ -31,6 +33,10 @@ public class Wrist extends SubsystemBase {
   public Wrist(Arm arm) {
     this.arm = arm;
     configure();
+
+    SmartDashboard.putData("Wrist/ff", ff);
+    SmartDashboard.putData("Wrist/pid", pid);
+    SmartDashboard.putNumber("Wrist/set goal", 0);
   }
 
   public double getGoal() {
@@ -44,22 +50,23 @@ public class Wrist extends SubsystemBase {
   // [Possibly a] HACK: Manually wrap absolute encoder position if dP > 2 as there are no apis to do this for us
   public double getPosition() {
     var nakedEncoderOutput = encoder.getPosition();
-    if (nakedEncoderOutput - lastNakedEncoderOutput > 2) {
-      iHateThis -= Math.PI * 2;
-    } else if (nakedEncoderOutput - lastNakedEncoderOutput < -2) {
-      iHateThis += Math.PI * 2;
-    }
-    lastNakedEncoderOutput = nakedEncoderOutput;
-    return nakedEncoderOutput - Constants.ARM.ANGLE_OFFSET + iHateThis;
+    // if (nakedEncoderOutput - lastNakedEncoderOutput > 2) {
+    //   iHateThis -= Math.PI * 2;
+    // } else if (nakedEncoderOutput - lastNakedEncoderOutput < -2) {
+    //   iHateThis += Math.PI * 2;
+    // }
+    // lastNakedEncoderOutput = nakedEncoderOutput;
+    // return nakedEncoderOutput - Constants.ARM.ANGLE_OFFSET + iHateThis;
+    return nakedEncoderOutput + Constants.WRIST.ANGLE_OFFSET;
   }
 
   private void configure() {
     motor.restoreFactoryDefaults();
-    motor.setInverted(false);
+    motor.setInverted(true);
+    encoder.setInverted(true);
     motor.setIdleMode(IdleMode.kCoast);
     encoder.setPositionConversionFactor(2 * Math.PI);
     encoder.setVelocityConversionFactor(2 * Math.PI);
-    encoder.setZeroOffset(0);
 
     /* Status 0 governs applied output, faults, and whether is a follower. Not important for this. */
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
@@ -75,13 +82,14 @@ public class Wrist extends SubsystemBase {
   }
 
   public void setVoltage(double volts) {
-    motor.setVoltage(volts);
+    // motor.setVoltage(volts);
   }
 
   @Override
   public void periodic() {
-    updateGoal();
-
+    // updateGoal();
+    setGoal(SmartDashboard.getNumber("Wrist/set goal", 0));
+    SmartDashboard.putNumber("Wrist/pos", getPosition());
     double currentPose = getPosition();
     double pidval = pid.calculate(currentPose, goal);
     double ffval = ff.calculate(currentPose, 0);

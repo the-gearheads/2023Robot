@@ -16,7 +16,7 @@ public class SetArmPose extends CommandBase {
   private ArmPose armPose;
 
   public enum ArmPose {
-    FLOOR(-65), HIGH_NODE(0), MID_NODE(-40), LOW_NODE(-60), FEEDER_STATION(-190), INSIDE_ROBOT(-90);
+    FLOOR(-65), HIGH_NODE(0), MID_NODE(-40), LOW_NODE(-60), FEEDER_STATION(-180), INSIDE_ROBOT(-90);
 
     double val;
 
@@ -42,7 +42,7 @@ public class SetArmPose extends CommandBase {
   @Override
   public void initialize() {
     arm.setControlMode(ArmControlMode.POS);
-    arm.setGoal(armPose.val);
+    arm.setPoseGoal(armPose.val);
   }
 
   // Called once the command ends or is interrupted.
@@ -56,7 +56,7 @@ public class SetArmPose extends CommandBase {
       return true;
     }
 
-    double goal = arm.getGoal();
+    double goal = arm.getPoseGoal();
     double currentPose = arm.getPosition();
     double poseError = goal - currentPose;
     poseError = Math.abs(poseError);

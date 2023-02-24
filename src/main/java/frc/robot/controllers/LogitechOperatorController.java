@@ -18,27 +18,27 @@ public class LogitechOperatorController implements OperatorController {
   }
 
   public Trigger armGoTo1ndNode() {
-    return new JoystickButton(joy, 2);
-  }
-
-  public Trigger armGoTo2ndNode() {
     return new JoystickButton(joy, 1);
   }
 
+  public Trigger armGoTo2ndNode() {
+    return new JoystickButton(joy, 2);
+  }
+
   public Trigger armGoTo3ndNode() {
-    return new JoystickButton(joy, 10);
+    return new JoystickButton(joy, 3);
   }
 
   public Trigger armGoToFeederStationNode() {
-    return new JoystickButton(joy, 11);
-  }
-
-  public Trigger armGoToInsideRobotNode() {
     return new JoystickButton(joy, 4);
   }
 
+  public Trigger armGoToInsideRobotNode() {
+    return new JoystickButton(joy, 5);
+  }
+
   public Trigger armGoToGroundPickUpNode() {
-    return new JoystickButton(joy, 3);
+    return new JoystickButton(joy, 6);
   }
 
   public Trigger setArmByJoystick() {

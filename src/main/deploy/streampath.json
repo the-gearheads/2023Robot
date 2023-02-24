@@ -1,1 +1,1 @@
-{"pipeline": "udpsrc port=5010 ! application/x-rtp,clock-rate=90000,payload=96 ! rtph264depay ! avdec_h264 ! videoconvert", "x": 640, "y": 480}
+{"pipeline": "udpsrc port=1189 ! application/x-rtp,clock-rate=90000,payload=96 ! rtph264depay ! avdec_h264 ! videoconvert", "x": 1280, "y": 720}
