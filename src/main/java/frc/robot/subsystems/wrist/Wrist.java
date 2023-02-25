@@ -118,9 +118,11 @@ public class Wrist extends SubsystemBase {
     if(WristState.INSIDE_ROBOT.inRange(getArmPose())){
       if((Math.signum(volts) == Math.signum(getPose() - 90) && getPose() > -90)
       || (getPose() < -90 && volts > 0)){
+        Logger.getInstance().recordOutput("Wrist/AntiDestructionTriggered", true);
         return 0;
       }
     }
+    Logger.getInstance().recordOutput("Wrist/AntiDestructionTriggered", false);
     return volts;
   }
 }
