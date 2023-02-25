@@ -79,7 +79,7 @@ public class Wrist extends SubsystemBase {
     Logger.getInstance().recordOutput("Wrist/FFVal", ffval);
     Logger.getInstance().recordOutput("Wrist/Appliedvolts", pidval + ffval);
 
-    setVoltage(ffval + pidval);
+    setVoltage(applySoftLimit(ffval + pidval));
   }
 
   public void setGoalByType(WristStateType wristStateType) { // check what range the arm is in and set the wrist accordingly
