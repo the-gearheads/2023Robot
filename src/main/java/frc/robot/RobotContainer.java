@@ -27,7 +27,7 @@ import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.wrist.DefaultWristControl;
-import frc.robot.commands.wrist.SetWristAlternatePose;
+import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.AutonChooser;
@@ -173,7 +173,7 @@ public class RobotContainer {
     Controllers.operatorController.armGoToHighNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
     Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
     Controllers.operatorController.armGoToInsideRobotNode().onTrue(new SetArmPose(arm, ArmPose.INSIDE_ROBOT));
-    Controllers.operatorController.setWristAlternatePose().whileTrue(new SetWristAlternatePose(wrist));
+    Controllers.operatorController.setWristAlternatePose().whileTrue(new AltWristControl(wrist));
     Controllers.operatorController.openGrabber().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
   }
 
