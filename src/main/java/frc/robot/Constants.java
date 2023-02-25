@@ -73,7 +73,7 @@ public class Constants extends AnnotatedClass {
     public static final double[] ARM_FF = {0, 0.5, 3};
 
     @NTPublish
-    public static double VELOCITY = 10;
+    public static double VELOCITY = 50;
     public static final double POSE_TOLERANCE = 0.01;
     public static final double ANGLE_OFFSET = -270;
     public static final Constraints ARM_CONSTRAINTS = new Constraints(20, 10);
