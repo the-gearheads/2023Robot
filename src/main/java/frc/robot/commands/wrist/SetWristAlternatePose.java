@@ -26,7 +26,7 @@ public class SetWristAlternatePose extends CommandBase {
   public void initialize() {
     double armPos = arm.getPosition();
     for (WristState wristState : WristState.values()) {
-      if (wristState.inRange(armPos) && wristState.type==WristStateType.ALT) {
+      if (wristState.inRange(armPos) && wristState.type == WristStateType.ALT) {
         wrist.setGoal(wristState.getWristGoal(armPos));
         return;
       }

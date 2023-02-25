@@ -96,7 +96,7 @@ public class Wrist extends SubsystemBase {
   public void overrideGoal() { // check what range the arm is in and set the wrist accordingly
     double armPos = arm.getPosition();
     for (WristState wristState : WristState.values()) {
-      if (wristState.type==WristStateType.OVERRIDE && wristState.inRange(armPos)) {
+      if (wristState.type == WristStateType.OVERRIDE && wristState.inRange(armPos)) {
         setGoal(wristState.getWristGoal(armPos));
         return;
       }

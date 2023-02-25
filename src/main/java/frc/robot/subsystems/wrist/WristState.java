@@ -9,15 +9,14 @@ public enum WristState {
   //These values are ALL WRONG
   //arm 0 deg is positive x axis
 
-  FEEDER_STATION(Units.radiansToDegrees(ARM.MIN_ANGLE), Units.radiansToDegrees(-3.16), -90),
-  TRANSITION(Units.radiansToDegrees(-3.16), Units.radiansToDegrees(-2.47), 0),
-  INSIDE_ROBOT(-140, -70, 90, WristStateType.OVERRIDE),
-  RIGHT(-70, Units.radiansToDegrees(ARM.MAX_ANGLE), 90),
+  FEEDER_STATION(Units.radiansToDegrees(ARM.MIN_ANGLE), Units.radiansToDegrees(-3.16), -90), TRANSITION(
+      Units.radiansToDegrees(-3.16), Units.radiansToDegrees(-2.47),
+      0), INSIDE_ROBOT(-140, -70, 90, WristStateType.OVERRIDE), RIGHT(-70, Units.radiansToDegrees(ARM.MAX_ANGLE), 90),
 
-  GROUND_PICK_UP(-70, ArmPose.LOW_NODE.val+10, -90, WristStateType.ALT),
-  PLACE_ON_NODE(ArmPose.LOW_NODE.val+10, Units.radiansToDegrees(ARM.MAX_ANGLE), 0, WristStateType.ALT);
+  GROUND_PICK_UP(-70, ArmPose.LOW_NODE.val + 10, -90, WristStateType.ALT), PLACE_ON_NODE(ArmPose.LOW_NODE.val + 10,
+      Units.radiansToDegrees(ARM.MAX_ANGLE), 0, WristStateType.ALT);
 
-  public enum WristStateType{
+  public enum WristStateType {
     OVERRIDE, ALT, DEFAULT;
   }
 

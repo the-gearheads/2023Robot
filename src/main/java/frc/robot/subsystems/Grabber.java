@@ -34,7 +34,7 @@ public class Grabber extends SubsystemBase {
   public void open() {
     closeSolenoid.set(false);
     openSolenoid.set(true);
-    isClosed=false;
+    isClosed = false;
   }
 
   public boolean isClosed() {

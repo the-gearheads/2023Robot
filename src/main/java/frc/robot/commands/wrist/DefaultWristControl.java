@@ -31,7 +31,7 @@ public class DefaultWristControl extends CommandBase {
   public void execute() {
     double armPos = arm.getPosition();
     for (WristState wristState : WristState.values()) {
-      if (wristState.inRange(armPos) && wristState.type==WristStateType.DEFAULT) {
+      if (wristState.inRange(armPos) && wristState.type == WristStateType.DEFAULT) {
         wrist.setGoal(wristState.getWristGoal(armPos));
         return;
       }
