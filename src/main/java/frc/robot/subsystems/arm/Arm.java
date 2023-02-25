@@ -51,13 +51,16 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putData("arm/vPid", velPid);
     SmartDashboard.putData("arm/ff", ff);
     setPoseGoal(getPose());
-    pid.reset(getPose(), getVelocity());
+    resetPIDs();
   }
 
   public void setControlMode(ArmControlMode mode) {
-    // pid.reset(getPosition(), getVelocity());
-    velPid.reset();
     controlMode = mode;
+  }
+
+  public void resetPIDs() {
+    pid.reset(getPose(), getVelocity());
+    velPid.reset();
   }
 
   public double getPoseGoal() {
@@ -143,7 +146,8 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Vel/Error", velPid.getPositionError());
 
     setPoseGoal(pose);
-    pid.reset(getPose(), getVelocity());
+    // We do not care about I-terms for vPID
+    resetPIDs();
     return ffval + pidval;
   }
 
