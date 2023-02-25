@@ -119,7 +119,7 @@ public class RobotContainer {
 
     swerve.setDefaultCommand(new TeleopDrive(swerve));
     arm.setDefaultCommand(new JoystickArmControl(arm));
-    wrist.setDefaultCommand(new DefaultWristControl(wrist, arm));
+    wrist.setDefaultCommand(new DefaultWristControl(wrist));
     updateControllers();
   }
 
@@ -173,7 +173,7 @@ public class RobotContainer {
     Controllers.operatorController.armGoToHighNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
     Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
     Controllers.operatorController.armGoToInsideRobotNode().onTrue(new SetArmPose(arm, ArmPose.INSIDE_ROBOT));
-    Controllers.operatorController.setWristAlternatePose().whileTrue(new SetWristAlternatePose(wrist, arm));
+    Controllers.operatorController.setWristAlternatePose().whileTrue(new SetWristAlternatePose(wrist));
     Controllers.operatorController.openGrabber().whileTrue(new OpenGrabber(grabber));
   }
 

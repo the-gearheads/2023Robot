@@ -12,12 +12,10 @@ import frc.robot.subsystems.wrist.Wrist;
 
 public class DefaultWristControl extends CommandBase {
   private Wrist wrist;
-  private Arm arm;
 
   /** Creates a new DefaultWristControl. */
-  public DefaultWristControl(Wrist wrist, Arm arm) {
+  public DefaultWristControl(Wrist wrist) {
     this.wrist = wrist;
-    this.arm = arm;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(wrist);
   }
@@ -29,13 +27,7 @@ public class DefaultWristControl extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double armPos = arm.getPosition();
-    for (WristState wristState : WristState.values()) {
-      if (wristState.inRange(armPos) && wristState.type == WristStateType.DEFAULT) {
-        wrist.setGoal(wristState.getWristGoal(armPos));
-        return;
-      }
-    }
+    wrist.setGoalByType(WristStateType.DEFAULT);
   }
 
   // Called once the command ends or is interrupted.

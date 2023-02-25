@@ -39,7 +39,7 @@ public class ArmSim extends Arm {
   }
 
   @Override
-  public double getPosition() {
+  public double getPose() {
     return m_armSim.getAngleRads();
   }
 

@@ -46,8 +46,44 @@ public class Wrist extends SubsystemBase {
     goal = newGoal;
   }
 
-  public double getPosition() {
+  public double getPose() {
     return encoder.getPosition() + Constants.WRIST.ANGLE_OFFSET;
+  }
+
+  //In case a wrist command needs to access arm pose (don't want to give it entire arm subsystem)
+  public double getArmPose(){
+    return arm.getPose();
+  }
+
+  public void setVoltage(double volts) {
+    motor.setVoltage(volts);
+  }
+
+  @Override
+  public void periodic() {
+    setGoalByType(WristStateType.OVERRIDE);
+    double currentPose = getPose();
+
+    double pidval = pid.calculate(currentPose, goal);
+    double ffval = ff.calculate(currentPose, 0);
+
+    Logger.getInstance().recordOutput("Wrist/Pose", currentPose);
+    Logger.getInstance().recordOutput("Wrist/Vel", encoder.getVelocity());
+    Logger.getInstance().recordOutput("Wrist/PIDVal", pidval);
+    Logger.getInstance().recordOutput("Wrist/FFVal", ffval);
+    Logger.getInstance().recordOutput("Wrist/Appliedvolts", pidval + ffval);
+
+    setVoltage(ffval + pidval);
+  }
+
+  public void setGoalByType(WristStateType wristStateType) { // check what range the arm is in and set the wrist accordingly
+    double armPos = arm.getPose();
+    for (WristState wristState : WristState.values()) {
+      if (wristState.type == wristStateType && wristState.inRange(armPos)) {
+        setGoal(wristState.getWristGoal(armPos));
+        return;
+      }
+    }
   }
 
   private void configure() {
@@ -69,37 +105,5 @@ public class Wrist extends SubsystemBase {
     /* Have a duty cycle encoder */
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
-  }
-
-  // TODO: temp
-  public void setVoltage(double volts) {
-    motor.setVoltage(volts);
-  }
-
-  @Override
-  public void periodic() {
-    overrideGoal();
-    double currentPose = getPosition();
-
-    double pidval = pid.calculate(currentPose, goal);
-    double ffval = ff.calculate(currentPose, 0);
-
-    Logger.getInstance().recordOutput("Wrist/Pose", currentPose);
-    Logger.getInstance().recordOutput("Wrist/Vel", encoder.getVelocity());
-    Logger.getInstance().recordOutput("Wrist/PIDVal", pidval);
-    Logger.getInstance().recordOutput("Wrist/FFVal", ffval);
-    Logger.getInstance().recordOutput("Wrist/Appliedvolts", pidval + ffval);
-
-    setVoltage(ffval + pidval);
-  }
-
-  public void overrideGoal() { // check what range the arm is in and set the wrist accordingly
-    double armPos = arm.getPosition();
-    for (WristState wristState : WristState.values()) {
-      if (wristState.type == WristStateType.OVERRIDE && wristState.inRange(armPos)) {
-        setGoal(wristState.getWristGoal(armPos));
-        return;
-      }
-    }
   }
 }

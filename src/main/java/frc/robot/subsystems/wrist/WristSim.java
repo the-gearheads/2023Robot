@@ -41,12 +41,12 @@ public class WristSim extends Wrist {
   }
 
   @Override
-  public double getPosition() {
+  public double getPose() {
     return sim.getAngleRads();
   }
 
   public void simulationPeriodic() {
-    double armPos = armSim.getPosition();
+    double armPos = armSim.getPose();
     double pivot_x = ARM_PLOT.ARM_PIVOT_X + (armSim.m_arm.getLength()) * Math.cos(armPos);
     double pivot_y = ARM_PLOT.ARM_PIVOT_Y + (armSim.m_arm.getLength()) * Math.sin(armPos);
     simPivot.setPosition(pivot_x, pivot_y);

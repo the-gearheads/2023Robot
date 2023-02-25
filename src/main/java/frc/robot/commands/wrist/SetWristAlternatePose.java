@@ -11,26 +11,18 @@ import frc.robot.subsystems.wrist.WristState;
 import frc.robot.subsystems.wrist.WristState.WristStateType;
 
 public class SetWristAlternatePose extends CommandBase {
-  private Arm arm;
   private Wrist wrist;
 
   /** Creates a new SetWristAlternatePose. */
-  public SetWristAlternatePose(Wrist wrist, Arm arm) {
+  public SetWristAlternatePose(Wrist wrist) {
     this.wrist = wrist;
-    this.arm = arm;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    double armPos = arm.getPosition();
-    for (WristState wristState : WristState.values()) {
-      if (wristState.inRange(armPos) && wristState.type == WristStateType.ALT) {
-        wrist.setGoal(wristState.getWristGoal(armPos));
-        return;
-      }
-    }
+    wrist.setGoalByType(WristStateType.ALT);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
