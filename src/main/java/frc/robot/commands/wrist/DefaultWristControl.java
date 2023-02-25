@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.wrist.WristState;
-import frc.robot.subsystems.wrist.WristState.TheStateOfTheStateOfTheWrist;
+import frc.robot.subsystems.wrist.WristState.WristStateType;
 import frc.robot.subsystems.wrist.Wrist;
 
 public class DefaultWristControl extends CommandBase {
@@ -32,7 +32,7 @@ public class DefaultWristControl extends CommandBase {
   public void execute() {
     double armPos = arm.getPosition();
     for (WristState wristState : WristState.values()) {
-      if (wristState.inRange(armPos) && wristState.type!=TheStateOfTheStateOfTheWrist.ALT) {
+      if (wristState.inRange(armPos) && wristState.type==WristStateType.DEFAULT) {
         wrist.setGoal(wristState.getWristGoal(armPos));
         return;
       }

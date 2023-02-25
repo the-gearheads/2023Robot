@@ -18,7 +18,7 @@ public class SetArmPose extends CommandBase {
   public enum ArmPose {
     FLOOR(-65), HIGH_NODE(4.58), MID_NODE(-15.46), LOW_NODE(-61.87), FEEDER_STATION(-183.5), INSIDE_ROBOT(-115.7);
 
-    double val;
+    public double val;
 
     private ArmPose(double val) {
       this.val = Units.degreesToRadians(val);

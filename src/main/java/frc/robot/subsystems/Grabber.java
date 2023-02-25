@@ -38,13 +38,6 @@ public class Grabber extends SubsystemBase {
   public void open() {
     closeSolenoid.set(false);
     openSolenoid.set(true);
-    // CommandScheduler.getInstance().schedule(new SequentialCommandGroup(
-    //   new WaitCommand(0.1), 
-    //   new InstantCommand(()->{
-    //     openSolenoid.set(false);
-    //     grabberClosed = false;
-    //   })
-    // ));
     isClosed=false;
   }
 

@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.WRIST;
 import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.wrist.WristState.TheStateOfTheStateOfTheWrist;
+import frc.robot.subsystems.wrist.WristState.WristStateType;
 import frc.robot.util.SendableArmFeedforward;
 
 public class Wrist extends SubsystemBase {
@@ -96,7 +96,7 @@ public class Wrist extends SubsystemBase {
   public void overrideGoal() { // check what range the arm is in and set the wrist accordingly
     double armPos = arm.getPosition();
     for (WristState wristState : WristState.values()) {
-      if (wristState.type==TheStateOfTheStateOfTheWrist.OVERRIDE && wristState.inRange(armPos)) {
+      if (wristState.type==WristStateType.OVERRIDE && wristState.inRange(armPos)) {
         setGoal(wristState.getWristGoal(armPos));
         return;
       }

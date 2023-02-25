@@ -11,7 +11,7 @@ import frc.robot.Constants.ARM;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristState;
-import frc.robot.subsystems.wrist.WristState.TheStateOfTheStateOfTheWrist;
+import frc.robot.subsystems.wrist.WristState.WristStateType;
 
 public class SetWristAlternatePose extends CommandBase {
   private Arm arm;
@@ -29,7 +29,7 @@ public class SetWristAlternatePose extends CommandBase {
   public void initialize() {
     double armPos = arm.getPosition();
     for (WristState wristState : WristState.values()) {
-      if (wristState.inRange(armPos) && wristState.type==TheStateOfTheStateOfTheWrist.ALT) {
+      if (wristState.inRange(armPos) && wristState.type==WristStateType.ALT) {
         wrist.setGoal(wristState.getWristGoal(armPos));
         return;
       }
