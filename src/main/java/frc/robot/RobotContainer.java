@@ -26,6 +26,10 @@ import frc.robot.commands.arm.JoystickArmControl;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.TeleopDrive;
+import frc.robot.commands.grabber.OpenGrabber;
+import frc.robot.commands.wrist.DebugWristControl;
+import frc.robot.commands.wrist.DefaultWristControl;
+import frc.robot.commands.wrist.SetWristAlternatePose;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.AutonChooser;
@@ -117,6 +121,7 @@ public class RobotContainer {
 
     swerve.setDefaultCommand(new TeleopDrive(swerve));
     arm.setDefaultCommand(new JoystickArmControl(arm));
+    wrist.setDefaultCommand(new DefaultWristControl(wrist, arm));
     updateControllers();
   }
 
@@ -165,15 +170,13 @@ public class RobotContainer {
       swerve.setPose(new Pose2d(3, 0.38, Rotation2d.fromDegrees(90)));
     }));
 
-    Controllers.operatorController.armGoTo1ndNode().onTrue(new SetArmPose(arm, ArmPose.LOW_NODE));
-    Controllers.operatorController.armGoTo2ndNode().onTrue(new SetArmPose(arm, ArmPose.MID_NODE));
-    Controllers.operatorController.armGoTo3ndNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
-    Controllers.operatorController.armGoTo3ndNode().onTrue(new InstantCommand(() -> {
-      leds.setState(LedState.WHITE);
-    }));
+    Controllers.operatorController.armGoToLowNode().onTrue(new SetArmPose(arm, ArmPose.LOW_NODE));
+    Controllers.operatorController.armGoToMidNode().onTrue(new SetArmPose(arm, ArmPose.MID_NODE));
+    Controllers.operatorController.armGoToHighNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
     Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
-    Controllers.operatorController.armGoToGroundPickUpNode().onTrue(new SetArmPose(arm, ArmPose.FLOOR));
     Controllers.operatorController.armGoToInsideRobotNode().onTrue(new SetArmPose(arm, ArmPose.INSIDE_ROBOT));
+    Controllers.operatorController.setWristAlternatePose().whileTrue(new SetWristAlternatePose(wrist, arm));
+    Controllers.operatorController.openGrabber().whileTrue(new OpenGrabber(grabber));
   }
 
   /**

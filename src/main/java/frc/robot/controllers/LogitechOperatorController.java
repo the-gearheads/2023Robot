@@ -17,28 +17,36 @@ public class LogitechOperatorController implements OperatorController {
     return -Controllers.deadband(joy.getY());
   }
 
-  public Trigger armGoTo1ndNode() {
-    return new JoystickButton(joy, 1);
-  }
-
-  public Trigger armGoTo2ndNode() {
-    return new JoystickButton(joy, 2);
-  }
-
-  public Trigger armGoTo3ndNode() {
-    return new JoystickButton(joy, 3);
-  }
-
-  public Trigger armGoToFeederStationNode() {
+  public Trigger armGoToLowNode() {
     return new JoystickButton(joy, 4);
   }
 
-  public Trigger armGoToInsideRobotNode() {
+  public Trigger armGoToMidNode() {
+    return new JoystickButton(joy, 3);
+  }
+
+  public Trigger armGoToHighNode() {
     return new JoystickButton(joy, 5);
+  }
+
+  public Trigger armGoToFeederStationNode() {
+    return new JoystickButton(joy, 7);
+  }
+
+  public Trigger armGoToInsideRobotNode() {
+    return new JoystickButton(joy, 6);
   }
 
   public Trigger armGoToGroundPickUpNode() {
     return new JoystickButton(joy, 6);
+  }
+
+  public Trigger setWristAlternatePose(){
+    return new JoystickButton(joy, 2);
+  }
+
+  public Trigger openGrabber(){
+    return new JoystickButton(joy, 1);
   }
 
   public Trigger setArmByJoystick() {

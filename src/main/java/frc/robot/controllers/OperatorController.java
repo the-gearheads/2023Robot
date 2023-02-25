@@ -7,15 +7,15 @@ public interface OperatorController {
     return 0.0;
   }
 
-  public default Trigger armGoTo1ndNode() {
+  public default Trigger armGoToLowNode() {
     return new Trigger(() -> false);
   }
 
-  public default Trigger armGoTo2ndNode() {
+  public default Trigger armGoToMidNode() {
     return new Trigger(() -> false);
   }
 
-  public default Trigger armGoTo3ndNode() {
+  public default Trigger armGoToHighNode() {
     return new Trigger(() -> false);
   }
 
@@ -32,6 +32,14 @@ public interface OperatorController {
   }
 
   public default Trigger setArmByJoystick() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger setWristAlternatePose(){
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger openGrabber(){
     return new Trigger(() -> false);
   }
 }

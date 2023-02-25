@@ -45,12 +45,12 @@ public class Constants extends AnnotatedClass {
 
   public static class ARM {
     public static final int ARM_ID = 9;
-    public static final double[] ARM_POS_PID = {1, 0, 0};
+    public static final double[] ARM_POS_PID = {3, 0, 0};
     public static final double[] ARM_VEL_PID = {0.5, 0, 0};
-    public static final double[] ARM_FF = {0.1, 0.5, 3};
+    public static final double[] ARM_FF = {0, 0.5, 3};
 
     @NTPublish
-    public static double VELOCITY = 2;
+    public static double VELOCITY = 1;
     public static final double POSE_TOLERANCE = 0.01;
     public static final double ANGLE_OFFSET = -(3.0 / 2) * Math.PI;
     public static final Constraints ARM_CONSTRAINTS = new Constraints(5, 2);

@@ -92,10 +92,10 @@ public class Arm extends SubsystemBase {
     encoder.setPositionConversionFactor(2 * Math.PI);
     encoder.setVelocityConversionFactor(2 * Math.PI);
 
-    motor.setSoftLimit(SoftLimitDirection.kForward, (float) ARM.MAX_ANGLE);
-    motor.setSoftLimit(SoftLimitDirection.kReverse, (float) ARM.MIN_ANGLE);
-    motor.enableSoftLimit(SoftLimitDirection.kForward, true);
-    motor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+    motor.setSoftLimit(SoftLimitDirection.kForward, (float) (ARM.MAX_ANGLE-ARM.ANGLE_OFFSET));
+    motor.setSoftLimit(SoftLimitDirection.kReverse, (float) (ARM.MIN_ANGLE-ARM.ANGLE_OFFSET));
+    motor.enableSoftLimit(SoftLimitDirection.kForward, false);
+    motor.enableSoftLimit(SoftLimitDirection.kReverse, false);
 
     /* Status 0 governs applied output, faults, and whether is a follower. Not important for this. */
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
@@ -111,6 +111,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void setVoltage(double volts) {
+    Logger.getInstance().recordOutput("Arm/Appliedvolts", volts);
     motor.setVoltage(volts);
   }
 
@@ -140,7 +141,7 @@ public class Arm extends SubsystemBase {
 
     Logger.getInstance().recordOutput("Arm/Pose/FFval", ffval);
     Logger.getInstance().recordOutput("Arm/Pose/PIDval", pidval);
-    Logger.getInstance().recordOutput("Arm/Appliedvolts", pidval + ffval);
+    Logger.getInstance().recordOutput("Arm/Pose/Error", pid.getPositionError());
 
     setVoltage(ffval + pidval);
   }
@@ -166,9 +167,10 @@ public class Arm extends SubsystemBase {
     double ffval = ff.calculate(pose, velGoal);
     double pidval = velPid.calculate(vel, velGoal);
 
-    Logger.getInstance().recordOutput("Arm/Pose/FFval", ffval);
-    Logger.getInstance().recordOutput("Arm/Pose/PIDval", pidval);
-    Logger.getInstance().recordOutput("Arm/Appliedvolts", pidval + ffval);
+    Logger.getInstance().recordOutput("Arm/Vel/FFval", ffval);
+    Logger.getInstance().recordOutput("Arm/Vel/PIDval", pidval);
+    Logger.getInstance().recordOutput("Arm/Vel/Error", velPid.getPositionError());
+
 
     setVoltage(ffval + pidval);
     setPoseGoal(pose);

@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.WRIST;
 import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.wrist.WristState.TheStateOfTheStateOfTheWrist;
 import frc.robot.util.SendableArmFeedforward;
 
 public class Wrist extends SubsystemBase {
@@ -35,7 +36,6 @@ public class Wrist extends SubsystemBase {
 
     SmartDashboard.putData("Wrist/ff", ff);
     SmartDashboard.putData("Wrist/pid", pid);
-    SmartDashboard.putNumber("Wrist/set goal", 0);
   }
 
   public double getGoal() {
@@ -73,16 +73,13 @@ public class Wrist extends SubsystemBase {
 
   // TODO: temp
   public void setVoltage(double volts) {
-    // motor.setVoltage(volts);
+    motor.setVoltage(volts);
   }
 
   @Override
   public void periodic() {
-    // updateGoal();
+    overrideGoal();
     double currentPose = getPosition();
-
-    setGoal(SmartDashboard.getNumber("Wrist/set goal", 0));
-    SmartDashboard.putNumber("Wrist/pos", currentPose);
 
     double pidval = pid.calculate(currentPose, goal);
     double ffval = ff.calculate(currentPose, 0);
@@ -96,10 +93,10 @@ public class Wrist extends SubsystemBase {
     setVoltage(ffval + pidval);
   }
 
-  public void updateGoal() { // check what range the arm is in and set the wrist accordingly
+  public void overrideGoal() { // check what range the arm is in and set the wrist accordingly
     double armPos = arm.getPosition();
     for (WristState wristState : WristState.values()) {
-      if (wristState.inRange(armPos)) {
+      if (wristState.type==TheStateOfTheStateOfTheWrist.OVERRIDE && wristState.inRange(armPos)) {
         setGoal(wristState.getWristGoal(armPos));
         return;
       }
