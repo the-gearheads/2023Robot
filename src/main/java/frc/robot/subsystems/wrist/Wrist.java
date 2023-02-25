@@ -113,9 +113,11 @@ public class Wrist extends SubsystemBase {
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
   }
 
+  /* Don't move towards the base of the robot if inside it (not good) */
   public double applySoftLimit(double volts){
     if(WristState.INSIDE_ROBOT.inRange(getArmPose())){
-      if(Math.signum(volts) == Math.signum(getPose() - 90)){
+      if((Math.signum(volts) == Math.signum(getPose() - 90) && getPose() > -90)
+      || (getPose() < -90 && volts > 0)){
         return 0;
       }
     }
