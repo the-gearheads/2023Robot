@@ -50,8 +50,9 @@ public enum WristState {
     this.min = Units.degreesToRadians(min);
     this.max = Units.degreesToRadians(max);
     this.getWristGoalLambda = getWristGoalLambda;
-    this.type=type;
+    this.type = type;
   }
+
   private WristState(double min, double max, Function<Double, Double> getWristGoalLambda) {
     this(min, max, getWristGoalLambda, WristStateType.DEFAULT);
   }
