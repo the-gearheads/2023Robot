@@ -64,7 +64,7 @@ public class ArmSim extends Arm {
   // to 255 degrees (rotated down in the back).
   private final SingleJointedArmSim m_armSim =
       new SingleJointedArmSim(m_armGearbox, m_armReduction, SingleJointedArmSim.estimateMOI(m_armLength, m_armMass),
-          m_armLength, Units.degreesToRadians(-1e10), Units.degreesToRadians(1e10), true, VecBuilder.fill(0.001) // Add noise with a std-dev of 1 tick
+          m_armLength, -1e10, 1e10, true, VecBuilder.fill(0.001) // Add noise with a std-dev of 1 tick
       );
 
   public final Mechanism2d m_mech2d = new Mechanism2d(ARM_PLOT.PLOT_WIDTH, ARM_PLOT.PLOT_HEIGHT);

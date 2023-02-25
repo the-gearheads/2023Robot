@@ -69,7 +69,7 @@ public class WristSim extends Wrist {
 
   private final SingleJointedArmSim sim = new SingleJointedArmSim(simMotor, ARM_PLOT.WRIST_REDUCTION,
       SingleJointedArmSim.estimateMOI(ARM_PLOT.WRIST_LENGTH, ARM_PLOT.WRIST_MASS), ARM_PLOT.WRIST_LENGTH,
-      Units.degreesToRadians(-1e10), Units.degreesToRadians(1e10), true, VecBuilder.fill(0.001) // Add noise with a std-dev of 1 tick
+      -1e10, 1e10, true, VecBuilder.fill(0.001) // Add noise with a std-dev of 1 tick
   );
 
   private final MechRootWrapper simPivot;

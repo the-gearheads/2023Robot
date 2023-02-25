@@ -45,17 +45,17 @@ public class Constants extends AnnotatedClass {
 
   public static class ARM {
     public static final int ARM_ID = 9;
-    public static final double[] ARM_POS_PID = {3, 0, 0};
-    public static final double[] ARM_VEL_PID = {0.5, 0, 0};
+    public static final double[] ARM_POS_PID = {0.05, 0, 0};
+    public static final double[] ARM_VEL_PID = {0.009, 0, 0};
     public static final double[] ARM_FF = {0, 0.5, 3};
 
     @NTPublish
-    public static double VELOCITY = 1;
+    public static double VELOCITY = 10;
     public static final double POSE_TOLERANCE = 0.01;
-    public static final double ANGLE_OFFSET = -(3.0 / 2) * Math.PI;
-    public static final Constraints ARM_CONSTRAINTS = new Constraints(5, 2);
-    public static final double MAX_ANGLE = Units.degreesToRadians(20);
-    public static final double MIN_ANGLE = Units.degreesToRadians(-200);
+    public static final double ANGLE_OFFSET = -270;
+    public static final Constraints ARM_CONSTRAINTS = new Constraints(20, 10);
+    public static final double MAX_ANGLE = 20;
+    public static final double MIN_ANGLE = -200;
   }
 
   public static final class ARM_PLOT {
@@ -84,7 +84,7 @@ public class Constants extends AnnotatedClass {
     public static final int WRIST_ID = 10;
     public static final double[] WRIST_PID = {10, 0, 0};
     public static final double[] WRIST_FF = {0, 0.5, 0};
-    public static final double ANGLE_OFFSET = -Math.PI;
+    public static final double ANGLE_OFFSET = -180;
   }
 
   public static final class GRABBER {

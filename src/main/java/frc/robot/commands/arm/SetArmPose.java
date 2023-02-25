@@ -21,7 +21,7 @@ public class SetArmPose extends CommandBase {
     public double val;
 
     private ArmPose(double val) {
-      this.val = Units.degreesToRadians(val);
+      this.val = val;
     }
 
   }

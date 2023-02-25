@@ -91,8 +91,8 @@ public class Wrist extends SubsystemBase {
     motor.setInverted(true);
     encoder.setInverted(true);
     motor.setIdleMode(IdleMode.kCoast);
-    encoder.setPositionConversionFactor(2 * Math.PI);
-    encoder.setVelocityConversionFactor(2 * Math.PI);
+    encoder.setPositionConversionFactor(360);
+    encoder.setVelocityConversionFactor(360);
 
     /* Status 0 governs applied output, faults, and whether is a follower. Not important for this. */
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);

@@ -156,8 +156,8 @@ public class Arm extends SubsystemBase {
     motor.setInverted(false);
     encoder.setInverted(false);
     motor.setIdleMode(IdleMode.kBrake);
-    encoder.setPositionConversionFactor(2 * Math.PI);
-    encoder.setVelocityConversionFactor(2 * Math.PI);
+    encoder.setPositionConversionFactor(360);
+    encoder.setVelocityConversionFactor(360);
 
     motor.setSoftLimit(SoftLimitDirection.kForward, (float) (ARM.MAX_ANGLE - ARM.ANGLE_OFFSET));
     motor.setSoftLimit(SoftLimitDirection.kReverse, (float) (ARM.MIN_ANGLE - ARM.ANGLE_OFFSET));
