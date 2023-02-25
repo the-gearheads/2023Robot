@@ -93,6 +93,7 @@ public class Arm extends SubsystemBase {
   public void periodic() {
     var pose = getPose();
     var vel = getVelocity();
+    var volts=0.0;
 
     Logger.getInstance().recordOutput("Arm/CurrentPose", pose);
     Logger.getInstance().recordOutput("Arm/CurrentVel", vel);
@@ -102,13 +103,16 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Pose/Setpoint", pid.getSetpoint().position);
 
     if (controlMode == ArmControlMode.VEL && MathUtil.applyDeadband(velGoal, 0.1) != 0) {
-      velControl();
+      volts=velControl();
     } else {
-      poseControl();
+      volts=poseControl();
     }
+
+    volts=applySoftLimit(volts);
+    setVoltage(volts);
   }
 
-  public void poseControl() {
+  public double poseControl() {
     var pose = getPose();
     double pidval = pid.calculate(pose, poseGoal);
     double ffval = ff.calculate(pid.getSetpoint().position, pid.getSetpoint().velocity); // ff wants 0 parallel to floor in pos x
@@ -117,24 +121,17 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Pose/PIDval", pidval);
     Logger.getInstance().recordOutput("Arm/Pose/Error", pid.getPositionError());
 
-    setVoltage(ffval + pidval);
+    return ffval + pidval;
   }
 
-  public void velControl() {
+  public double velControl() {
     var pose = getPose();
     var vel = getVelocity();
 
-    /* Don't let ourselves go outside [-180, 0]  */
-    if (((getPose() > ARM.MAX_ANGLE) && velGoal < 0) || ((getPose() < ARM.MIN_ANGLE) && velGoal < 0)) {
-      setVoltage(0);
-      return;
-    }
-
+    /* Prospective Soft Limit */
     if ((getPose() + velGoal * 0.02 > ARM.MAX_ANGLE)) {
-      velGoal = (0 - getPose()) / 0.02;
       velGoal = 0;
     } else if ((getPose() + velGoal * 0.02 < ARM.MIN_ANGLE)) {
-      velGoal = (-Math.PI - getPose()) / 0.02;
       velGoal = 0;
     }
 
@@ -145,10 +142,16 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Vel/PIDval", pidval);
     Logger.getInstance().recordOutput("Arm/Vel/Error", velPid.getPositionError());
 
-
-    setVoltage(ffval + pidval);
     setPoseGoal(pose);
     pid.reset(getPose(), getVelocity());
+    return ffval + pidval;
+  }
+
+  private double applySoftLimit(double volts){
+    if (((getPose() > ARM.MAX_ANGLE) && volts > 0) || ((getPose() < ARM.MIN_ANGLE) && volts < 0)) {
+      return 0;
+    }
+    return volts;
   }
 
   private void configure() {
@@ -159,6 +162,7 @@ public class Arm extends SubsystemBase {
     encoder.setPositionConversionFactor(360);
     encoder.setVelocityConversionFactor(360);
 
+    //currently useless
     motor.setSoftLimit(SoftLimitDirection.kForward, (float) (ARM.MAX_ANGLE - ARM.ANGLE_OFFSET));
     motor.setSoftLimit(SoftLimitDirection.kReverse, (float) (ARM.MIN_ANGLE - ARM.ANGLE_OFFSET));
     motor.enableSoftLimit(SoftLimitDirection.kForward, false);

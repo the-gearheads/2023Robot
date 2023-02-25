@@ -50,6 +50,10 @@ public class Wrist extends SubsystemBase {
     return encoder.getPosition() + Constants.WRIST.ANGLE_OFFSET;
   }
 
+  public double getVelocity(){
+    return encoder.getVelocity();
+  }
+
   //In case a wrist command needs to access arm pose (don't want to give it entire arm subsystem)
   public double getArmPose(){
     return arm.getPose();
@@ -68,7 +72,9 @@ public class Wrist extends SubsystemBase {
     double ffval = ff.calculate(currentPose, 0);
 
     Logger.getInstance().recordOutput("Wrist/Pose", currentPose);
-    Logger.getInstance().recordOutput("Wrist/Vel", encoder.getVelocity());
+    Logger.getInstance().recordOutput("Wrist/Vel", getVelocity());
+    Logger.getInstance().recordOutput("Wrist/Goal", goal);
+    Logger.getInstance().recordOutput("Wrist/Error", pid.getPositionError());
     Logger.getInstance().recordOutput("Wrist/PIDVal", pidval);
     Logger.getInstance().recordOutput("Wrist/FFVal", ffval);
     Logger.getInstance().recordOutput("Wrist/Appliedvolts", pidval + ffval);

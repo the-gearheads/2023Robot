@@ -26,7 +26,6 @@ import frc.robot.commands.arm.JoystickArmControl;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.TeleopDrive;
-import frc.robot.commands.grabber.OpenGrabber;
 import frc.robot.commands.wrist.DefaultWristControl;
 import frc.robot.commands.wrist.SetWristAlternatePose;
 import frc.robot.controllers.Controllers;
@@ -48,6 +47,7 @@ import frc.robot.subsystems.drive.gyro.GyroSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very little robot logic should actually be handled in
@@ -174,7 +174,7 @@ public class RobotContainer {
     Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
     Controllers.operatorController.armGoToInsideRobotNode().onTrue(new SetArmPose(arm, ArmPose.INSIDE_ROBOT));
     Controllers.operatorController.setWristAlternatePose().whileTrue(new SetWristAlternatePose(wrist));
-    Controllers.operatorController.openGrabber().whileTrue(new OpenGrabber(grabber));
+    Controllers.operatorController.openGrabber().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
   }
 
   /**
