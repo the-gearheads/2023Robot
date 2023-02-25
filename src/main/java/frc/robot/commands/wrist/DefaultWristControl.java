@@ -4,7 +4,6 @@
 
 package frc.robot.commands.wrist;
 
-import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.wrist.WristState;
@@ -17,8 +16,8 @@ public class DefaultWristControl extends CommandBase {
 
   /** Creates a new DefaultWristControl. */
   public DefaultWristControl(Wrist wrist, Arm arm) {
-    this.wrist=wrist;
-    this.arm=arm;
+    this.wrist = wrist;
+    this.arm = arm;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(wrist);
   }
@@ -32,7 +31,7 @@ public class DefaultWristControl extends CommandBase {
   public void execute() {
     double armPos = arm.getPosition();
     for (WristState wristState : WristState.values()) {
-      if (wristState.inRange(armPos) && wristState.type!=TheStateOfTheStateOfTheWrist.ALT) {
+      if (wristState.inRange(armPos) && wristState.type != TheStateOfTheStateOfTheWrist.ALT) {
         wrist.setGoal(wristState.getWristGoal(armPos));
         return;
       }

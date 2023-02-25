@@ -4,7 +4,6 @@
 
 package frc.robot.commands.wrist;
 
-import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.wrist.Wrist;
@@ -15,7 +14,7 @@ public class DebugWristControl extends CommandBase {
   /** Creates a new DebugWristControl. */
   public DebugWristControl(Wrist wrist) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.wrist=wrist;
+    this.wrist = wrist;
     addRequirements(wrist);
 
     SmartDashboard.putNumber("Wrist/set goal", 0);

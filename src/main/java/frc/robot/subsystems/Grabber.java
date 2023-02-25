@@ -10,11 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.GRABBER;
 
 public class Grabber extends SubsystemBase {
@@ -32,7 +28,7 @@ public class Grabber extends SubsystemBase {
   public void close() {
     openSolenoid.set(false);
     closeSolenoid.set(true);
-    isClosed=true;
+    isClosed = true;
   }
 
   public void open() {
@@ -45,7 +41,7 @@ public class Grabber extends SubsystemBase {
     //     grabberClosed = false;
     //   })
     // ));
-    isClosed=false;
+    isClosed = false;
   }
 
   public boolean isClosed() {

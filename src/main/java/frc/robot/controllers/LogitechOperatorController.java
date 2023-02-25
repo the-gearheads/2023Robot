@@ -41,11 +41,11 @@ public class LogitechOperatorController implements OperatorController {
     return new JoystickButton(joy, 6);
   }
 
-  public Trigger setWristAlternatePose(){
+  public Trigger setWristAlternatePose() {
     return new JoystickButton(joy, 2);
   }
 
-  public Trigger openGrabber(){
+  public Trigger openGrabber() {
     return new JoystickButton(joy, 1);
   }
 

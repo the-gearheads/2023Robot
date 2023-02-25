@@ -35,11 +35,11 @@ public interface OperatorController {
     return new Trigger(() -> false);
   }
 
-  public default Trigger setWristAlternatePose(){
+  public default Trigger setWristAlternatePose() {
     return new Trigger(() -> false);
   }
 
-  public default Trigger openGrabber(){
+  public default Trigger openGrabber() {
     return new Trigger(() -> false);
   }
 }
