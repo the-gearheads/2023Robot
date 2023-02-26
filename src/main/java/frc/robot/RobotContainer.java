@@ -113,7 +113,7 @@ public class RobotContainer {
 
     grabber = new Grabber();
     vision = new Vision(swerve);
-    autonChooser = new AutonChooser(swerve);
+    autonChooser = new AutonChooser(swerve, arm, wrist, grabber);
     leds = new Leds();
     // Configure the button binding
 

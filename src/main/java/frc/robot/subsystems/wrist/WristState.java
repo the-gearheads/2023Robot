@@ -9,13 +9,13 @@ public enum WristState {
   //These values are ALL WRONG
   //arm 0 deg is positive x axis
   // format:off
-  FEEDER_STATION(ARM.MIN_ANGLE, -181, -90), 
-  TRANSITION(-181, -140,0),
+  FEEDER_STATION(ARM.MIN_ANGLE, -170, -90), 
+  TRANSITION(-170, -140,0),
   INSIDE_ROBOT(-140, -70, 90, WristStateType.OVERRIDE), 
   RIGHT(-70, ARM.MAX_ANGLE, 90),
 
-  GROUND_PICK_UP(-70, ArmPose.LOW_NODE.val + 10, -90, WristStateType.ALT), 
-  PLACE_ON_NODE(ArmPose.LOW_NODE.val + 10, ARM.MAX_ANGLE, 0, WristStateType.ALT);
+  GROUND_PICK_UP(-66, -50, -90, WristStateType.ALT), 
+  PLACE_ON_NODE(-50, ARM.MAX_ANGLE, 0, WristStateType.ALT);
   // format:on
 
   public enum WristStateType {

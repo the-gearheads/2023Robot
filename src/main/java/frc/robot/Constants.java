@@ -74,9 +74,9 @@ public class Constants extends AnnotatedClass {
 
     @NTPublish
     public static double VELOCITY = 50;
-    public static final double POSE_TOLERANCE = 0.01;
+    public static final double POSE_TOLERANCE = 5;
     public static final double ANGLE_OFFSET = -270;
-    public static final Constraints ARM_CONSTRAINTS = new Constraints(20, 10);
+    public static final Constraints ARM_CONSTRAINTS = new Constraints(120, 150);
     public static final double MAX_ANGLE = 10;
     public static final double MIN_ANGLE = -190;
   }
@@ -142,9 +142,9 @@ public class Constants extends AnnotatedClass {
         new Translation2d(Units.inchesToMeters(-12.25), Units.inchesToMeters(-13.25));
 
     @NTPublish
-    public static double MAX_LIN_VEL = 2;//set to 2
+    public static double MAX_LIN_VEL = 4;//set to 2
     @NTPublish
-    public static double MAX_ROT_VEL = 1;
+    public static double MAX_ROT_VEL = 2.5;
 
     @NTPublish
     public static double MAX_MODULE_SPEED = 5;

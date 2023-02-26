@@ -60,17 +60,6 @@ public class Swerve extends SubsystemBase {
   /** Creates a new SwerveSubsystem. */
   public Swerve(GyroIO gyro, SwerveModuleIO... modules) {
     this.gyro = gyro;
-    switch (Constants.getMode()) {
-      case REAL:
-        this.gyro = new Gyro(SPI.Port.kMXP, true);
-        break;
-      case SIM:
-        this.gyro = new GyroSim();
-        break;
-      case SIM_REPLAY:
-        this.gyro = new GyroIO() {};
-        break;
-    }
 
     this.modules = modules;
     /* Get module states to pass to odometry */
@@ -275,6 +264,7 @@ public class Swerve extends SubsystemBase {
     lastInputs = inputs;
 
     GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+    gyro.updateInputs(gyroInputs);
     Logger.getInstance().processInputs("Gyro", gyroInputs);
     lastGyroInputs = gyroInputs;
   }
