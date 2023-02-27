@@ -118,5 +118,9 @@ public class AutonChooser {
     //Forward 1 Meter
     Command debugForward = AutonPaths.getCommandForPath("Debug_Forward", true, AUTON.SLOW_CONSTRAINTS, swerve);
     autons.put("Debug Forward", debugForward);
+
+    Subsystems s = new Subsystems(swerve, wrist, arm, grabber);
+    Command testPath = AutonPaths.getTestPlacePath(s);
+    autons.put("Test place path", testPath);
   }
 }

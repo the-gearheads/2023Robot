@@ -19,4 +19,12 @@ public class Subsystems {
     this.vision = vision;
     this.grabber = grabber;
   }
+
+  public Subsystems(Swerve swerve, Wrist wrist, Arm arm, Grabber grabber) {
+    this.swerve = swerve;
+    this.wrist = wrist;
+    this.arm = arm;
+    this.vision = null;
+    this.grabber = grabber;
+  }
 }
