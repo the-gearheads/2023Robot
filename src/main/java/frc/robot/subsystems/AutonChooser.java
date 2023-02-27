@@ -2,9 +2,6 @@ package frc.robot.subsystems;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -83,7 +80,8 @@ public class AutonChooser {
   public void initializeAutons() {//Here we define auton choices
     //Left Most Cone Node -> Left Most Game Piece -> Left Most Cone Node -> Charging Station 
     Command leftSide2ConesChargingStation = new SetArmPose(arm, ArmPose.HIGH_NODE)
-        .andThen(AutonPaths.getCommandForPath("Inert_To_Start", true, AUTON.SLOW_CONSTRAINTS, swerve)).andThen(new AltWristControl(wrist)
+        .andThen(AutonPaths.getCommandForPath("Inert_To_Start", true, AUTON.SLOW_CONSTRAINTS, swerve))
+        .andThen(new AltWristControl(wrist)
             .raceWith(new WaitCommand(0.5).andThen(new InstantCommand(grabber::open).andThen(new WaitCommand(0.25)))));
     // .andThen(
     // new InstantCommand(()->{
