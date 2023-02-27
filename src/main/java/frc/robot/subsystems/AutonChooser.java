@@ -19,7 +19,6 @@ import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.wrist.Wrist;
-import frc.robot.subsystems.wrist.WristState;
 
 public class AutonChooser {
   private HashMap<String, Command> autons;
@@ -32,9 +31,9 @@ public class AutonChooser {
 
   public AutonChooser(Swerve swerve, Arm arm, Wrist wrist, Grabber grabber) {
     this.swerve = swerve;
-    this.arm=arm;
-    this.wrist=wrist;
-    this.grabber =grabber;
+    this.arm = arm;
+    this.wrist = wrist;
+    this.grabber = grabber;
     this.chooser = new SendableChooser<>();
     this.autons = new HashMap<>();
 
@@ -82,40 +81,37 @@ public class AutonChooser {
 
   public void initializeAutons() {//Here we define auton choices
     //Left Most Cone Node -> Left Most Game Piece -> Left Most Cone Node -> Charging Station 
-    Command leftSide2ConesChargingStation = 
-        new SetArmPose(arm, ArmPose.HIGH_NODE)
-        .andThen(getCommandForPath("Inert_To_Start", true, AUTON.SLOW_CONSTRAINTS))
-        .andThen(new AltWristControl(wrist)
-          .raceWith(new WaitCommand(0.5)
-            .andThen(new InstantCommand(grabber::open).andThen(new WaitCommand(0.25)))));
-        // .andThen(
-        // new InstantCommand(()->{
-        //   SmartDashboard.putNumber("Auton Status", 0);
-        // })).andThen(
-        // getCommandForPath("Start_To_Game_Piece_1", false, AUTON.SLOW_CONSTRAINTS)
-        //   .alongWith(new SetArmPose(arm, ArmPose.LOW_NODE)))
-        // .andThen(new InstantCommand(()->{
-        //   SmartDashboard.putNumber("Auton Status", 1);
-        // }))
-        // .andThen(new InstantCommand(grabber::open))
-        // .andThen(new InstantCommand(()->{
-        //   SmartDashboard.putNumber("Auton Status", 2);
-        // }))
-        // .andThen(new AltWristControl(wrist)
-        //   .raceWith(new WaitCommand(0.5)
-        //     .andThen(new InstantCommand(grabber::close))))
-        // .andThen(new InstantCommand(()->{
-        //   SmartDashboard.putNumber("Auton Status", 3);
-        // }))
-        // .andThen(getCommandForPath("Game_Piece_1_To_Start", false, AUTON.SLOW_CONSTRAINTS)
-        //   .alongWith(new SetArmPose(arm, ArmPose.HIGH_NODE)))
-        // .andThen(new InstantCommand(()->{
-        //   SmartDashboard.putNumber("Auton Status", 6);
-        // }));
-        // .andThen(getCommandForPath("Start_To_Charging_Station", false, AUTON.SLOW_CONSTRAINTS))
-        // .andThen(new InstantCommand(() -> {
-          // swerve.setX();
-        // }));
+    Command leftSide2ConesChargingStation = new SetArmPose(arm, ArmPose.HIGH_NODE)
+        .andThen(getCommandForPath("Inert_To_Start", true, AUTON.SLOW_CONSTRAINTS)).andThen(new AltWristControl(wrist)
+            .raceWith(new WaitCommand(0.5).andThen(new InstantCommand(grabber::open).andThen(new WaitCommand(0.25)))));
+    // .andThen(
+    // new InstantCommand(()->{
+    //   SmartDashboard.putNumber("Auton Status", 0);
+    // })).andThen(
+    // getCommandForPath("Start_To_Game_Piece_1", false, AUTON.SLOW_CONSTRAINTS)
+    //   .alongWith(new SetArmPose(arm, ArmPose.LOW_NODE)))
+    // .andThen(new InstantCommand(()->{
+    //   SmartDashboard.putNumber("Auton Status", 1);
+    // }))
+    // .andThen(new InstantCommand(grabber::open))
+    // .andThen(new InstantCommand(()->{
+    //   SmartDashboard.putNumber("Auton Status", 2);
+    // }))
+    // .andThen(new AltWristControl(wrist)
+    //   .raceWith(new WaitCommand(0.5)
+    //     .andThen(new InstantCommand(grabber::close))))
+    // .andThen(new InstantCommand(()->{
+    //   SmartDashboard.putNumber("Auton Status", 3);
+    // }))
+    // .andThen(getCommandForPath("Game_Piece_1_To_Start", false, AUTON.SLOW_CONSTRAINTS)
+    //   .alongWith(new SetArmPose(arm, ArmPose.HIGH_NODE)))
+    // .andThen(new InstantCommand(()->{
+    //   SmartDashboard.putNumber("Auton Status", 6);
+    // }));
+    // .andThen(getCommandForPath("Start_To_Charging_Station", false, AUTON.SLOW_CONSTRAINTS))
+    // .andThen(new InstantCommand(() -> {
+    // swerve.setX();
+    // }));
     autons.put("Left, 2 Cones, Charging Station", leftSide2ConesChargingStation);
 
     //Forward 1 Meter

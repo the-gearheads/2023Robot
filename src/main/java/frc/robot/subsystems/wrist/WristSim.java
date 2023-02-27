@@ -12,7 +12,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants.MECH_PLOT;
@@ -45,7 +44,7 @@ public class WristSim extends Wrist {
     return Units.radiansToDegrees(sim.getAngleRads());
   }
 
-  public double getVelocity(){
+  public double getVelocity() {
     return Units.radiansToDegrees(sim.getVelocityRadPerSec());
   }
 
@@ -71,8 +70,8 @@ public class WristSim extends Wrist {
   private final DCMotor simMotor = DCMotor.getNEO(1);
 
   private final SingleJointedArmSim sim = new SingleJointedArmSim(simMotor, MECH_PLOT.WRIST_REDUCTION,
-      SingleJointedArmSim.estimateMOI(MECH_PLOT.WRIST_LENGTH, MECH_PLOT.WRIST_MASS), MECH_PLOT.WRIST_LENGTH,
-      -1e10, 1e10, true, VecBuilder.fill(0.001) // Add noise with a std-dev of 1 tick
+      SingleJointedArmSim.estimateMOI(MECH_PLOT.WRIST_LENGTH, MECH_PLOT.WRIST_MASS), MECH_PLOT.WRIST_LENGTH, -1e10,
+      1e10, true, VecBuilder.fill(0.001) // Add noise with a std-dev of 1 tick
   );
 
   private final MechRootWrapper simPivot;

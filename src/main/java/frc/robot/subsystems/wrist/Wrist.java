@@ -50,12 +50,12 @@ public class Wrist extends SubsystemBase {
     return encoder.getPosition() + Constants.WRIST.ANGLE_OFFSET;
   }
 
-  public double getVelocity(){
+  public double getVelocity() {
     return encoder.getVelocity();
   }
 
   //In case a wrist command needs to access arm pose (don't want to give it entire arm subsystem)
-  public double getArmPose(){
+  public double getArmPose() {
     return arm.getPose();
   }
 
@@ -114,10 +114,9 @@ public class Wrist extends SubsystemBase {
   }
 
   /* Don't move towards the base of the robot if inside it (not good) */
-  public double applySoftLimit(double volts){
-    if(WristState.INSIDE_ROBOT.inRange(getArmPose())){
-      if((Math.signum(volts) == Math.signum(getPose() - 90) && getPose() > -90)
-      || (getPose() < -90 && volts > 0)){
+  public double applySoftLimit(double volts) {
+    if (WristState.INSIDE_ROBOT.inRange(getArmPose())) {
+      if ((Math.signum(volts) == Math.signum(getPose() - 90) && getPose() > -90) || (getPose() < -90 && volts > 0)) {
         Logger.getInstance().recordOutput("Wrist/AntiDestructionTriggered", true);
         return 0;
       }

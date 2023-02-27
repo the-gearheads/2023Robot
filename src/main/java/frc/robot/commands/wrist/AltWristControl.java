@@ -6,9 +6,7 @@ package frc.robot.commands.wrist;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.wrist.Wrist;
-import frc.robot.subsystems.wrist.WristState;
 import frc.robot.subsystems.wrist.WristState.WristStateType;
 
 public class AltWristControl extends CommandBase {

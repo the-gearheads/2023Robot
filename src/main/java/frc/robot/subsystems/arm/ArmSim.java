@@ -18,7 +18,7 @@ import frc.robot.Constants.MECH_PLOT;
 
 public class ArmSim extends Arm {
   private double simVolts = 0;
-  
+
   /** Creates a new ArmSim. */
   public ArmSim() {
     super();
@@ -60,14 +60,14 @@ public class ArmSim extends Arm {
   private static final double m_armReduction = 200;
   private static final double m_armMass = 8.0; // Kilograms
   private static final double m_armLength = Units.inchesToMeters(20);
-  private static final SingleJointedArmSim m_armSim =
-      new SingleJointedArmSim(m_armGearbox, m_armReduction, SingleJointedArmSim.estimateMOI(m_armLength, m_armMass),
-          m_armLength, -1e10, 1e10, true, VecBuilder.fill(0.001) // Add noise with a std-dev of 1 tick
-      );
+  private static final SingleJointedArmSim m_armSim = new SingleJointedArmSim(m_armGearbox, m_armReduction,
+      SingleJointedArmSim.estimateMOI(m_armLength, m_armMass), m_armLength, -1e10, 1e10, true, VecBuilder.fill(0.001) // Add noise with a std-dev of 1 tick
+  );
 
   public static final Mechanism2d m_mech2d = new Mechanism2d(MECH_PLOT.PLOT_WIDTH, MECH_PLOT.PLOT_HEIGHT);
 
-  public static final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", MECH_PLOT.ARM_PIVOT_X, MECH_PLOT.ARM_PIVOT_Y);
+  public static final MechanismRoot2d m_armPivot =
+      m_mech2d.getRoot("ArmPivot", MECH_PLOT.ARM_PIVOT_X, MECH_PLOT.ARM_PIVOT_Y);
   private static final MechanismLigament2d m_armTower = m_armPivot.append(
       new MechanismLigament2d("ArmTower", MECH_PLOT.ARM_TOWER_LENGTH, -90, 10.0, new Color8Bit(Color.kDarkGray)));
   public static final MechanismLigament2d m_arm = m_armPivot.append(new MechanismLigament2d("Arm", MECH_PLOT.ARM_LENGTH,

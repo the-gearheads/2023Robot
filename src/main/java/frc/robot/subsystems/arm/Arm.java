@@ -96,7 +96,7 @@ public class Arm extends SubsystemBase {
   public void periodic() {
     var pose = getPose();
     var vel = getVelocity();
-    var volts=0.0;
+    var volts = 0.0;
 
     Logger.getInstance().recordOutput("Arm/CurrentPose", pose);
     Logger.getInstance().recordOutput("Arm/CurrentVel", vel);
@@ -106,12 +106,12 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Pose/Setpoint", pid.getSetpoint().position);
 
     if (controlMode == ArmControlMode.VEL && MathUtil.applyDeadband(velGoal, 0.1) != 0) {
-      volts=velControl();
+      volts = velControl();
     } else {
-      volts=poseControl();
+      volts = poseControl();
     }
 
-    volts=applySoftLimit(volts);
+    volts = applySoftLimit(volts);
     setVoltage(volts);
   }
 
@@ -151,7 +151,7 @@ public class Arm extends SubsystemBase {
     return ffval + pidval;
   }
 
-  private double applySoftLimit(double volts){
+  private double applySoftLimit(double volts) {
     if (((getPose() > ARM.MAX_ANGLE) && volts > 0) || ((getPose() < ARM.MIN_ANGLE) && volts < 0)) {
       return 0;
     }
