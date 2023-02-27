@@ -123,19 +123,6 @@ public class RobotContainer {
     updateControllers();
   }
 
-
-  private Command getCommandForPath(String pathName, boolean resetOdometry, PathConstraints constraints) {
-    PathPlannerTrajectory path = PathPlanner.loadPath(pathName, constraints);
-    if (path == null) {
-      DriverStation.reportError("Failed to load path: " + pathName, true);
-      return new InstantCommand(() -> {
-        DriverStation.reportError("Tried to execute path that failed to load! Path name: " + pathName, true);
-      });
-    }
-    Command forwardCommand = swerve.followTrajectoryCommand(path, resetOdometry, true);
-    return forwardCommand;
-  }
-
   /**
    * Use this method to define your button->command mappings. Buttons can be created by instantiating a {@link GenericHID} or one of its subclasses
    * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
@@ -154,10 +141,10 @@ public class RobotContainer {
 
     // Put new bindings here.
     Controllers.driverController.getPPLoadDebugForwardPath()
-        .toggleOnTrue(getCommandForPath("Start_To_Game_Piece_1", true, AUTON.SLOW_CONSTRAINTS));
+        .toggleOnTrue(AutonPaths.getCommandForPath("Start_To_Game_Piece_1", true, AUTON.SLOW_CONSTRAINTS, swerve));
 
     Controllers.driverController.getPPLoadDebugBackwardPath()
-        .toggleOnTrue(getCommandForPath("Game_Piece_1_To_Start", true, AUTON.SLOW_CONSTRAINTS));
+        .toggleOnTrue(AutonPaths.getCommandForPath("Game_Piece_1_To_Start", true, AUTON.SLOW_CONSTRAINTS, swerve));
 
     // This command puts the robot 1 meter in front of apriltag 8 (middle of bottom left grid on pathplanner picture of 2023 field)
     Controllers.driverController.getPPGotoTag8().onTrue(new InstantCommand(() -> {
