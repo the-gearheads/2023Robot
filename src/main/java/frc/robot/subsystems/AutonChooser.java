@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.AutonPaths;
 import frc.robot.Constants.AUTON;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
@@ -82,7 +83,7 @@ public class AutonChooser {
   public void initializeAutons() {//Here we define auton choices
     //Left Most Cone Node -> Left Most Game Piece -> Left Most Cone Node -> Charging Station 
     Command leftSide2ConesChargingStation = new SetArmPose(arm, ArmPose.HIGH_NODE)
-        .andThen(getCommandForPath("Inert_To_Start", true, AUTON.SLOW_CONSTRAINTS)).andThen(new AltWristControl(wrist)
+        .andThen(AutonPaths.getCommandForPath("Inert_To_Start", true, AUTON.SLOW_CONSTRAINTS, swerve)).andThen(new AltWristControl(wrist)
             .raceWith(new WaitCommand(0.5).andThen(new InstantCommand(grabber::open).andThen(new WaitCommand(0.25)))));
     // .andThen(
     // new InstantCommand(()->{
@@ -115,20 +116,7 @@ public class AutonChooser {
     autons.put("Left, 2 Cones, Charging Station", leftSide2ConesChargingStation);
 
     //Forward 1 Meter
-    Command debugForward = getCommandForPath("Debug_Forward", true, AUTON.SLOW_CONSTRAINTS);
+    Command debugForward = AutonPaths.getCommandForPath("Debug_Forward", true, AUTON.SLOW_CONSTRAINTS, swerve);
     autons.put("Debug Forward", debugForward);
-  }
-
-
-  private Command getCommandForPath(String pathName, boolean resetOdometry, PathConstraints constraints) {
-    PathPlannerTrajectory path = PathPlanner.loadPath(pathName, constraints);
-    if (path == null) {
-      DriverStation.reportError("Failed to load path: " + pathName, true);
-      return new InstantCommand(() -> {
-        DriverStation.reportError("Tried to execute path that failed to load! Path name: " + pathName, true);
-      });
-    }
-    Command forwardCommand = swerve.followTrajectoryCommand(path, resetOdometry, true);
-    return forwardCommand;
   }
 }
