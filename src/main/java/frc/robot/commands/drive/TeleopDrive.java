@@ -7,6 +7,7 @@ package frc.robot.commands.drive;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -40,7 +41,7 @@ public class TeleopDrive extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    //swerveSubsystem.setPose(Constants.Drivetrain.zeroPos);
+    swerve.setPose(new Pose2d());
     angleSetPoint = swerve.getPose().getRotation().getRadians();
   }
 
@@ -92,7 +93,8 @@ public class TeleopDrive extends CommandBase {
     if (SmartDashboard.getBoolean("TeleopDrive/UseFieldRelative", true)) {
       swerve.driveFieldRelative(speeds);
     } else {
-      swerve.drive(speeds);
+      // swerve.drive(speeds);
+      swerve.driveFieldRelative(speeds);
     }
   }
 

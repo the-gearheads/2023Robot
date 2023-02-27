@@ -12,10 +12,9 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import frc.robot.Constants.ARM_PLOT;
+import frc.robot.Constants.MECH_PLOT;
 import frc.robot.subsystems.arm.ArmSim;
 import frc.robot.util.sim.Cone;
 import frc.robot.util.sim.MechRootWrapper;
@@ -30,9 +29,9 @@ public class WristSim extends Wrist {
     this.armSim = arm;
 
     simPivot = new MechRootWrapper(this.armSim.m_mech2d, "WristPivot", 0, 0);
-    simLig = simPivot.append(new MechanismLigament2d("Wrist", ARM_PLOT.WRIST_LENGTH,
+    simLig = simPivot.append(new MechanismLigament2d("Wrist", MECH_PLOT.WRIST_LENGTH,
         Units.radiansToDegrees(sim.getAngleRads()), 10.0, new Color8Bit(Color.kBlue)));
-    simCone = new Cone(simPivot, new Pose2d(5, 0, new Rotation2d(180)));;
+    simCone = new Cone(simPivot, new Pose2d(5, 0, new Rotation2d(180)));
   }
 
   @Override
@@ -41,14 +40,18 @@ public class WristSim extends Wrist {
   }
 
   @Override
-  public double getPosition() {
-    return sim.getAngleRads();
+  public double getPose() {
+    return Units.radiansToDegrees(sim.getAngleRads());
+  }
+
+  public double getVelocity() {
+    return Units.radiansToDegrees(sim.getVelocityRadPerSec());
   }
 
   public void simulationPeriodic() {
-    double armPos = armSim.getPosition();
-    double pivot_x = ARM_PLOT.ARM_PIVOT_X + (armSim.m_arm.getLength()) * Math.cos(armPos);
-    double pivot_y = ARM_PLOT.ARM_PIVOT_Y + (armSim.m_arm.getLength()) * Math.sin(armPos);
+    double armPosRads = Units.degreesToRadians(armSim.getPose());
+    double pivot_x = MECH_PLOT.ARM_PIVOT_X + (armSim.m_arm.getLength()) * Math.cos(armPosRads);
+    double pivot_y = MECH_PLOT.ARM_PIVOT_Y + (armSim.m_arm.getLength()) * Math.sin(armPosRads);
     simPivot.setPosition(pivot_x, pivot_y);
     // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)
@@ -61,15 +64,14 @@ public class WristSim extends Wrist {
     // Update the Mechanism Arm angle based on the simulated arm angle
     simLig.setAngle(Units.radiansToDegrees(sim.getAngleRads()));
     simCone.update(new Rotation2d(sim.getAngleRads()));
-    SmartDashboard.putNumber("Wrist Vel", sim.getVelocityRadPerSec());
   }
 
   //Setting up the Scenery:
   private final DCMotor simMotor = DCMotor.getNEO(1);
 
-  private final SingleJointedArmSim sim = new SingleJointedArmSim(simMotor, ARM_PLOT.WRIST_REDUCTION,
-      SingleJointedArmSim.estimateMOI(ARM_PLOT.WRIST_LENGTH, ARM_PLOT.WRIST_MASS), ARM_PLOT.WRIST_LENGTH,
-      Units.degreesToRadians(-1e10), Units.degreesToRadians(1e10), true, VecBuilder.fill(0.001) // Add noise with a std-dev of 1 tick
+  private final SingleJointedArmSim sim = new SingleJointedArmSim(simMotor, MECH_PLOT.WRIST_REDUCTION,
+      SingleJointedArmSim.estimateMOI(MECH_PLOT.WRIST_LENGTH, MECH_PLOT.WRIST_MASS), MECH_PLOT.WRIST_LENGTH, -1e10,
+      1e10, true, VecBuilder.fill(0.001) // Add noise with a std-dev of 1 tick
   );
 
   private final MechRootWrapper simPivot;

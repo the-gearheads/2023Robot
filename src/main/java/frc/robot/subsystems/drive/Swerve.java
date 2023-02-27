@@ -29,7 +29,6 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -41,8 +40,6 @@ import frc.robot.Constants.DRIVE;
 import frc.robot.Constants.AUTON;
 import frc.robot.subsystems.drive.gyro.GyroIO;
 import frc.robot.subsystems.drive.gyro.GyroIOInputsAutoLogged;
-import frc.robot.subsystems.drive.gyro.GyroSim;
-import frc.robot.subsystems.drive.gyro.Gyro;
 
 public class Swerve extends SubsystemBase {
 
@@ -60,17 +57,6 @@ public class Swerve extends SubsystemBase {
   /** Creates a new SwerveSubsystem. */
   public Swerve(GyroIO gyro, SwerveModuleIO... modules) {
     this.gyro = gyro;
-    switch (Constants.getMode()) {
-      case REAL:
-        this.gyro = new Gyro(SPI.Port.kMXP, true);
-        break;
-      case SIM:
-        this.gyro = new GyroSim();
-        break;
-      case SIM_REPLAY:
-        this.gyro = new GyroIO() {};
-        break;
-    }
 
     this.modules = modules;
     /* Get module states to pass to odometry */
@@ -275,6 +261,7 @@ public class Swerve extends SubsystemBase {
     lastInputs = inputs;
 
     GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+    gyro.updateInputs(gyroInputs);
     Logger.getInstance().processInputs("Gyro", gyroInputs);
     lastGyroInputs = gyroInputs;
   }

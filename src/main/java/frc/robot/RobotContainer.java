@@ -26,9 +26,8 @@ import frc.robot.commands.arm.JoystickArmControl;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.TeleopDrive;
-import frc.robot.commands.grabber.OpenGrabber;
 import frc.robot.commands.wrist.DefaultWristControl;
-import frc.robot.commands.wrist.SetWristAlternatePose;
+import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.AutonChooser;
@@ -48,6 +47,7 @@ import frc.robot.subsystems.drive.gyro.GyroSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very little robot logic should actually be handled in
@@ -113,13 +113,13 @@ public class RobotContainer {
 
     grabber = new Grabber();
     vision = new Vision(swerve);
-    autonChooser = new AutonChooser(swerve);
+    autonChooser = new AutonChooser(swerve, arm, wrist, grabber);
     leds = new Leds();
     // Configure the button binding
 
     swerve.setDefaultCommand(new TeleopDrive(swerve));
     arm.setDefaultCommand(new JoystickArmControl(arm));
-    wrist.setDefaultCommand(new DefaultWristControl(wrist, arm));
+    wrist.setDefaultCommand(new DefaultWristControl(wrist));
     updateControllers();
   }
 
@@ -173,8 +173,8 @@ public class RobotContainer {
     Controllers.operatorController.armGoToHighNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
     Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
     Controllers.operatorController.armGoToInsideRobotNode().onTrue(new SetArmPose(arm, ArmPose.INSIDE_ROBOT));
-    Controllers.operatorController.setWristAlternatePose().whileTrue(new SetWristAlternatePose(wrist, arm));
-    Controllers.operatorController.openGrabber().whileTrue(new OpenGrabber(grabber));
+    Controllers.operatorController.setWristAlternatePose().whileTrue(new AltWristControl(wrist));
+    Controllers.operatorController.openGrabber().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
   }
 
   /**

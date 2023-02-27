@@ -4,7 +4,6 @@
 
 package frc.robot.commands.arm;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.controllers.Controllers;
@@ -16,12 +15,12 @@ public class SetArmPose extends CommandBase {
   private ArmPose armPose;
 
   public enum ArmPose {
-    FLOOR(-65), HIGH_NODE(4.58), MID_NODE(-15.46), LOW_NODE(-61.87), FEEDER_STATION(-183.5), INSIDE_ROBOT(-115.7);
+    FLOOR(-65), HIGH_NODE(4.58), MID_NODE(-15.46), LOW_NODE(-61.87), FEEDER_STATION(-186), INSIDE_ROBOT(-115.7);
 
-    double val;
+    public double val;
 
     private ArmPose(double val) {
-      this.val = Units.degreesToRadians(val);
+      this.val = val;
     }
 
   }
@@ -57,7 +56,7 @@ public class SetArmPose extends CommandBase {
     }
 
     double goal = arm.getPoseGoal();
-    double currentPose = arm.getPosition();
+    double currentPose = arm.getPose();
     double poseError = goal - currentPose;
     poseError = Math.abs(poseError);
     return poseError < Constants.ARM.POSE_TOLERANCE;

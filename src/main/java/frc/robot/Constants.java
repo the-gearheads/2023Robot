@@ -43,22 +43,8 @@ public class Constants extends AnnotatedClass {
     }
   }
 
-  public static class ARM {
-    public static final int ARM_ID = 9;
-    public static final double[] ARM_POS_PID = {3, 0, 0};
-    public static final double[] ARM_VEL_PID = {0.5, 0, 0};
-    public static final double[] ARM_FF = {0, 0.5, 3};
 
-    @NTPublish
-    public static double VELOCITY = 1;
-    public static final double POSE_TOLERANCE = 0.01;
-    public static final double ANGLE_OFFSET = -(3.0 / 2) * Math.PI;
-    public static final Constraints ARM_CONSTRAINTS = new Constraints(5, 2);
-    public static final double MAX_ANGLE = Units.degreesToRadians(20);
-    public static final double MIN_ANGLE = Units.degreesToRadians(-200);
-  }
-
-  public static final class ARM_PLOT {
+  public static final class MECH_PLOT {
     public static final double PLOT_HEIGHT = 90;
     public static final double PLOT_WIDTH = 130;
 
@@ -80,11 +66,26 @@ public class Constants extends AnnotatedClass {
     public static final double WRIST_MASS = Units.lbsToKilograms(3.5);
   }
 
+  public static class ARM {
+    public static final int ARM_ID = 9;
+    public static final double[] ARM_POS_PID = {0.05, 0, 0};
+    public static final double[] ARM_VEL_PID = {0.009, 0, 0};
+    public static final double[] ARM_FF = {0, 0.5, 3};
+
+    @NTPublish
+    public static double VELOCITY = 50;
+    public static final double POSE_TOLERANCE = 5;
+    public static final double ANGLE_OFFSET = -270;
+    public static final Constraints ARM_CONSTRAINTS = new Constraints(120, 150);
+    public static final double MAX_ANGLE = 10;
+    public static final double MIN_ANGLE = -190;
+  }
+
   public static final class WRIST {
     public static final int WRIST_ID = 10;
-    public static final double[] WRIST_PID = {10, 0, 0};
+    public static final double[] WRIST_PID = {0.17, 0, 0};
     public static final double[] WRIST_FF = {0, 0.5, 0};
-    public static final double ANGLE_OFFSET = -Math.PI;
+    public static final double ANGLE_OFFSET = -180;
   }
 
   public static final class GRABBER {
@@ -141,9 +142,9 @@ public class Constants extends AnnotatedClass {
         new Translation2d(Units.inchesToMeters(-12.25), Units.inchesToMeters(-13.25));
 
     @NTPublish
-    public static double MAX_LIN_VEL = 2;//set to 2
+    public static double MAX_LIN_VEL = 4;//set to 2
     @NTPublish
-    public static double MAX_ROT_VEL = 1;
+    public static double MAX_ROT_VEL = 2.5;
 
     @NTPublish
     public static double MAX_MODULE_SPEED = 5;

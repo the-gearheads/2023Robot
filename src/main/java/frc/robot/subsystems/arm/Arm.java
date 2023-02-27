@@ -50,14 +50,17 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putData("arm/pPid", pid);
     SmartDashboard.putData("arm/vPid", velPid);
     SmartDashboard.putData("arm/ff", ff);
-    setPoseGoal(getPosition());
-    pid.reset(getPosition(), getVelocity());
+    setPoseGoal(getPose());
+    resetPIDs();
   }
 
   public void setControlMode(ArmControlMode mode) {
-    // pid.reset(getPosition(), getVelocity());
-    velPid.reset();
     controlMode = mode;
+  }
+
+  public void resetPIDs() {
+    pid.reset(getPose(), getVelocity());
+    velPid.reset();
   }
 
   public double getPoseGoal() {
@@ -76,7 +79,7 @@ public class Arm extends SubsystemBase {
     velGoal = newGoal;
   }
 
-  public double getPosition() {
+  public double getPose() {
     return encoder.getPosition() + ARM.ANGLE_OFFSET;
   }
 
@@ -84,14 +87,86 @@ public class Arm extends SubsystemBase {
     return encoder.getVelocity();
   }
 
+  public void setVoltage(double volts) {
+    Logger.getInstance().recordOutput("Arm/Appliedvolts", volts);
+    motor.setVoltage(volts);
+  }
+
+  @Override
+  public void periodic() {
+    var pose = getPose();
+    var vel = getVelocity();
+    var volts = 0.0;
+
+    Logger.getInstance().recordOutput("Arm/CurrentPose", pose);
+    Logger.getInstance().recordOutput("Arm/CurrentVel", vel);
+    Logger.getInstance().recordOutput("Arm/Pose/Goal", poseGoal);
+    Logger.getInstance().recordOutput("Arm/Vel/Goal", velGoal);
+    Logger.getInstance().recordOutput("Arm/ControlMode", controlMode.name);
+    Logger.getInstance().recordOutput("Arm/Pose/Setpoint", pid.getSetpoint().position);
+
+    if (controlMode == ArmControlMode.VEL && MathUtil.applyDeadband(velGoal, 0.1) != 0) {
+      volts = velControl();
+    } else {
+      volts = poseControl();
+    }
+
+    volts = applySoftLimit(volts);
+    setVoltage(volts);
+  }
+
+  public double poseControl() {
+    var pose = getPose();
+    double pidval = pid.calculate(pose, poseGoal);
+    double ffval = ff.calculate(pid.getSetpoint().position, pid.getSetpoint().velocity); // ff wants 0 parallel to floor in pos x
+
+    Logger.getInstance().recordOutput("Arm/Pose/FFval", ffval);
+    Logger.getInstance().recordOutput("Arm/Pose/PIDval", pidval);
+    Logger.getInstance().recordOutput("Arm/Pose/Error", pid.getPositionError());
+
+    return ffval + pidval;
+  }
+
+  public double velControl() {
+    var pose = getPose();
+    var vel = getVelocity();
+
+    /* Prospective Soft Limit */
+    if ((getPose() + velGoal * 0.02 > ARM.MAX_ANGLE)) {
+      velGoal = 0;
+    } else if ((getPose() + velGoal * 0.02 < ARM.MIN_ANGLE)) {
+      velGoal = 0;
+    }
+
+    double ffval = ff.calculate(pose, velGoal);
+    double pidval = velPid.calculate(vel, velGoal);
+
+    Logger.getInstance().recordOutput("Arm/Vel/FFval", ffval);
+    Logger.getInstance().recordOutput("Arm/Vel/PIDval", pidval);
+    Logger.getInstance().recordOutput("Arm/Vel/Error", velPid.getPositionError());
+
+    setPoseGoal(pose);
+    // We do not care about I-terms for vPID
+    resetPIDs();
+    return ffval + pidval;
+  }
+
+  private double applySoftLimit(double volts) {
+    if (((getPose() > ARM.MAX_ANGLE) && volts > 0) || ((getPose() < ARM.MIN_ANGLE) && volts < 0)) {
+      return 0;
+    }
+    return volts;
+  }
+
   private void configure() {
     motor.restoreFactoryDefaults();
     motor.setInverted(false);
     encoder.setInverted(false);
     motor.setIdleMode(IdleMode.kBrake);
-    encoder.setPositionConversionFactor(2 * Math.PI);
-    encoder.setVelocityConversionFactor(2 * Math.PI);
+    encoder.setPositionConversionFactor(360);
+    encoder.setVelocityConversionFactor(360);
 
+    //currently useless
     motor.setSoftLimit(SoftLimitDirection.kForward, (float) (ARM.MAX_ANGLE - ARM.ANGLE_OFFSET));
     motor.setSoftLimit(SoftLimitDirection.kReverse, (float) (ARM.MIN_ANGLE - ARM.ANGLE_OFFSET));
     motor.enableSoftLimit(SoftLimitDirection.kForward, false);
@@ -108,72 +183,5 @@ public class Arm extends SubsystemBase {
     /* Have a duty cycle encoder */
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
-  }
-
-  public void setVoltage(double volts) {
-    Logger.getInstance().recordOutput("Arm/Appliedvolts", volts);
-    motor.setVoltage(volts);
-  }
-
-  @Override
-  public void periodic() {
-    var pose = getPosition();
-    var vel = getVelocity();
-
-    Logger.getInstance().recordOutput("Arm/CurrentPose", pose);
-    Logger.getInstance().recordOutput("Arm/CurrentVel", vel);
-    Logger.getInstance().recordOutput("Arm/Pose/Goal", poseGoal);
-    Logger.getInstance().recordOutput("Arm/Vel/Goal", velGoal);
-    Logger.getInstance().recordOutput("Arm/ControlMode", controlMode.name);
-    Logger.getInstance().recordOutput("Arm/Pose/Setpoint", pid.getSetpoint().position);
-
-    if (controlMode == ArmControlMode.VEL && MathUtil.applyDeadband(velGoal, 0.1) != 0) {
-      velControl();
-    } else {
-      posControl();
-    }
-  }
-
-  public void posControl() {
-    var pose = getPosition();
-    double pidval = pid.calculate(pose, poseGoal);
-    double ffval = ff.calculate(pid.getSetpoint().position, pid.getSetpoint().velocity); // ff wants 0 parallel to floor in pos x
-
-    Logger.getInstance().recordOutput("Arm/Pose/FFval", ffval);
-    Logger.getInstance().recordOutput("Arm/Pose/PIDval", pidval);
-    Logger.getInstance().recordOutput("Arm/Pose/Error", pid.getPositionError());
-
-    setVoltage(ffval + pidval);
-  }
-
-  public void velControl() {
-    var pose = getPosition();
-    var vel = getVelocity();
-
-    /* Don't let ourselves go outside [-180, 0]  */
-    if (((getPosition() > ARM.MAX_ANGLE) && velGoal < 0) || ((getPosition() < ARM.MIN_ANGLE) && velGoal < 0)) {
-      setVoltage(0);
-      return;
-    }
-
-    if ((getPosition() + velGoal * 0.02 > ARM.MAX_ANGLE)) {
-      velGoal = (0 - getPosition()) / 0.02;
-      velGoal = 0;
-    } else if ((getPosition() + velGoal * 0.02 < ARM.MIN_ANGLE)) {
-      velGoal = (-Math.PI - getPosition()) / 0.02;
-      velGoal = 0;
-    }
-
-    double ffval = ff.calculate(pose, velGoal);
-    double pidval = velPid.calculate(vel, velGoal);
-
-    Logger.getInstance().recordOutput("Arm/Vel/FFval", ffval);
-    Logger.getInstance().recordOutput("Arm/Vel/PIDval", pidval);
-    Logger.getInstance().recordOutput("Arm/Vel/Error", velPid.getPositionError());
-
-
-    setVoltage(ffval + pidval);
-    setPoseGoal(pose);
-    pid.reset(getPosition(), getVelocity());
   }
 }

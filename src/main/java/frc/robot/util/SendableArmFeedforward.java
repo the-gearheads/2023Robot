@@ -4,6 +4,7 @@
 
 package frc.robot.util;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
@@ -69,27 +70,31 @@ public class SendableArmFeedforward implements Sendable {
   /**
    * Calculates the feedforward from the gains and setpoints.
    *
-   * @param positionRadians The position (angle) setpoint. This angle should be measured from the horizontal (i.e. if the provided angle is 0, the arm should be parallel
-   *          with the floor). If your encoder does not follow this convention, an offset should be added.
-   * @param velocityRadPerSec The velocity setpoint.
-   * @param accelRadPerSecSquared The acceleration setpoint.
+   * @param positionDeg The position (angle) setpoint. This angle should be measured from the horizontal (i.e. if the provided angle is 0, the arm should be parallel with
+   *          the floor). If your encoder does not follow this convention, an offset should be added.
+   * @param velocityDegPerSec The velocity setpoint.
+   * @param accelDegPerSecSquared The acceleration setpoint.
    * @return The computed feedforward.
    */
-  public double calculate(double positionRadians, double velocityRadPerSec, double accelRadPerSecSquared) {
-    return ks * Math.signum(velocityRadPerSec) + kg * Math.cos(positionRadians) + kv * velocityRadPerSec
+  public double calculate(double positionDeg, double velocityDegPerSec, double accelDegPerSecSquared) {
+    double positionRad = Units.degreesToRadians(positionDeg);
+    double velocityRadPerSec = Units.degreesToRadians(velocityDegPerSec);
+    double accelRadPerSecSquared = Units.degreesToRadians(accelDegPerSecSquared);
+
+    return ks * Math.signum(velocityRadPerSec) + kg * Math.cos(positionRad) + kv * velocityRadPerSec
         + ka * accelRadPerSecSquared;
   }
 
   /**
    * Calculates the feedforward from the gains and velocity setpoint (acceleration is assumed to be zero).
    *
-   * @param positionRadians The position (angle) setpoint. This angle should be measured from the horizontal (i.e. if the provided angle is 0, the arm should be parallel
-   *          with the floor). If your encoder does not follow this convention, an offset should be added.
-   * @param velocity The velocity setpoint.
+   * @param positionDeg The position (angle) setpoint. This angle should be measured from the horizontal (i.e. if the provided angle is 0, the arm should be parallel with
+   *          the floor). If your encoder does not follow this convention, an offset should be added.
+   * @param velocityDegPerSec The velocity setpoint.
    * @return The computed feedforward.
    */
-  public double calculate(double positionRadians, double velocity) {
-    return calculate(positionRadians, velocity, 0);
+  public double calculate(double positionDeg, double velocityDegPerSec) {
+    return calculate(positionDeg, velocityDegPerSec, 0);
   }
 
   // Rearranging the main equation from the calculate() method yields the
@@ -101,14 +106,16 @@ public class SendableArmFeedforward implements Sendable {
    * constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the arm.
-   * @param angle The angle of the arm. This angle should be measured from the horizontal (i.e. if the provided angle is 0, the arm should be parallel with the floor). If
-   *          your encoder does not follow this convention, an offset should be added.
-   * @param acceleration The acceleration of the arm.
+   * @param positionDeg The angle of the arm. This angle should be measured from the horizontal (i.e. if the provided angle is 0, the arm should be parallel with the
+   *          floor). If your encoder does not follow this convention, an offset should be added.
+   * @param accelDegPerSec The acceleration of the arm.
    * @return The maximum possible velocity at the given acceleration and angle.
    */
-  public double maxAchievableVelocity(double maxVoltage, double angle, double acceleration) {
+  public double maxAchievableVelocity(double maxVoltage, double positionDeg, double accelDegPerSec) {
     // Assume max velocity is positive
-    return (maxVoltage - ks - Math.cos(angle) * kg - acceleration * ka) / kv;
+    double positionRad = Units.degreesToRadians(positionDeg);
+    double accelRadPerSecSquared = Units.degreesToRadians(accelDegPerSec);
+    return (maxVoltage - ks - Math.cos(positionRad) * kg - accelRadPerSecSquared * ka) / kv;
   }
 
   /**
@@ -117,14 +124,16 @@ public class SendableArmFeedforward implements Sendable {
    * constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the arm.
-   * @param angle The angle of the arm. This angle should be measured from the horizontal (i.e. if the provided angle is 0, the arm should be parallel with the floor). If
-   *          your encoder does not follow this convention, an offset should be added.
-   * @param acceleration The acceleration of the arm.
+   * @param positionDeg The angle of the arm. This angle should be measured from the horizontal (i.e. if the provided angle is 0, the arm should be parallel with the
+   *          floor). If your encoder does not follow this convention, an offset should be added.
+   * @param accelDegPerSec The acceleration of the arm.
    * @return The minimum possible velocity at the given acceleration and angle.
    */
-  public double minAchievableVelocity(double maxVoltage, double angle, double acceleration) {
+  public double minAchievableVelocity(double maxVoltage, double positionDeg, double accelDegPerSec) {
+    double positionRad = Units.degreesToRadians(positionDeg);
+    double accelRadPerSecSquared = Units.degreesToRadians(accelDegPerSec);
     // Assume min velocity is negative, ks flips sign
-    return (-maxVoltage + ks - Math.cos(angle) * kg - acceleration * ka) / kv;
+    return (-maxVoltage + ks - Math.cos(positionRad) * kg - accelRadPerSecSquared * ka) / kv;
   }
 
   /**
@@ -133,13 +142,16 @@ public class SendableArmFeedforward implements Sendable {
    * constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the arm.
-   * @param angle The angle of the arm. This angle should be measured from the horizontal (i.e. if the provided angle is 0, the arm should be parallel with the floor). If
-   *          your encoder does not follow this convention, an offset should be added.
-   * @param velocity The velocity of the arm.
+   * @param positionDeg The angle of the arm. This angle should be measured from the horizontal (i.e. if the provided angle is 0, the arm should be parallel with the
+   *          floor). If your encoder does not follow this convention, an offset should be added.
+   * @param velocityDegPerSec The velocity of the arm.
    * @return The maximum possible acceleration at the given velocity.
    */
-  public double maxAchievableAcceleration(double maxVoltage, double angle, double velocity) {
-    return (maxVoltage - ks * Math.signum(velocity) - Math.cos(angle) * kg - velocity * kv) / ka;
+  public double maxAchievableAcceleration(double maxVoltage, double positionDeg, double velocityDegPerSec) {
+    double positionRad = Units.degreesToRadians(positionDeg);
+    double velocityRadPerSec = Units.degreesToRadians(velocityDegPerSec);
+    return (maxVoltage - ks * Math.signum(velocityRadPerSec) - Math.cos(positionRad) * kg - velocityRadPerSec * kv)
+        / ka;
   }
 
   /**
@@ -148,12 +160,12 @@ public class SendableArmFeedforward implements Sendable {
    * constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the arm.
-   * @param angle The angle of the arm. This angle should be measured from the horizontal (i.e. if the provided angle is 0, the arm should be parallel with the floor). If
-   *          your encoder does not follow this convention, an offset should be added.
-   * @param velocity The velocity of the arm.
+   * @param positionDeg The angle of the arm. This angle should be measured from the horizontal (i.e. if the provided angle is 0, the arm should be parallel with the
+   *          floor). If your encoder does not follow this convention, an offset should be added.
+   * @param velocityDegPerSec The velocity of the arm.
    * @return The minimum possible acceleration at the given velocity.
    */
-  public double minAchievableAcceleration(double maxVoltage, double angle, double velocity) {
-    return maxAchievableAcceleration(-maxVoltage, angle, velocity);
+  public double minAchievableAcceleration(double maxVoltage, double positionDeg, double velocityDegPerSec) {
+    return maxAchievableAcceleration(-maxVoltage, positionDeg, velocityDegPerSec);
   }
 }

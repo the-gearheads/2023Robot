@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.WRIST;
 import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.wrist.WristState.TheStateOfTheStateOfTheWrist;
+import frc.robot.subsystems.wrist.WristState.WristStateType;
 import frc.robot.util.SendableArmFeedforward;
 
 public class Wrist extends SubsystemBase {
@@ -46,8 +46,50 @@ public class Wrist extends SubsystemBase {
     goal = newGoal;
   }
 
-  public double getPosition() {
+  public double getPose() {
     return encoder.getPosition() + Constants.WRIST.ANGLE_OFFSET;
+  }
+
+  public double getVelocity() {
+    return encoder.getVelocity();
+  }
+
+  //In case a wrist command needs to access arm pose (don't want to give it entire arm subsystem)
+  public double getArmPose() {
+    return arm.getPose();
+  }
+
+  public void setVoltage(double volts) {
+    motor.setVoltage(volts);
+  }
+
+  @Override
+  public void periodic() {
+    setGoalByType(WristStateType.OVERRIDE);
+    double currentPose = getPose();
+
+    double pidval = pid.calculate(currentPose, goal);
+    double ffval = ff.calculate(currentPose, 0);
+
+    Logger.getInstance().recordOutput("Wrist/Pose", currentPose);
+    Logger.getInstance().recordOutput("Wrist/Vel", getVelocity());
+    Logger.getInstance().recordOutput("Wrist/Goal", goal);
+    Logger.getInstance().recordOutput("Wrist/Error", pid.getPositionError());
+    Logger.getInstance().recordOutput("Wrist/PIDVal", pidval);
+    Logger.getInstance().recordOutput("Wrist/FFVal", ffval);
+    Logger.getInstance().recordOutput("Wrist/Appliedvolts", pidval + ffval);
+
+    setVoltage(applySoftLimit(ffval + pidval));
+  }
+
+  public void setGoalByType(WristStateType wristStateType) { // check what range the arm is in and set the wrist accordingly
+    double armPos = arm.getPose();
+    for (WristState wristState : WristState.values()) {
+      if (wristState.type == wristStateType && wristState.inRange(armPos)) {
+        setGoal(wristState.getWristGoal(armPos));
+        return;
+      }
+    }
   }
 
   private void configure() {
@@ -55,8 +97,8 @@ public class Wrist extends SubsystemBase {
     motor.setInverted(true);
     encoder.setInverted(true);
     motor.setIdleMode(IdleMode.kCoast);
-    encoder.setPositionConversionFactor(2 * Math.PI);
-    encoder.setVelocityConversionFactor(2 * Math.PI);
+    encoder.setPositionConversionFactor(360);
+    encoder.setVelocityConversionFactor(360);
 
     /* Status 0 governs applied output, faults, and whether is a follower. Not important for this. */
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
@@ -71,35 +113,15 @@ public class Wrist extends SubsystemBase {
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
   }
 
-  // TODO: temp
-  public void setVoltage(double volts) {
-    motor.setVoltage(volts);
-  }
-
-  @Override
-  public void periodic() {
-    overrideGoal();
-    double currentPose = getPosition();
-
-    double pidval = pid.calculate(currentPose, goal);
-    double ffval = ff.calculate(currentPose, 0);
-
-    Logger.getInstance().recordOutput("Wrist/Pose", currentPose);
-    Logger.getInstance().recordOutput("Wrist/Vel", encoder.getVelocity());
-    Logger.getInstance().recordOutput("Wrist/PIDVal", pidval);
-    Logger.getInstance().recordOutput("Wrist/FFVal", ffval);
-    Logger.getInstance().recordOutput("Wrist/Appliedvolts", pidval + ffval);
-
-    setVoltage(ffval + pidval);
-  }
-
-  public void overrideGoal() { // check what range the arm is in and set the wrist accordingly
-    double armPos = arm.getPosition();
-    for (WristState wristState : WristState.values()) {
-      if (wristState.type == TheStateOfTheStateOfTheWrist.OVERRIDE && wristState.inRange(armPos)) {
-        setGoal(wristState.getWristGoal(armPos));
-        return;
+  /* Don't move towards the base of the robot if inside it (not good) */
+  public double applySoftLimit(double volts) {
+    if (WristState.INSIDE_ROBOT.inRange(getArmPose())) {
+      if ((Math.signum(volts) == Math.signum(getPose() - 90) && getPose() > -90) || (getPose() < -90 && volts > 0)) {
+        Logger.getInstance().recordOutput("Wrist/AntiDestructionTriggered", true);
+        return 0;
       }
     }
+    Logger.getInstance().recordOutput("Wrist/AntiDestructionTriggered", false);
+    return volts;
   }
 }
