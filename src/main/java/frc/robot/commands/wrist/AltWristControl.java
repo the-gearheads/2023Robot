@@ -23,12 +23,12 @@ public class AltWristControl extends CommandBase {
   @Override
   public void initialize() {
     SmartDashboard.putString("Alt wrist control turned on?", "ON");
+    wrist.setControlState(WristStateType.ALT);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    wrist.setGoalByType(WristStateType.ALT);
   }
 
   // Called once the command ends or is interrupted.
@@ -40,6 +40,6 @@ public class AltWristControl extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

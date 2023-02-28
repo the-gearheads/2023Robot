@@ -25,10 +25,11 @@ public class Wrist extends SubsystemBase {
   private double goal;
   private CANSparkMax motor = new CANSparkMax(WRIST.WRIST_ID, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
-  private PIDController pid = new PIDController(WRIST.WRIST_PID[0], WRIST.WRIST_PID[1], WRIST.WRIST_PID[2]);
+  protected PIDController pid = new PIDController(WRIST.WRIST_PID[0], WRIST.WRIST_PID[1], WRIST.WRIST_PID[2]);
   private SendableArmFeedforward ff =
       new SendableArmFeedforward(WRIST.WRIST_FF[0], WRIST.WRIST_FF[1], WRIST.WRIST_FF[2]);
   private Arm arm;
+  private WristStateType controlState = WristStateType.DEFAULT;
 
   public Wrist(Arm arm) {
     this.arm = arm;
@@ -36,6 +37,10 @@ public class Wrist extends SubsystemBase {
 
     SmartDashboard.putData("Wrist/ff", ff);
     SmartDashboard.putData("Wrist/pid", pid);
+  }
+
+  public void setControlState(WristStateType wristStateType){
+    controlState = wristStateType;
   }
 
   public double getGoal() {
@@ -65,6 +70,7 @@ public class Wrist extends SubsystemBase {
 
   @Override
   public void periodic() {
+    setGoalByType(controlState);
     setGoalByType(WristStateType.OVERRIDE);
     double currentPose = getPose();
 
@@ -78,6 +84,7 @@ public class Wrist extends SubsystemBase {
     Logger.getInstance().recordOutput("Wrist/PIDVal", pidval);
     Logger.getInstance().recordOutput("Wrist/FFVal", ffval);
     Logger.getInstance().recordOutput("Wrist/Appliedvolts", pidval + ffval);
+    Logger.getInstance().recordOutput("Wrist/Current Command", this.getCurrentCommand()!=null?this.getCurrentCommand().getName() : "");
 
     setVoltage(applySoftLimit(ffval + pidval));
   }
