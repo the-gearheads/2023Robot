@@ -32,11 +32,27 @@ public class JoystickArmControl extends CommandBase {
   @Override
   public void execute() {
     arm.setControlMode(ArmControlMode.VEL);
+    double pov = Controllers.operatorController.getPOVAngle();
     double axis = Controllers.operatorController.getArmAxis();
-    SmartDashboard.putNumber("Arm Axis", axis);
-    axis *= Math.abs(axis);
-    axis *= Math.abs(axis);
+    double armPose = arm.getPose();
+
+    SmartDashboard.putNumber("Arm/Axis", axis);
+    SmartDashboard.putNumber("Arm/pov", pov);
+    axis = Math.pow(axis, 3);
+
     double armvel = axis * Constants.ARM.VELOCITY;
+    if (pov != -1) {
+      double posvel = 0;
+      if (pov > 90 && pov < 270) {
+        posvel = 15;
+      } else if (pov > 270 || pov < 90) {
+        posvel = -15;
+      }
+      if (armPose < 90 && armPose > -90) {
+        posvel *= -1;
+      }
+      armvel += posvel;
+    }
     arm.setVelGoal(armvel);
   }
 
