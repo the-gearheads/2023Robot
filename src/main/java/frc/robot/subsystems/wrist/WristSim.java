@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.Constants;
 import frc.robot.Constants.MECH_PLOT;
 import frc.robot.subsystems.arm.ArmSim;
 import frc.robot.util.sim.Cone;
@@ -32,6 +33,10 @@ public class WristSim extends Wrist {
     simLig = simPivot.append(new MechanismLigament2d("Wrist", MECH_PLOT.WRIST_LENGTH,
         Units.radiansToDegrees(sim.getAngleRads()), 10.0, new Color8Bit(Color.kBlue)));
     simCone = new Cone(simPivot, new Pose2d(5, 0, new Rotation2d(180)));
+
+    super.pid.setP(Constants.MECH_PLOT.SIM_WRIST_PID[0]);
+    super.pid.setI(Constants.MECH_PLOT.SIM_WRIST_PID[1]);
+    super.pid.setD(Constants.MECH_PLOT.SIM_WRIST_PID[2]);
   }
 
   @Override

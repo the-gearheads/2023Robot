@@ -156,7 +156,7 @@ public class RobotContainer {
     Controllers.operatorController.armGoToHighNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
     Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
     Controllers.operatorController.armGoToInsideRobotNode().onTrue(new SetArmPose(arm, ArmPose.INSIDE_ROBOT));
-    Controllers.operatorController.setWristAlternatePose().whileTrue(new AltWristControl(wrist));
+    Controllers.operatorController.setWristAlternatePose().whileTrue(new AltWristControl(wrist).repeatedly());
     Controllers.operatorController.openGrabber().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
   }
 
@@ -166,6 +166,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    wrist.setDefaultCommand(new DefaultWristControl(wrist));
     return autonChooser.getSelectedAuton();
   }
 }

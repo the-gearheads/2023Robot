@@ -78,47 +78,13 @@ public class AutonChooser {
   }
 
   public void initializeAutons() {//Here we define auton choices
+    Subsystems s = new Subsystems(swerve, wrist, arm, grabber);
     //Left Most Cone Node -> Left Most Game Piece -> Left Most Cone Node -> Charging Station 
-    Command leftSide2ConesChargingStation = new SetArmPose(arm, ArmPose.HIGH_NODE)
-        .andThen(AutonPaths.getCommandForPath("Inert_To_Start", true, AUTON.SLOW_CONSTRAINTS, swerve))
-        .andThen(new AltWristControl(wrist)
-            .raceWith(new WaitCommand(0.5).andThen(new InstantCommand(grabber::open).andThen(new WaitCommand(0.25)))));
-    // .andThen(
-    // new InstantCommand(()->{
-    //   SmartDashboard.putNumber("Auton Status", 0);
-    // })).andThen(
-    // getCommandForPath("Start_To_Game_Piece_1", false, AUTON.SLOW_CONSTRAINTS)
-    //   .alongWith(new SetArmPose(arm, ArmPose.LOW_NODE)))
-    // .andThen(new InstantCommand(()->{
-    //   SmartDashboard.putNumber("Auton Status", 1);
-    // }))
-    // .andThen(new InstantCommand(grabber::open))
-    // .andThen(new InstantCommand(()->{
-    //   SmartDashboard.putNumber("Auton Status", 2);
-    // }))
-    // .andThen(new AltWristControl(wrist)
-    //   .raceWith(new WaitCommand(0.5)
-    //     .andThen(new InstantCommand(grabber::close))))
-    // .andThen(new InstantCommand(()->{
-    //   SmartDashboard.putNumber("Auton Status", 3);
-    // }))
-    // .andThen(getCommandForPath("Game_Piece_1_To_Start", false, AUTON.SLOW_CONSTRAINTS)
-    //   .alongWith(new SetArmPose(arm, ArmPose.HIGH_NODE)))
-    // .andThen(new InstantCommand(()->{
-    //   SmartDashboard.putNumber("Auton Status", 6);
-    // }));
-    // .andThen(getCommandForPath("Start_To_Charging_Station", false, AUTON.SLOW_CONSTRAINTS))
-    // .andThen(new InstantCommand(() -> {
-    // swerve.setX();
-    // }));
-    autons.put("Left, 2 Cones, Charging Station", leftSide2ConesChargingStation);
+    Command testPath = AutonPaths.getTestPlacePath(s);
+    autons.put("Left, 2 Cones, Charging Station", testPath);
 
     //Forward 1 Meter
     Command debugForward = AutonPaths.getCommandForPath("Debug_Forward", true, AUTON.SLOW_CONSTRAINTS, swerve);
     autons.put("Debug Forward", debugForward);
-
-    Subsystems s = new Subsystems(swerve, wrist, arm, grabber);
-    Command testPath = AutonPaths.getTestPlacePath(s);
-    autons.put("Test place path", testPath);
   }
 }
