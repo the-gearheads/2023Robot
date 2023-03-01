@@ -56,5 +56,5 @@ public class ThrustMaster implements OperatorController {
       }
       return false;
     });
-}
+  }
 }

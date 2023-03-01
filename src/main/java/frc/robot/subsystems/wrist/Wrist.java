@@ -39,7 +39,7 @@ public class Wrist extends SubsystemBase {
     SmartDashboard.putData("Wrist/pid", pid);
   }
 
-  public void setControlState(WristStateType wristStateType){
+  public void setControlState(WristStateType wristStateType) {
     controlState = wristStateType;
   }
 
@@ -84,7 +84,8 @@ public class Wrist extends SubsystemBase {
     Logger.getInstance().recordOutput("Wrist/PIDVal", pidval);
     Logger.getInstance().recordOutput("Wrist/FFVal", ffval);
     Logger.getInstance().recordOutput("Wrist/Appliedvolts", pidval + ffval);
-    Logger.getInstance().recordOutput("Wrist/Current Command", this.getCurrentCommand()!=null?this.getCurrentCommand().getName() : "");
+    Logger.getInstance().recordOutput("Wrist/Current Command",
+        this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "");
 
     setVoltage(applySoftLimit(ffval + pidval));
   }

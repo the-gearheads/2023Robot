@@ -6,17 +6,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.AutonPaths;
 import frc.robot.Constants.AUTON;
-import frc.robot.commands.drive.AutoBalance;
-import frc.robot.commands.arm.SetArmPose;
-import frc.robot.commands.arm.SetArmPose.ArmPose;
-import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.subsystems.arm.Arm;
-import frc.robot.commands.drive.AutoBalance;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.wrist.Wrist;
 
@@ -85,7 +78,7 @@ public class AutonChooser {
     Command testPath = AutonPaths.twoConePath(s);
     autons.put("Left, 2 Cones", testPath);
 
-    Command  placeThenChargingStation = AutonPaths.placeThenChargingStation(s);
+    Command placeThenChargingStation = AutonPaths.placeThenChargingStation(s);
     autons.put("Left, place cone, charging station", placeThenChargingStation);
 
     //Forward 1 Meter
