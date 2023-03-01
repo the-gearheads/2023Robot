@@ -80,8 +80,11 @@ public class AutonChooser {
   public void initializeAutons() {//Here we define auton choices
     Subsystems s = new Subsystems(swerve, wrist, arm, grabber);
     //Left Most Cone Node -> Left Most Game Piece -> Left Most Cone Node -> Charging Station 
-    Command testPath = AutonPaths.getTestPlacePath(s);
-    autons.put("Left, 2 Cones, Charging Station", testPath);
+    Command testPath = AutonPaths.twoConePath(s);
+    autons.put("Left, 2 Cones", testPath);
+
+    Command  placeThenChargingStation = AutonPaths.placeThenChargingStation(s);
+    autons.put("Left, place cone, charging station", placeThenChargingStation);
 
     //Forward 1 Meter
     Command debugForward = AutonPaths.getCommandForPath("Debug_Forward", true, AUTON.SLOW_CONSTRAINTS, swerve);
