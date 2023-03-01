@@ -1,7 +1,9 @@
 package frc.robot.subsystems.drive;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.robot.Constants.DRIVE;
 import frc.robot.subsystems.drive.motors.Neo550Steer;
 import frc.robot.subsystems.drive.motors.NeoDrive;
 
@@ -15,12 +17,16 @@ public class SwerveModule implements SwerveModuleIO {
   private int id;
   private String description;
 
+  private SlewRateLimiter steerLimiter;
+  
+
   public SwerveModule(int id, int driveId, int steerId, double[] offsets, String description) {
     this.id = id;
     this.description = description;
     this.angleOffset = Rotation2d.fromDegrees(offsets[0]);
     drive = new NeoDrive(driveId);
     steer = new Neo550Steer(steerId, offsets[1], getPath());
+    steerLimiter = new SlewRateLimiter(DRIVE.STEER_SLEW_RATE_LIMIT, -DRIVE.STEER_SLEW_RATE_LIMIT, steer.getAngle().getRadians());
   }
 
   @Override
@@ -53,7 +59,8 @@ public class SwerveModule implements SwerveModuleIO {
     state.angle = state.angle.plus(angleOffset);
     state = SwerveModuleState.optimize(state, steer.getAngle());
 
-    steer.setAngle(state.angle);
+    var slewedAngle = steerLimiter.calculate(state.angle.getRadians());
+    steer.setAngle(new Rotation2d(slewedAngle));
     drive.setSpeed(state.speedMetersPerSecond);
   }
 

@@ -46,6 +46,12 @@ public class Controllers {
         operatorController = new LogitechOperatorController(i);
         foundOperatorController = true;
         continue;
+      } else if (!foundOperatorController
+          && (joyName.toLowerCase().contains("16000m"))) {
+        System.out.println("Found Thrustmaster operator controller on port " + i);
+        operatorController = new ThrustMaster(i);
+        foundOperatorController = true;
+        continue;
       }
       if (!foundOperatorController
           && (joyName.toLowerCase().contains("16000m"))) {

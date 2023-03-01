@@ -43,5 +43,7 @@ public class Gyro extends AHRS implements GyroIO {
   public void updateInputs(GyroIOInputs inputs) {
     inputs.angleRadians = getRotation2d().getRadians();
     inputs.angleRate = getRate();
+    inputs.pitchDegrees = getPitch();
+    inputs.rollDegrees = getRoll();
   }
 }

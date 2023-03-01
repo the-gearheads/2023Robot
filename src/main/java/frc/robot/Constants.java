@@ -127,6 +127,8 @@ public class Constants extends AnnotatedClass {
     public static final double STEER_POS_FACTOR = 2 * Math.PI; // rotations -> radians
     public static final double STEER_VEL_FACTOR = 2 * Math.PI * 60; // rpm -> rad/sec
 
+    public static final double STEER_SLEW_RATE_LIMIT = 1; // rad/sec
+
     public static final int DRIVE_CURRENT_LIMIT = 40;
     public static final int STEER_CURRENT_LIMIT = 20;
 
@@ -179,7 +181,7 @@ public class Constants extends AnnotatedClass {
   }
 
   public static final class LEDS {
-    public static final int PORT = 0;
-    public static final int LENGTH = 3;
+    public static final int PORT = 1;
+    public static final int LENGTH = 12;
   }
 }

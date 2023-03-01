@@ -21,19 +21,19 @@ public class Grabber extends SubsystemBase {
   Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
 
   public Grabber() {
-    compressor.enableAnalog(GRABBER.MIN_PRESSURE, GRABBER.MAX_PRESSURE);
+    //compressor.enableAnalog(GRABBER.MIN_PRESSURE, GRABBER.MAX_PRESSURE);
     close();
   }
 
   public void close() {
-    openSolenoid.set(false);
-    closeSolenoid.set(true);
+    //openSolenoid.set(false);
+    //closeSolenoid.set(true);
     isClosed = true;
   }
 
   public void open() {
-    closeSolenoid.set(false);
-    openSolenoid.set(true);
+    //closeSolenoid.set(false);
+    //openSolenoid.set(true);
     isClosed = false;
   }
 

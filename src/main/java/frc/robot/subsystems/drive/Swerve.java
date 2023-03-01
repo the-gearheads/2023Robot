@@ -382,6 +382,14 @@ public class Swerve extends SubsystemBase {
     return getRotation().getRadians();
   }
 
+  public double getPitch() {
+    return lastGyroInputs.pitchDegrees;
+  }
+
+  public double getRoll() {
+    return lastGyroInputs.rollDegrees;
+  }
+
   /**
    * Sets steer pid constants for all modules
    * 

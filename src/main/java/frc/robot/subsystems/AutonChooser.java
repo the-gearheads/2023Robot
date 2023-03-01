@@ -15,6 +15,7 @@ import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.subsystems.arm.Arm;
+import frc.robot.commands.drive.AutoBalance;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.wrist.Wrist;
 
