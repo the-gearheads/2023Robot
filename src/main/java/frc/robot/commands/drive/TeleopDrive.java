@@ -4,6 +4,7 @@
 
 package frc.robot.commands.drive;
 
+import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
@@ -72,18 +73,18 @@ public class TeleopDrive extends CommandBase {
       rotSpd *= Math.abs(rotSpd);
     }
 
-    SmartDashboard.putNumber("TeleopDrive/NotRateLimitedX", xSpd);
-    SmartDashboard.putNumber("TeleopDrive/NotRateLimitedY", ySpd);
-    SmartDashboard.putNumber("TeleopDrive/NotRateLimitedRot", rotSpd);
+    Logger.getInstance().recordOutput("TeleopDrive/NotRateLimitedX", xSpd);
+    Logger.getInstance().recordOutput("TeleopDrive/NotRateLimitedY", ySpd);
+    Logger.getInstance().recordOutput("TeleopDrive/NotRateLimitedRot", rotSpd);
 
     var limitedSpeeds = rateLimiter.rateLimit(new ChassisSpeeds(xSpd, ySpd, rotSpd));
     if(SmartDashboard.getBoolean("TeleopDrive/RateLimitDrive", true)) {
       xSpd = limitedSpeeds.vxMetersPerSecond;
       ySpd = limitedSpeeds.vyMetersPerSecond;
       rotSpd = limitedSpeeds.omegaRadiansPerSecond;
-      SmartDashboard.putNumber("TeleopDrive/RateLimitedX", xSpd);
-      SmartDashboard.putNumber("TeleopDrive/RateLimitedY", ySpd);
-      SmartDashboard.putNumber("TeleopDrive/RateLimitedRot", rotSpd);  
+      Logger.getInstance().recordOutput("TeleopDrive/RateLimitedX", xSpd);
+      Logger.getInstance().recordOutput("TeleopDrive/RateLimitedY", ySpd);
+      Logger.getInstance().recordOutput("TeleopDrive/RateLimitedRot", rotSpd);  
     }
 
     xSpd *= Constants.DRIVE.MAX_LIN_VEL;
@@ -102,9 +103,9 @@ public class TeleopDrive extends CommandBase {
       }
     }
 
-    SmartDashboard.putNumber("TeleopDrive/xSpd", xSpd);
-    SmartDashboard.putNumber("TeleopDrive/ySpd", ySpd);
-    SmartDashboard.putNumber("TeleopDrive/rot", rotSpd);
+    Logger.getInstance().recordOutput("TeleopDrive/xSpd", xSpd);
+    Logger.getInstance().recordOutput("TeleopDrive/ySpd", ySpd);
+    Logger.getInstance().recordOutput("TeleopDrive/rot", rotSpd);
 
     var speeds = new ChassisSpeeds(xSpd, ySpd, rotSpd);
     if (SmartDashboard.getBoolean("TeleopDrive/UseFieldRelative", true)) {
