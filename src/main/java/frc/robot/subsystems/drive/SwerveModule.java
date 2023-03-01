@@ -18,7 +18,7 @@ public class SwerveModule implements SwerveModuleIO {
   private String description;
 
   private SlewRateLimiter steerLimiter;
-  
+
 
   public SwerveModule(int id, int driveId, int steerId, double[] offsets, String description) {
     this.id = id;
@@ -26,7 +26,8 @@ public class SwerveModule implements SwerveModuleIO {
     this.angleOffset = Rotation2d.fromDegrees(offsets[0]);
     drive = new NeoDrive(driveId);
     steer = new Neo550Steer(steerId, offsets[1], getPath());
-    steerLimiter = new SlewRateLimiter(DRIVE.STEER_SLEW_RATE_LIMIT, -DRIVE.STEER_SLEW_RATE_LIMIT, steer.getAngle().getRadians());
+    steerLimiter =
+        new SlewRateLimiter(DRIVE.STEER_SLEW_RATE_LIMIT, -DRIVE.STEER_SLEW_RATE_LIMIT, steer.getAngle().getRadians());
   }
 
   @Override

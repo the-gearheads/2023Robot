@@ -7,11 +7,11 @@ package frc.robot.commands.drive;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.drive.Swerve;
-import frc.robot.subsystems.drive.gyro.Gyro;
 
 public class AutoBalance extends CommandBase {
   // assumes already on chargin station.
   private Swerve swerve;
+
   /** Creates a new AutoBalance. */
   public AutoBalance(Swerve swerve) {
     this.swerve = swerve;
@@ -20,8 +20,7 @@ public class AutoBalance extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
