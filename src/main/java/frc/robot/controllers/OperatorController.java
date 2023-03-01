@@ -8,7 +8,7 @@ public interface OperatorController {
   }
 
   public default double getPOVAngle() {
-    return 0.0;
+    return -1;
   }
 
   public default Trigger armGoToLowNode() {
