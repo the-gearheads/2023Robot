@@ -22,7 +22,7 @@ import frc.robot.util.SwerveRateLimit;
 public class TeleopDrive extends CommandBase {
   private final Swerve swerve;
   private PIDController rotPIDController = new PIDController(1, 0, 0);
-  private SwerveRateLimit rateLimiter =  new SwerveRateLimit();
+  private SwerveRateLimit rateLimiter = new SwerveRateLimit();
   private double angleSetPoint;
 
 
@@ -78,13 +78,13 @@ public class TeleopDrive extends CommandBase {
     Logger.getInstance().recordOutput("TeleopDrive/NotRateLimitedRot", rotSpd);
 
     var limitedSpeeds = rateLimiter.rateLimit(new ChassisSpeeds(xSpd, ySpd, rotSpd));
-    if(SmartDashboard.getBoolean("TeleopDrive/RateLimitDrive", true)) {
+    if (SmartDashboard.getBoolean("TeleopDrive/RateLimitDrive", true)) {
       xSpd = limitedSpeeds.vxMetersPerSecond;
       ySpd = limitedSpeeds.vyMetersPerSecond;
       rotSpd = limitedSpeeds.omegaRadiansPerSecond;
       Logger.getInstance().recordOutput("TeleopDrive/RateLimitedX", xSpd);
       Logger.getInstance().recordOutput("TeleopDrive/RateLimitedY", ySpd);
-      Logger.getInstance().recordOutput("TeleopDrive/RateLimitedRot", rotSpd);  
+      Logger.getInstance().recordOutput("TeleopDrive/RateLimitedRot", rotSpd);
     }
 
     xSpd *= Constants.DRIVE.MAX_LIN_VEL;
