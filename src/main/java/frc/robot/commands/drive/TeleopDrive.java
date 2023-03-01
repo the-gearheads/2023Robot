@@ -15,11 +15,13 @@ import frc.robot.Constants;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.AdditionalMathUtils;
+import frc.robot.util.SwerveRateLimit;
 
 /** An example command that uses an example subsystem. */
 public class TeleopDrive extends CommandBase {
   private final Swerve swerve;
   private PIDController rotPIDController = new PIDController(1, 0, 0);
+  private SwerveRateLimit rateLimiter =  new SwerveRateLimit();
   private double angleSetPoint;
 
 
@@ -34,6 +36,7 @@ public class TeleopDrive extends CommandBase {
     addRequirements(swerve);
     SmartDashboard.putBoolean("TeleopDrive/UseFieldRelative", false);
     SmartDashboard.putBoolean("TeleopDrive/ExponentialJoystickControl", false);
+    SmartDashboard.putBoolean("TeleopDrive/RateLimitDrive", true);
     SmartDashboard.putBoolean("Rotation PID", false);
     SmartDashboard.putNumber("Rotation PID kP", 1.5);
   }
@@ -67,6 +70,20 @@ public class TeleopDrive extends CommandBase {
       xSpd *= Math.abs(xSpd);
       ySpd *= Math.abs(ySpd);
       rotSpd *= Math.abs(rotSpd);
+    }
+
+    SmartDashboard.putNumber("TeleopDrive/NotRateLimitedX", xSpd);
+    SmartDashboard.putNumber("TeleopDrive/NotRateLimitedY", ySpd);
+    SmartDashboard.putNumber("TeleopDrive/NotRateLimitedRot", rotSpd);
+
+    var limitedSpeeds = rateLimiter.rateLimit(new ChassisSpeeds(xSpd, ySpd, rotSpd));
+    if(SmartDashboard.getBoolean("TeleopDrive/RateLimitDrive", true)) {
+      xSpd = limitedSpeeds.vxMetersPerSecond;
+      ySpd = limitedSpeeds.vyMetersPerSecond;
+      rotSpd = limitedSpeeds.omegaRadiansPerSecond;
+      SmartDashboard.putNumber("TeleopDrive/RateLimitedX", xSpd);
+      SmartDashboard.putNumber("TeleopDrive/RateLimitedY", ySpd);
+      SmartDashboard.putNumber("TeleopDrive/RateLimitedRot", rotSpd);  
     }
 
     xSpd *= Constants.DRIVE.MAX_LIN_VEL;
