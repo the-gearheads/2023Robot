@@ -127,7 +127,9 @@ public class Constants extends AnnotatedClass {
     public static final double STEER_POS_FACTOR = 2 * Math.PI; // rotations -> radians
     public static final double STEER_VEL_FACTOR = 2 * Math.PI * 60; // rpm -> rad/sec
 
-    public static final double STEER_SLEW_RATE_LIMIT = 1; // rad/sec
+    public static final double DIRECTION_SLEW_RATE = 1.2; // radians per second
+    public static final double MAG_SLEW_RATE = 1.8; // percent per second (1 = 100%)
+    public static final double ROT_SLEW_RATE = 2.0; // percent per second (1 = 100%)
 
     public static final int DRIVE_CURRENT_LIMIT = 40;
     public static final int STEER_CURRENT_LIMIT = 20;
