@@ -1,9 +1,7 @@
 package frc.robot.subsystems.drive;
 
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.Constants.DRIVE;
 import frc.robot.subsystems.drive.motors.Neo550Steer;
 import frc.robot.subsystems.drive.motors.NeoDrive;
 
