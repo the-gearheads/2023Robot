@@ -17,9 +17,6 @@ public class ThrustMaster implements OperatorController {
     return -Controllers.deadband(joy.getY());
   }
 
-  public double getPOVAngle() {
-    return joy.getPOV();
-  }
   public Trigger armGoToLowNode() {
     return new JoystickButton(joy, 5);
   }
@@ -37,7 +34,7 @@ public class ThrustMaster implements OperatorController {
   }
 
   public Trigger armGoToInsideRobotNode() {
-    return new JoystickButton(joy, 8);
+    return new JoystickButton(joy, 2);
   }
 
   public Trigger armGoToGroundPickUpNode() {
@@ -45,7 +42,7 @@ public class ThrustMaster implements OperatorController {
   }
 
   public Trigger setWristAlternatePose() {
-    return new JoystickButton(joy, 2);
+    return new JoystickButton(joy, 8);
   }
 
   public Trigger openGrabber() {
@@ -59,7 +56,5 @@ public class ThrustMaster implements OperatorController {
       }
       return false;
     });
-
-  
 }
 }
