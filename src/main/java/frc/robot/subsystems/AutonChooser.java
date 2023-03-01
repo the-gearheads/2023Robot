@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.AutonPaths;
 import frc.robot.Constants.AUTON;
+import frc.robot.commands.drive.AutoBalance;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.wrist.AltWristControl;
