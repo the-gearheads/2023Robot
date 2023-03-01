@@ -53,13 +53,6 @@ public class Controllers {
         foundOperatorController = true;
         continue;
       }
-      if (!foundOperatorController
-          && (joyName.toLowerCase().contains("16000m"))) {
-        System.out.println("Found Thrustmaster operator controller on port " + i);
-        operatorController = new ThrustMaster(i);
-        foundOperatorController = true;
-        continue;
-      }
       // Fallback
       if (!foundDriveController) {
         System.out.println("Found xbox drive controller controller on port " + i);
