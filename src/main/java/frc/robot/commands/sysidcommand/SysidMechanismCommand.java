@@ -34,7 +34,8 @@ public class SysidMechanismCommand extends CommandBase {
   private Consumer<Double> setVoltage;
 
 
-  // Runs as auton, tries to emulate the sysid interface. Note: may have potential issues due to other robot code running and taking up processing time
+  // Runs as auton, tries to emulate the sysid interface. Note: may have potential issues due to other robot code running and taking up processing time.
+  // POSITION AND VELOCITY UNITS ARE IN ROTATIONS
   public SysidMechanismCommand(Runnable zeroEncoder, Supplier<Double> getVoltage, Supplier<Double> getVelocity,
       Supplier<Double> getPosition, Consumer<Double> setVoltage, Subsystem... requirements) {
 
@@ -96,6 +97,8 @@ public class SysidMechanismCommand extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
+
+    setVoltage.accept((double)0);
 
     // This was probably false initially
     Threads.setCurrentThreadPriority(false, 0);
