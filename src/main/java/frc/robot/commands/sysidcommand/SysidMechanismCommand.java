@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -35,7 +36,9 @@ public class SysidMechanismCommand extends CommandBase {
 
   // Runs as auton, tries to emulate the sysid interface. Note: may have potential issues due to other robot code running and taking up processing time
   public SysidMechanismCommand(Runnable zeroEncoder, Supplier<Double> getVoltage, Supplier<Double> getVelocity,
-      Supplier<Double> getPosition, Consumer<Double> setVoltage) {
+      Supplier<Double> getPosition, Consumer<Double> setVoltage, Subsystem... requirements) {
+
+    addRequirements(requirements);
 
     this.zeroEncoder = zeroEncoder;
     this.getVelocity = getVelocity;

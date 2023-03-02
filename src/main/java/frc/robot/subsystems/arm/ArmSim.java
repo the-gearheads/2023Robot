@@ -53,6 +53,10 @@ public class ArmSim extends Arm {
     this.simVolts = volts;
   }
 
+  @Override
+  public double getVoltage() {
+    return this.simVolts;
+  }
 
   // Setting The Scenery
   private static final DCMotor m_armGearbox = DCMotor.getNEO(1);

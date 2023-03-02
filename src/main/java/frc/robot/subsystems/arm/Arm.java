@@ -32,7 +32,7 @@ public class Arm extends SubsystemBase {
   private SendableArmFeedforward ff = new SendableArmFeedforward(ARM.ARM_FF[0], ARM.ARM_FF[1], ARM.ARM_FF[2]);
 
   public enum ArmControlMode {
-    VEL("Velocity"), POS("Position");
+    VEL("Velocity"), POS("Position"), VOLTAGE("voltage");
 
     public final String name;
 
@@ -92,6 +92,10 @@ public class Arm extends SubsystemBase {
     motor.setVoltage(volts);
   }
 
+  public double getVoltage() {
+    return motor.getAppliedOutput() * motor.getBusVoltage();
+  }
+
   @Override
   public void periodic() {
     var pose = getPose();
@@ -104,6 +108,9 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Vel/Goal", velGoal);
     Logger.getInstance().recordOutput("Arm/ControlMode", controlMode.name);
     Logger.getInstance().recordOutput("Arm/Pose/Setpoint", pid.getSetpoint().position);
+
+    /* Controlled entirely via setVoltage() */
+    if (controlMode == ArmControlMode.VOLTAGE) return;
 
     if (controlMode == ArmControlMode.VEL && MathUtil.applyDeadband(velGoal, 0.1) != 0) {
       volts = velControl();
