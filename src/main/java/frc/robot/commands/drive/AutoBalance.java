@@ -4,8 +4,10 @@
 
 package frc.robot.commands.drive;
 
+import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.AUTON;
 import frc.robot.subsystems.drive.Swerve;
 
 public class AutoBalance extends CommandBase {
@@ -15,6 +17,7 @@ public class AutoBalance extends CommandBase {
   /** Creates a new AutoBalance. */
   public AutoBalance(Swerve swerve) {
     this.swerve = swerve;
+    addRequirements(swerve);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -29,16 +32,22 @@ public class AutoBalance extends CommandBase {
     double roll = swerve.getRoll();
     double vx = 0;
     double vy = 0;
-    if (pitch > 5) {
-      vx = -0.5;
-    } else if (pitch < -5) {
-      vx = 0.5;
+    if (pitch > AUTON.AUTO_BALANCE_THRESHOLD) {
+      Logger.getInstance().recordOutput("AutoBalance/Mode", "-vy");
+      vy = -AUTON.AUTO_BALANCE_SPEED;
+    } else if (pitch < -AUTON.AUTO_BALANCE_THRESHOLD) {
+      Logger.getInstance().recordOutput("AutoBalance/Mode", "+vy");
+      vy = AUTON.AUTO_BALANCE_SPEED;
+    } else if (roll > AUTON.AUTO_BALANCE_THRESHOLD) {
+      Logger.getInstance().recordOutput("AutoBalance/Mode", "-vx");
+      vx = -AUTON.AUTO_BALANCE_SPEED;
+    } else if (roll < -AUTON.AUTO_BALANCE_THRESHOLD) {
+      Logger.getInstance().recordOutput("AutoBalance/Mode", "+vx");
+      vx = AUTON.AUTO_BALANCE_SPEED;
+    } else {
+      Logger.getInstance().recordOutput("AutoBalance/Mode", "NONE");
     }
-    if (roll > 5) {
-      vy = -0.5;
-    } else if (roll < -5) {
-      vy = 0.5;
-    }
+
 
     swerve.drive(new ChassisSpeeds(vx, vy, 0));
 
@@ -55,6 +64,10 @@ public class AutoBalance extends CommandBase {
   public boolean isFinished() {
     double pitch = swerve.getPitch();
     double roll = swerve.getRoll();
-    return Math.abs(pitch) < 5 && Math.abs(roll) < 5;
+    if((Math.abs(pitch) < AUTON.AUTO_BALANCE_DONE_THRESHOLD) && (Math.abs(roll) < AUTON.AUTO_BALANCE_DONE_THRESHOLD)) {
+      Logger.getInstance().recordOutput("AutoBalance/Mode", "FINISHED");
+      return true;
+    }
+    return false;
   }
 }

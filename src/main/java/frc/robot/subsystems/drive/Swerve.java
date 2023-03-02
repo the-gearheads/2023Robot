@@ -125,6 +125,9 @@ public class Swerve extends SubsystemBase {
    * @param speeds Speeds to go
    */
   public void drive(ChassisSpeeds speeds) {
+    Logger.getInstance().recordOutput("Swerve/DesiredSpeeds/Vx", speeds.vxMetersPerSecond);
+    Logger.getInstance().recordOutput("Swerve/DesiredSpeeds/Vy", speeds.vyMetersPerSecond);
+    Logger.getInstance().recordOutput("Swerve/DesiredSpeeds/Rot", speeds.omegaRadiansPerSecond);
     var states = kinematics.toSwerveModuleStates(speeds);
     if (SmartDashboard.getBoolean("/Swerve/DesaturateWheelSpeeds", true)) {
       SwerveDriveKinematics.desaturateWheelSpeeds(states, getChassisSpeeds(), DRIVE.MAX_MODULE_SPEED,
