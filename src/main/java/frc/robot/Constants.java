@@ -167,12 +167,7 @@ public class Constants extends AnnotatedClass {
     public static PathConstraints SLOW_CONSTRAINTS = new PathConstraints(2, 1);
     public static PathConstraints MID_CONSTRAINTS = new PathConstraints(4, 2);
     public static PathConstraints FAST_CONSTRAINTS = new PathConstraints(7, 3);
-    @NTPublish
-    public static double AUTO_BALANCE_SPEED = 0.5;
-    @NTPublish
-    public static double AUTO_BALANCE_THRESHOLD = 2.5;
-    @NTPublish
-    public static double AUTO_BALANCE_DONE_THRESHOLD = 1.5;
+    public static PIDController AUTO_BALANCE_PID = new PIDController(0.025, 0, 00);
   }
   public static final class FIELD_CONSTANTS {
     public static final double WIDTH = 8.02;
