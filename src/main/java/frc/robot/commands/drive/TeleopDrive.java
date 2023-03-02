@@ -37,7 +37,7 @@ public class TeleopDrive extends CommandBase {
     addRequirements(swerve);
     SmartDashboard.putBoolean("TeleopDrive/UseFieldRelative", false);
     SmartDashboard.putBoolean("TeleopDrive/ExponentialJoystickControl", false);
-    SmartDashboard.putBoolean("TeleopDrive/RateLimitDrive", true);
+    SmartDashboard.putBoolean("TeleopDrive/RateLimitDrive", false);
     SmartDashboard.putBoolean("Rotation PID", false);
     SmartDashboard.putNumber("Rotation PID kP", 1.5);
   }
@@ -78,7 +78,7 @@ public class TeleopDrive extends CommandBase {
     Logger.getInstance().recordOutput("TeleopDrive/NotRateLimitedRot", rotSpd);
 
     var limitedSpeeds = rateLimiter.rateLimit(new ChassisSpeeds(xSpd, ySpd, rotSpd));
-    if (SmartDashboard.getBoolean("TeleopDrive/RateLimitDrive", true)) {
+    if (SmartDashboard.getBoolean("TeleopDrive/RateLimitDrive", false)) {
       xSpd = limitedSpeeds.vxMetersPerSecond;
       ySpd = limitedSpeeds.vyMetersPerSecond;
       rotSpd = limitedSpeeds.omegaRadiansPerSecond;
