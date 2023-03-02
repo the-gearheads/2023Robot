@@ -84,5 +84,9 @@ public class AutonChooser {
     //Forward 1 Meter
     Command debugForward = AutonPaths.getCommandForPath("Debug_Forward", true, AUTON.SLOW_CONSTRAINTS, swerve);
     autons.put("Debug Forward", debugForward);
+
+    Command autoBalance = AutonPaths.getCommandForPath("AutoBalance", false, AUTON.SLOW_CONSTRAINTS, swerve);
+    autons.put("Auto Balance", autoBalance);
+
   }
 }
