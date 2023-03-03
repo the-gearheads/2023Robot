@@ -137,10 +137,10 @@ public class RobotContainer {
 
     // Put new bindings here.
     Controllers.driverController.getPPLoadDebugForwardPath()
-        .toggleOnTrue(AutonPaths.getCommandForPath("Start_To_Game_Piece_1", true, AUTON.SLOW_CONSTRAINTS, swerve));
+        .toggleOnTrue(AutonPaths.getCommandForPath("StartN1-GamePiece1", true, AUTON.SLOW_CONSTRAINTS, swerve));
 
     Controllers.driverController.getPPLoadDebugBackwardPath()
-        .toggleOnTrue(AutonPaths.getCommandForPath("Game_Piece_1_To_Start", true, AUTON.SLOW_CONSTRAINTS, swerve));
+        .toggleOnTrue(AutonPaths.getCommandForPath("GamePiece1-StartN1", true, AUTON.SLOW_CONSTRAINTS, swerve));
 
     // This command puts the robot 1 meter in front of apriltag 8 (middle of bottom left grid on pathplanner picture of 2023 field)
     Controllers.driverController.getPPGotoTag8().onTrue(new InstantCommand(() -> {
