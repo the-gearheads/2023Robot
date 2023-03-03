@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.GRABBER;
 
 public class Grabber extends SubsystemBase {
   boolean isClosed = true;
@@ -20,19 +21,19 @@ public class Grabber extends SubsystemBase {
   Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
 
   public Grabber() {
-    //compressor.enableAnalog(GRABBER.MIN_PRESSURE, GRABBER.MAX_PRESSURE);
+    compressor.enableAnalog(GRABBER.MIN_PRESSURE, GRABBER.MAX_PRESSURE);
     close();
   }
 
   public void close() {
-    //openSolenoid.set(false);
-    //closeSolenoid.set(true);
+    openSolenoid.set(false);
+    closeSolenoid.set(true);
     isClosed = true;
   }
 
   public void open() {
-    //closeSolenoid.set(false);
-    //openSolenoid.set(true);
+    closeSolenoid.set(false);
+    openSolenoid.set(true);
     isClosed = false;
   }
 

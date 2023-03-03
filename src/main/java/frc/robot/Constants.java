@@ -72,7 +72,8 @@ public class Constants extends AnnotatedClass {
     public static final int ARM_ID = 9;
     public static final double[] ARM_POS_PID = {0.05, 0, 0};
     public static final double[] ARM_VEL_PID = {0.009, 0, 0};
-    public static final double[] ARM_FF = {0, 0.5, 3};
+    // ks, kg, kv, ka
+    public static final double[] ARM_FF = {0, 0.5, 3, 0};
 
     @NTPublish
     public static double VELOCITY = 50;
