@@ -79,7 +79,7 @@ public class AutonChooser {
     Command testPath = AutonPaths.twoConePath(s);
     autons.put("Left, 2 Cones", testPath);
 
-    Command placeThenChargingStation = AutonPaths.placeThenChargingStation(s);
+    Command placeThenChargingStation = AutonPaths.Node1PlaceThenDock(s);
     autons.put("Left, place cone, charging station", placeThenChargingStation);
 
     //Forward 1 Meter
