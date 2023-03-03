@@ -136,9 +136,11 @@ public class AutonPaths {
         // go back to grid node 3 inert
         new ParallelCommandGroup(
             getCommandForPath("GamePiece1-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
-            new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT)),
+            new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT))
 
-        // run autobalance
+        // run autobalance      
+      );
+
   }
 
   public static CommandBase InertN9GrabThenDock(Subsystems s) {
@@ -162,9 +164,9 @@ public class AutonPaths {
         // go back to grid node 3 inert
         new ParallelCommandGroup(
             getCommandForPath("GamePiece1-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
-            new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT)),
+            new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT)));
 
-        // run autobalance
+        // run autobalance here
   }
 
   /* Places a cone on the grid
