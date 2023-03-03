@@ -29,7 +29,7 @@ public class Arm extends SubsystemBase {
   private ProfiledPIDController pid =
       new ProfiledPIDController(ARM.ARM_POS_PID[0], ARM.ARM_POS_PID[1], ARM.ARM_POS_PID[2], ARM.ARM_CONSTRAINTS);
   private PIDController velPid = new PIDController(ARM.ARM_VEL_PID[0], ARM.ARM_VEL_PID[1], ARM.ARM_VEL_PID[2]);
-  private SendableArmFeedforward ff = new SendableArmFeedforward(ARM.ARM_FF[0], ARM.ARM_FF[1], ARM.ARM_FF[2]);
+  private SendableArmFeedforward ff = new SendableArmFeedforward(ARM.ARM_FF[0], ARM.ARM_FF[1], ARM.ARM_FF[2], ARM.ARM_FF[3]);
 
   public enum ArmControlMode {
     VEL("Velocity"), POS("Position"), VOLTAGE("voltage");
