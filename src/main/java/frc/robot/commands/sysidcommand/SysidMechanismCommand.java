@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -33,9 +34,12 @@ public class SysidMechanismCommand extends CommandBase {
   private Consumer<Double> setVoltage;
 
 
-  // Runs as auton, tries to emulate the sysid interface. Note: may have potential issues due to other robot code running and taking up processing time
+  // Runs as auton, tries to emulate the sysid interface. Note: may have potential issues due to other robot code running and taking up processing time.
+  // POSITION AND VELOCITY UNITS ARE IN ROTATIONS
   public SysidMechanismCommand(Runnable zeroEncoder, Supplier<Double> getVoltage, Supplier<Double> getVelocity,
-      Supplier<Double> getPosition, Consumer<Double> setVoltage) {
+      Supplier<Double> getPosition, Consumer<Double> setVoltage, Subsystem... requirements) {
+
+    addRequirements(requirements);
 
     this.zeroEncoder = zeroEncoder;
     this.getVelocity = getVelocity;
@@ -93,6 +97,8 @@ public class SysidMechanismCommand extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
+
+    setVoltage.accept((double)0);
 
     // This was probably false initially
     Threads.setCurrentThreadPriority(false, 0);

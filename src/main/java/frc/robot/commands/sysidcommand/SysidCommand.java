@@ -93,6 +93,8 @@ public class SysidCommand extends CommandBase {
   @Override
   public void end(boolean interrupted) {
 
+    drive.setVolts(0, 0);
+
     // This was probably false initially
     Threads.setCurrentThreadPriority(false, 0);
     SmartDashboard.putBoolean("SysIdOverflow", data.size() > maxCapacity);
