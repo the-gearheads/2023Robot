@@ -50,18 +50,18 @@ public class AutonPaths {
         getPlaceConeCommand(s));
   }
 
-  public static CommandBase altStartTwoConePath(Subsystems s) {
+  public static CommandBase StartN4TwoConePath(Subsystems s) {
     return new SequentialCommandGroup(
         // Move forward
         new ParallelCommandGroup(new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-            getCommandForPath("AltInert-AltStart", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
+            getCommandForPath("InertN4-StartN4", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
 
         // place game piece
         getPlaceConeCommand(s),
 
         // Go get game piece
         new ParallelCommandGroup(
-            getCommandForPath("AltStart-GamePiece4", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+            getCommandForPath("StartN4-GamePiece4", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
             new SequentialCommandGroup( // Start moving the arm 1 second into the path following
                 new WaitCommand(1), new SetArmPose(s.arm, ArmPose.FLOOR))),
 
