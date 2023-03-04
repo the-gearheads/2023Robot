@@ -111,8 +111,8 @@ public class TeleopDrive extends CommandBase {
     if (SmartDashboard.getBoolean("TeleopDrive/UseFieldRelative", true)) {
       swerve.driveFieldRelative(speeds);
     } else {
-      // swerve.drive(speeds);
-      swerve.driveFieldRelative(speeds);
+      swerve.drive(speeds);
+      // swerve.driveFieldRelative(speeds);
     }
   }
 

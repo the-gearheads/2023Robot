@@ -6,6 +6,7 @@ package frc.robot.subsystems.wrist;
 
 import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
@@ -25,6 +26,7 @@ public class Wrist extends SubsystemBase {
   private double goal;
   private CANSparkMax motor = new CANSparkMax(WRIST.WRIST_ID, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
+  private RelativeEncoder relativeEncoder;
   protected PIDController pid = new PIDController(WRIST.WRIST_PID[0], WRIST.WRIST_PID[1], WRIST.WRIST_PID[2]);
   private SendableArmFeedforward ff =
       new SendableArmFeedforward(WRIST.WRIST_FF[0], WRIST.WRIST_FF[1], WRIST.WRIST_FF[2]);
@@ -55,6 +57,34 @@ public class Wrist extends SubsystemBase {
     return encoder.getPosition() + Constants.WRIST.ANGLE_OFFSET;
   }
 
+  /**
+   The code calculates the number of full 360-degree wraps using the relativeEncoder.getPosition() method, and then calculates the relative encoder position modulo 360 to get the position within the current 360-degree wrap. It adjusts the modulo value by adding 360 degrees and subtracting 1 from the number of wraps if the modulo value is negative.
+
+The code then checks if the relative encoder position is greater than 180 degrees and the absolute encoder position is less than 180 degrees, or if the relative encoder position is less than 180 degrees and the absolute encoder position is greater than 180 degrees. If either condition is true, it adjusts the number of wraps accordingly.
+
+Finally, the code multiplies the number of wraps by 360 degrees and adds the absolute encoder position to get the continuous angle.
+
+However, it's important to note that without knowledge of the specific system requirements, it is impossible to determine if the code meets all requirements or if there are any edge cases that it doesn't handle. It is always recommended to thoroughly test the code and ensure that it works correctly in all possible scenarios before using it in a production environment.
+ */
+  public double getCtsPose(){//dont touch
+    int numWraps = (int) (relativeEncoder.getPosition() / 360);
+
+    double relativeEncoderPoseMod360 = relativeEncoder.getPosition() % 360;
+    if(relativeEncoderPoseMod360<0){
+      relativeEncoderPoseMod360+=360;
+      numWraps-=1;
+    } 
+
+    if(relativeEncoderPoseMod360 > 180 && getPose() < 180){
+      numWraps+=1;
+    }else if(relativeEncoderPoseMod360 < 180 && getPose() > 180){
+      numWraps-=1;
+    }
+
+    int ctsOffset = numWraps*360;
+    return ctsOffset + getPose();
+  }
+
   public double getVelocity() {
     return encoder.getVelocity();
   }
@@ -65,7 +95,7 @@ public class Wrist extends SubsystemBase {
   }
 
   public void setVoltage(double volts) {
-    motor.setVoltage(volts);
+    // motor.setVoltage(volts);
   }
 
   @Override
@@ -78,6 +108,7 @@ public class Wrist extends SubsystemBase {
     double ffval = ff.calculate(currentPose, 0);
 
     Logger.getInstance().recordOutput("Wrist/Pose", currentPose);
+    Logger.getInstance().recordOutput("Wrist/Cts Pose", getCtsPose());
     Logger.getInstance().recordOutput("Wrist/Vel", getVelocity());
     Logger.getInstance().recordOutput("Wrist/Goal", goal);
     Logger.getInstance().recordOutput("Wrist/Error", pid.getPositionError());
@@ -107,6 +138,14 @@ public class Wrist extends SubsystemBase {
     motor.setIdleMode(IdleMode.kCoast);
     encoder.setPositionConversionFactor(360);
     encoder.setVelocityConversionFactor(360);
+
+    // don't touch this either
+    relativeEncoder = motor.getEncoder();
+    relativeEncoder.setPositionConversionFactor(360.0 / Constants.MECH_PLOT.WRIST_REDUCTION);
+    relativeEncoder.setVelocityConversionFactor(360.0 / Constants.MECH_PLOT.WRIST_REDUCTION);
+    var startPose = getPose();
+    if(startPose < -90) startPose+=360;
+    relativeEncoder.setPosition(startPose);
 
     /* Status 0 governs applied output, faults, and whether is a follower. Not important for this. */
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
