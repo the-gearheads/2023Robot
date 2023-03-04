@@ -170,6 +170,42 @@ public class AutonPaths {
         // run autobalance here
   }
 
+  public static CommandBase Inert9StraightToDock(Subsystems s) {
+    return new SequentialCommandGroup(
+      // Move forward
+      new ParallelCommandGroup(new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+          getCommandForPath("InertN9-StartN9", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
+
+      // place game piece
+      getPlaceConeCommand(s),
+
+      //go to autobalance pose
+      new ParallelCommandGroup(new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT),
+        getCommandForPath("InertN9-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)  
+      )
+
+      // run autobalance here
+    );
+  }
+
+  public static CommandBase Inert1StraightToDock(Subsystems s) {
+    return new SequentialCommandGroup(
+      // Move forward
+      new ParallelCommandGroup(new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+          getCommandForPath("InertN1-StartN1", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
+
+      // place game piece
+      getPlaceConeCommand(s),
+
+      //go to autobalance pose
+      new ParallelCommandGroup(new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT),
+        getCommandForPath("InertN1-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)  
+      )
+
+      // run autobalance here
+    );
+  }
+
   /* Places a cone on the grid
    * ASSUPTIONS: Cone being held, arm in correct position, alt mode corresponds to setting wrist to 0deg, and default sets it to 90deg
    */
