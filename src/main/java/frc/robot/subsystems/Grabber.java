@@ -41,11 +41,21 @@ public class Grabber extends SubsystemBase {
     return isClosed;
   }
 
+  boolean wasLastEnabled = false;
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // Turn spinny air pump cooling device on if enabled
-    pdh.setSwitchableChannel(DriverStation.isEnabled());
+    var enabled = DriverStation.isEnabled();
+    if(enabled && !wasLastEnabled) {
+      // Turn spinny air pump cooling device on if enabled
+      pdh.setSwitchableChannel(true);
+    }
+    if(!enabled && wasLastEnabled) {
+      pdh.setSwitchableChannel(false);
+    }
+
+    wasLastEnabled = enabled;
     Logger.getInstance().recordOutput("Grabber/IsClosed", isClosed);
   }
 }
