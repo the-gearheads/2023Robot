@@ -83,7 +83,9 @@ public class AutonChooser {
     Command InertN9TwoConePath = AutonPaths.InertN9TwoConePath(s);
     Command InertN9GrabThenDock = AutonPaths.InertN9GrabThenDock(s);
     Command InertN9PlaceThenDock = AutonPaths.InertN9PlaceThenDock(s);
+    Command InertN4PlaceThenDock = AutonPaths.InertN4PlaceThenDock(s);
 
+    autons.put("N4 Place Then Dock", InertN4PlaceThenDock);
     autons.put("N1 TwoCone", InertN1TwoConePath);
     autons.put("N1 Grab Then Dock", InertN1GrabThenDock);
     autons.put("N1 Place Then Dock", InertN1PlaceThenDock);
