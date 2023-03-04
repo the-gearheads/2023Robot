@@ -218,7 +218,18 @@ public class AutonPaths {
     );
   }
 
-  public static CommandBase Inert4-
+  public static CommandBase InertN4ExploreOverStationDock(Subsystems s) {
+    return new SequentialCommandGroup(
+      new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+      getCommandForPath("InertN4-StartN4", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+
+      getPlaceConeCommand(s),
+
+      new ParallelCommandGroup(new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT),
+        getCommandForPath("StartN4-ExploreOverStation-Dock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)
+      )
+    );
+  }
 
   /* Places a cone on the grid
    * ASSUPTIONS: Cone being held, arm in correct position, alt mode corresponds to setting wrist to 0deg, and default sets it to 90deg
