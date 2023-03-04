@@ -32,10 +32,16 @@ public class Wrist extends SubsystemBase {
       new SendableArmFeedforward(WRIST.WRIST_FF[0], WRIST.WRIST_FF[1], WRIST.WRIST_FF[2]);
   private Arm arm;
   private WristStateType controlState = WristStateType.DEFAULT;
+  private int numWraps;
+  private double lastPose;
 
   public Wrist(Arm arm) {
     this.arm = arm;
     configure();
+    numWraps = 0;
+    lastPose=getPose();
+
+    if(lastPose < - 135) numWraps += 1;
 
     SmartDashboard.putData("Wrist/ff", ff);
     SmartDashboard.putData("Wrist/pid", pid);
@@ -56,33 +62,17 @@ public class Wrist extends SubsystemBase {
   public double getPose() {
     return encoder.getPosition() + Constants.WRIST.ANGLE_OFFSET;
   }
-
-  /**
-   The code calculates the number of full 360-degree wraps using the relativeEncoder.getPosition() method, and then calculates the relative encoder position modulo 360 to get the position within the current 360-degree wrap. It adjusts the modulo value by adding 360 degrees and subtracting 1 from the number of wraps if the modulo value is negative.
-
-The code then checks if the relative encoder position is greater than 180 degrees and the absolute encoder position is less than 180 degrees, or if the relative encoder position is less than 180 degrees and the absolute encoder position is greater than 180 degrees. If either condition is true, it adjusts the number of wraps accordingly.
-
-Finally, the code multiplies the number of wraps by 360 degrees and adds the absolute encoder position to get the continuous angle.
-
-However, it's important to note that without knowledge of the specific system requirements, it is impossible to determine if the code meets all requirements or if there are any edge cases that it doesn't handle. It is always recommended to thoroughly test the code and ensure that it works correctly in all possible scenarios before using it in a production environment.
- */
   public double getCtsPose(){//dont touch
-    int numWraps = (int) (relativeEncoder.getPosition() / 360);
+    var pose = getPose();
 
-    double relativeEncoderPoseMod360 = relativeEncoder.getPosition() % 360;
-    if(relativeEncoderPoseMod360<0){
-      relativeEncoderPoseMod360+=360;
-      numWraps-=1;
-    } 
-
-    if(relativeEncoderPoseMod360 > 180 && getPose() < 180){
-      numWraps+=1;
-    }else if(relativeEncoderPoseMod360 < 180 && getPose() > 180){
-      numWraps-=1;
+    var deltaPose = pose - lastPose;
+    if (deltaPose > 270) {
+      numWraps -= 1;
+    } else if (deltaPose < -270) {
+      numWraps += 1;
     }
-
-    int ctsOffset = numWraps*360;
-    return ctsOffset + getPose();
+    lastPose = pose;
+    return pose + numWraps*360;
   }
 
   public double getVelocity() {
@@ -95,14 +85,14 @@ However, it's important to note that without knowledge of the specific system re
   }
 
   public void setVoltage(double volts) {
-    // motor.setVoltage(volts);
+    motor.setVoltage(volts);
   }
 
   @Override
   public void periodic() {
     setGoalByType(controlState);
     setGoalByType(WristStateType.OVERRIDE);
-    double currentPose = getPose();
+    double currentPose = getCtsPose();
 
     double pidval = pid.calculate(currentPose, goal);
     double ffval = ff.calculate(currentPose, 0);
