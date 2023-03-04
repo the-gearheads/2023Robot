@@ -37,7 +37,10 @@ public class AutonPaths {
         
         new ParallelCommandGroup(
           getCommandForPath("StartN4-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
-          new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT)));
+          new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT)),
+        
+        new AutoBalance(s.swerve)
+        );
   }
   public static CommandBase InertN1TwoConePath(Subsystems s) {
     return new SequentialCommandGroup(
