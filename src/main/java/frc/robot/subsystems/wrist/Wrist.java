@@ -6,6 +6,7 @@ package frc.robot.subsystems.wrist;
 
 import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
@@ -25,15 +26,22 @@ public class Wrist extends SubsystemBase {
   private double goal;
   private CANSparkMax motor = new CANSparkMax(WRIST.WRIST_ID, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
+  private RelativeEncoder relativeEncoder;
   protected PIDController pid = new PIDController(WRIST.WRIST_PID[0], WRIST.WRIST_PID[1], WRIST.WRIST_PID[2]);
   private SendableArmFeedforward ff =
       new SendableArmFeedforward(WRIST.WRIST_FF[0], WRIST.WRIST_FF[1], WRIST.WRIST_FF[2]);
   private Arm arm;
   private WristStateType controlState = WristStateType.DEFAULT;
+  private int numWraps;
+  private double lastPose;
 
   public Wrist(Arm arm) {
     this.arm = arm;
     configure();
+    numWraps = 0;
+    lastPose=getPose();
+
+    if(lastPose < - 135) numWraps += 1;
 
     SmartDashboard.putData("Wrist/ff", ff);
     SmartDashboard.putData("Wrist/pid", pid);
@@ -54,6 +62,18 @@ public class Wrist extends SubsystemBase {
   public double getPose() {
     return encoder.getPosition() + Constants.WRIST.ANGLE_OFFSET;
   }
+  public double getCtsPose(){//dont touch
+    var pose = getPose();
+
+    var deltaPose = pose - lastPose;
+    if (deltaPose > 270) {
+      numWraps -= 1;
+    } else if (deltaPose < -270) {
+      numWraps += 1;
+    }
+    lastPose = pose;
+    return pose + numWraps*360;
+  }
 
   public double getVelocity() {
     return encoder.getVelocity();
@@ -72,12 +92,13 @@ public class Wrist extends SubsystemBase {
   public void periodic() {
     setGoalByType(controlState);
     setGoalByType(WristStateType.OVERRIDE);
-    double currentPose = getPose();
+    double currentPose = getCtsPose();
 
     double pidval = pid.calculate(currentPose, goal);
     double ffval = ff.calculate(currentPose, 0);
 
     Logger.getInstance().recordOutput("Wrist/Pose", currentPose);
+    Logger.getInstance().recordOutput("Wrist/Cts Pose", getCtsPose());
     Logger.getInstance().recordOutput("Wrist/Vel", getVelocity());
     Logger.getInstance().recordOutput("Wrist/Goal", goal);
     Logger.getInstance().recordOutput("Wrist/Error", pid.getPositionError());
@@ -107,6 +128,14 @@ public class Wrist extends SubsystemBase {
     motor.setIdleMode(IdleMode.kCoast);
     encoder.setPositionConversionFactor(360);
     encoder.setVelocityConversionFactor(360);
+
+    // don't touch this either
+    relativeEncoder = motor.getEncoder();
+    relativeEncoder.setPositionConversionFactor(360.0 / Constants.MECH_PLOT.WRIST_REDUCTION);
+    relativeEncoder.setVelocityConversionFactor(360.0 / Constants.MECH_PLOT.WRIST_REDUCTION);
+    var startPose = getPose();
+    if(startPose < -90) startPose+=360;
+    relativeEncoder.setPosition(startPose);
 
     /* Status 0 governs applied output, faults, and whether is a follower. Not important for this. */
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
