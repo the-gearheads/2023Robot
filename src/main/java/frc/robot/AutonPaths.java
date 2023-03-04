@@ -23,6 +23,21 @@ public class AutonPaths {
   /* Places cone in high node, goes to GP1 to pick up a cube, places it in low hybrid node
    * ASSUMPTIONS: Cone preloaded, arm already inside robot, in inert pos, pos constants correct
    */
+
+  public static Command InertN4PlaceThenDock(Subsystems s){
+    return new SequentialCommandGroup(
+        setInitPose(s,"InertN4-StartN4"),
+        // Move forward
+        new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+        getCommandForPath("InertN4-StartN4", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+
+        // place game piece
+        getPlaceConeCommand(s),
+        
+        new ParallelCommandGroup(
+          getCommandForPath("StartN4-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+          new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT)));
+  }
   public static CommandBase InertN1TwoConePath(Subsystems s) {
     return new SequentialCommandGroup(
         setInitPose(s,"InertN1-StartN1"),
