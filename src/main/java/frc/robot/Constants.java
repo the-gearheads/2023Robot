@@ -70,7 +70,7 @@ public class Constants extends AnnotatedClass {
 
   public static class ARM {
     public static final int ARM_ID = 9;
-    public static final double[] ARM_POS_PID = {0.05, 0, 0};
+    public static final double[] ARM_POS_PID = {0.086, 0, 0};
     public static final double[] ARM_VEL_PID = {0.009, 0, 0};
     // ks, kg, kv, ka
     public static final double[] ARM_FF = {0, 0.5, 3, 0};
@@ -80,6 +80,7 @@ public class Constants extends AnnotatedClass {
     public static final double POSE_TOLERANCE = 5;
     public static final double ANGLE_OFFSET = -270;
     public static final Constraints ARM_CONSTRAINTS = new Constraints(120, 150);
+    public static final Constraints ARM_VEL_CONSTRAINTS = new Constraints(VELOCITY, 10);
     public static final double MAX_ANGLE = 10;
     public static final double MIN_ANGLE = -190;
   }
