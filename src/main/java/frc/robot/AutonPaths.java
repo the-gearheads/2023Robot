@@ -55,8 +55,8 @@ public class AutonPaths {
   public static CommandBase InertN9TwoConePath(Subsystems s) {
     return new SequentialCommandGroup(
         // Move forward
-        new ParallelCommandGroup(new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-            getCommandForPath("InertN9-StartN9", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
+        new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+        getCommandForPath("InertN9-StartN9", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
 
         // place game piece
         getPlaceConeCommand(s),
@@ -126,8 +126,8 @@ public class AutonPaths {
   public static CommandBase InertN1GrabThenDock(Subsystems s) {
     return new SequentialCommandGroup(
         // Move forward
-        new ParallelCommandGroup(new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-            getCommandForPath("InertN1-StartN1", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
+        new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+        getCommandForPath("InertN1-StartN1", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
 
         // place game piece
         getPlaceConeCommand(s),
@@ -155,8 +155,8 @@ public class AutonPaths {
   public static CommandBase InertN9GrabThenDock(Subsystems s) {
     return new SequentialCommandGroup(
         // Move forward
-        new ParallelCommandGroup(new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-            getCommandForPath("InertN9-StartN9", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
+        new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+        getCommandForPath("InertN9-StartN9", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
 
         // place game piece
         getPlaceConeCommand(s),
@@ -183,8 +183,8 @@ public class AutonPaths {
   public static CommandBase Inert9StraightToDock(Subsystems s) {
     return new SequentialCommandGroup(
       // Move forward
-      new ParallelCommandGroup(new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-          getCommandForPath("InertN9-StartN9", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
+      new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+      getCommandForPath("InertN9-StartN9", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
 
       // place game piece
       getPlaceConeCommand(s),
@@ -202,8 +202,8 @@ public class AutonPaths {
   public static CommandBase Inert1StraightToDock(Subsystems s) {
     return new SequentialCommandGroup(
       // Move forward
-      new ParallelCommandGroup(new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-          getCommandForPath("InertN1-StartN1", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
+      new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+      getCommandForPath("InertN1-StartN1", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
 
       // place game piece
       getPlaceConeCommand(s),

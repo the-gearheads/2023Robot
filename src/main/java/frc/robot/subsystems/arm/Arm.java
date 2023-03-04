@@ -182,6 +182,7 @@ public class Arm extends SubsystemBase {
   private void configure() {
     motor.restoreFactoryDefaults();
     motor.setInverted(false);
+    motor.setSmartCurrentLimit(50);
     encoder.setInverted(false);
     motor.setIdleMode(IdleMode.kBrake);
     encoder.setPositionConversionFactor(360);
