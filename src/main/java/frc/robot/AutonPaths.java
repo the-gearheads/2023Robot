@@ -180,7 +180,7 @@ public class AutonPaths {
 
   }
 
-  public static CommandBase Inert9StraightToDock(Subsystems s) {
+  public static CommandBase InertN9StraightToDock(Subsystems s) {
     return new SequentialCommandGroup(
       // Move forward
       new SetArmPose(s.arm, ArmPose.HIGH_NODE),
@@ -199,7 +199,7 @@ public class AutonPaths {
     );
   }
 
-  public static CommandBase Inert1StraightToDock(Subsystems s) {
+  public static CommandBase InertN1StraightToDock(Subsystems s) {
     return new SequentialCommandGroup(
       // Move forward
       new SetArmPose(s.arm, ArmPose.HIGH_NODE),
@@ -217,6 +217,8 @@ public class AutonPaths {
       new AutoBalance(s.swerve)
     );
   }
+
+  public static CommandBase Inert4-
 
   /* Places a cone on the grid
    * ASSUPTIONS: Cone being held, arm in correct position, alt mode corresponds to setting wrist to 0deg, and default sets it to 90deg
