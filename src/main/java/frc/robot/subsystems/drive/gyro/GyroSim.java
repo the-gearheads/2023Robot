@@ -32,6 +32,6 @@ public class GyroSim implements GyroIO {
 
   public void updateInputs(GyroIOInputs inputs) {
     inputs.angleRadians = rot.getRadians();
-    inputs.angleRadians = getRate();
+    // inputs.angleRadians = getRate();
   }
 }
