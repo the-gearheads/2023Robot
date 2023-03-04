@@ -56,8 +56,8 @@ public class UpdateSwervePoseEstimator extends CommandBase {
         continue;
       }
 
-      var closestEstimate = vision.closestEstimateFinder.getClosestEstimate(estimator, estimate);
-      fuseEstimate(closestEstimate.get());
+      // var closestEstimate = vision.closestEstimateFinder.getClosestEstimate(estimator, estimate);
+      // fuseEstimate(closestEstimate.get());
     }
   }
 

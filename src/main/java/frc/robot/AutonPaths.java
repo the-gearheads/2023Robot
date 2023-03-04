@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
+import frc.robot.commands.drive.AutoBalance;
 import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.commands.wrist.DefaultWristControl;
 import frc.robot.subsystems.Grabber;
@@ -93,9 +94,11 @@ public class AutonPaths {
         new ParallelCommandGroup(
             getCommandForPath("StartN1-Explore-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
             new SequentialCommandGroup( // Start moving the arm 1 second into the path following
-                new WaitCommand(1), new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT))));
+                new WaitCommand(1), new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT))),
 
         // Add autobalance here.
+        new AutoBalance(s.swerve)
+    );
   }
 
   public static CommandBase InertN9PlaceThenDock(Subsystems s) {
@@ -113,7 +116,11 @@ public class AutonPaths {
         new ParallelCommandGroup(
             getCommandForPath("StartN9-Explore-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
             new SequentialCommandGroup( // Start moving the arm 1 second into the path following
-                new WaitCommand(1), new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT))));
+                new WaitCommand(1), new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT))),
+        
+        new AutoBalance(s.swerve)
+                
+    );
   }
 
   public static CommandBase InertN1GrabThenDock(Subsystems s) {
@@ -137,9 +144,10 @@ public class AutonPaths {
         // go back to grid node 3 inert
         new ParallelCommandGroup(
             getCommandForPath("GamePiece1-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
-            new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT))
+            new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT)),
 
-        // run autobalance      
+        // run autobalance 
+        new AutoBalance(s.swerve)
       );
 
   }
@@ -165,9 +173,11 @@ public class AutonPaths {
         // go back to grid node 3 inert
         new ParallelCommandGroup(
             getCommandForPath("GamePiece9-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
-            new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT)));
+            new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT)),
 
-        // run autobalance here
+        new AutoBalance(s.swerve)
+    );
+
   }
 
   public static CommandBase Inert9StraightToDock(Subsystems s) {
@@ -182,9 +192,10 @@ public class AutonPaths {
       //go to autobalance pose
       new ParallelCommandGroup(new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT),
         getCommandForPath("InertN9-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)  
-      )
+      ),
 
       // run autobalance here
+      new AutoBalance(s.swerve)
     );
   }
 
@@ -200,9 +211,10 @@ public class AutonPaths {
       //go to autobalance pose
       new ParallelCommandGroup(new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT),
         getCommandForPath("InertN1-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)  
-      )
+      ),
 
       // run autobalance here
+      new AutoBalance(s.swerve)
     );
   }
 
