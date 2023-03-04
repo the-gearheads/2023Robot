@@ -156,7 +156,7 @@ public class Constants extends AnnotatedClass {
         new Translation2d(Units.inchesToMeters(-12.25), Units.inchesToMeters(-13.25));
 
     @NTPublish
-    public static double MAX_LIN_VEL = 4;//set to 2
+    public static double MAX_LIN_VEL = 2;//set to 2
     @NTPublish
     public static double MAX_ROT_VEL = 2.5;
 
