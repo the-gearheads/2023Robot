@@ -15,6 +15,9 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.Trajectory.State;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ARM;
@@ -28,8 +31,11 @@ public class Arm extends SubsystemBase {
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
   private ProfiledPIDController pid =
       new ProfiledPIDController(ARM.ARM_POS_PID[0], ARM.ARM_POS_PID[1], ARM.ARM_POS_PID[2], ARM.ARM_CONSTRAINTS);
-  private PIDController velPid = new PIDController(ARM.ARM_VEL_PID[0], ARM.ARM_VEL_PID[1], ARM.ARM_VEL_PID[2]);
+  private ProfiledPIDController velPid = new ProfiledPIDController(ARM.ARM_VEL_PID[0], ARM.ARM_VEL_PID[1], ARM.ARM_VEL_PID[2], ARM.ARM_VEL_CONSTRAINTS);
   private SendableArmFeedforward ff = new SendableArmFeedforward(ARM.ARM_FF[0], ARM.ARM_FF[1], ARM.ARM_FF[2], ARM.ARM_FF[3]);
+  private double lastTime = Timer.getFPGATimestamp();
+  private double lastVel = 0;
+  private double acceleration;
 
   public enum ArmControlMode {
     VEL("Velocity"), POS("Position"), VOLTAGE("voltage");
@@ -47,9 +53,9 @@ public class Arm extends SubsystemBase {
     controlMode = ArmControlMode.VEL;
     configure();
 
-    SmartDashboard.putData("arm/pPid", pid);
-    SmartDashboard.putData("arm/vPid", velPid);
-    SmartDashboard.putData("arm/ff", ff);
+    SmartDashboard.putData("Arm/pPid", pid);
+    SmartDashboard.putData("Arm/vPid", velPid);
+    SmartDashboard.putData("Arm/ff", ff);
     setPoseGoal(getPose());
     resetPIDs();
   }
@@ -60,7 +66,7 @@ public class Arm extends SubsystemBase {
 
   public void resetPIDs() {
     pid.reset(getPose(), getVelocity());
-    velPid.reset();
+    velPid.reset(getVelocity(), 0);
   }
 
   public double getPoseGoal() {
@@ -102,12 +108,17 @@ public class Arm extends SubsystemBase {
     var vel = getVelocity();
     var volts = 0.0;
 
+    /* Calculate accleration. IT'S DOUBLE DIFFERENTIATION TIME*/
+    acceleration = (vel - lastVel) / (Timer.getFPGATimestamp() - lastTime);
+
     Logger.getInstance().recordOutput("Arm/CurrentPose", pose);
     Logger.getInstance().recordOutput("Arm/CurrentVel", vel);
+    Logger.getInstance().recordOutput("Arm/Acceleration", acceleration);
     Logger.getInstance().recordOutput("Arm/Pose/Goal", poseGoal);
     Logger.getInstance().recordOutput("Arm/Vel/Goal", velGoal);
     Logger.getInstance().recordOutput("Arm/ControlMode", controlMode.name);
     Logger.getInstance().recordOutput("Arm/Pose/Setpoint", pid.getSetpoint().position);
+    Logger.getInstance().recordOutput("Arm/Vel/Setpoint", velPid.getSetpoint().position);
 
     /* Controlled entirely via setVoltage() */
     if (controlMode == ArmControlMode.VOLTAGE) return;
@@ -117,6 +128,9 @@ public class Arm extends SubsystemBase {
     } else {
       volts = poseControl();
     }
+
+    lastVel = getVelocity();
+    lastTime = Timer.getFPGATimestamp();
 
     volts = applySoftLimit(volts);
     setVoltage(volts);
@@ -131,6 +145,7 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Pose/PIDval", pidval);
     Logger.getInstance().recordOutput("Arm/Pose/Error", pid.getPositionError());
 
+    velPid.reset(getVelocity(), acceleration);
     return ffval + pidval;
   }
 
@@ -153,8 +168,7 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Vel/Error", velPid.getPositionError());
 
     setPoseGoal(pose);
-    // We do not care about I-terms for vPID
-    resetPIDs();
+    pid.reset(getPose(), getVelocity());
     return ffval + pidval;
   }
 
