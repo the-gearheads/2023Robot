@@ -4,10 +4,16 @@
 
 package frc.robot;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import org.photonvision.PhotonCamera;
 import com.pathplanner.lib.PathConstraints;
-
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -178,8 +184,22 @@ public class Constants extends AnnotatedClass {
   }
 
   public static final class VISION {
-    public static final Transform3d ROBOT_TO_CAM =
-        new Transform3d(new Translation3d(0.4, -0.005, 0.13), new Rotation3d());
+    public static final HashMap<PhotonCamera, Transform3d> CAMS_AND_TRANS = new HashMap<PhotonCamera, Transform3d>(){{
+      put(new PhotonCamera("ov9281"), 
+        new Transform3d());
+      put(new PhotonCamera("lifecam"), 
+        new Transform3d(new Translation3d(0, 0.05, 0), new Rotation3d()));
+    }};
+
+    public static final List<AprilTag> TEST_TAGS = new ArrayList<AprilTag>(){{
+      var id1Pose = new Pose3d(2.5,2.5,0,new Rotation3d());
+      var id1Toid8 = new Transform3d(new Translation3d(0,0.3,0), new Rotation3d());
+      var id8Pose = id1Pose.plus(id1Toid8);
+
+      add(new AprilTag(1, id1Pose));
+      add(new AprilTag(8, id8Pose));
+    }};
+    public static final AprilTagFieldLayout TEST_ATFL = new AprilTagFieldLayout(TEST_TAGS, 5, 5);
   }
   public static final class CONTROLLERS {
     public static final double JOYSTICK_DEADBAND = 0.1;

@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.wrist.Wrist;
+import frc.robot.subsystems.vision.Vision;
 
 /* Container class for all subsystems */
 public class Subsystems {

@@ -44,7 +44,7 @@ import frc.robot.subsystems.drive.gyro.GyroIOInputsAutoLogged;
 public class Swerve extends SubsystemBase {
 
   Translation2d[] modulePositions = {DRIVE.FL_POS, DRIVE.FR_POS, DRIVE.RL_POS, DRIVE.RR_POS};
-  final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(modulePositions);
+  public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(modulePositions);
   public SwerveModuleIO[] modules;
   public SwerveModuleInputsAutoLogged[] lastInputs;
   public GyroIOInputsAutoLogged lastGyroInputs;
@@ -53,6 +53,8 @@ public class Swerve extends SubsystemBase {
   /* Regular odometry object so we can compare vision-aided odometry with regular odometry in telemetry */
   SwerveDriveOdometry wheelOdometry;
   Field2d field = new Field2d();
+  Runnable resetBuffer = () -> {
+  };
 
   /** Creates a new SwerveSubsystem. */
   public Swerve(GyroIO gyro, SwerveModuleIO... modules) {
@@ -61,12 +63,15 @@ public class Swerve extends SubsystemBase {
     this.modules = modules;
     /* Get module states to pass to odometry */
     updateInputs();
+
+    this.odometry = new SwerveDrivePoseEstimator(kinematics, getRotation(), getModulePositions(), new Pose2d());
+    this.wheelOdometry = new SwerveDriveOdometry(kinematics, getRotation(), getModulePositions());
     zeroEncoders();
 
     /* Initialize SmartDashboard values */
     SmartDashboard.putBoolean("/Swerve/DesaturateWheelSpeeds", false);
 
-    SmartDashboard.putData(field);
+    SmartDashboard.putData("swerve field", field);
 
     SmartDashboard.putData("xPid", AUTON.X_PID);
     SmartDashboard.putData("yPid", AUTON.Y_PID);
@@ -147,10 +152,7 @@ public class Swerve extends SubsystemBase {
     }
     // Needed to update lastInputs to be accurate
     updateInputs();
-    odometry =
-        new SwerveDrivePoseEstimator(kinematics, getRotation(), getPositionsFromInputs(lastInputs), new Pose2d());
-    wheelOdometry =
-        new SwerveDriveOdometry(kinematics, getRotation(), getPositionsFromInputs(lastInputs), new Pose2d());
+    setPose(new Pose2d());
   }
 
   /**
@@ -170,14 +172,15 @@ public class Swerve extends SubsystemBase {
   public void setPose(Pose2d pose) {
     odometry.resetPosition(getRotation(), getPositionsFromInputs(lastInputs), pose);
     wheelOdometry.resetPosition(getRotation(), getPositionsFromInputs(lastInputs), pose);
+    resetBuffer.run();
   }
 
-  public void setVisionPose(Pose2d visionRobotPos, double timestamp) {
+  public void fuseVisionEstimate(Pose2d visionRobotPos, double timestamp) {
     odometry.addVisionMeasurement(visionRobotPos, timestamp);
     field.getObject("Vision").setPose(visionRobotPos);
   }
 
-  public void setVisionPose(Pose2d visionRobotPos, double timestamp, Matrix<N3, N1> stDevs) {
+  public void fuseVisionEstimate(Pose2d visionRobotPos, double timestamp, Matrix<N3, N1> stDevs) {
     odometry.addVisionMeasurement(visionRobotPos, timestamp, stDevs);
     field.getObject("Vision").setPose(visionRobotPos);
   }
@@ -405,5 +408,17 @@ public class Swerve extends SubsystemBase {
     for (int i = 0; i < modules.length; i++) {
       modules[i].setPIDConstants(kF, kP, kI, kD);
     }
+  }
+
+  public SwerveModulePosition[] getModulePositions() {
+    return getPositionsFromInputs(lastInputs);
+  }
+
+  public Pose2d getWheelPose() {
+    return wheelOdometry.getPoseMeters();
+  }
+
+  public void setResetBuffer(Runnable resetBuffer) {
+    this.resetBuffer = resetBuffer;
   }
 }
