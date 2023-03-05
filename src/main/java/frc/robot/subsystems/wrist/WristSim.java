@@ -27,8 +27,8 @@ public class WristSim extends Wrist {
 
   private static final DCMotor simMotor = DCMotor.getNEO(1);
   private static final SingleJointedArmSim sim = new SingleJointedArmSim(simMotor, MECH_PLOT.WRIST_REDUCTION,
-  SingleJointedArmSim.estimateMOI(MECH_PLOT.WRIST_LENGTH, MECH_PLOT.WRIST_MASS), MECH_PLOT.WRIST_LENGTH, -1e10,
-  1e10, true, VecBuilder.fill(0.001));
+      SingleJointedArmSim.estimateMOI(MECH_PLOT.WRIST_LENGTH, MECH_PLOT.WRIST_MASS), MECH_PLOT.WRIST_LENGTH, -1e10,
+      1e10, true, VecBuilder.fill(0.001));
   private final MechRootWrapper simPivot;
   private final MechanismLigament2d simLig;
   private final Cone simCone;
