@@ -93,7 +93,10 @@ public class Constants extends AnnotatedClass {
 
   public static final class WRIST {
     public static final int WRIST_ID = 10;
-    public static final double[] WRIST_PID = {0.17, 0, 0};
+    public static final double[] WRIST_PID = {0.135
+      , 0, 0};//0.17
+      
+      
     public static final double[] WRIST_FF = {0, 0.5, 0};
     public static final double ANGLE_OFFSET = -180;
   }
@@ -156,9 +159,18 @@ public class Constants extends AnnotatedClass {
         new Translation2d(Units.inchesToMeters(-12.25), Units.inchesToMeters(-13.25));
 
     @NTPublish
-    public static double MAX_LIN_VEL = 2;//set to 2
+    public static double HIGH_LIN_VEL = 5;
+
+    public static double MID_LIN_VEL = 1.5;//set to 2
+
+    public static double LOW_LIN_VEL = 0.5;
     @NTPublish
-    public static double MAX_ROT_VEL = 2.5;
+    public static double HIGH_ROT_VEL = 2.5;
+
+    public static double MID_ROT_VEL = 1.5;
+
+    public static double LOW_ROT_VEL = 0.5;
+
 
     @NTPublish
     public static double MAX_MODULE_SPEED = 5;
@@ -172,6 +184,7 @@ public class Constants extends AnnotatedClass {
     public static PIDController X_PID = new PIDController(5, 0, 0);//0.5
     public static PIDController Y_PID = new PIDController(5, 0, 0);//0.5
     public static PIDController ROT_PID = new PIDController(1.5, 0, 0);
+    public static PathConstraints REALLY_SLOW_CONSTRAINTS = new PathConstraints(0.75, 0.7);
     public static PathConstraints SLOW_CONSTRAINTS = new PathConstraints(2, 1);
     public static PathConstraints MID_CONSTRAINTS = new PathConstraints(4, 2);
     public static PathConstraints FAST_CONSTRAINTS = new PathConstraints(7, 3);

@@ -51,6 +51,13 @@ public class XboxDriverController implements DriverController {
     return new JoystickButton(controller, XboxController.Button.kRightBumper.value);
   }
 
+  public Trigger HIGH_SPEED() {
+    return new JoystickButton(controller, XboxController.Button.kRightBumper.value);
+  }
+  public Trigger LOW_SPEED() {
+    return new JoystickButton(controller, XboxController.Button.kLeftBumper.value);
+  }
+
   public Trigger getResetPoseButton() {
     return new JoystickButton(controller, XboxController.Button.kLeftBumper.value);
   }

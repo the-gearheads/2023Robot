@@ -92,7 +92,7 @@ public class Wrist extends SubsystemBase {
   public void periodic() {
     setGoalByType(controlState);
     setGoalByType(WristStateType.OVERRIDE);
-    double currentPose = getCtsPose();
+    double currentPose = getPose();
 
     double pidval = pid.calculate(currentPose, goal);
     double ffval = ff.calculate(currentPose, 0);

@@ -86,10 +86,20 @@ public class TeleopDrive extends CommandBase {
       Logger.getInstance().recordOutput("TeleopDrive/RateLimitedY", ySpd);
       Logger.getInstance().recordOutput("TeleopDrive/RateLimitedRot", rotSpd);
     }
+    
+    var lin_mult = Constants.DRIVE.MID_LIN_VEL;
+    var rot_mult = Constants.DRIVE.MID_ROT_VEL;
 
-    xSpd *= Constants.DRIVE.MAX_LIN_VEL;
-    ySpd *= Constants.DRIVE.MAX_LIN_VEL;
-    rotSpd *= Constants.DRIVE.MAX_ROT_VEL;
+    if(Controllers.driverController.LOW_SPEED().getAsBoolean()){
+      lin_mult=Constants.DRIVE.LOW_LIN_VEL;
+      rot_mult=Constants.DRIVE.LOW_ROT_VEL;
+    }else if(Controllers.driverController.HIGH_SPEED().getAsBoolean()){
+      lin_mult=Constants.DRIVE.HIGH_LIN_VEL;
+      rot_mult=Constants.DRIVE.HIGH_ROT_VEL;
+    }
+    xSpd *= lin_mult;
+    ySpd *= lin_mult;
+    rotSpd *= rot_mult;
 
     //Make sure the robot maintains its heading when we aren't toggling the rotation axis
     if (SmartDashboard.getBoolean("Rotation PID", false)) {

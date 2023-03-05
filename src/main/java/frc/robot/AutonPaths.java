@@ -244,8 +244,10 @@ public class AutonPaths {
       getPlaceConeCommand(s),
 
       new ParallelCommandGroup(new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT),
-        getCommandForPath("StartN4-ExploreOverStation-Dock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)
-      )
+        getCommandForPath("StartN4-ExploreOverStation", false, Constants.AUTON.REALLY_SLOW_CONSTRAINTS, s.swerve)
+      ),
+      getCommandForPath("ExploreOverStation-Dock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+      new AutoBalance(s.swerve)
     );
   }
 
