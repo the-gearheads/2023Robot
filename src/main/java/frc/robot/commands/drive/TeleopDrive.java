@@ -71,57 +71,15 @@ public class TeleopDrive extends CommandBase {
       xSpd = xyPair.getFirst();
       ySpd = xyPair.getSecond();
     } else {
-      //Quadratic axis control
-      xSpd *= Math.abs(xSpd);
-      ySpd *= Math.abs(ySpd);
-      rotSpd *= Math.abs(rotSpd);
+      //Cubic axis control (yes, i intentionally put the signum there in case we want to change to an even power)
+      xSpd = Math.pow(xSpd, 3) * Math.signum(xSpd);
+      ySpd *= Math.pow(xSpd, 3) * Math.signum(xSpd);
+      rotSpd *= Math.pow(xSpd, 3) * Math.signum(xSpd);
     }
-
-    Logger.getInstance().recordOutput("TeleopDrive/Squared/xSpd", xSpd);
-    Logger.getInstance().recordOutput("TeleopDrive/Squared/ySpd", ySpd);
-    Logger.getInstance().recordOutput("TeleopDrive/Squared/rotSpd", rotSpd);
-
-    //Quadratic axis control
-    xSpd *= Math.abs(xSpd);
-    ySpd *= Math.abs(ySpd);
-    rotSpd *= Math.abs(rotSpd);
 
     Logger.getInstance().recordOutput("TeleopDrive/Cubed/xSpd", xSpd);
     Logger.getInstance().recordOutput("TeleopDrive/Cubed/ySpd", ySpd);
     Logger.getInstance().recordOutput("TeleopDrive/Cubed/rotSpd", rotSpd);
-
-    //Quadratic axis control
-    xSpd *= Math.abs(xSpd);
-    ySpd *= Math.abs(ySpd);
-    rotSpd *= Math.abs(rotSpd);
-
-    Logger.getInstance().recordOutput("TeleopDrive/4th/xSpd", xSpd);
-    Logger.getInstance().recordOutput("TeleopDrive/4th/ySpd", ySpd);
-    Logger.getInstance().recordOutput("TeleopDrive/4th/rotSpd", rotSpd);
-
-    xSpd *= Math.abs(xSpd);
-    ySpd *= Math.abs(ySpd);
-    rotSpd *= Math.abs(rotSpd);
-
-    Logger.getInstance().recordOutput("TeleopDrive/5th/xSpd", xSpd);
-    Logger.getInstance().recordOutput("TeleopDrive/5th/ySpd", ySpd);
-    Logger.getInstance().recordOutput("TeleopDrive/5th/rotSpd", rotSpd);
-
-    xSpd *= Math.abs(xSpd);
-    ySpd *= Math.abs(ySpd);
-    rotSpd *= Math.abs(rotSpd);
-
-    Logger.getInstance().recordOutput("TeleopDrive/6th/xSpd", xSpd);
-    Logger.getInstance().recordOutput("TeleopDrive/6th/ySpd", ySpd);
-    Logger.getInstance().recordOutput("TeleopDrive/6th/rotSpd", rotSpd);
-
-    xSpd *= Math.abs(xSpd);
-    ySpd *= Math.abs(ySpd);
-    rotSpd *= Math.abs(rotSpd);
-
-    Logger.getInstance().recordOutput("TeleopDrive/7th/xSpd", xSpd);
-    Logger.getInstance().recordOutput("TeleopDrive/7th/ySpd", ySpd);
-    Logger.getInstance().recordOutput("TeleopDrive/7th/rotSpd", rotSpd);
 
     var limitedSpeeds = rateLimiter.rateLimit(new ChassisSpeeds(xSpd, ySpd, rotSpd));
     if (SmartDashboard.getBoolean("TeleopDrive/RateLimitDrive", false)) {
