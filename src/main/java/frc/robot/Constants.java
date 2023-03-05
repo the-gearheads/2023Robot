@@ -215,7 +215,7 @@ public class Constants extends AnnotatedClass {
     public static final AprilTagFieldLayout TEST_ATFL = new AprilTagFieldLayout(TEST_TAGS, 5, 5);
   }
   public static final class CONTROLLERS {
-    public static final double JOYSTICK_DEADBAND = 0.1;
+    public static final double JOYSTICK_DEADBAND = 0.05;//if robot starts moving by itself, change to 0.1
   }
 
   public static final class LEDS {
