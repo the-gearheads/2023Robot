@@ -98,7 +98,7 @@ public class SysidMechanismCommand extends CommandBase {
   @Override
   public void end(boolean interrupted) {
 
-    setVoltage.accept((double)0);
+    setVoltage.accept((double) 0);
 
     // This was probably false initially
     Threads.setCurrentThreadPriority(false, 0);

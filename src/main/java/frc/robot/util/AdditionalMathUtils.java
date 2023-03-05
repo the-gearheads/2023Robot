@@ -19,11 +19,11 @@ public class AdditionalMathUtils {
     //      "; Deg="+ round(pos.getRotation().getDegrees(), places);
     return "X=" + pos.getX() + "; Y=" + pos.getY() + "; Deg=" + pos.getRotation().getDegrees();
   }
-  public static String cornerToString(TargetCorner corner, int places){
-    return "("  + round(corner.x, places) + 
-         ", "  + round(corner.y, places)+
-         ")";
+
+  public static String cornerToString(TargetCorner corner, int places) {
+    return "(" + round(corner.x, places) + ", " + round(corner.y, places) + ")";
   }
+
   /* Pose exp for teleop drive. Takes in controller x and y axises and outputs pose exped ones */
   public static Pair<Double, Double> poseExp(double x, double y) {
     // java doesn't have an exponent operator apparently
