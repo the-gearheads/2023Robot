@@ -49,6 +49,9 @@ public interface DriverController {
     return new Trigger(() -> false);
   }
 
+  public default Trigger backUpFromFeeder() {
+    return new Trigger(() -> false);
+  }
   /* Button to set wheels into X formation */
   public default Trigger getSetWheelXButton() {
     return new Trigger(() -> false);

@@ -18,6 +18,10 @@ public class XboxDriverController implements DriverController {
     return -Controllers.deadband(controller.getLeftY());
   }
 
+  public Trigger backUpFromFeeder() {
+    return new JoystickButton(controller, XboxController.Button.kA.value);
+  }
+  
   @Override
   public double getYMoveAxis() {
     return -Controllers.deadband(controller.getLeftX());
