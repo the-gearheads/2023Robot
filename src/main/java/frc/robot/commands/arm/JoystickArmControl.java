@@ -24,7 +24,7 @@ public class JoystickArmControl extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    //arm.setPoseGoal(arm.getPose());
+    // arm.setPoseGoal(arm.getPose());
     // arm.resetPIDs();
   }
 

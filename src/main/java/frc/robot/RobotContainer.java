@@ -141,20 +141,20 @@ public class RobotContainer {
     Controllers.updateActiveControllerInstance();
 
     // Put new bindings here.
-    Controllers.driverController.getPPLoadDebugForwardPath()
-        .toggleOnTrue(AutonPaths.getCommandForPath("StartN1-GamePiece1", true, AUTON.SLOW_CONSTRAINTS, swerve));
+    // Controllers.driverController.getPPLoadDebugForwardPath()
+    //     .toggleOnTrue(AutonPaths.getCommandForPath("StartN1-GamePiece1", true, AUTON.SLOW_CONSTRAINTS, swerve));
 
-    Controllers.driverController.getPPLoadDebugBackwardPath()
-        .toggleOnTrue(AutonPaths.getCommandForPath("GamePiece1-StartN1", true, AUTON.SLOW_CONSTRAINTS, swerve));
+    // Controllers.driverController.getPPLoadDebugBackwardPath()
+    //     .toggleOnTrue(AutonPaths.getCommandForPath("GamePiece1-StartN1", true, AUTON.SLOW_CONSTRAINTS, swerve));
 
     // This command puts the robot 1 meter in front of apriltag 8 (middle of bottom left grid on pathplanner picture of 2023 field)
-    Controllers.driverController.getPPGotoTag8().onTrue(new InstantCommand(() -> {
-      swerve.goTo(Constants.FIELD_CONSTANTS.DEBUG_GO_TO_DEST, AUTON.SLOW_CONSTRAINTS).schedule();
-    }));
+    // Controllers.driverController.getPPGotoTag8().onTrue(new InstantCommand(() -> {
+    //   swerve.goTo(Constants.FIELD_CONSTANTS.DEBUG_GO_TO_DEST, AUTON.SLOW_CONSTRAINTS).schedule();
+    // }));
 
-    Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(() -> {
-      swerve.setPose(new Pose2d(3, 0.38, Rotation2d.fromDegrees(90)));
-    }));
+    // Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(() -> {
+    //   swerve.setPose(new Pose2d(3, 0.38, Rotation2d.fromDegrees(90)));
+    // }));
 
     Controllers.operatorController.armGoToLowNode().onTrue(new SetArmPose(arm, ArmPose.LOW_NODE));
     Controllers.operatorController.armGoToMidNode().onTrue(new SetArmPose(arm, ArmPose.MID_NODE));

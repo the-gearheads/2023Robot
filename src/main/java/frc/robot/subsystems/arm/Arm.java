@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.arm;
 
+import java.sql.Driver;
 import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
@@ -17,6 +18,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.Trajectory.State;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -48,6 +50,7 @@ public class Arm extends SubsystemBase {
   }
 
   private ArmControlMode controlMode;
+  private boolean prevDisabled;
 
   public Arm() {
     controlMode = ArmControlMode.VEL;
@@ -58,6 +61,7 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putData("Arm/ff", ff);
     setPoseGoal(getPose());
     resetPIDs();
+    prevDisabled = !DriverStation.isEnabled();
   }
 
   public void setControlMode(ArmControlMode mode) {
@@ -104,6 +108,12 @@ public class Arm extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if(prevDisabled && DriverStation.isEnabled()){
+      setPoseGoal(getPose());
+      resetPIDs();
+    }
+    prevDisabled = !DriverStation.isEnabled();
+
     var pose = getPose();
     var vel = getVelocity();
     var volts = 0.0;
