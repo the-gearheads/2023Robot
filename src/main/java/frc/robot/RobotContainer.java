@@ -10,6 +10,9 @@ import java.nio.file.Paths;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -155,6 +158,8 @@ public class RobotContainer {
     // Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(() -> {
     //   swerve.setPose(new Pose2d(3, 0.38, Rotation2d.fromDegrees(90)));
     // }));
+
+    Controllers.driverController.backUpFromFeeder().onTrue(swerve.goTo(swerve.getPose().plus(new Transform2d(new Translation2d(Units.inchesToMeters(10),0.0), new Rotation2d())), Constants.AUTON.SLOW_CONSTRAINTS));
 
     Controllers.operatorController.armGoToLowNode().onTrue(new SetArmPose(arm, ArmPose.LOW_NODE));
     Controllers.operatorController.armGoToMidNode().onTrue(new SetArmPose(arm, ArmPose.MID_NODE));
