@@ -47,11 +47,11 @@ public class Grabber extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     var enabled = DriverStation.isEnabled();
-    if(enabled && !wasLastEnabled) {
+    if (enabled && !wasLastEnabled) {
       // Turn spinny air pump cooling device on if enabled
       pdh.setSwitchableChannel(true);
     }
-    if(!enabled && wasLastEnabled) {
+    if (!enabled && wasLastEnabled) {
       pdh.setSwitchableChannel(false);
     }
 

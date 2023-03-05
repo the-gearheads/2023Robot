@@ -12,18 +12,21 @@ import frc.robot.subsystems.vision.Vision;
 
 public class UpdateSwervePoseEstimator extends CommandBase {
   private Vision vision;
-  public enum ShouldFuseEstimate{
+
+  public enum ShouldFuseEstimate {
     YES, NO;
   }
-  public ShouldFuseEstimate shouldFuseEstimate; 
+
+  public ShouldFuseEstimate shouldFuseEstimate;
 
   /** Creates a new UpdateSwervePoseEstimator. */
   public UpdateSwervePoseEstimator(Vision vision) {
     this(vision, ShouldFuseEstimate.YES);
   }
+
   public UpdateSwervePoseEstimator(Vision vision, ShouldFuseEstimate shouldFuseEstimate) {
     this.vision = vision;
-    this.shouldFuseEstimate=shouldFuseEstimate;
+    this.shouldFuseEstimate = shouldFuseEstimate;
 
     addRequirements(vision);
   }
@@ -41,18 +44,18 @@ public class UpdateSwervePoseEstimator extends CommandBase {
     var useClosestEstimate = SmartDashboard.putBoolean("Vision/Use Closest Estimate", false);
     if (useClosestEstimate) {
       useClosestEstimate();
-    }else{
+    } else {
       useBestEstimate();
     }
   }
 
-  public void useClosestEstimate(){
+  public void useClosestEstimate() {
     var estimates = vision.estimates;
-    for(var i = 0; i < estimates.size(); i++){
+    for (var i = 0; i < estimates.size(); i++) {
       var estimate = estimates.get(i);
       var estimator = vision.estimators.get(i);
 
-      if(!Vision.isEstimatePresent(estimate)){
+      if (!Vision.isEstimatePresent(estimate)) {
         continue;
       }
 
@@ -61,12 +64,12 @@ public class UpdateSwervePoseEstimator extends CommandBase {
     }
   }
 
-  public void useBestEstimate(){
+  public void useBestEstimate() {
     var estimates = vision.estimates;
-    for(var i = 0; i < estimates.size(); i++){
+    for (var i = 0; i < estimates.size(); i++) {
       var estimate = estimates.get(i);
 
-      if(!Vision.isEstimatePresent(estimate)){
+      if (!Vision.isEstimatePresent(estimate)) {
         continue;
       }
 
@@ -89,7 +92,7 @@ public class UpdateSwervePoseEstimator extends CommandBase {
       }
       var stDevs = VecBuilder.fill(visionStDev, visionStDev, visionStDev);
       this.vision.swerve.fuseVisionEstimate(poseEstimate, timestamp, stDevs);
-    }else{
+    } else {
       this.vision.swerve.fuseVisionEstimate(poseEstimate, timestamp);
     }
   }

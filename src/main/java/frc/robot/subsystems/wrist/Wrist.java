@@ -39,9 +39,10 @@ public class Wrist extends SubsystemBase {
     this.arm = arm;
     configure();
     numWraps = 0;
-    lastPose=getPose();
+    lastPose = getPose();
 
-    if(lastPose < - 135) numWraps += 1;
+    if (lastPose < -135)
+      numWraps += 1;
 
     SmartDashboard.putData("Wrist/ff", ff);
     SmartDashboard.putData("Wrist/pid", pid);
@@ -62,7 +63,8 @@ public class Wrist extends SubsystemBase {
   public double getPose() {
     return encoder.getPosition() + Constants.WRIST.ANGLE_OFFSET;
   }
-  public double getCtsPose(){//dont touch
+
+  public double getCtsPose() {//dont touch
     var pose = getPose();
 
     var deltaPose = pose - lastPose;
@@ -72,7 +74,7 @@ public class Wrist extends SubsystemBase {
       numWraps += 1;
     }
     lastPose = pose;
-    return pose + numWraps*360;
+    return pose + numWraps * 360;
   }
 
   public double getVelocity() {
@@ -134,7 +136,8 @@ public class Wrist extends SubsystemBase {
     relativeEncoder.setPositionConversionFactor(360.0 / Constants.MECH_PLOT.WRIST_REDUCTION);
     relativeEncoder.setVelocityConversionFactor(360.0 / Constants.MECH_PLOT.WRIST_REDUCTION);
     var startPose = getPose();
-    if(startPose < -90) startPose+=360;
+    if (startPose < -90)
+      startPose += 360;
     relativeEncoder.setPosition(startPose);
 
     /* Status 0 governs applied output, faults, and whether is a follower. Not important for this. */
