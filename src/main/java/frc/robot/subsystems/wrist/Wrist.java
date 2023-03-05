@@ -131,15 +131,6 @@ public class Wrist extends SubsystemBase {
     encoder.setPositionConversionFactor(360);
     encoder.setVelocityConversionFactor(360);
 
-    // don't touch this either
-    relativeEncoder = motor.getEncoder();
-    relativeEncoder.setPositionConversionFactor(360.0 / Constants.MECH_PLOT.WRIST_REDUCTION);
-    relativeEncoder.setVelocityConversionFactor(360.0 / Constants.MECH_PLOT.WRIST_REDUCTION);
-    var startPose = getPose();
-    if (startPose < -90)
-      startPose += 360;
-    relativeEncoder.setPosition(startPose);
-
     /* Status 0 governs applied output, faults, and whether is a follower. Not important for this. */
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
     /* Integrated motor position isn't important here. */
