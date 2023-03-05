@@ -23,7 +23,7 @@ public class XboxDriverController implements DriverController {
   public Trigger backUpFromFeeder() {
     return new JoystickButton(controller, XboxController.Button.kA.value);
   }
-  
+
   @Override
   public double getYMoveAxis() {
     return -Controllers.deadband(controller.getLeftX());
@@ -60,6 +60,7 @@ public class XboxDriverController implements DriverController {
   public Trigger HIGH_SPEED() {
     return new JoystickButton(controller, XboxController.Button.kRightBumper.value);
   }
+
   public Trigger LOW_SPEED() {
     return new JoystickButton(controller, XboxController.Button.kLeftBumper.value);
   }

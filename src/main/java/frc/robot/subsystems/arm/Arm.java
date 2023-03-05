@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.arm;
 
-import java.sql.Driver;
 import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
@@ -14,10 +13,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,8 +29,10 @@ public class Arm extends SubsystemBase {
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
   private ProfiledPIDController pid =
       new ProfiledPIDController(ARM.ARM_POS_PID[0], ARM.ARM_POS_PID[1], ARM.ARM_POS_PID[2], ARM.ARM_CONSTRAINTS);
-  private ProfiledPIDController velPid = new ProfiledPIDController(ARM.ARM_VEL_PID[0], ARM.ARM_VEL_PID[1], ARM.ARM_VEL_PID[2], ARM.ARM_VEL_CONSTRAINTS);
-  private SendableArmFeedforward ff = new SendableArmFeedforward(ARM.ARM_FF[0], ARM.ARM_FF[1], ARM.ARM_FF[2], ARM.ARM_FF[3]);
+  private ProfiledPIDController velPid =
+      new ProfiledPIDController(ARM.ARM_VEL_PID[0], ARM.ARM_VEL_PID[1], ARM.ARM_VEL_PID[2], ARM.ARM_VEL_CONSTRAINTS);
+  private SendableArmFeedforward ff =
+      new SendableArmFeedforward(ARM.ARM_FF[0], ARM.ARM_FF[1], ARM.ARM_FF[2], ARM.ARM_FF[3]);
   private double lastTime = Timer.getFPGATimestamp();
   private double lastVel = 0;
   private double acceleration;
@@ -108,7 +106,7 @@ public class Arm extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if(prevDisabled && DriverStation.isEnabled()){
+    if (prevDisabled && DriverStation.isEnabled()) {
       setPoseGoal(getPose());
       resetPIDs();
     }
@@ -131,7 +129,8 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Vel/Setpoint", velPid.getSetpoint().position);
 
     /* Controlled entirely via setVoltage() */
-    if (controlMode == ArmControlMode.VOLTAGE) return;
+    if (controlMode == ArmControlMode.VOLTAGE)
+      return;
 
     if (controlMode == ArmControlMode.VEL && MathUtil.applyDeadband(velGoal, 0.1) != 0) {
       volts = velControl();
