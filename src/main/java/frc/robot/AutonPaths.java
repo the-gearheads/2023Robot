@@ -36,7 +36,8 @@ public class AutonPaths {
 
         new ParallelCommandGroup(
             getCommandForPath("StartN4-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
-            new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT)),
+            new SequentialCommandGroup( // Start moving the arm 1 second into the path following
+                new WaitCommand(1), new SetArmPose(s.arm, ArmPose.FLOOR))),
 
         new AutoBalance(s.swerve));
   }
@@ -243,8 +244,8 @@ public class AutonPaths {
    * ASSUPTIONS: Cone being held, arm in correct position, alt mode corresponds to setting wrist to 0deg, and default sets it to 90deg
    */
   public static Command getPlaceConeCommand(Subsystems s) {
-    return new SequentialCommandGroup(new AltWristControl(s.wrist), new WaitCommand(0.5), // Wait for wrist to rotate before dropping cone
-        getGrabberOpenCommand(s.grabber), new WaitCommand(0.5), // Wait for grabber and gravity to drop cone
+    return new SequentialCommandGroup(new AltWristControl(s.wrist), new WaitCommand(0.25), // Wait for wrist to rotate before dropping cone
+        getGrabberOpenCommand(s.grabber), new WaitCommand(0.25), // Wait for grabber and gravity to drop cone
         getGrabberCloseCommand(s.grabber), new DefaultWristControl(s.wrist));
   }
 

@@ -59,6 +59,8 @@ public class NeoDrive {
     /* Don't have a duty cycle encoder */
     max.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 500);
     max.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 500);
+
+    try {Thread.sleep((long)40.0);} catch(Exception e) {e.printStackTrace();};
   }
 
   public void setSpeed(double speed) {
