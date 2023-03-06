@@ -77,6 +77,8 @@ public class Neo550Steer {
     /* We -really- care about our duty cycle encoder readings though. THE DEFAULT WAS 200MS */
     max.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
     max.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
+
+    try {Thread.sleep((long)40.0);} catch(Exception e) {e.printStackTrace();};
   }
 
   public void setAngle(Rotation2d angle) {

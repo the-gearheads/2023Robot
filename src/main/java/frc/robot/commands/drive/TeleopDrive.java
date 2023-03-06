@@ -72,9 +72,9 @@ public class TeleopDrive extends CommandBase {
       ySpd = xyPair.getSecond();
     } else {
       //Cubic axis control (yes, i intentionally put the signum there in case we want to change to an even power)
-      xSpd = Math.pow(xSpd, 3) * Math.signum(xSpd);
-      ySpd *= Math.pow(xSpd, 3) * Math.signum(xSpd);
-      rotSpd *= Math.pow(xSpd, 3) * Math.signum(xSpd);
+      xSpd = Math.abs(Math.pow(xSpd, 3)) * Math.signum(xSpd);
+      ySpd = Math.abs(Math.pow(ySpd, 3)) * Math.signum(ySpd);
+      rotSpd = Math.abs(Math.pow(rotSpd, 3)) * Math.signum(rotSpd);
     }
 
     Logger.getInstance().recordOutput("TeleopDrive/Cubed/xSpd", xSpd);
