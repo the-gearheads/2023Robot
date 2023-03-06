@@ -8,21 +8,21 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.AUTON;
 import frc.robot.Constants.DRIVE;
 import frc.robot.commands.arm.JoystickArmControl;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.TeleopDrive;
-import frc.robot.commands.sysidcommand.SysidMechanismCommand;
 import frc.robot.commands.vision.UpdateSwervePoseEstimator;
 import frc.robot.commands.wrist.DefaultWristControl;
 import frc.robot.commands.wrist.AltWristControl;
@@ -34,7 +34,6 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmSim;
-import frc.robot.subsystems.arm.Arm.ArmControlMode;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristSim;
 import frc.robot.subsystems.drive.SwerveModule;
@@ -45,8 +44,6 @@ import frc.robot.subsystems.drive.gyro.GyroIO;
 import frc.robot.subsystems.drive.gyro.GyroSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 
 /**
@@ -155,6 +152,11 @@ public class RobotContainer {
     // Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(() -> {
     //   swerve.setPose(new Pose2d(3, 0.38, Rotation2d.fromDegrees(90)));
     // }));
+
+    Controllers.driverController.backUpFromFeeder()
+        .onTrue(swerve.goTo(
+            swerve.getPose().plus(new Transform2d(new Translation2d(Units.inchesToMeters(10), 0.0), new Rotation2d())),
+            Constants.AUTON.SLOW_CONSTRAINTS));
 
     Controllers.operatorController.armGoToLowNode().onTrue(new SetArmPose(arm, ArmPose.LOW_NODE));
     Controllers.operatorController.armGoToMidNode().onTrue(new SetArmPose(arm, ArmPose.MID_NODE));

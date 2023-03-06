@@ -42,10 +42,16 @@ public interface DriverController {
   public default Trigger getResetPoseButton() {
     return new Trigger(() -> false);
   }
+
   public default Trigger HIGH_SPEED() {
     return new Trigger(() -> false);
   }
+
   public default Trigger LOW_SPEED() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger backUpFromFeeder() {
     return new Trigger(() -> false);
   }
 

@@ -93,10 +93,9 @@ public class Constants extends AnnotatedClass {
 
   public static final class WRIST {
     public static final int WRIST_ID = 10;
-    public static final double[] WRIST_PID = {0.135
-      , 0, 0};//0.17
-      
-      
+    public static final double[] WRIST_PID = {0.135, 0, 0};//0.17
+
+
     public static final double[] WRIST_FF = {0, 0.5, 0};
     public static final double ANGLE_OFFSET = -180;
   }
@@ -197,25 +196,27 @@ public class Constants extends AnnotatedClass {
   }
 
   public static final class VISION {
-    public static final HashMap<PhotonCamera, Transform3d> CAMS_AND_TRANS = new HashMap<PhotonCamera, Transform3d>(){{
-      put(new PhotonCamera("ov9281"), 
-        new Transform3d());
-      put(new PhotonCamera("lifecam"), 
-        new Transform3d(new Translation3d(0, 0.05, 0), new Rotation3d()));
-    }};
+    public static final HashMap<PhotonCamera, Transform3d> CAMS_AND_TRANS = new HashMap<PhotonCamera, Transform3d>() {
+      {
+        put(new PhotonCamera("ov9281"), new Transform3d());
+        put(new PhotonCamera("lifecam"), new Transform3d(new Translation3d(0, 0.05, 0), new Rotation3d()));
+      }
+    };
 
-    public static final List<AprilTag> TEST_TAGS = new ArrayList<AprilTag>(){{
-      var id1Pose = new Pose3d(2.5,2.5,0,new Rotation3d());
-      var id1Toid8 = new Transform3d(new Translation3d(0,0.3,0), new Rotation3d());
-      var id8Pose = id1Pose.plus(id1Toid8);
+    public static final List<AprilTag> TEST_TAGS = new ArrayList<AprilTag>() {
+      {
+        var id1Pose = new Pose3d(2.5, 2.5, 0, new Rotation3d());
+        var id1Toid8 = new Transform3d(new Translation3d(0, 0.3, 0), new Rotation3d());
+        var id8Pose = id1Pose.plus(id1Toid8);
 
-      add(new AprilTag(1, id1Pose));
-      add(new AprilTag(8, id8Pose));
-    }};
+        add(new AprilTag(1, id1Pose));
+        add(new AprilTag(8, id8Pose));
+      }
+    };
     public static final AprilTagFieldLayout TEST_ATFL = new AprilTagFieldLayout(TEST_TAGS, 5, 5);
   }
   public static final class CONTROLLERS {
-    public static final double JOYSTICK_DEADBAND = 0.1;
+    public static final double JOYSTICK_DEADBAND = 0.075;
   }
 
   public static final class LEDS {

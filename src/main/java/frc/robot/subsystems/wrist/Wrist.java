@@ -7,12 +7,14 @@ package frc.robot.subsystems.wrist;
 import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMax.FaultID;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -23,6 +25,8 @@ import frc.robot.util.SendableArmFeedforward;
 
 public class Wrist extends SubsystemBase {
   /** Creates a new Wrist. */
+  private int zeroCount = 0;
+  private Boolean configureHasRan = false;
   private double goal;
   private CANSparkMax motor = new CANSparkMax(WRIST.WRIST_ID, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
@@ -36,12 +40,14 @@ public class Wrist extends SubsystemBase {
   private double lastPose;
 
   public Wrist(Arm arm) {
+    this.zeroCount=0;
     this.arm = arm;
     configure();
     numWraps = 0;
-    lastPose=getPose();
+    lastPose = getPose();
 
-    if(lastPose < - 135) numWraps += 1;
+    if (lastPose < -135)
+      numWraps += 1;
 
     SmartDashboard.putData("Wrist/ff", ff);
     SmartDashboard.putData("Wrist/pid", pid);
@@ -62,7 +68,8 @@ public class Wrist extends SubsystemBase {
   public double getPose() {
     return encoder.getPosition() + Constants.WRIST.ANGLE_OFFSET;
   }
-  public double getCtsPose(){//dont touch
+
+  public double getCtsPose() {//dont touch
     var pose = getPose();
 
     var deltaPose = pose - lastPose;
@@ -72,7 +79,7 @@ public class Wrist extends SubsystemBase {
       numWraps += 1;
     }
     lastPose = pose;
-    return pose + numWraps*360;
+    return pose + numWraps * 360;
   }
 
   public double getVelocity() {
@@ -94,9 +101,20 @@ public class Wrist extends SubsystemBase {
     setGoalByType(WristStateType.OVERRIDE);
     double currentPose = getPose();
 
+    if(sensorErrorHandler()){
+      DriverStation.reportError("OUR ZERO ERROR IN WRIST", null);
+      setVoltage(0);
+      if (configureHasRan == false) {
+        configure();
+      }
+      configureHasRan = true;
+      return;
+    }
+
     double pidval = pid.calculate(currentPose, goal);
     double ffval = ff.calculate(currentPose, 0);
 
+    Logger.getInstance().recordOutput("Wrist/ReConfigure has ran", configureHasRan);
     Logger.getInstance().recordOutput("Wrist/Pose", currentPose);
     Logger.getInstance().recordOutput("Wrist/Cts Pose", getCtsPose());
     Logger.getInstance().recordOutput("Wrist/Vel", getVelocity());
@@ -109,6 +127,23 @@ public class Wrist extends SubsystemBase {
         this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "");
 
     setVoltage(applySoftLimit(ffval + pidval));
+  }
+
+  public boolean sensorErrorHandler(){
+    boolean hasFaults = motor.getFault(FaultID.kCANTX) || motor.getFault(FaultID.kCANRX);
+    boolean hasStickyFaults = motor.getStickyFault(FaultID.kCANTX) || motor.getStickyFault(FaultID.kCANRX);
+    var pose = encoder.getPosition();
+
+    if(pose==0 || pose>2000 || pose<-2000){
+      zeroCount++;
+    }
+    
+    var zeroCountFault = zeroCount > 1;
+    Logger.getInstance().recordOutput("Wrist/Faults/Zero Count Fault",zeroCountFault);
+    Logger.getInstance().recordOutput("Wrist/Faults/Fault", hasFaults);
+    Logger.getInstance().recordOutput("Wrist/Faults/Sticky Fault", hasStickyFaults);
+
+    return zeroCountFault || hasFaults || hasStickyFaults;
   }
 
   public void setGoalByType(WristStateType wristStateType) { // check what range the arm is in and set the wrist accordingly
@@ -129,14 +164,6 @@ public class Wrist extends SubsystemBase {
     encoder.setPositionConversionFactor(360);
     encoder.setVelocityConversionFactor(360);
 
-    // don't touch this either
-    relativeEncoder = motor.getEncoder();
-    relativeEncoder.setPositionConversionFactor(360.0 / Constants.MECH_PLOT.WRIST_REDUCTION);
-    relativeEncoder.setVelocityConversionFactor(360.0 / Constants.MECH_PLOT.WRIST_REDUCTION);
-    var startPose = getPose();
-    if(startPose < -90) startPose+=360;
-    relativeEncoder.setPosition(startPose);
-
     /* Status 0 governs applied output, faults, and whether is a follower. Not important for this. */
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
     /* Integrated motor position isn't important here. */
@@ -148,6 +175,8 @@ public class Wrist extends SubsystemBase {
     /* Have a duty cycle encoder */
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
+
+    try {Thread.sleep((long)40.0);} catch(Exception e) {e.printStackTrace();};
   }
 
   /* Don't move towards the base of the robot if inside it (not good) */

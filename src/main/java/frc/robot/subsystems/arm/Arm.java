@@ -4,20 +4,17 @@
 
 package frc.robot.subsystems.arm;
 
-import java.sql.Driver;
 import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
+import com.revrobotics.CANSparkMax.FaultID;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,14 +24,18 @@ import frc.robot.util.SendableArmFeedforward;
 
 public class Arm extends SubsystemBase {
   /** Creates a new arm. */
+  public boolean configureHasRan = false;
+  private int zeroCount = 0;
   private double poseGoal = 0;
   private double velGoal = 0;
   protected CANSparkMax motor = new CANSparkMax(ARM.ARM_ID, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
   private ProfiledPIDController pid =
       new ProfiledPIDController(ARM.ARM_POS_PID[0], ARM.ARM_POS_PID[1], ARM.ARM_POS_PID[2], ARM.ARM_CONSTRAINTS);
-  private ProfiledPIDController velPid = new ProfiledPIDController(ARM.ARM_VEL_PID[0], ARM.ARM_VEL_PID[1], ARM.ARM_VEL_PID[2], ARM.ARM_VEL_CONSTRAINTS);
-  private SendableArmFeedforward ff = new SendableArmFeedforward(ARM.ARM_FF[0], ARM.ARM_FF[1], ARM.ARM_FF[2], ARM.ARM_FF[3]);
+  private ProfiledPIDController velPid =
+      new ProfiledPIDController(ARM.ARM_VEL_PID[0], ARM.ARM_VEL_PID[1], ARM.ARM_VEL_PID[2], ARM.ARM_VEL_CONSTRAINTS);
+  private SendableArmFeedforward ff =
+      new SendableArmFeedforward(ARM.ARM_FF[0], ARM.ARM_FF[1], ARM.ARM_FF[2], ARM.ARM_FF[3]);
   private double lastTime = Timer.getFPGATimestamp();
   private double lastVel = 0;
   private double acceleration;
@@ -108,11 +109,21 @@ public class Arm extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if(prevDisabled && DriverStation.isEnabled()){
+    if (prevDisabled && DriverStation.isEnabled()) {
       setPoseGoal(getPose());
       resetPIDs();
     }
     prevDisabled = !DriverStation.isEnabled();
+
+    if(sensorErrorHandler()){
+      DriverStation.reportError("OUR ZERO ERROR IN ARM", null);
+      setVoltage(0);
+      if (configureHasRan == false) {
+        configure();
+      }
+      configureHasRan = true;
+      return;
+    }
 
     var pose = getPose();
     var vel = getVelocity();
@@ -131,7 +142,8 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Vel/Setpoint", velPid.getSetpoint().position);
 
     /* Controlled entirely via setVoltage() */
-    if (controlMode == ArmControlMode.VOLTAGE) return;
+    if (controlMode == ArmControlMode.VOLTAGE)
+      return;
 
     if (controlMode == ArmControlMode.VEL && MathUtil.applyDeadband(velGoal, 0.1) != 0) {
       volts = velControl();
@@ -144,6 +156,23 @@ public class Arm extends SubsystemBase {
 
     volts = applySoftLimit(volts);
     setVoltage(volts);
+  }
+
+  public boolean sensorErrorHandler(){
+    boolean hasFaults = motor.getFault(FaultID.kCANTX) || motor.getFault(FaultID.kCANRX);
+    boolean hasStickyFaults = motor.getStickyFault(FaultID.kCANTX) || motor.getStickyFault(FaultID.kCANRX);
+    var pose = encoder.getPosition();
+
+    if(pose==0 || pose>2000 || pose<-2000){
+      zeroCount++;
+    }
+    
+    var zeroCountFault = zeroCount > 1;
+    Logger.getInstance().recordOutput("Arm/Faults/Zero Count Fault",zeroCountFault);
+    Logger.getInstance().recordOutput("Arm/Faults/Fault", hasFaults);
+    Logger.getInstance().recordOutput("Arm/Faults/Sticky Fault", hasStickyFaults);
+
+    return zeroCountFault || hasFaults || hasStickyFaults;
   }
 
   public double poseControl() {
@@ -215,5 +244,7 @@ public class Arm extends SubsystemBase {
     /* Have a duty cycle encoder */
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
+
+    try {Thread.sleep((long)40.0);} catch(Exception e) {e.printStackTrace();};
   }
 }

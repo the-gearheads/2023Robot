@@ -39,7 +39,7 @@ public class TeleopDrive extends CommandBase {
     SmartDashboard.putBoolean("TeleopDrive/ExponentialJoystickControl", false);
     SmartDashboard.putBoolean("TeleopDrive/RateLimitDrive", false);
     SmartDashboard.putBoolean("Rotation PID", false);
-    SmartDashboard.putNumber("Rotation PID kP", 1.5);
+    SmartDashboard.putNumber("Rotation PID kP", 3);
   }
 
   // Called when the command is initially scheduled.
@@ -56,6 +56,10 @@ public class TeleopDrive extends CommandBase {
     var ySpd = Controllers.driverController.getYMoveAxis();
     var rotSpd = Controllers.driverController.getRotateAxis();
 
+    Logger.getInstance().recordOutput("TeleopDrive/Deadbanded/xSpd", xSpd);
+    Logger.getInstance().recordOutput("TeleopDrive/Deadbanded/ySpd", ySpd);
+    Logger.getInstance().recordOutput("TeleopDrive/Deadbanded/rotSpd", rotSpd);
+
     if (Controllers.driverController.getSetWheelXButton().getAsBoolean()) {
       swerve.setX();
       return;
@@ -67,39 +71,43 @@ public class TeleopDrive extends CommandBase {
       xSpd = xyPair.getFirst();
       ySpd = xyPair.getSecond();
     } else {
-      //Quadratic axis control
-      xSpd *= Math.abs(xSpd);
-      ySpd *= Math.abs(ySpd);
-      rotSpd *= Math.abs(rotSpd);
+      //Cubic axis control (yes, i intentionally put the signum there in case we want to change to an even power)
+      xSpd = Math.abs(Math.pow(xSpd, 3)) * Math.signum(xSpd);
+      ySpd = Math.abs(Math.pow(ySpd, 3)) * Math.signum(ySpd);
+      rotSpd = Math.abs(Math.pow(rotSpd, 3)) * Math.signum(rotSpd);
     }
 
-    Logger.getInstance().recordOutput("TeleopDrive/NotRateLimitedX", xSpd);
-    Logger.getInstance().recordOutput("TeleopDrive/NotRateLimitedY", ySpd);
-    Logger.getInstance().recordOutput("TeleopDrive/NotRateLimitedRot", rotSpd);
+    Logger.getInstance().recordOutput("TeleopDrive/Cubed/xSpd", xSpd);
+    Logger.getInstance().recordOutput("TeleopDrive/Cubed/ySpd", ySpd);
+    Logger.getInstance().recordOutput("TeleopDrive/Cubed/rotSpd", rotSpd);
 
     var limitedSpeeds = rateLimiter.rateLimit(new ChassisSpeeds(xSpd, ySpd, rotSpd));
     if (SmartDashboard.getBoolean("TeleopDrive/RateLimitDrive", false)) {
       xSpd = limitedSpeeds.vxMetersPerSecond;
       ySpd = limitedSpeeds.vyMetersPerSecond;
       rotSpd = limitedSpeeds.omegaRadiansPerSecond;
-      Logger.getInstance().recordOutput("TeleopDrive/RateLimitedX", xSpd);
-      Logger.getInstance().recordOutput("TeleopDrive/RateLimitedY", ySpd);
-      Logger.getInstance().recordOutput("TeleopDrive/RateLimitedRot", rotSpd);
+      Logger.getInstance().recordOutput("TeleopDrive/Rate Limited/xSpd", xSpd);
+      Logger.getInstance().recordOutput("TeleopDrive/Rate Limited/ySpd", ySpd);
+      Logger.getInstance().recordOutput("TeleopDrive/Rate Limited/rotSpd", rotSpd);
     }
-    
+
     var lin_mult = Constants.DRIVE.MID_LIN_VEL;
     var rot_mult = Constants.DRIVE.MID_ROT_VEL;
 
-    if(Controllers.driverController.LOW_SPEED().getAsBoolean()){
-      lin_mult=Constants.DRIVE.LOW_LIN_VEL;
-      rot_mult=Constants.DRIVE.LOW_ROT_VEL;
-    }else if(Controllers.driverController.HIGH_SPEED().getAsBoolean()){
-      lin_mult=Constants.DRIVE.HIGH_LIN_VEL;
-      rot_mult=Constants.DRIVE.HIGH_ROT_VEL;
+    if (Controllers.driverController.LOW_SPEED().getAsBoolean()) {
+      lin_mult = Constants.DRIVE.LOW_LIN_VEL;
+      rot_mult = Constants.DRIVE.LOW_ROT_VEL;
+    } else if (Controllers.driverController.HIGH_SPEED().getAsBoolean()) {
+      lin_mult = Constants.DRIVE.HIGH_LIN_VEL;
+      rot_mult = Constants.DRIVE.HIGH_ROT_VEL;
     }
     xSpd *= lin_mult;
     ySpd *= lin_mult;
     rotSpd *= rot_mult;
+
+    Logger.getInstance().recordOutput("TeleopDrive/Scaled/xSpd", xSpd);
+    Logger.getInstance().recordOutput("TeleopDrive/Scaled/ySpd", ySpd);
+    Logger.getInstance().recordOutput("TeleopDrive/Scaled/rotSpd", rotSpd);
 
     //Make sure the robot maintains its heading when we aren't toggling the rotation axis
     if (SmartDashboard.getBoolean("Rotation PID", false)) {
@@ -108,14 +116,15 @@ public class TeleopDrive extends CommandBase {
       double gyroAngle = swerve.getContinuousGyroAngleRad();
       if (MathUtil.applyDeadband(rotSpd, 1E-2) == 0) {
         rotSpd = -rotPIDController.calculate(angleSetPoint, gyroAngle);
+        Logger.getInstance().recordOutput("TeleopDrive/rot pid/rotSpd", rotSpd);
       } else {
         angleSetPoint = gyroAngle;
       }
     }
 
-    Logger.getInstance().recordOutput("TeleopDrive/xSpd", xSpd);
-    Logger.getInstance().recordOutput("TeleopDrive/ySpd", ySpd);
-    Logger.getInstance().recordOutput("TeleopDrive/rot", rotSpd);
+    Logger.getInstance().recordOutput("TeleopDrive/Final/xSpd", xSpd);
+    Logger.getInstance().recordOutput("TeleopDrive/Final/ySpd", ySpd);
+    Logger.getInstance().recordOutput("TeleopDrive/Final/rotSpd", rotSpd);
 
     var speeds = new ChassisSpeeds(xSpd, ySpd, rotSpd);
     if (SmartDashboard.getBoolean("TeleopDrive/UseFieldRelative", true)) {

@@ -1,5 +1,6 @@
 package frc.robot.controllers;
 
+import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -15,7 +16,12 @@ public class XboxDriverController implements DriverController {
 
   @Override
   public double getXMoveAxis() {
+    Logger.getInstance().recordOutput("TeleopDrive/Raw/xSpd", -controller.getLeftY());
     return -Controllers.deadband(controller.getLeftY());
+  }
+
+  public Trigger backUpFromFeeder() {
+    return new JoystickButton(controller, XboxController.Button.kA.value);
   }
 
   @Override
@@ -54,6 +60,7 @@ public class XboxDriverController implements DriverController {
   public Trigger HIGH_SPEED() {
     return new JoystickButton(controller, XboxController.Button.kRightBumper.value);
   }
+
   public Trigger LOW_SPEED() {
     return new JoystickButton(controller, XboxController.Button.kLeftBumper.value);
   }
