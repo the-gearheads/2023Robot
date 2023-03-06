@@ -7,6 +7,7 @@ package frc.robot.subsystems.arm;
 import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
+import com.revrobotics.CANSparkMax.FaultID;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -23,6 +24,8 @@ import frc.robot.util.SendableArmFeedforward;
 
 public class Arm extends SubsystemBase {
   /** Creates a new arm. */
+  public boolean configureHasRan = false;
+  private int zeroCount = 0;
   private double poseGoal = 0;
   private double velGoal = 0;
   protected CANSparkMax motor = new CANSparkMax(ARM.ARM_ID, MotorType.kBrushless);
@@ -112,6 +115,16 @@ public class Arm extends SubsystemBase {
     }
     prevDisabled = !DriverStation.isEnabled();
 
+    if(sensorErrorHandler()){
+      DriverStation.reportError("OUR ZERO ERROR IN ARM", null);
+      setVoltage(0);
+      if (configureHasRan == false) {
+        configure();
+      }
+      configureHasRan = true;
+      return;
+    }
+
     var pose = getPose();
     var vel = getVelocity();
     var volts = 0.0;
@@ -143,6 +156,23 @@ public class Arm extends SubsystemBase {
 
     volts = applySoftLimit(volts);
     setVoltage(volts);
+  }
+
+  public boolean sensorErrorHandler(){
+    boolean hasFaults = motor.getFault(FaultID.kCANTX) || motor.getFault(FaultID.kCANRX);
+    boolean hasStickyFaults = motor.getStickyFault(FaultID.kCANTX) || motor.getStickyFault(FaultID.kCANRX);
+    var pose = encoder.getPosition();
+
+    if(pose==0 || pose>2000 || pose<-2000){
+      zeroCount++;
+    }
+    
+    var zeroCountFault = zeroCount > 1;
+    Logger.getInstance().recordOutput("Arm/Faults/Zero Count Fault",zeroCountFault);
+    Logger.getInstance().recordOutput("Arm/Faults/Fault", hasFaults);
+    Logger.getInstance().recordOutput("Arm/Faults/Sticky Fault", hasStickyFaults);
+
+    return zeroCountFault || hasFaults || hasStickyFaults;
   }
 
   public double poseControl() {
@@ -214,5 +244,7 @@ public class Arm extends SubsystemBase {
     /* Have a duty cycle encoder */
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
+
+    try {Thread.sleep((long)40.0);} catch(Exception e) {e.printStackTrace();};
   }
 }
