@@ -4,6 +4,7 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -267,17 +268,34 @@ public class AutonPaths {
     }, grabber);
   }
 
-  public static Command getCommandForPath(String pathName, boolean resetOdometry, PathConstraints constraints,
-      Swerve swerve) {
-    PathPlannerTrajectory path = PathPlanner.loadPath(pathName, constraints);
+  public static PathPlannerTrajectory getPathByName(String pathName, PathConstraints constraints) {
+
+    if(DriverStation.getAlliance() == Alliance.Red) {
+      var overridePath = PathPlanner.loadPath(DriverStation.getEventName() + "Red_" + pathName, constraints);
+      if (overridePath != null) return overridePath;
+    } else {
+      var overridePath = PathPlanner.loadPath(DriverStation.getEventName() + "Blue_" + pathName, constraints);
+      if (overridePath != null) return overridePath;
+    }
+    /* Both alliances */
+    var path = PathPlanner.loadPath(DriverStation.getEventName() + "_" + pathName, constraints);
+    if (path != null) return path;
+    
+    /* Actual path */
+    path = PathPlanner.loadPath(pathName, constraints);
     if (path == null) {
       DriverStation.reportError("Failed to load path: " + pathName, true);
-      return new InstantCommand(() -> {
-        DriverStation.reportError("Tried to execute path that failed to load! Path name: " + pathName, true);
-      });
     }
-    Command forwardCommand = swerve.followTrajectoryCommand(path, resetOdometry, true);
-    return forwardCommand;
+    return path;
+  }
+
+  public static Command getCommandForPath(String pathName, boolean resetOdometry, PathConstraints constraints,
+      Swerve swerve) {
+    return new InstantCommand(()->{
+      var path = getPathByName(pathName, constraints);
+      Command forwardCommand = swerve.followTrajectoryCommand(path, resetOdometry, true);
+      forwardCommand.schedule();
+    });
   }
 
   public static Command setInitPose(Subsystems s, String pathName) {
