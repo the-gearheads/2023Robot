@@ -15,7 +15,6 @@ import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.AutoBalance;
 import frc.robot.commands.wrist.AltWristControl;
-import frc.robot.commands.wrist.DefaultWristControl;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.drive.Swerve;
@@ -245,15 +244,29 @@ public class AutonPaths {
    * ASSUPTIONS: Cone being held, arm in correct position, alt mode corresponds to setting wrist to 0deg, and default sets it to 90deg
    */
   public static Command getPlaceConeCommand(Subsystems s) {
-    return new SequentialCommandGroup(new AltWristControl(s.wrist), new WaitCommand(0.25), // Wait for wrist to rotate before dropping cone
-        getGrabberOpenCommand(s.grabber), new WaitCommand(0.25), // Wait for grabber and gravity to drop cone
-        getGrabberCloseCommand(s.grabber), new DefaultWristControl(s.wrist));
+    return new AltWristControl(s.wrist).alongWith( 
+    new SequentialCommandGroup(
+      new WaitCommand(0.25), // Wait for wrist to rotate before dropping cone
+      getGrabberOpenCommand(s.grabber), 
+      new WaitCommand(0.25) // Wait for grabber and gravity to drop cone
+    )).andThen(
+      getGrabberCloseCommand(s.grabber)
+    );
   }
 
   public static Command getGroundPickUpCommand(Subsystems s) {
-    return new SequentialCommandGroup(getGrabberOpenCommand(s.grabber), new WaitCommand(0.5),
-        new AltWristControl(s.wrist), new WaitCommand(0.5), getGrabberCloseCommand(s.grabber), new WaitCommand(0.5),
-        new DefaultWristControl(s.wrist));
+    return new SequentialCommandGroup(
+      getGrabberOpenCommand(s.grabber),
+      new WaitCommand(0.25),
+      new AltWristControl(s.wrist).alongWith(
+        new SequentialCommandGroup(
+          new WaitCommand(0.25),
+          getGrabberCloseCommand(s.grabber),
+          new WaitCommand(0.25)
+        )
+      ));
+      
+
   }
 
   public static Command getGrabberOpenCommand(Grabber grabber) {
