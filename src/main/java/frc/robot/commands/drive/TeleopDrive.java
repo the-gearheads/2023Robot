@@ -35,9 +35,9 @@ public class TeleopDrive extends CommandBase {
     this.swerve = swerve;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerve);
-    SmartDashboard.putBoolean("TeleopDrive/UseFieldRelative", false);
+    SmartDashboard.putBoolean("TeleopDrive/UseFieldRelative", true);
     SmartDashboard.putBoolean("TeleopDrive/ExponentialJoystickControl", false);
-    SmartDashboard.putBoolean("TeleopDrive/RateLimitDrive", false);
+    SmartDashboard.putBoolean("TeleopDrive/RateLimitDrive", true);
     SmartDashboard.putBoolean("Rotation PID", false);
     SmartDashboard.putNumber("Rotation PID kP", 3);
   }
