@@ -21,6 +21,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.WRIST;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.wrist.WristState.WristControlType;
+import frc.robot.util.MoreMath;
 import frc.robot.util.SendableArmFeedforward;
 
 public class Wrist extends SubsystemBase {
@@ -109,13 +110,13 @@ public class Wrist extends SubsystemBase {
 
   private void log(){
     Logger.getInstance().recordOutput("Wrist/ReConfigure has ran", configureHasRan);
-    Logger.getInstance().recordOutput("Wrist/Pose", getPose());
-    Logger.getInstance().recordOutput("Wrist/Vel", getVelocity());
-    Logger.getInstance().recordOutput("Wrist/Goal", goal);
-    Logger.getInstance().recordOutput("Wrist/Error", pid.getPositionError());
-    Logger.getInstance().recordOutput("Wrist/PIDVal", pidval);
-    Logger.getInstance().recordOutput("Wrist/FFVal", ffval);
-    Logger.getInstance().recordOutput("Wrist/Appliedvolts", pidval + ffval);
+    Logger.getInstance().recordOutput("Wrist/Pose", MoreMath.round(getPose(),1));
+    Logger.getInstance().recordOutput("Wrist/Vel", MoreMath.round(getVelocity(),1));
+    Logger.getInstance().recordOutput("Wrist/Goal", MoreMath.round(goal,1));
+    Logger.getInstance().recordOutput("Wrist/Error", MoreMath.round(pid.getPositionError(),1));
+    Logger.getInstance().recordOutput("Wrist/PIDVal", MoreMath.round(pidval,1));
+    Logger.getInstance().recordOutput("Wrist/FFVal", MoreMath.round(ffval,1));
+    Logger.getInstance().recordOutput("Wrist/Appliedvolts", MoreMath.round(pidval + ffval,1));
     Logger.getInstance().recordOutput("Wrist/Current Command",
         this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "");
   }

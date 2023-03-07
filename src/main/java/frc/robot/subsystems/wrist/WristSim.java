@@ -61,6 +61,10 @@ public class WristSim extends Wrist {
     return Units.radiansToDegrees(sim.getVelocityRadPerSec());
   }
 
+  public boolean sensorErrorHandler(){
+    return false;
+  }
+
   public void simulationPeriodic() {
     double armPosRads = Units.degreesToRadians(armSim.getPose());
     double pivot_x = MECH_PLOT.ARM_PIVOT_X + (armSim.m_arm.getLength()) * Math.cos(armPosRads);

@@ -58,6 +58,10 @@ public class ArmSim extends Arm {
     return this.simVolts;
   }
 
+  public boolean sensorErrorHandler(){
+    return false;
+  }
+
   // Setting The Scenery
   private static final DCMotor m_armGearbox = DCMotor.getNEO(1);
 

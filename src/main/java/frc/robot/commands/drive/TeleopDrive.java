@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
-import frc.robot.util.AdditionalMathUtils;
+import frc.robot.util.MoreMath;
 import frc.robot.util.SwerveRateLimit;
 
 /** An example command that uses an example subsystem. */
@@ -67,7 +67,7 @@ public class TeleopDrive extends CommandBase {
 
     boolean useExponentialJoystickControl = SmartDashboard.getBoolean("TeleopDrive/ExponentialJoystickControl", false);
     if (useExponentialJoystickControl) {
-      Pair<Double, Double> xyPair = AdditionalMathUtils.poseExp(xSpd, ySpd);
+      Pair<Double, Double> xyPair = MoreMath.poseExp(xSpd, ySpd);
       xSpd = xyPair.getFirst();
       ySpd = xyPair.getSecond();
     } else {
