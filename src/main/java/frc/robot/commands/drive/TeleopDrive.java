@@ -37,7 +37,7 @@ public class TeleopDrive extends CommandBase {
     addRequirements(swerve);
     SmartDashboard.putBoolean("TeleopDrive/UseFieldRelative", true);
     SmartDashboard.putBoolean("TeleopDrive/ExponentialJoystickControl", false);
-    SmartDashboard.putBoolean("TeleopDrive/RateLimitDrive", true);
+    SmartDashboard.putBoolean("TeleopDrive/RateLimitDrive", false);
     SmartDashboard.putBoolean("Rotation PID", false);
     SmartDashboard.putNumber("Rotation PID kP", 3);
   }
