@@ -115,7 +115,7 @@ public class Arm extends SubsystemBase {
     }
     prevDisabled = !DriverStation.isEnabled();
 
-    if(sensorErrorHandler()){
+    if (sensorErrorHandler()) {
       DriverStation.reportError("OUR ZERO ERROR IN ARM", true);
       setVoltage(0);
       if (configureHasRan == false) {
@@ -158,17 +158,17 @@ public class Arm extends SubsystemBase {
     setVoltage(volts);
   }
 
-  public boolean sensorErrorHandler(){
+  public boolean sensorErrorHandler() {
     boolean hasFaults = motor.getFault(FaultID.kCANTX) || motor.getFault(FaultID.kCANRX);
     boolean hasStickyFaults = motor.getStickyFault(FaultID.kCANTX) || motor.getStickyFault(FaultID.kCANRX);
     var pose = encoder.getPosition();
 
-    if(pose==0 || pose>2000 || pose<-2000){
+    if (pose == 0 || pose > 2000 || pose < -2000) {
       zeroCount++;
     }
-    
+
     var zeroCountFault = zeroCount > 1;
-    Logger.getInstance().recordOutput("Arm/Faults/Zero Count Fault",zeroCountFault);
+    Logger.getInstance().recordOutput("Arm/Faults/Zero Count Fault", zeroCountFault);
     Logger.getInstance().recordOutput("Arm/Faults/Fault", hasFaults);
     Logger.getInstance().recordOutput("Arm/Faults/Sticky Fault", hasStickyFaults);
 
@@ -245,6 +245,10 @@ public class Arm extends SubsystemBase {
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
 
-    try {Thread.sleep((long)40.0);} catch(Exception e) {e.printStackTrace();};
+    try {
+      Thread.sleep((long) 40.0);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } ;
   }
 }

@@ -14,8 +14,8 @@ public class ManualWristControl extends CommandBase {
 
   /** Creates a new ManualWristControl. */
   public ManualWristControl(Wrist wrist, WristState state) {
-    this.wrist=wrist;
-    this.state=state;
+    this.wrist = wrist;
+    this.state = state;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(wrist);
   }

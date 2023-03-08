@@ -58,7 +58,7 @@ public class ArmSim extends Arm {
     return this.simVolts;
   }
 
-  public boolean sensorErrorHandler(){
+  public boolean sensorErrorHandler() {
     return false;
   }
 
