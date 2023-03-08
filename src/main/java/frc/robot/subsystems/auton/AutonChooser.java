@@ -18,7 +18,7 @@ public class AutonChooser {
   private HashMap<String, Command> autons;
   private Swerve swerve;//necessary to create PPSwerveCommand instances
   private SendableChooser<Command> chooser;
-  private final String defaultChoice = "Left, 2 Cones, Charging Station";
+  private final String defaultChoice = "N4 Place Then Dock";
   private Wrist wrist;
   private Arm arm;
   private Grabber grabber;

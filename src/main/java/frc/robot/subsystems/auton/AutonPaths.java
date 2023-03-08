@@ -5,11 +5,13 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
@@ -29,9 +31,12 @@ public class AutonPaths {
    */
 
   public static Command InertN4PlaceThenDock(Subsystems s) {
-    return new SequentialCommandGroup(setInitPose(s, "InertN4-StartN4"),
+    return new SequentialCommandGroup(
+        setInitPose(s, "InertN4-StartN4"),
+
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+
         getCommandForPath("InertN4-StartN4", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
 
         // place game piece
@@ -251,19 +256,20 @@ public class AutonPaths {
 
   public static PathPlannerTrajectory getPathByName(String pathName, PathConstraints constraints) {
 
-    if (DriverStation.getAlliance() == Alliance.Red) {
-      var overridePath = PathPlanner.loadPath(DriverStation.getEventName() + "Red_" + pathName, constraints);
-      if (overridePath != null)
-        return overridePath;
-    } else {
-      var overridePath = PathPlanner.loadPath(DriverStation.getEventName() + "Blue_" + pathName, constraints);
-      if (overridePath != null)
-        return overridePath;
-    }
-    /* Both alliances */
-    var path = PathPlanner.loadPath(DriverStation.getEventName() + "_" + pathName, constraints);
-    if (path != null)
-      return path;
+      if (DriverStation.getAlliance() == Alliance.Red) {
+        var overridePath = PathPlanner.loadPath(DriverStation.getEventName() + "Red_" + pathName, constraints);
+        if (overridePath != null)
+          return overridePath;
+      } else {
+        var overridePath = PathPlanner.loadPath(DriverStation.getEventName() + "Blue_" + pathName, constraints);
+        if (overridePath != null)
+          return overridePath;
+      }
+      /* Both alliances */
+      var path = PathPlanner.loadPath(DriverStation.getEventName() + "_" + pathName, constraints);
+      if (path != null)
+        return path;
+
 
     /* Actual path */
     path = PathPlanner.loadPath(pathName, constraints);
@@ -275,11 +281,11 @@ public class AutonPaths {
 
   public static Command getCommandForPath(String pathName, boolean resetOdometry, PathConstraints constraints,
       Swerve swerve) {
-    return new InstantCommand(() -> {
-      var path = getPathByName(pathName, constraints);
-      Command forwardCommand = swerve.followTrajectoryCommand(path, resetOdometry, true);
-      forwardCommand.schedule();
-    });
+    return new ProxyCommand(()->{
+      var path = PathPlanner.loadPath(pathName, constraints);
+      // var path = getPathByName(pathName, constraints);
+      return swerve.silentFollowTrajectoryCommand(path, resetOdometry, true);
+    }); 
   }
 
   public static Command setInitPose(Subsystems s, String pathName) {

@@ -4,11 +4,14 @@
 
 package frc.robot.subsystems.drive.gyro;
 
+import edu.wpi.first.math.StateSpaceUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /** Add your docs here. */
 public class GyroSim implements GyroIO {
   private Rotation2d rot;
+  private double rate;
 
   public GyroSim() {
     this.rot = new Rotation2d();
@@ -23,15 +26,22 @@ public class GyroSim implements GyroIO {
   }
 
   public double getRate() {
-    return 0;
+    return this.rate;
   }
+  public void setRate(double omegaRadiansPerSecond) {
+    this.rate=omegaRadiansPerSecond;
+  };
+
 
   public void zeroYaw() {
     rot = new Rotation2d();
   }
 
   public void updateInputs(GyroIOInputs inputs) {
-    inputs.angleRadians = rot.getRadians();
-    // inputs.angleRadians = getRate();
+    var noise = StateSpaceUtil.makeWhiteNoiseVector(VecBuilder.fill(0.01)).get(0, 0);
+    var delta = getRate() * 0.02 + noise;
+    this.rot = new Rotation2d(this.rot.getRadians()+delta);
+    inputs.angleRadians = this.rot.getRadians();
+    inputs.angleRate = rate;
   }
 }

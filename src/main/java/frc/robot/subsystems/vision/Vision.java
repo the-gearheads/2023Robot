@@ -67,7 +67,7 @@ public class Vision extends SubsystemBase {
   }
 
   private void initField() {
-    SmartDashboard.putData("vision field", field);
+    SmartDashboard.putData("vision/vision field", field);
     field.setRobotPose(new Pose2d(-100, -100, new Rotation2d()));
   }
 

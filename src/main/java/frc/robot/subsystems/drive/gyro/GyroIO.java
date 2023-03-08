@@ -20,6 +20,8 @@ public interface GyroIO {
 
   public default void setRotation2d(Rotation2d newRotation2d) {};
 
+  public default void setRate(double omegaRadiansPerSecond) {};
+
   public default void zeroYaw() {};
 
   public default void updateInputs(GyroIOInputs inputs) {};

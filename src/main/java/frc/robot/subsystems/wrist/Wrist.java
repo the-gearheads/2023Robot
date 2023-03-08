@@ -86,7 +86,6 @@ public class Wrist extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putBoolean("reached here", false);
     if (controlState == WristControlType.DEFAULT) {
       setGoalByType(WristControlType.DEFAULT);
     }

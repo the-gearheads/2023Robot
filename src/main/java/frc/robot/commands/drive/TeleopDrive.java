@@ -8,8 +8,10 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
@@ -21,9 +23,9 @@ import frc.robot.util.SwerveRateLimit;
 /** An example command that uses an example subsystem. */
 public class TeleopDrive extends CommandBase {
   private final Swerve swerve;
-  private PIDController rotPIDController = new PIDController(1, 0, 0);
+  private ProfiledPIDController rotPIDController = new ProfiledPIDController(3d, 0d, 1d, new Constraints(8,4));
   private SwerveRateLimit rateLimiter = new SwerveRateLimit();
-  private double angleSetPoint;
+  private double angleGoal;
 
 
   /**
@@ -38,15 +40,18 @@ public class TeleopDrive extends CommandBase {
     SmartDashboard.putBoolean("TeleopDrive/UseFieldRelative", true);
     SmartDashboard.putBoolean("TeleopDrive/ExponentialJoystickControl", false);
     SmartDashboard.putBoolean("TeleopDrive/RateLimitDrive", false);
-    SmartDashboard.putBoolean("Rotation PID", false);
-    SmartDashboard.putNumber("Rotation PID kP", 3);
+    SmartDashboard.putBoolean("TeleopDrive/rot pid/Turn On", true);
+    SmartDashboard.putData("TeleopDrive/rot pid/Rot PID Controller", rotPIDController);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    swerve.setPose(new Pose2d());
-    angleSetPoint = swerve.getPose().getRotation().getRadians();
+    // swerve.setPose(new Pose2d());
+    var ctsGyroAngle=swerve.getContinuousGyroAngleRad();
+    var ctsGyroRate=swerve.getContinuousGyroAngleRad();
+    angleGoal = ctsGyroAngle;
+    rotPIDController.reset(ctsGyroAngle, ctsGyroRate);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -109,18 +114,7 @@ public class TeleopDrive extends CommandBase {
     Logger.getInstance().recordOutput("TeleopDrive/Scaled/ySpd", ySpd);
     Logger.getInstance().recordOutput("TeleopDrive/Scaled/rotSpd", rotSpd);
 
-    //Make sure the robot maintains its heading when we aren't toggling the rotation axis
-    if (SmartDashboard.getBoolean("Rotation PID", false)) {
-      rotPIDController = new PIDController(SmartDashboard.getNumber("Rotation PID kP", 1), 0, 0);
-
-      double gyroAngle = swerve.getContinuousGyroAngleRad();
-      if (MathUtil.applyDeadband(rotSpd, 1E-2) == 0) {
-        rotSpd = -rotPIDController.calculate(angleSetPoint, gyroAngle);
-        Logger.getInstance().recordOutput("TeleopDrive/rot pid/rotSpd", rotSpd);
-      } else {
-        angleSetPoint = gyroAngle;
-      }
-    }
+    rotSpd = applyRotPid(rotSpd);
 
     Logger.getInstance().recordOutput("TeleopDrive/Final/xSpd", xSpd);
     Logger.getInstance().recordOutput("TeleopDrive/Final/ySpd", ySpd);
@@ -133,6 +127,30 @@ public class TeleopDrive extends CommandBase {
       swerve.drive(speeds);
       // swerve.driveFieldRelative(speeds);
     }
+  }
+
+  public double applyRotPid(double rotSpd){
+    //Make sure the robot maintains its heading when we aren't toggling the rotation axis
+    var runRotPid = SmartDashboard.getBoolean("TeleopDrive/rot pid/Turn On", false);
+    var rotSpdEqualZero = MathUtil.applyDeadband(rotSpd, 1E-2) == 0;
+    var ctsGyroAngle=swerve.getContinuousGyroAngleRad();
+    var ctsGyroRate=swerve.getAngularVelRad();
+    rotPIDController.reset(ctsGyroAngle, ctsGyroRate);
+
+    if (runRotPid && rotSpdEqualZero){
+      rotSpd = rotPIDController.calculate(ctsGyroAngle, angleGoal);
+      Logger.getInstance().recordOutput("TeleopDrive/rot pid/rotSpd", rotSpd);
+      SmartDashboard.putBoolean("TeleopDrive/rot pid/running", true);
+    }else{
+      angleGoal = ctsGyroAngle;
+      SmartDashboard.putBoolean("TeleopDrive/rot pid/running", false);
+    }
+    SmartDashboard.putNumber("TeleopDrive/rot pid/cts gyro angle", ctsGyroAngle);
+    SmartDashboard.putNumber("TeleopDrive/rot pid/cts gyro rate", ctsGyroRate);
+    SmartDashboard.putNumber("TeleopDrive/rot pid/Goal", angleGoal);
+    SmartDashboard.putNumber("TeleopDrive/rot pid/setpoint", rotPIDController.getSetpoint().position);
+
+    return rotSpd;
   }
 
   // Called once the command ends or is interrupted.

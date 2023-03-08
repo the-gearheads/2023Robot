@@ -74,7 +74,7 @@ public class NeoDrive {
 
   /* Please work */
   public void setVoltage(double volts) {
-    SmartDashboard.putNumber("/Swerve/ManualVolts", volts);
+    SmartDashboard.putNumber("Swerve/ManualVolts", volts);
     // pid.setReference(volts, CANSparkMax.ControlType.kVoltage);
     max.setVoltage(volts);
   }
