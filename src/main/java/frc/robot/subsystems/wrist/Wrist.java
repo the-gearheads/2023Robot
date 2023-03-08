@@ -6,7 +6,6 @@ package frc.robot.subsystems.wrist;
 
 import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.FaultID;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -42,8 +41,11 @@ public class Wrist extends SubsystemBase {
   
   private double pidval;
   private double ffval;
+
+  private double lastValidPose=90;
   
   private Arm arm;
+  private boolean invalidReached=false;
 
   public Wrist(Arm arm) {
     this.arm = arm;
@@ -89,6 +91,35 @@ public class Wrist extends SubsystemBase {
       setGoalByType(WristControlType.DEFAULT);
     }
 
+    double currentPose = getPose();
+    this.pidval = pid.calculate(currentPose, goal);
+    this.ffval = ff.calculate(currentPose, 0);
+
+    setVoltage(applySoftLimit(ffval + pidval));
+    setControlState(WristControlType.DEFAULT);
+    log();
+
+    if(inInvalidRange()){
+      invalidReached=true;
+    }else{
+      if(invalidReached==false){
+        lastValidPose = currentPose;
+      }
+    }
+
+    if(invalidReached){
+      if(!inInvalidRange() && (Math.signum(lastValidPose) == Math.signum(currentPose))){
+        invalidReached=false;
+      }else{
+        if(lastValidPose>0){
+          setVoltage(-2);
+        }else{
+          setVoltage(2);
+        }
+      }
+    }
+      
+
     if(sensorErrorHandler()){
       DriverStation.reportError("OUR ZERO ERROR IN WRIST", null);
       setVoltage(0);
@@ -96,19 +127,17 @@ public class Wrist extends SubsystemBase {
         configure();
       }
       configureHasRan = true;
-      return;
     }
+  }
 
-    double currentPose = getPose();
-    this.pidval = pid.calculate(currentPose, goal);
-    this.ffval = ff.calculate(currentPose, 0);
-
-    setVoltage(applySoftLimit(ffval + pidval));
-    log();
-    setControlState(WristControlType.DEFAULT);
+  private boolean inInvalidRange() {
+    var currentPose = getPose();
+    return currentPose>135 || currentPose<-135;
   }
 
   private void log(){
+    Logger.getInstance().recordOutput("Wrist/invalid reached", invalidReached);
+    Logger.getInstance().recordOutput("Wrist/Last Valid Pose", lastValidPose);
     Logger.getInstance().recordOutput("Wrist/ReConfigure has ran", configureHasRan);
     Logger.getInstance().recordOutput("Wrist/Pose", MoreMath.round(getPose(),1));
     Logger.getInstance().recordOutput("Wrist/Vel", MoreMath.round(getVelocity(),1));

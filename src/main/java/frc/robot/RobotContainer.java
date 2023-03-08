@@ -26,6 +26,7 @@ import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.vision.UpdateSwervePoseEstimator;
 import frc.robot.commands.wrist.AltWristControl;
+import frc.robot.commands.wrist.DebugWristControl;
 import frc.robot.commands.wrist.ManualWristControl;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
@@ -118,6 +119,7 @@ public class RobotContainer {
 
     swerve.setDefaultCommand(new TeleopDrive(swerve));
     arm.setDefaultCommand(new JoystickArmControl(arm));
+    wrist.setDefaultCommand(new DebugWristControl(wrist));
     vision.setDefaultCommand(new UpdateSwervePoseEstimator(vision).ignoringDisable(true));
     updateControllers();
   }

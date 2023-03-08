@@ -100,7 +100,7 @@ public class Arm extends SubsystemBase {
 
   public void setVoltage(double volts) {
     Logger.getInstance().recordOutput("Arm/Appliedvolts", volts);
-    motor.setVoltage(volts);
+    // motor.setVoltage(volts);
   }
 
   public double getVoltage() {
