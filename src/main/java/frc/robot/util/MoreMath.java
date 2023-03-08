@@ -4,9 +4,9 @@ import org.photonvision.targeting.TargetCorner;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 
-public class AdditionalMathUtils {
+public class MoreMath {
 
-  private AdditionalMathUtils() {}
+  private MoreMath() {}
 
   // More or less https://stackoverflow.com/a/5295202 but could be easily reimplemented
   public static double round(double num, int places) {
