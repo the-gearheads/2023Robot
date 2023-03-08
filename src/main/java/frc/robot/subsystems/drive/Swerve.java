@@ -194,6 +194,7 @@ public class Swerve extends SubsystemBase {
    */
   public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath, boolean stopWhenDone) {
     return new SequentialCommandGroup(new InstantCommand(() -> {
+      var innerTraj = traj;
       // Reset odometry for the first path you run during auto
       if (isFirstPath) {
         Pose2d initPose = traj.getInitialHolonomicPose();
@@ -205,10 +206,11 @@ public class Swerve extends SubsystemBase {
           initPose = new Pose2d(newTranslation, newHeading);
         }
         this.setPose(initPose);
-        var allianceTraj = PathPlannerTrajectory.transformTrajectoryForAlliance(traj, DriverStation.getAlliance());
-        field.getObject("CurrentTrajectory").setTrajectory(allianceTraj);
-        Logger.getInstance().recordOutput("Swerve/Field/CurrentTrajectory", allianceTraj);
+        innerTraj = PathPlannerTrajectory.transformTrajectoryForAlliance(traj, DriverStation.getAlliance());
       }
+      
+      field.getObject("CurrentTrajectory").setTrajectory(innerTraj);
+      Logger.getInstance().recordOutput("Swerve/Field/CurrentTrajectory", innerTraj);
     }), new PPSwerveControllerCommand(traj, this::getPose, // Pose supplier
         this.kinematics, // SwerveDriveKinematicsSS
         (PIDController) SmartDashboard.getData("Swerve/xPid"), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
@@ -287,7 +289,7 @@ public class Swerve extends SubsystemBase {
   public Command goTo(Pose2d endPose, PathConstraints constraints) {
     Pose2d startPose = getPose();
     Rotation2d startHeading = endPose.minus(startPose).getTranslation().getAngle();
-    Rotation2d endHeading = startHeading;
+    Rotation2d endHeading = startHeading.rotateBy(Rotation2d.fromDegrees(180));
 
     PathPoint startPoint = new PathPoint(startPose.getTranslation(), startHeading, startPose.getRotation());// position, heading(direction of travel), holonomic rotation
     PathPoint endPoint = new PathPoint(endPose.getTranslation(), endHeading, endPose.getRotation());
