@@ -58,7 +58,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Swerve swerve;
   @SuppressWarnings("unused")
-  private final Vision vision;
+  // private final Vision vision;
   private final AutonChooser autonChooser;
   private final Arm arm;
   private Wrist wrist;
@@ -112,15 +112,14 @@ public class RobotContainer {
     }
 
     grabber = new Grabber();
-    vision = new Vision(swerve);
+    // vision = new Vision(swerve);
     autonChooser = new AutonChooser(swerve, arm, wrist, grabber);
     leds = new Leds();
     // Configure the button binding
 
     swerve.setDefaultCommand(new TeleopDrive(swerve));
     arm.setDefaultCommand(new JoystickArmControl(arm));
-    wrist.setDefaultCommand(new DebugWristControl(wrist));
-    vision.setDefaultCommand(new UpdateSwervePoseEstimator(vision).ignoringDisable(true));
+    // vision.setDefaultCommand(new UpdateSwervePoseEstimator(vision).ignoringDisable(true));
     updateControllers();
   }
 
@@ -169,6 +168,8 @@ public class RobotContainer {
     Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
     Controllers.operatorController.setWristAlternatePose().whileTrue(new AltWristControl(wrist).repeatedly());
     Controllers.operatorController.openGrabber().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
+
+    Controllers.operatorController.setArmByJoystick().onTrue(new JoystickArmControl(arm));
   }
 
   /**

@@ -100,7 +100,7 @@ public class Arm extends SubsystemBase {
 
   public void setVoltage(double volts) {
     Logger.getInstance().recordOutput("Arm/Appliedvolts", volts);
-    // motor.setVoltage(volts);
+    motor.setVoltage(volts);
   }
 
   public double getVoltage() {
@@ -116,7 +116,7 @@ public class Arm extends SubsystemBase {
     prevDisabled = !DriverStation.isEnabled();
 
     if(sensorErrorHandler()){
-      DriverStation.reportError("OUR ZERO ERROR IN ARM", null);
+      DriverStation.reportError("OUR ZERO ERROR IN ARM", true);
       setVoltage(0);
       if (configureHasRan == false) {
         configure();
