@@ -54,18 +54,18 @@ public class WristSim extends Wrist {
 
   @Override
   public double getPose() {
-    var ctsPose = Units.radiansToDegrees(sim.getAngleRads())+180;
-    var numWraps = (int) (ctsPose/180.0);
-    if(ctsPose>0){
-      if(numWraps%2==0){
+    var ctsPose = Units.radiansToDegrees(sim.getAngleRads()) + 180;
+    var numWraps = (int) (ctsPose / 180.0);
+    if (ctsPose > 0) {
+      if (numWraps % 2 == 0) {
         return (ctsPose % 180.0);
-      }else{
+      } else {
         return -180.0 + (ctsPose % 180.0);
       }
-    }else{
-      if(numWraps%2==0){
+    } else {
+      if (numWraps % 2 == 0) {
         return (ctsPose % 180.0);
-      }else{
+      } else {
         return 180.0 + (ctsPose % 180.0);
       }
     }
@@ -75,7 +75,7 @@ public class WristSim extends Wrist {
     return Units.radiansToDegrees(sim.getVelocityRadPerSec());
   }
 
-  public boolean sensorErrorHandler(){
+  public boolean sensorErrorHandler() {
     return false;
   }
 

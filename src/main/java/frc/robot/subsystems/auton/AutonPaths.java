@@ -29,8 +29,7 @@ public class AutonPaths {
    */
 
   public static Command InertN4PlaceThenDock(Subsystems s) {
-    return new SequentialCommandGroup(
-      setInitPose(s, "InertN4-StartN4"),
+    return new SequentialCommandGroup(setInitPose(s, "InertN4-StartN4"),
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
         getCommandForPath("InertN4-StartN4", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
@@ -38,26 +37,20 @@ public class AutonPaths {
         // place game piece
         getPlaceConeCommand(s),
 
-        stowAnd(s, 
-            getCommandForPath("StartN4-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
-            new AutoBalance(s.swerve)
-        )
-    );
+        stowAnd(s, getCommandForPath("StartN4-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+            new AutoBalance(s.swerve)));
   }
 
   public static CommandBase InertN4ExploreOverStationDock(Subsystems s) {
-    return new SequentialCommandGroup(
-      setInitPose(s, "InertN4-StartN4"),
-      new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-      getCommandForPath("InertN4-StartN4", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+    return new SequentialCommandGroup(setInitPose(s, "InertN4-StartN4"), new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+        getCommandForPath("InertN4-StartN4", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
 
-      getPlaceConeCommand(s),
+        getPlaceConeCommand(s),
 
-      stowAnd(s, 
-      getCommandForPath("StartN4-ExploreOverStation", false, Constants.AUTON.REALLY_SLOW_CONSTRAINTS, s.swerve),
-      getCommandForPath("ExploreOverStation-Dock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
-      new AutoBalance(s.swerve))
-    );
+        stowAnd(s,
+            getCommandForPath("StartN4-ExploreOverStation", false, Constants.AUTON.REALLY_SLOW_CONSTRAINTS, s.swerve),
+            getCommandForPath("ExploreOverStation-Dock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+            new AutoBalance(s.swerve)));
   }
 
   public static CommandBase InertN1PlaceThenDock(Subsystems s) {
@@ -72,10 +65,8 @@ public class AutonPaths {
         getPlaceConeCommand(s),
 
         // Go to charging station
-        stowAnd(s, 
-          getCommandForPath("StartN1-Explore-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
-          new AutoBalance(s.swerve))
-        );
+        stowAnd(s, getCommandForPath("StartN1-Explore-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+            new AutoBalance(s.swerve)));
   }
 
   public static CommandBase InertN1TwoConePath(Subsystems s) {
@@ -88,9 +79,7 @@ public class AutonPaths {
         getPlaceConeCommand(s),
 
         // Go get game piece
-        stowAnd(s, 
-          getCommandForPath("StartN1-GamePiece1", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)
-        ),
+        stowAnd(s, getCommandForPath("StartN1-GamePiece1", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
 
         // pick up game piece
         getGroundPickUpCommand(s),
@@ -114,9 +103,7 @@ public class AutonPaths {
         getPlaceConeCommand(s),
 
         // Go get game piece
-        stowAnd(s,
-            getCommandForPath("StartN9-GamePiece9", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)
-        ),
+        stowAnd(s, getCommandForPath("StartN9-GamePiece9", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
 
         // pick up game piece
         getGroundPickUpCommand(s),
@@ -142,9 +129,7 @@ public class AutonPaths {
         getPlaceConeCommand(s),
 
         // Go to charging station
-        stowAnd(s,
-            getCommandForPath("StartN9-Explore-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)
-        ),
+        stowAnd(s, getCommandForPath("StartN9-Explore-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
 
         new AutoBalance(s.swerve)
 
@@ -161,9 +146,7 @@ public class AutonPaths {
         getPlaceConeCommand(s),
 
         // Go get game piece
-        stowAnd(s,
-            getCommandForPath("StartN1-GamePiece1", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)
-        ),
+        stowAnd(s, getCommandForPath("StartN1-GamePiece1", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
 
         // pick up game piece
         getGroundPickUpCommand(s),
@@ -188,9 +171,7 @@ public class AutonPaths {
         getPlaceConeCommand(s),
 
         // Go get game piece
-        stowAnd(s,
-            getCommandForPath("StartN9-GamePiece9", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)
-        ),
+        stowAnd(s, getCommandForPath("StartN9-GamePiece9", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
 
         // pick up game piece
         getGroundPickUpCommand(s),
@@ -214,9 +195,7 @@ public class AutonPaths {
         getPlaceConeCommand(s),
 
         //go to autobalance pose
-        stowAnd(s,
-            getCommandForPath("InertN9-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)
-        ),
+        stowAnd(s, getCommandForPath("InertN9-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
 
         // run autobalance here
         new AutoBalance(s.swerve));
@@ -232,9 +211,7 @@ public class AutonPaths {
         getPlaceConeCommand(s),
 
         //go to autobalance pose
-        stowAnd(s,
-            getCommandForPath("InertN1-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)
-        ),
+        stowAnd(s, getCommandForPath("InertN1-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
 
         // run autobalance here
         new AutoBalance(s.swerve));
@@ -244,37 +221,20 @@ public class AutonPaths {
    * ASSUPTIONS: Cone being held, arm in correct position, alt mode corresponds to setting wrist to 0deg, and default sets it to 90deg
    */
   public static Command getPlaceConeCommand(Subsystems s) {
-    return new AltWristControl(s.wrist).raceWith( 
-    new SequentialCommandGroup(
-      new WaitCommand(0.25), // Wait for wrist to rotate before dropping cone
-      getGrabberOpenCommand(s.grabber), 
-      new WaitCommand(0.25) // Wait for grabber and gravity to drop cone
-    )).andThen(
-      getGrabberCloseCommand(s.grabber)
-    );
+    return new AltWristControl(s.wrist).raceWith(new SequentialCommandGroup(new WaitCommand(0.25), // Wait for wrist to rotate before dropping cone
+        getGrabberOpenCommand(s.grabber), new WaitCommand(0.25) // Wait for grabber and gravity to drop cone
+    )).andThen(getGrabberCloseCommand(s.grabber));
   }
 
   public static Command getGroundPickUpCommand(Subsystems s) {
-    return new SequentialCommandGroup(
-      getGrabberOpenCommand(s.grabber),
-      new WaitCommand(0.25),
-      new AltWristControl(s.wrist).raceWith(
-        new SequentialCommandGroup(
-          new WaitCommand(0.25),
-          getGrabberCloseCommand(s.grabber),
-          new WaitCommand(0.25)
-        )
-      ));
+    return new SequentialCommandGroup(getGrabberOpenCommand(s.grabber), new WaitCommand(0.25),
+        new AltWristControl(s.wrist).raceWith(new SequentialCommandGroup(new WaitCommand(0.25),
+            getGrabberCloseCommand(s.grabber), new WaitCommand(0.25))));
   }
 
   public static Command stowAnd(Subsystems s, Command... commands) {
-    return new ParallelRaceGroup(
-      new SequentialCommandGroup(commands),
-      new SequentialCommandGroup( // Start moving the arm 1 second into the path following
-          new WaitCommand(1), 
-          new StowArm(s.arm, s.wrist)
-      )
-    );
+    return new ParallelRaceGroup(new SequentialCommandGroup(commands), new SequentialCommandGroup( // Start moving the arm 1 second into the path following
+        new WaitCommand(1), new StowArm(s.arm, s.wrist)));
   }
 
   public static Command getGrabberOpenCommand(Grabber grabber) {
@@ -291,17 +251,20 @@ public class AutonPaths {
 
   public static PathPlannerTrajectory getPathByName(String pathName, PathConstraints constraints) {
 
-    if(DriverStation.getAlliance() == Alliance.Red) {
+    if (DriverStation.getAlliance() == Alliance.Red) {
       var overridePath = PathPlanner.loadPath(DriverStation.getEventName() + "Red_" + pathName, constraints);
-      if (overridePath != null) return overridePath;
+      if (overridePath != null)
+        return overridePath;
     } else {
       var overridePath = PathPlanner.loadPath(DriverStation.getEventName() + "Blue_" + pathName, constraints);
-      if (overridePath != null) return overridePath;
+      if (overridePath != null)
+        return overridePath;
     }
     /* Both alliances */
     var path = PathPlanner.loadPath(DriverStation.getEventName() + "_" + pathName, constraints);
-    if (path != null) return path;
-    
+    if (path != null)
+      return path;
+
     /* Actual path */
     path = PathPlanner.loadPath(pathName, constraints);
     if (path == null) {
@@ -312,7 +275,7 @@ public class AutonPaths {
 
   public static Command getCommandForPath(String pathName, boolean resetOdometry, PathConstraints constraints,
       Swerve swerve) {
-    return new InstantCommand(()->{
+    return new InstantCommand(() -> {
       var path = getPathByName(pathName, constraints);
       Command forwardCommand = swerve.followTrajectoryCommand(path, resetOdometry, true);
       forwardCommand.schedule();
