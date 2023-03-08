@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.Swerve;
-import frc.robot.util.AdditionalMathUtils;
+import frc.robot.util.MoreMath;
 import frc.robot.util.multicamvision.ClosestEstimateFinder;
 
 public class Vision extends SubsystemBase {
@@ -182,12 +182,12 @@ public class Vision extends SubsystemBase {
       var tagIdsArray = tagIds.stream().mapToLong(Long::valueOf).toArray();
 
       var robotEstPerTagStrs = robotEstPerTag.stream()
-          .map((estRobotPose) -> AdditionalMathUtils.pos2dToString(estRobotPose, 1)).toList().toArray(new String[0]);
+          .map((estRobotPose) -> MoreMath.pos2dToString(estRobotPose, 1)).toList().toArray(new String[0]);
 
-      var tagPoseStrs = tagPoses.stream().map((tagPose) -> (AdditionalMathUtils.pos2dToString(tagPose.toPose2d(), 1)))
+      var tagPoseStrs = tagPoses.stream().map((tagPose) -> (MoreMath.pos2dToString(tagPose.toPose2d(), 1)))
           .toList().toArray(new String[0]);
 
-      var tagCornersStr = tagCorners.stream().map((corner) -> AdditionalMathUtils.cornerToString(corner, 1)).toList()
+      var tagCornersStr = tagCorners.stream().map((corner) -> MoreMath.cornerToString(corner, 1)).toList()
           .toArray(new String[0]);
 
       var estimateStr = "invalid";
@@ -195,7 +195,7 @@ public class Vision extends SubsystemBase {
         var estimate = optEstimate.get();
         var pose = estimate.estimatedPose.toPose2d();
         this.field.getObject(cam.getName()).setPose(pose);
-        estimateStr = AdditionalMathUtils.pos2dToString(pose, 1);
+        estimateStr = MoreMath.pos2dToString(pose, 1);
       }
 
       var timestamp = cam.getLatestResult().getTimestampSeconds();
