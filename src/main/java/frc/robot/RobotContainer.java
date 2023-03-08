@@ -24,15 +24,12 @@ import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.StowArm;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.TeleopDrive;
-import frc.robot.commands.vision.UpdateSwervePoseEstimator;
 import frc.robot.commands.wrist.AltWristControl;
-import frc.robot.commands.wrist.DebugWristControl;
 import frc.robot.commands.wrist.ManualWristControl;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.auton.AutonChooser;
 import frc.robot.subsystems.Grabber;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmSim;
@@ -160,8 +157,8 @@ public class RobotContainer {
             swerve.getPose().plus(new Transform2d(new Translation2d(Units.inchesToMeters(10), 0.0), new Rotation2d())),
             Constants.AUTON.SLOW_CONSTRAINTS));
 
-    Controllers.operatorController.armGoToLowNode().onTrue(new SetArmPose(arm, ArmPose.LOW_NODE)
-    .andThen(new ManualWristControl(wrist, WristState.RIGHT)));
+    Controllers.operatorController.armGoToLowNode()
+        .onTrue(new SetArmPose(arm, ArmPose.LOW_NODE).andThen(new ManualWristControl(wrist, WristState.RIGHT)));
     Controllers.operatorController.armGoToMidNode().onTrue(new SetArmPose(arm, ArmPose.MID_NODE));
     Controllers.operatorController.armGoToHighNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
     Controllers.operatorController.armGoToInsideRobotNode().onTrue(new StowArm(arm, wrist));

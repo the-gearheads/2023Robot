@@ -181,14 +181,14 @@ public class Vision extends SubsystemBase {
       /* Prepare values for logging */
       var tagIdsArray = tagIds.stream().mapToLong(Long::valueOf).toArray();
 
-      var robotEstPerTagStrs = robotEstPerTag.stream()
-          .map((estRobotPose) -> MoreMath.pos2dToString(estRobotPose, 1)).toList().toArray(new String[0]);
-
-      var tagPoseStrs = tagPoses.stream().map((tagPose) -> (MoreMath.pos2dToString(tagPose.toPose2d(), 1)))
+      var robotEstPerTagStrs = robotEstPerTag.stream().map((estRobotPose) -> MoreMath.pos2dToString(estRobotPose, 1))
           .toList().toArray(new String[0]);
 
-      var tagCornersStr = tagCorners.stream().map((corner) -> MoreMath.cornerToString(corner, 1)).toList()
+      var tagPoseStrs = tagPoses.stream().map((tagPose) -> (MoreMath.pos2dToString(tagPose.toPose2d(), 1))).toList()
           .toArray(new String[0]);
+
+      var tagCornersStr =
+          tagCorners.stream().map((corner) -> MoreMath.cornerToString(corner, 1)).toList().toArray(new String[0]);
 
       var estimateStr = "invalid";
       if (isEstimatePresent(optEstimate)) {

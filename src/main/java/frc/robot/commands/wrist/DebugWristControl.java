@@ -30,7 +30,7 @@ public class DebugWristControl extends CommandBase {
   public void execute() {
     var goal = SmartDashboard.getNumber("Wrist/set goal", 0);
     var goalState = WristState.VARIABLE;
-    
+
     goalState.setWristGoal(goal);
     wrist.setGoal(goalState);
   }

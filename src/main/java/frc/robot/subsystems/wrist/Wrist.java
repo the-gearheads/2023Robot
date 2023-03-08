@@ -27,25 +27,24 @@ public class Wrist extends SubsystemBase {
   /** Creates a new Wrist. */
   private int zeroCount = 0;
   private Boolean configureHasRan = false;
- 
+
   private double goal;
   private WristControlType controlState = WristControlType.DEFAULT;
- 
+
   private CANSparkMax motor = new CANSparkMax(WRIST.WRIST_ID, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
 
-  protected PIDController pid = 
-      new PIDController(WRIST.WRIST_PID[0], WRIST.WRIST_PID[1], WRIST.WRIST_PID[2]);
+  protected PIDController pid = new PIDController(WRIST.WRIST_PID[0], WRIST.WRIST_PID[1], WRIST.WRIST_PID[2]);
   private SendableArmFeedforward ff =
       new SendableArmFeedforward(WRIST.WRIST_FF[0], WRIST.WRIST_FF[1], WRIST.WRIST_FF[2]);
-  
+
   private double pidval;
   private double ffval;
 
-  private double lastValidPose=90;
-  
+  private double lastValidPose = 90;
+
   private Arm arm;
-  private boolean invalidReached=false;
+  private boolean invalidReached = false;
 
   public Wrist(Arm arm) {
     this.arm = arm;
@@ -55,7 +54,7 @@ public class Wrist extends SubsystemBase {
     SmartDashboard.putData("Wrist/pid", pid);
   }
 
-  private void setControlState(WristControlType controlState){
+  private void setControlState(WristControlType controlState) {
     this.controlState = controlState;
   }
 
@@ -88,7 +87,7 @@ public class Wrist extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putBoolean("reached here", false);
-    if(controlState==WristControlType.DEFAULT){
+    if (controlState == WristControlType.DEFAULT) {
       setGoalByType(WristControlType.DEFAULT);
     }
 
@@ -98,30 +97,30 @@ public class Wrist extends SubsystemBase {
 
     setVoltage(ffval + pidval);
 
-    if(inInvalidRange()){
-      invalidReached=true;
+    if (inInvalidRange()) {
+      invalidReached = true;
       var goal = WristState.VARIABLE;
       goal.setWristGoal(lastValidPose);
       setGoal(goal);
-    }else{
-      if(invalidReached==false){
+    } else {
+      if (invalidReached == false) {
         lastValidPose = currentPose;
       }
     }
 
-    if(invalidReached){
-      if(!inInvalidRange() && (Math.signum(lastValidPose) == Math.signum(currentPose))){
-        invalidReached=false;
-      }else{
-        if(lastValidPose>0){
+    if (invalidReached) {
+      if (!inInvalidRange() && (Math.signum(lastValidPose) == Math.signum(currentPose))) {
+        invalidReached = false;
+      } else {
+        if (lastValidPose > 0) {
           setVoltage(-2);
-        }else{
+        } else {
           setVoltage(2);
         }
       }
     }
 
-    if(sensorErrorHandler()){
+    if (sensorErrorHandler()) {
       DriverStation.reportError("OUR ZERO ERROR IN WRIST", null);
       setVoltage(0);
       if (configureHasRan == false) {
@@ -135,36 +134,36 @@ public class Wrist extends SubsystemBase {
 
   private boolean inInvalidRange() {
     var currentPose = getPose();
-    return currentPose>135 || currentPose<-135;
+    return currentPose > 135 || currentPose < -135;
   }
 
-  private void log(){
+  private void log() {
     Logger.getInstance().recordOutput("Wrist/invalid reached", invalidReached);
     Logger.getInstance().recordOutput("Wrist/Last Valid Pose", lastValidPose);
     Logger.getInstance().recordOutput("Wrist/ReConfigure has ran", configureHasRan);
     Logger.getInstance().recordOutput("Wrist/control state", controlState.name());
-    Logger.getInstance().recordOutput("Wrist/Pose", MoreMath.round(getPose(),1));
-    Logger.getInstance().recordOutput("Wrist/Vel", MoreMath.round(getVelocity(),1));
-    Logger.getInstance().recordOutput("Wrist/Goal", MoreMath.round(goal,1));
-    Logger.getInstance().recordOutput("Wrist/Error", MoreMath.round(pid.getPositionError(),1));
-    Logger.getInstance().recordOutput("Wrist/PIDVal", MoreMath.round(pidval,1));
-    Logger.getInstance().recordOutput("Wrist/FFVal", MoreMath.round(ffval,1));
+    Logger.getInstance().recordOutput("Wrist/Pose", MoreMath.round(getPose(), 1));
+    Logger.getInstance().recordOutput("Wrist/Vel", MoreMath.round(getVelocity(), 1));
+    Logger.getInstance().recordOutput("Wrist/Goal", MoreMath.round(goal, 1));
+    Logger.getInstance().recordOutput("Wrist/Error", MoreMath.round(pid.getPositionError(), 1));
+    Logger.getInstance().recordOutput("Wrist/PIDVal", MoreMath.round(pidval, 1));
+    Logger.getInstance().recordOutput("Wrist/FFVal", MoreMath.round(ffval, 1));
     Logger.getInstance().recordOutput("Wrist/Appliedvolts", MoreMath.round(motor.getAppliedOutput(), 1));
     Logger.getInstance().recordOutput("Wrist/Current Command",
         this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "");
   }
 
-  public boolean sensorErrorHandler(){
+  public boolean sensorErrorHandler() {
     boolean hasFaults = motor.getFault(FaultID.kCANTX) || motor.getFault(FaultID.kCANRX);
     boolean hasStickyFaults = motor.getStickyFault(FaultID.kCANTX) || motor.getStickyFault(FaultID.kCANRX);
     var pose = encoder.getPosition();
 
-    if(pose==0 || pose>2000 || pose<-2000){
+    if (pose == 0 || pose > 2000 || pose < -2000) {
       zeroCount++;
     }
-    
+
     var zeroCountFault = zeroCount > 1;
-    Logger.getInstance().recordOutput("Wrist/Faults/Zero Count Fault",zeroCountFault);
+    Logger.getInstance().recordOutput("Wrist/Faults/Zero Count Fault", zeroCountFault);
     Logger.getInstance().recordOutput("Wrist/Faults/Fault", hasFaults);
     Logger.getInstance().recordOutput("Wrist/Faults/Sticky Fault", hasStickyFaults);
 
@@ -201,7 +200,11 @@ public class Wrist extends SubsystemBase {
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
 
-    try {Thread.sleep((long)40.0);} catch(Exception e) {e.printStackTrace();};
+    try {
+      Thread.sleep((long) 40.0);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } ;
   }
 
   /* Don't move towards the base of the robot if inside it (not good) */

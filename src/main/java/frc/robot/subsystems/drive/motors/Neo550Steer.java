@@ -78,7 +78,11 @@ public class Neo550Steer {
     max.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
     max.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
 
-    try {Thread.sleep((long)40.0);} catch(Exception e) {e.printStackTrace();};
+    try {
+      Thread.sleep((long) 40.0);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } ;
   }
 
   public void setAngle(Rotation2d angle) {
