@@ -56,19 +56,47 @@ public class TeleopDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    var xSpd = Controllers.driverController.getXMoveAxis();
-    var ySpd = Controllers.driverController.getYMoveAxis();
-    var rotSpd = Controllers.driverController.getRotateAxis();
-
-    Logger.getInstance().recordOutput("TeleopDrive/Deadbanded/xSpd", xSpd);
-    Logger.getInstance().recordOutput("TeleopDrive/Deadbanded/ySpd", ySpd);
-    Logger.getInstance().recordOutput("TeleopDrive/Deadbanded/rotSpd", rotSpd);
-
     if (Controllers.driverController.getSetWheelXButton().getAsBoolean()) {
       swerve.setX();
       return;
     }
 
+    var xSpd = Controllers.driverController.getXMoveAxis();
+    var ySpd = Controllers.driverController.getYMoveAxis();
+    var rotSpd = Controllers.driverController.getRotateAxis();
+
+    var spds = new ChassisSpeeds(xSpd, ySpd, rotSpd);
+
+    logSpds("deadbanded", spds);
+
+    spds=cube(spds);
+
+    logSpds("Cubed", spds);
+
+    spds=rateLimit(spds);
+
+    logSpds("rate limited", spds);
+
+    spds=scaleVel(spds);
+
+    logSpds("scaled", spds);
+
+    spds = maintainHeading(spds);
+
+    logSpds("final", spds);
+
+    if (SmartDashboard.getBoolean("TeleopDrive/UseFieldRelative", true)) {
+      swerve.driveFieldRelative(spds);
+    } else {
+      swerve.drive(spds);
+    }
+  }
+
+  public ChassisSpeeds cube(ChassisSpeeds spds){
+    var xSpd=spds.vxMetersPerSecond;
+    var ySpd=spds.vyMetersPerSecond;
+    var rotSpd=spds.omegaRadiansPerSecond;
+    
     boolean useExponentialJoystickControl = SmartDashboard.getBoolean("TeleopDrive/ExponentialJoystickControl", false);
     if (useExponentialJoystickControl) {
       Pair<Double, Double> xyPair = MoreMath.poseExp(xSpd, ySpd);
@@ -81,20 +109,17 @@ public class TeleopDrive extends CommandBase {
       rotSpd = Math.abs(Math.pow(rotSpd, 3)) * Math.signum(rotSpd);
     }
 
-    Logger.getInstance().recordOutput("TeleopDrive/Cubed/xSpd", xSpd);
-    Logger.getInstance().recordOutput("TeleopDrive/Cubed/ySpd", ySpd);
-    Logger.getInstance().recordOutput("TeleopDrive/Cubed/rotSpd", rotSpd);
+    return new ChassisSpeeds(xSpd, ySpd, rotSpd);
+  }
 
-    var limitedSpeeds = rateLimiter.rateLimit(new ChassisSpeeds(xSpd, ySpd, rotSpd));
+  public ChassisSpeeds rateLimit(ChassisSpeeds spds){
     if (SmartDashboard.getBoolean("TeleopDrive/RateLimitDrive", false)) {
-      xSpd = limitedSpeeds.vxMetersPerSecond;
-      ySpd = limitedSpeeds.vyMetersPerSecond;
-      rotSpd = limitedSpeeds.omegaRadiansPerSecond;
-      Logger.getInstance().recordOutput("TeleopDrive/Rate Limited/xSpd", xSpd);
-      Logger.getInstance().recordOutput("TeleopDrive/Rate Limited/ySpd", ySpd);
-      Logger.getInstance().recordOutput("TeleopDrive/Rate Limited/rotSpd", rotSpd);
+        return rateLimiter.rateLimit(spds);
     }
+    return spds;
+  }
 
+  public ChassisSpeeds scaleVel(ChassisSpeeds spds){
     var lin_mult = Constants.DRIVE.MID_LIN_VEL;
     var rot_mult = Constants.DRIVE.MID_ROT_VEL;
 
@@ -105,52 +130,48 @@ public class TeleopDrive extends CommandBase {
       lin_mult = Constants.DRIVE.HIGH_LIN_VEL;
       rot_mult = Constants.DRIVE.HIGH_ROT_VEL;
     }
-    xSpd *= lin_mult;
-    ySpd *= lin_mult;
-    rotSpd *= rot_mult;
+    spds.vxMetersPerSecond *= lin_mult;
+    spds.vyMetersPerSecond *= lin_mult;
+    spds.omegaRadiansPerSecond *= rot_mult;
 
-    Logger.getInstance().recordOutput("TeleopDrive/Scaled/xSpd", xSpd);
-    Logger.getInstance().recordOutput("TeleopDrive/Scaled/ySpd", ySpd);
-    Logger.getInstance().recordOutput("TeleopDrive/Scaled/rotSpd", rotSpd);
-
-    rotSpd = applyRotPid(rotSpd);
-
-    Logger.getInstance().recordOutput("TeleopDrive/Final/xSpd", xSpd);
-    Logger.getInstance().recordOutput("TeleopDrive/Final/ySpd", ySpd);
-    Logger.getInstance().recordOutput("TeleopDrive/Final/rotSpd", rotSpd);
-
-    var speeds = new ChassisSpeeds(xSpd, ySpd, rotSpd);
-    if (SmartDashboard.getBoolean("TeleopDrive/UseFieldRelative", true)) {
-      swerve.driveFieldRelative(speeds);
-    } else {
-      swerve.drive(speeds);
-      // swerve.driveFieldRelative(speeds);
-    }
+    return spds;
   }
 
   /*Make sure the robot maintains its heading when we aren't toggling the rotation axis*/
-  public double applyRotPid(double rotSpd){
+  public ChassisSpeeds maintainHeading(ChassisSpeeds spds){
     var runRotPid = SmartDashboard.getBoolean("TeleopDrive/rot pid/Turn On", false);
+    var rotSpd = spds.omegaRadiansPerSecond;
     var rotSpdEqualZero = MathUtil.applyDeadband(rotSpd, 1E-2) == 0;
 
     var ctsGyroAngle=swerve.getContinuousGyroAngleRad();
 
     if (runRotPid && rotSpdEqualZero){
       rotSpd = rotPIDCnt.calculate(ctsGyroAngle, angleGoal);
-      SmartDashboard.putString("TeleopDrive/rot pid/running", "pid");
+      Logger.getInstance().recordOutput("TeleopDrive/rot pid/rotSpd", rotSpd);
+      rotSpd = MathUtil.clamp(rotSpd, -0.5, 0.5);
+      Logger.getInstance().recordOutput("TeleopDrive/rot pid/clamped rotSpd", rotSpd);
+
+      spds.omegaRadiansPerSecond=rotSpd;
+      SmartDashboard.putBoolean("TeleopDrive/rot pid/running", true);
     }else{
       angleGoal = ctsGyroAngle;
-      SmartDashboard.putString("TeleopDrive/rot pid/running", "nothing");
+      SmartDashboard.putBoolean("TeleopDrive/rot pid/running", false);
     }
 
     SmartDashboard.putNumber("TeleopDrive/rot pid/cts gyro angle", ctsGyroAngle);
     SmartDashboard.putNumber("TeleopDrive/rot pid/Goal", angleGoal);
-    Logger.getInstance().recordOutput("TeleopDrive/rot pid/rotSpd", rotSpd);
 
-    rotSpd = MathUtil.clamp(rotSpd, -0.5, 0.5);
-    Logger.getInstance().recordOutput("TeleopDrive/rot pid/clamped rotSpd", rotSpd);
+    return spds;
+  }
 
-    return rotSpd;
+  public void logSpds(String subPath, ChassisSpeeds spds){
+    var xSpd=spds.vxMetersPerSecond;
+    var ySpd=spds.vyMetersPerSecond;
+    var rotSpd=spds.omegaRadiansPerSecond;
+
+    Logger.getInstance().recordOutput("TeleopDrive/"+subPath+"/xSpd", xSpd);
+    Logger.getInstance().recordOutput("TeleopDrive/"+subPath+"/ySpd", ySpd);
+    Logger.getInstance().recordOutput("TeleopDrive/"+subPath+"/rotSpd", rotSpd);
   }
 
   // Called once the command ends or is interrupted.
