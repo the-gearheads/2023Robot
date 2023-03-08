@@ -44,6 +44,7 @@ import frc.robot.subsystems.drive.gyro.GyroIO;
 import frc.robot.subsystems.drive.gyro.GyroSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 
 /**
@@ -153,9 +154,13 @@ public class RobotContainer {
     // }));
 
     Controllers.driverController.backUpFromFeeder()
-        .onTrue(swerve.goTo(
-            swerve.getPose().plus(new Transform2d(new Translation2d(Units.inchesToMeters(10), 0.0), new Rotation2d())),
-            Constants.AUTON.SLOW_CONSTRAINTS));
+        .onTrue(new ProxyCommand(
+          ()->{
+            var delta = new Transform2d(new Translation2d(Units.inchesToMeters(10), 0.0), new Rotation2d());
+            var dest = swerve.getPose().plus(delta);
+            return swerve.goTo(dest, Constants.AUTON.MID_CONSTRAINTS);
+          }));
+            
 
     Controllers.operatorController.armGoToLowNode()
         .onTrue(new SetArmPose(arm, ArmPose.LOW_NODE).andThen(new ManualWristControl(wrist, WristState.RIGHT)));

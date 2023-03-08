@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Launch delete",
+      "request": "launch",
+      "mainClass": "frc.robot.commands.drive.delete",
+      "projectName": "2023Robot"
+    },
+    {
+      "type": "java",
       "name": "Launch test",
       "request": "launch",
       "mainClass": "frc.robot.subsystems.test",

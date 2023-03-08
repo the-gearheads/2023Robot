@@ -1,6 +1,7 @@
 package frc.robot.controllers;
 
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -9,8 +10,10 @@ import frc.robot.Constants;
 public class XboxDriverController implements DriverController {
 
   public XboxController controller;
+  private int port;
 
   public XboxDriverController(int port) {
+    this.port = port;
     controller = new XboxController(port);
   }
 
@@ -73,4 +76,28 @@ public class XboxDriverController implements DriverController {
   public Trigger getSetWheelXButton() {
     return new JoystickButton(controller, XboxController.Button.kStart.value);
   }
+
+  public Trigger getSetHeading0Btn(){
+    return new Trigger(()->{
+      return controller.getPOV()==0;
+    });
+  };
+  
+  public Trigger getSetHeading90Btn(){
+    return new Trigger(()->{
+      return controller.getPOV()==270;
+    });  
+  };
+  
+  public Trigger getSetHeading180Btn(){
+    return new Trigger(()->{
+      return controller.getPOV()==180;
+    });  
+  };
+  
+  public Trigger getSetHeading270Btn(){
+    return new Trigger(()->{
+      return controller.getPOV()==90;
+    });
+  };
 }
