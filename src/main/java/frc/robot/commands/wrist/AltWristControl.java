@@ -7,7 +7,7 @@ package frc.robot.commands.wrist;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.wrist.Wrist;
-import frc.robot.subsystems.wrist.WristState.WristStateType;
+import frc.robot.subsystems.wrist.WristState.WristControlType;
 
 public class AltWristControl extends CommandBase {
   private Wrist wrist;
@@ -23,12 +23,13 @@ public class AltWristControl extends CommandBase {
   @Override
   public void initialize() {
     SmartDashboard.putString("Alt wrist control turned on?", "ON");
-    wrist.setControlState(WristStateType.ALT);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    wrist.setGoalByType(WristControlType.ALT);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -39,6 +40,6 @@ public class AltWristControl extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
+    return false;
   }
 }

@@ -21,14 +21,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DRIVE;
 import frc.robot.commands.arm.JoystickArmControl;
 import frc.robot.commands.arm.SetArmPose;
+import frc.robot.commands.arm.StowArm;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.vision.UpdateSwervePoseEstimator;
-import frc.robot.commands.wrist.DefaultWristControl;
 import frc.robot.commands.wrist.AltWristControl;
+import frc.robot.commands.wrist.DebugWristControl;
+import frc.robot.commands.wrist.ManualWristControl;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
-import frc.robot.subsystems.AutonChooser;
+import frc.robot.subsystems.auton.AutonChooser;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.leds.Leds;
@@ -36,6 +38,7 @@ import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmSim;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristSim;
+import frc.robot.subsystems.wrist.WristState;
 import frc.robot.subsystems.drive.SwerveModule;
 import frc.robot.subsystems.drive.SwerveModuleIO;
 import frc.robot.subsystems.drive.SwerveModuleSim;
@@ -55,7 +58,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Swerve swerve;
   @SuppressWarnings("unused")
-  private final Vision vision;
+  // private final Vision vision;
   private final AutonChooser autonChooser;
   private final Arm arm;
   private Wrist wrist;
@@ -109,15 +112,14 @@ public class RobotContainer {
     }
 
     grabber = new Grabber();
-    vision = new Vision(swerve);
+    // vision = new Vision(swerve);
     autonChooser = new AutonChooser(swerve, arm, wrist, grabber);
     leds = new Leds();
     // Configure the button binding
 
     swerve.setDefaultCommand(new TeleopDrive(swerve));
     arm.setDefaultCommand(new JoystickArmControl(arm));
-    wrist.setDefaultCommand(new DefaultWristControl(wrist));
-    vision.setDefaultCommand(new UpdateSwervePoseEstimator(vision).ignoringDisable(true));
+    // vision.setDefaultCommand(new UpdateSwervePoseEstimator(vision).ignoringDisable(true));
     updateControllers();
   }
 
@@ -158,13 +160,16 @@ public class RobotContainer {
             swerve.getPose().plus(new Transform2d(new Translation2d(Units.inchesToMeters(10), 0.0), new Rotation2d())),
             Constants.AUTON.SLOW_CONSTRAINTS));
 
-    Controllers.operatorController.armGoToLowNode().onTrue(new SetArmPose(arm, ArmPose.LOW_NODE));
+    Controllers.operatorController.armGoToLowNode().onTrue(new SetArmPose(arm, ArmPose.LOW_NODE)
+    .andThen(new ManualWristControl(wrist, WristState.RIGHT)));
     Controllers.operatorController.armGoToMidNode().onTrue(new SetArmPose(arm, ArmPose.MID_NODE));
     Controllers.operatorController.armGoToHighNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
+    Controllers.operatorController.armGoToInsideRobotNode().onTrue(new StowArm(arm, wrist));
     Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
-    Controllers.operatorController.armGoToInsideRobotNode().onTrue(new SetArmPose(arm, ArmPose.INSIDE_ROBOT));
     Controllers.operatorController.setWristAlternatePose().whileTrue(new AltWristControl(wrist).repeatedly());
     Controllers.operatorController.openGrabber().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
+
+    Controllers.operatorController.setArmByJoystick().onTrue(new JoystickArmControl(arm));
   }
 
   /**
@@ -173,7 +178,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    wrist.setDefaultCommand(new DefaultWristControl(wrist));
     return autonChooser.getSelectedAuton();
   }
 }

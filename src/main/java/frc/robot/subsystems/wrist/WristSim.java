@@ -54,11 +54,29 @@ public class WristSim extends Wrist {
 
   @Override
   public double getPose() {
-    return Units.radiansToDegrees(sim.getAngleRads());
+    var ctsPose = Units.radiansToDegrees(sim.getAngleRads())+180;
+    var numWraps = (int) (ctsPose/180.0);
+    if(ctsPose>0){
+      if(numWraps%2==0){
+        return (ctsPose % 180.0);
+      }else{
+        return -180.0 + (ctsPose % 180.0);
+      }
+    }else{
+      if(numWraps%2==0){
+        return (ctsPose % 180.0);
+      }else{
+        return 180.0 + (ctsPose % 180.0);
+      }
+    }
   }
 
   public double getVelocity() {
     return Units.radiansToDegrees(sim.getVelocityRadPerSec());
+  }
+
+  public boolean sensorErrorHandler(){
+    return false;
   }
 
   public void simulationPeriodic() {
@@ -75,7 +93,7 @@ public class WristSim extends Wrist {
 
     // SimBattery estimates loaded battery voltages
     // Update the Mechanism Arm angle based on the simulated arm angle
-    simLig.setAngle(Units.radiansToDegrees(sim.getAngleRads()));
-    simCone.update(new Rotation2d(sim.getAngleRads()));
+    simLig.setAngle(getPose());
+    simCone.update(Rotation2d.fromDegrees(getPose()));
   }
 }
