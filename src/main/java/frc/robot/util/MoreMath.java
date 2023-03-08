@@ -34,4 +34,42 @@ public class MoreMath {
 
     return new Pair<>(Math.cos(angle) * mag, Math.sin(angle) * mag);
   }
+
+  public static double getClosest(double current, double desired){
+    var currentWrap = getWrap(current);
+    var currentBase = currentWrap*360;
+
+    var desiredMod360 = mod360(desired);
+    
+    double[] possibilities = {
+        (currentBase+desiredMod360-720),
+        (currentBase+desiredMod360-360),
+        (currentBase+desiredMod360),
+        (currentBase+desiredMod360+360),
+        (currentBase+desiredMod360+720)
+    };
+
+    var closest = Double.MIN_VALUE;
+    for(var possibility: possibilities){
+        var currentDist = Math.abs(possibility - current);
+        var closestDist = Math.abs(closest - current);
+        if(closestDist>currentDist){
+            closest = possibility;
+        }
+    }
+    // System.out.println(index);
+    return closest;
+  }
+
+  
+  public static int getWrap(double angle){
+    var wrap = (int) (angle / 360.0);
+    return wrap;
+  }
+
+  public static double mod360(double angle){
+    var angleMod360 = angle%360;
+    angleMod360 = angleMod360<0?angleMod360+360:angleMod360;
+    return angleMod360;
+  }
 }

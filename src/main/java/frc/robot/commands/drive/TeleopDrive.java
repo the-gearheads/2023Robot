@@ -12,6 +12,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -81,6 +82,7 @@ public class TeleopDrive extends CommandBase {
 
     logSpds("scaled", spds);
 
+    cardinalBtns();
     spds = maintainHeading(spds);
 
     logSpds("final", spds);
@@ -89,6 +91,33 @@ public class TeleopDrive extends CommandBase {
       swerve.driveFieldRelative(spds);
     } else {
       swerve.drive(spds);
+    }
+  }
+
+  private void cardinalBtns() {
+    var heading0 = Controllers.driverController.getSetHeading0Btn().getAsBoolean();
+    var heading90 = Controllers.driverController.getSetHeading90Btn().getAsBoolean();
+    var heading180 = Controllers.driverController.getSetHeading180Btn().getAsBoolean();
+    var heading270 = Controllers.driverController.getSetHeading270Btn().getAsBoolean();
+
+    var ctsGyroAngle = swerve.getContinuousGyroAngleRad();
+
+    // SmartDashboard.putNumber("Actual Heading #", Controllers.driverController.controller.getPOV());
+
+    if(heading0){
+      SmartDashboard.putNumber("Heading #", 0);
+      angleGoal=MoreMath.getClosest(ctsGyroAngle,Units.degreesToRadians(0));
+    }else if(heading90){
+      SmartDashboard.putNumber("Heading #", 90);
+      angleGoal=MoreMath.getClosest(ctsGyroAngle, Units.degreesToRadians(90));
+    }else if(heading180){
+      SmartDashboard.putNumber("Heading #", 180);
+      angleGoal=MoreMath.getClosest(ctsGyroAngle,Units.degreesToRadians(180));
+    }else if(heading270){
+      SmartDashboard.putNumber("Heading #", 270);
+      angleGoal=MoreMath.getClosest(ctsGyroAngle,Units.degreesToRadians(270));
+    }else{
+      SmartDashboard.putNumber("Heading #", -1);
     }
   }
 
