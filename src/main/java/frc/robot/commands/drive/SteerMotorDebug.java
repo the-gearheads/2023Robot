@@ -18,7 +18,7 @@ public class SteerMotorDebug extends CommandBase {//Currently only affects FL St
     this.swerveSubsystem = swerve;
     addRequirements(swerve);
     double currentAngle = swerve.lastInputs[0].steerAngleSetpoint;
-    SmartDashboard.putNumber("Desired Steer Motor Angle", currentAngle);
+    SmartDashboard.putNumber("Steer Motor Debug/Desired Steer Motor Angle", currentAngle);
 
 
     // Use addRequirements() here to declare subsystem dependencies.
@@ -28,16 +28,16 @@ public class SteerMotorDebug extends CommandBase {//Currently only affects FL St
   @Override
   public void initialize() {
     double currentAngle = swerveSubsystem.lastInputs[0].steerAngleSetpoint;
-    SmartDashboard.putNumber("Desired Steer Motor Angle", currentAngle);
+    SmartDashboard.putNumber("Steer Motor Debug/Desired Steer Motor Angle", currentAngle);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     double currentAngle = swerveSubsystem.lastInputs[0].steerAngle;
-    SmartDashboard.putNumber("Current Steer Motor Angle", currentAngle);
+    SmartDashboard.putNumber("Steer Motor Debug/Current Steer Motor Angle", currentAngle);
 
-    double desiredAngle = SmartDashboard.getNumber("Desired Steer Motor Angle", currentAngle);
+    double desiredAngle = SmartDashboard.getNumber("Steer Motor Debug/Desired Steer Motor Angle", currentAngle);
     swerveSubsystem.setStates(new SwerveModuleState[] {new SwerveModuleState(0, Rotation2d.fromDegrees(desiredAngle))});
   }
 

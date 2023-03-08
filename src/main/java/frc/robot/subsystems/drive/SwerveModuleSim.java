@@ -36,7 +36,6 @@ public class SwerveModuleSim extends SwerveModule {
   @Override
   public void updateInputs(SwerveModuleInputs inputs) {
     super.updateInputs(inputs);
-    SmartDashboard.putNumber("We reached here", this.drivePos);
     inputs.drivePosition = this.drivePos;
     inputs.driveVelocity = this.driveVel;
     inputs.steerAngle = this.angle.getRadians();
