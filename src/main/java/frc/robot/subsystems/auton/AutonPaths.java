@@ -30,6 +30,8 @@ public class AutonPaths {
    * ASSUMPTIONS: Cone preloaded, arm already inside robot, in inert pos, pos constants correct
    */
 
+  private static PathConstraints defaultConstraints = Constants.AUTON.SLOW_CONSTRAINTS;
+
   public static Command InertN4PlaceThenDock(Subsystems s) {
     return new SequentialCommandGroup(
         setInitPose(s, "InertN4-StartN4"),
@@ -37,24 +39,24 @@ public class AutonPaths {
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
 
-        getCommandForPath("InertN4-StartN4", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+        getCommandForPath("InertN4-StartN4", true, defaultConstraints, s.swerve),
 
         // place game piece
         getPlaceConeCommand(s),
 
-        stowAnd(s, getCommandForPath("StartN4-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+        stowAnd(s, getCommandForPath("StartN4-PrepareDock", false, defaultConstraints, s.swerve),
             new AutoBalance(s.swerve)));
   }
 
   public static CommandBase InertN4ExploreOverStationDock(Subsystems s) {
     return new SequentialCommandGroup(setInitPose(s, "InertN4-StartN4"), new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-        getCommandForPath("InertN4-StartN4", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+        getCommandForPath("InertN4-StartN4", true, defaultConstraints, s.swerve),
 
         getPlaceConeCommand(s),
 
         stowAnd(s,
             getCommandForPath("StartN4-ExploreOverStation", false, Constants.AUTON.REALLY_SLOW_CONSTRAINTS, s.swerve),
-            getCommandForPath("ExploreOverStation-Dock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+            getCommandForPath("ExploreOverStation-Dock", false, defaultConstraints, s.swerve),
             new AutoBalance(s.swerve)));
   }
 
@@ -63,14 +65,14 @@ public class AutonPaths {
         // Move forward
         // new ParallelCommandGroup(
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-        getCommandForPath("InertN1-StartN1", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+        getCommandForPath("InertN1-StartN1", true, defaultConstraints, s.swerve),
         // ),
 
         // place game piece
         getPlaceConeCommand(s),
 
         // Go to charging station
-        stowAnd(s, getCommandForPath("StartN1-Explore-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+        stowAnd(s, getCommandForPath("StartN1-Explore-PrepareDock", false, defaultConstraints, s.swerve),
             new AutoBalance(s.swerve)));
   }
 
@@ -78,20 +80,20 @@ public class AutonPaths {
     return new SequentialCommandGroup(setInitPose(s, "InertN1-StartN1"),
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-        getCommandForPath("InertN1-StartN1", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+        getCommandForPath("InertN1-StartN1", true, defaultConstraints, s.swerve),
 
         // place game piece
         getPlaceConeCommand(s),
 
         // Go get game piece
-        stowAnd(s, getCommandForPath("StartN1-GamePiece1", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
+        stowAnd(s, getCommandForPath("StartN1-GamePiece1", false, defaultConstraints, s.swerve)),
 
         // pick up game piece
         getGroundPickUpCommand(s),
 
         // go back to grid node 3 inert
         new ParallelCommandGroup(
-            getCommandForPath("GamePiece1-StartN3", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+            getCommandForPath("GamePiece1-StartN3", false, defaultConstraints, s.swerve),
             new SetArmPose(s.arm, ArmPose.HIGH_NODE)),
 
         // Place game piece
@@ -102,20 +104,20 @@ public class AutonPaths {
     return new SequentialCommandGroup(
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-        getCommandForPath("InertN9-StartN9", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+        getCommandForPath("InertN9-StartN9", true, defaultConstraints, s.swerve),
 
         // place game piece
         getPlaceConeCommand(s),
 
         // Go get game piece
-        stowAnd(s, getCommandForPath("StartN9-GamePiece9", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
+        stowAnd(s, getCommandForPath("StartN9-GamePiece9", false, defaultConstraints, s.swerve)),
 
         // pick up game piece
         getGroundPickUpCommand(s),
 
         // go back to grid node 3 inert
         new ParallelCommandGroup(
-            getCommandForPath("GamePiece9-StartN7", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+            getCommandForPath("GamePiece9-StartN7", false, defaultConstraints, s.swerve),
             new SetArmPose(s.arm, ArmPose.HIGH_NODE)),
 
         // Place game piece
@@ -127,14 +129,14 @@ public class AutonPaths {
         // Move forward
         // new ParallelCommandGroup(
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-        getCommandForPath("InertN9-StartN9", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+        getCommandForPath("InertN9-StartN9", true, defaultConstraints, s.swerve),
         // ),
 
         // place game piece
         getPlaceConeCommand(s),
 
         // Go to charging station
-        stowAnd(s, getCommandForPath("StartN9-Explore-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
+        stowAnd(s, getCommandForPath("StartN9-Explore-PrepareDock", false, defaultConstraints, s.swerve)),
 
         new AutoBalance(s.swerve)
 
@@ -145,20 +147,20 @@ public class AutonPaths {
     return new SequentialCommandGroup(
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-        getCommandForPath("InertN1-StartN1", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+        getCommandForPath("InertN1-StartN1", true, defaultConstraints, s.swerve),
 
         // place game piece
         getPlaceConeCommand(s),
 
         // Go get game piece
-        stowAnd(s, getCommandForPath("StartN1-GamePiece1", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
+        stowAnd(s, getCommandForPath("StartN1-GamePiece1", false, defaultConstraints, s.swerve)),
 
         // pick up game piece
         getGroundPickUpCommand(s),
 
         // go back to grid node 3 inert
         new ParallelCommandGroup(
-            getCommandForPath("GamePiece1-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+            getCommandForPath("GamePiece1-PrepareDock", false, defaultConstraints, s.swerve),
             new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT)),
 
         // run autobalance 
@@ -170,20 +172,20 @@ public class AutonPaths {
     return new SequentialCommandGroup(
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-        getCommandForPath("InertN9-StartN9", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+        getCommandForPath("InertN9-StartN9", true, defaultConstraints, s.swerve),
 
         // place game piece
         getPlaceConeCommand(s),
 
         // Go get game piece
-        stowAnd(s, getCommandForPath("StartN9-GamePiece9", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
+        stowAnd(s, getCommandForPath("StartN9-GamePiece9", false, defaultConstraints, s.swerve)),
 
         // pick up game piece
         getGroundPickUpCommand(s),
 
         // go back to grid node 3 inert
         new ParallelCommandGroup(
-            getCommandForPath("GamePiece9-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+            getCommandForPath("GamePiece9-PrepareDock", false, defaultConstraints, s.swerve),
             new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT)),
 
         new AutoBalance(s.swerve));
@@ -194,13 +196,13 @@ public class AutonPaths {
     return new SequentialCommandGroup(
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-        getCommandForPath("InertN9-StartN9", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+        getCommandForPath("InertN9-StartN9", true, defaultConstraints, s.swerve),
 
         // place game piece
         getPlaceConeCommand(s),
 
         //go to autobalance pose
-        stowAnd(s, getCommandForPath("InertN9-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
+        stowAnd(s, getCommandForPath("InertN9-PrepareDock", false, defaultConstraints, s.swerve)),
 
         // run autobalance here
         new AutoBalance(s.swerve));
@@ -210,13 +212,13 @@ public class AutonPaths {
     return new SequentialCommandGroup(
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-        getCommandForPath("InertN1-StartN1", true, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+        getCommandForPath("InertN1-StartN1", true, defaultConstraints, s.swerve),
 
         // place game piece
         getPlaceConeCommand(s),
 
         //go to autobalance pose
-        stowAnd(s, getCommandForPath("InertN1-PrepareDock", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)),
+        stowAnd(s, getCommandForPath("InertN1-PrepareDock", false, defaultConstraints, s.swerve)),
 
         // run autobalance here
         new AutoBalance(s.swerve));
@@ -290,7 +292,7 @@ public class AutonPaths {
 
   public static Command setInitPose(Subsystems s, String pathName) {
     return new InstantCommand(() -> {
-      PathPlannerTrajectory path = PathPlanner.loadPath(pathName, Constants.AUTON.SLOW_CONSTRAINTS);
+      PathPlannerTrajectory path = PathPlanner.loadPath(pathName, defaultConstraints);
       var initPose = path.getInitialPose();
       s.swerve.setPose(initPose);
     });
