@@ -28,7 +28,7 @@ import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.commands.wrist.ManualWristControl;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
-import frc.robot.subsystems.auton.AutonChooser;
+import frc.robot.auton.AutonChooser;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.arm.Arm;

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.auton;
+package frc.robot.auton;
 
 import java.util.HashMap;
 import java.util.Map;
