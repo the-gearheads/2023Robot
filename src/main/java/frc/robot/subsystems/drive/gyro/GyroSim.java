@@ -39,6 +39,7 @@ public class GyroSim implements GyroIO {
 
   public void updateInputs(GyroIOInputs inputs) {
     var noise = StateSpaceUtil.makeWhiteNoiseVector(VecBuilder.fill(0.01)).get(0, 0);
+    noise=0;
     var delta = (getRate() + noise) * 0.02;
     this.rot = new Rotation2d(this.rot.getRadians()+delta);
     inputs.angleRadians = this.rot.getRadians();

@@ -26,7 +26,7 @@ import frc.robot.util.SwerveRateLimit;
 /** An example command that uses an example subsystem. */
 public class TeleopDrive extends CommandBase {
   private final Swerve swerve;
-  private PIDController rotPIDCnt = new PIDController(3d, 0d, 0d);
+  private PIDController rotPIDCnt = new PIDController(4d, 0d, 0d);
   private SwerveRateLimit rateLimiter = new SwerveRateLimit();
   private double angleGoal;
 
@@ -50,7 +50,7 @@ public class TeleopDrive extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    // swerve.setPose(new Pose2d());
+    swerve.setPose(new Pose2d());
     var ctsGyroAngle=swerve.getContinuousGyroAngleRad();
     angleGoal = ctsGyroAngle;
   }
@@ -181,7 +181,7 @@ public class TeleopDrive extends CommandBase {
     if (runRotPid && rotSpdEqualZero){
       rotSpd = rotPIDCnt.calculate(ctsGyroAngle, angleGoal);
       Logger.getInstance().recordOutput("TeleopDrive/rot pid/rotSpd", rotSpd);
-      rotSpd = MathUtil.clamp(rotSpd, -1.5, 1.5);
+      rotSpd = MathUtil.clamp(rotSpd, -2.5, 2.5);
       Logger.getInstance().recordOutput("TeleopDrive/rot pid/clamped rotSpd", rotSpd);
 
       spds.omegaRadiansPerSecond=rotSpd;
