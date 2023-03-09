@@ -288,7 +288,7 @@ public class Swerve extends SubsystemBase {
 
   public Command goTo(Pose2d endPose, PathConstraints constraints) {
     Pose2d startPose = getPose();
-    Rotation2d startHeading = endPose.minus(startPose).getTranslation().getAngle();
+    Rotation2d startHeading = endPose.getTranslation().minus(startPose.getTranslation()).getAngle();
     Rotation2d endHeading = startHeading;
     // .rotateBy(Rotation2d.fromDegrees(180));
 
