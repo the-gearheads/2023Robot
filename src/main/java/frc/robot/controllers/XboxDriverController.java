@@ -10,10 +10,8 @@ import frc.robot.Constants;
 public class XboxDriverController implements DriverController {
 
   public XboxController controller;
-  private int port;
 
   public XboxDriverController(int port) {
-    this.port = port;
     controller = new XboxController(port);
   }
 
@@ -32,10 +30,14 @@ public class XboxDriverController implements DriverController {
     return -Controllers.deadband(controller.getLeftX());
   }
 
+
   @Override
   public double getRotateAxis() {
-    if (Constants.getMode() == Constants.RobotMode.SIM) {
-      return -Controllers.deadband(controller.getRawAxis(2));
+    // if (Constants.getMode() == Constants.RobotMode.SIM) {
+    //   return -Controllers.deadband(controller.getRawAxis(2));
+    // }
+    if(getRotateButton().getAsBoolean()) {
+      return 0;
     }
     return -Controllers.deadband(controller.getRightX());
   }
@@ -68,6 +70,12 @@ public class XboxDriverController implements DriverController {
     return new JoystickButton(controller, XboxController.Button.kLeftBumper.value);
   }
 
+  private Trigger getRotateButton() {
+    return new Trigger(()->{
+      return controller.getRightTriggerAxis() > 0.7;
+    });
+  }
+
   public Trigger getResetPoseButton() {
     return new JoystickButton(controller, XboxController.Button.kLeftBumper.value);
   }
@@ -79,25 +87,28 @@ public class XboxDriverController implements DriverController {
 
   public Trigger getSetHeading0Btn(){
     return new Trigger(()->{
-      return controller.getPOV()==0;
+      return getRotateButton().getAsBoolean() && (controller.getRightY() < -0.75);
     });
   };
   
   public Trigger getSetHeading90Btn(){
     return new Trigger(()->{
-      return controller.getPOV()==270;
+      return getRotateButton().getAsBoolean() && (controller.getRightX() < -0.75);
     });  
   };
   
   public Trigger getSetHeading180Btn(){
     return new Trigger(()->{
-      return controller.getPOV()==180;
+      return getRotateButton().getAsBoolean() && (controller.getRightY() > 0.75);
     });  
   };
   
   public Trigger getSetHeading270Btn(){
     return new Trigger(()->{
-      return controller.getPOV()==90;
+      return getRotateButton().getAsBoolean() && (controller.getRightX() > 0.75);
     });
+  };
+  public double getPOV(){
+    return controller.getPOV();
   };
 }

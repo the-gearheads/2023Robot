@@ -3,6 +3,7 @@ package frc.robot.util;
 import org.photonvision.targeting.TargetCorner;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 
 public class MoreMath {
 
@@ -49,7 +50,7 @@ public class MoreMath {
         (currentBase+desiredMod360+720)
     };
 
-    var closest = Double.MIN_VALUE;
+    var closest = (double) Integer.MIN_VALUE;
     for(var possibility: possibilities){
         var currentDist = Math.abs(possibility - current);
         var closestDist = Math.abs(closest - current);
@@ -59,6 +60,11 @@ public class MoreMath {
     }
     // System.out.println(index);
     return closest;
+  }
+
+  public static double getClosestRad(double current, double desired){
+    var result = getClosest(Units.radiansToDegrees(current), Units.radiansToDegrees(desired));
+    return Units.degreesToRadians(result);
   }
 
   
