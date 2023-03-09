@@ -118,7 +118,7 @@ public class RobotContainer {
     leds = new Leds();
     // Configure the button binding
 
-    swerve.setDefaultCommand(new TeleopDrive(swerve));
+    // swerve.setDefaultCommand(new TeleopDrive(swerve));
     arm.setDefaultCommand(new JoystickArmControl(arm));
     // vision.setDefaultCommand(new UpdateSwervePoseEstimator(vision).ignoringDisable(true));
     updateControllers();
@@ -192,5 +192,13 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autonChooser.getSelectedAuton();
+  }
+
+  public void setTeleopDefault() {
+    swerve.setDefaultCommand(new TeleopDrive(swerve));
+  }
+
+  public void clearTeleopDefault(){
+    swerve.setDefaultCommand(new InstantCommand(()->{}, swerve));
   }
 }
