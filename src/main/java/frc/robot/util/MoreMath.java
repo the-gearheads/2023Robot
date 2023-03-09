@@ -3,6 +3,7 @@ package frc.robot.util;
 import org.photonvision.targeting.TargetCorner;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 
 public class MoreMath {
@@ -77,5 +78,11 @@ public class MoreMath {
     var angleMod360 = angle%360;
     angleMod360 = angleMod360<0?angleMod360+360:angleMod360;
     return angleMod360;
+  }
+
+  public static Pose2d deepCopyPose(Pose2d pose){
+    var deepCopy = new Pose2d();
+    deepCopy=deepCopy.plus(new Transform2d(new Pose2d(), pose));
+    return deepCopy;
   }
 }

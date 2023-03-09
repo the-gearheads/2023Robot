@@ -209,7 +209,7 @@ public class Swerve extends SubsystemBase {
         innerTraj = PathPlannerTrajectory.transformTrajectoryForAlliance(traj, DriverStation.getAlliance());
       }
       
-      field.getObject("CurrentTrajectory").setTrajectory(innerTraj);
+      // field.getObject("CurrentTrajectory").setTrajectory(innerTraj);
       Logger.getInstance().recordOutput("Swerve/Field/CurrentTrajectory", innerTraj);
     }), new PPSwerveControllerCommand(traj, this::getPose, // Pose supplier
         this.kinematics, // SwerveDriveKinematicsSS
@@ -222,7 +222,7 @@ public class Swerve extends SubsystemBase {
       if (stopWhenDone) {
         drive(new ChassisSpeeds(0, 0, 0));
       }
-      field.getObject("CurrentTrajectory").setTrajectory(new Trajectory());
+      // field.getObject("CurrentTrajectory").setTrajectory(new Trajectory());
       Logger.getInstance().recordOutput("Swerve/Field/CurrentTrajectory", new Trajectory());
     }));
   }
@@ -289,7 +289,8 @@ public class Swerve extends SubsystemBase {
   public Command goTo(Pose2d endPose, PathConstraints constraints) {
     Pose2d startPose = getPose();
     Rotation2d startHeading = endPose.minus(startPose).getTranslation().getAngle();
-    Rotation2d endHeading = startHeading.rotateBy(Rotation2d.fromDegrees(180));
+    Rotation2d endHeading = startHeading;
+    // .rotateBy(Rotation2d.fromDegrees(180));
 
     PathPoint startPoint = new PathPoint(startPose.getTranslation(), startHeading, startPose.getRotation());// position, heading(direction of travel), holonomic rotation
     PathPoint endPoint = new PathPoint(endPose.getTranslation(), endHeading, endPose.getRotation());
