@@ -96,6 +96,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     autonCommand = robotContainer.getAutonomousCommand();
+    robotContainer.clearTeleopDefault();
 
     // schedule the autonomous command (example)
     if (autonCommand != null) {
@@ -117,6 +118,7 @@ public class Robot extends LoggedRobot {
       autonCommand.cancel();
     }
     TestPlaceThenDock.initDockTestingTelemetry();
+    robotContainer.setTeleopDefault();
   }
 
   /** This function is called periodically during operator control. */
