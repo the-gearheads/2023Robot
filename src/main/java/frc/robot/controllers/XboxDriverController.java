@@ -77,7 +77,7 @@ public class XboxDriverController implements DriverController {
   }
 
   public Trigger getResetPoseButton() {
-    return new JoystickButton(controller, XboxController.Button.kLeftBumper.value);
+    return new JoystickButton(controller, XboxController.Button.kX.value);
   }
 
   /* Probably should change to something better but all the good buttons are used by the debug stuff */
@@ -111,4 +111,8 @@ public class XboxDriverController implements DriverController {
   public double getPOV(){
     return controller.getPOV();
   };
+
+  public Trigger testDockPath(){
+    return new JoystickButton(controller, XboxController.Button.kY.value);
+  }
 }

@@ -7,7 +7,7 @@ package frc.robot;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -29,6 +29,7 @@ import frc.robot.commands.wrist.ManualWristControl;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.auton.AutonChooser;
+import frc.robot.auton.TestPlaceThenDock;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.arm.Arm;
@@ -36,6 +37,7 @@ import frc.robot.subsystems.arm.ArmSim;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristSim;
 import frc.robot.subsystems.wrist.WristState;
+import frc.robot.util.MoreMath;
 import frc.robot.subsystems.drive.SwerveModule;
 import frc.robot.subsystems.drive.SwerveModuleIO;
 import frc.robot.subsystems.drive.SwerveModuleSim;
@@ -44,6 +46,7 @@ import frc.robot.subsystems.drive.gyro.GyroIO;
 import frc.robot.subsystems.drive.gyro.GyroSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 
@@ -121,6 +124,8 @@ public class RobotContainer {
     updateControllers();
   }
 
+
+
   /**
    * Use this method to define your button->command mappings. Buttons can be created by instantiating a {@link GenericHID} or one of its subclasses
    * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
@@ -156,11 +161,17 @@ public class RobotContainer {
     Controllers.driverController.backUpFromFeeder()
         .onTrue(new ProxyCommand(
           ()->{
-            var delta = new Transform2d(new Translation2d(Units.inchesToMeters(3), 0.0), new Rotation2d());
-            var dest = swerve.getPose().plus(delta);
+            var currentPose = swerve.getPose();
+            var dest = MoreMath.deepCopyPose(currentPose);
+            var translation = new Translation2d(Units.inchesToMeters(5), 0);
+            dest=new Pose2d(dest.getTranslation().plus(translation), dest.getRotation());
             return swerve.goTo(dest, Constants.AUTON.MID_CONSTRAINTS);
           }));
-            
+    Controllers.driverController.testDockPath().onTrue(new TestPlaceThenDock(swerve));
+    Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(()->
+      {
+        swerve.setPose(swerve.getPose());
+      }));
 
     Controllers.operatorController.armGoToLowNode()
         .onTrue(new SetArmPose(arm, ArmPose.LOW_NODE).andThen(new ManualWristControl(wrist, WristState.RIGHT)));
