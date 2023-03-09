@@ -156,7 +156,7 @@ public class RobotContainer {
     Controllers.driverController.backUpFromFeeder()
         .onTrue(new ProxyCommand(
           ()->{
-            var delta = new Transform2d(new Translation2d(Units.inchesToMeters(10), 0.0), new Rotation2d());
+            var delta = new Transform2d(new Translation2d(Units.inchesToMeters(-10), 0.0), new Rotation2d());
             var dest = swerve.getPose().plus(delta);
             return swerve.goTo(dest, Constants.AUTON.MID_CONSTRAINTS);
           }));
