@@ -3,7 +3,6 @@ package frc.robot.controllers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public interface DriverController {
-
   /** Axis used for moving forwards and backwards. Value between -1 and 1 */
   public default double getXMoveAxis() {
     return 0.0;
@@ -74,5 +73,8 @@ public default Trigger getSetHeading180Btn(){
 
 public default Trigger getSetHeading270Btn(){
   return new Trigger(() -> false);
+};
+public default double getPOV(){
+  return -1;
 };
 }

@@ -4,6 +4,7 @@
 
 package frc.robot.commands.drive;
 
+import java.lang.ModuleLayer.Controller;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
@@ -102,20 +103,23 @@ public class TeleopDrive extends CommandBase {
 
     var ctsGyroAngle = swerve.getContinuousGyroAngleRad();
 
-    // SmartDashboard.putNumber("Actual Heading #", Controllers.driverController.controller.getPOV());
-
+    SmartDashboard.putNumber("Actual Heading #", Controllers.driverController.getPOV());
     if(heading0){
       SmartDashboard.putNumber("Heading #", 0);
-      angleGoal=MoreMath.getClosest(ctsGyroAngle,Units.degreesToRadians(0));
+      angleGoal=MoreMath.getClosestRad(ctsGyroAngle,Units.degreesToRadians(0));
+      SmartDashboard.putNumber("more math", angleGoal);
     }else if(heading90){
       SmartDashboard.putNumber("Heading #", 90);
-      angleGoal=MoreMath.getClosest(ctsGyroAngle, Units.degreesToRadians(90));
+      angleGoal=MoreMath.getClosestRad(ctsGyroAngle, Units.degreesToRadians(90));
+      SmartDashboard.putNumber("more math", angleGoal);
     }else if(heading180){
       SmartDashboard.putNumber("Heading #", 180);
-      angleGoal=MoreMath.getClosest(ctsGyroAngle,Units.degreesToRadians(180));
+      angleGoal=MoreMath.getClosestRad(ctsGyroAngle,Units.degreesToRadians(180));
+      SmartDashboard.putNumber("more math", angleGoal);
     }else if(heading270){
       SmartDashboard.putNumber("Heading #", 270);
-      angleGoal=MoreMath.getClosest(ctsGyroAngle,Units.degreesToRadians(270));
+      angleGoal=MoreMath.getClosestRad(ctsGyroAngle,Units.degreesToRadians(270));
+      SmartDashboard.putNumber("more math", angleGoal);
     }else{
       SmartDashboard.putNumber("Heading #", -1);
     }
@@ -177,7 +181,7 @@ public class TeleopDrive extends CommandBase {
     if (runRotPid && rotSpdEqualZero){
       rotSpd = rotPIDCnt.calculate(ctsGyroAngle, angleGoal);
       Logger.getInstance().recordOutput("TeleopDrive/rot pid/rotSpd", rotSpd);
-      rotSpd = MathUtil.clamp(rotSpd, -0.5, 0.5);
+      rotSpd = MathUtil.clamp(rotSpd, -1.5, 1.5);
       Logger.getInstance().recordOutput("TeleopDrive/rot pid/clamped rotSpd", rotSpd);
 
       spds.omegaRadiansPerSecond=rotSpd;
