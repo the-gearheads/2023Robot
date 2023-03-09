@@ -102,6 +102,7 @@ public class AutonPaths {
 
   public static CommandBase InertN9TwoConePath(Subsystems s) {
     return new SequentialCommandGroup(
+      setInitPose(s, "InertN9-StartN9"),
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
         getCommandForPath("InertN9-StartN9", true, defaultConstraints, s.swerve),
