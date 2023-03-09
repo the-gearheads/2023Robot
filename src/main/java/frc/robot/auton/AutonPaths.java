@@ -1,4 +1,4 @@
-package frc.robot.subsystems.auton;
+package frc.robot.auton;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -226,9 +226,12 @@ public class AutonPaths {
    * ASSUPTIONS: Cone being held, arm in correct position, alt mode corresponds to setting wrist to 0deg, and default sets it to 90deg
    */
   public static Command getPlaceConeCommand(Subsystems s) {
-    return new AltWristControl(s.wrist).raceWith(new SequentialCommandGroup(new WaitCommand(0.25), // Wait for wrist to rotate before dropping cone
-        getGrabberOpenCommand(s.grabber), new WaitCommand(0.25) // Wait for grabber and gravity to drop cone
-    )).andThen(getGrabberCloseCommand(s.grabber));
+    return new AltWristControl(s.wrist).raceWith(new SequentialCommandGroup(
+        new WaitCommand(0.25), // Wait for wrist to rotate before dropping cone
+        getGrabberOpenCommand(s.grabber),
+        new WaitCommand(0.25), // Wait for grabber and gravity to drop cone
+        getGrabberCloseCommand(s.grabber)
+    ));
   }
 
   public static Command getGroundPickUpCommand(Subsystems s) {
