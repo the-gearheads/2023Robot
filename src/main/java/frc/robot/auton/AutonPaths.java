@@ -30,7 +30,7 @@ public class AutonPaths {
    * ASSUMPTIONS: Cone preloaded, arm already inside robot, in inert pos, pos constants correct
    */
 
-  private static PathConstraints defaultConstraints = Constants.AUTON.SLOW_CONSTRAINTS;
+  private static PathConstraints defaultConstraints = Constants.AUTON.MID_CONSTRAINTS;
 
   public static Command InertN4PlaceThenDock(Subsystems s) {
     return new SequentialCommandGroup(
@@ -55,7 +55,7 @@ public class AutonPaths {
         getPlaceConeCommand(s),
 
         stowAnd(s,
-            getCommandForPath("StartN4-ExploreOverStation", false, Constants.AUTON.REALLY_SLOW_CONSTRAINTS, s.swerve),
+            getCommandForPath("StartN4-ExploreOverStation", false, defaultConstraints, s.swerve),
             getCommandForPath("ExploreOverStation-Dock", false, defaultConstraints, s.swerve),
             new AutoBalance(s.swerve)));
   }
