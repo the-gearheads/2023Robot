@@ -83,7 +83,10 @@ public class Swerve extends SubsystemBase {
     updateInputs();
     odometry.update(getRotation(), getPositionsFromInputs(lastInputs));
     wheelOdometry.update(getRotation(), getPositionsFromInputs(lastInputs));
+    log();
+  }
 
+  public void log(){
     field.setRobotPose(getPose());
     field.getObject("Wheels").setPose(wheelOdometry.getPoseMeters());
 
@@ -98,6 +101,9 @@ public class Swerve extends SubsystemBase {
 
     var states = getStatesFromInputs(lastInputs);
     Logger.getInstance().recordOutput("Swerve/CurrentModuleStates", states);
+
+    var commandName = this.getCurrentCommand() == null?"None" : this.getCurrentCommand().getName();
+    Logger.getInstance().recordOutput("Swerve/Current Command", commandName);
   }
 
   public void simulationPeriodic() {
