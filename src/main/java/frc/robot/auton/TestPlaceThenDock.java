@@ -5,9 +5,11 @@
 package frc.robot.auton;
 
 import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
@@ -22,6 +24,7 @@ public class TestPlaceThenDock extends ProxyCommand {
     super(()->{
 
       var defaultPath = AutonPaths.getPathByName("StartN4-PrepareDock", Constants.AUTON.DOCK_CONSTRAINTS);
+      // defaultPath = PathPlannerTrajectory.transformTrajectoryForAlliance(defaultPath, DriverStation.getAlliance());
       var startPose = defaultPath.getInitialPose();
       var endPose = MoreMath.deepCopyPose(startPose);
 
