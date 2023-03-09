@@ -76,5 +76,8 @@ public default Trigger getSetHeading270Btn(){
 };
 public default double getPOV(){
   return -1;
-};
+}
+public default Trigger testDockPath(){
+  return new Trigger(()->false);
+}
 }

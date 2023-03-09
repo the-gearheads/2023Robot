@@ -44,7 +44,7 @@ public class AutonPaths {
         // place game piece
         getPlaceConeCommand(s),
 
-        stowAnd(s, getCommandForPath("StartN4-PrepareDock", false, defaultConstraints, s.swerve),
+        stowAnd(s, getCommandForPath("StartN4-PrepareDock", false, Constants.AUTON.DOCK_CONSTRAINTS, s.swerve),
             new AutoBalance(s.swerve)));
   }
 

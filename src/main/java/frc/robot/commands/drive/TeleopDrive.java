@@ -50,7 +50,7 @@ public class TeleopDrive extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    swerve.setPose(new Pose2d());
+    // swerve.setPose(new Pose2d());
     var ctsGyroAngle=swerve.getContinuousGyroAngleRad();
     angleGoal = ctsGyroAngle;
   }

@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import frc.robot.Constants.RobotMode;
+import frc.robot.auton.TestPlaceThenDock;
 import frc.robot.util.NTToAdvantageKit;
 
 /**
@@ -115,6 +116,7 @@ public class Robot extends LoggedRobot {
     if (autonCommand != null) {
       autonCommand.cancel();
     }
+    TestPlaceThenDock.initDockTestingTelemetry();
   }
 
   /** This function is called periodically during operator control. */
