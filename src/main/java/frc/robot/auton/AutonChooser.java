@@ -75,31 +75,7 @@ public class AutonChooser {
 
   public void initializeAutons() {//Here we define auton choices
     Subsystems s = new Subsystems(swerve, wrist, arm, grabber);
-    //Left Most Cone Node -> Left Most Game Piece -> Left Most Cone Node -> Charging Station 
-    Command InertN1TwoConePath = AutonPaths.InertN1TwoConePath(s);
-    // Command InertN1GrabThenDock = AutonPaths.InertN1GrabThenDock(s);
-    // Command InertN1PlaceThenDock = AutonPaths.InertN1PlaceThenDock(s);
-    Command InertN9TwoConePath = AutonPaths.InertN9TwoConePath(s);
-    // Command InertN9GrabThenDock = AutonPaths.InertN9GrabThenDock(s);
-    // Command InertN9PlaceThenDock = AutonPaths.InertN9PlaceThenDock(s);
     Command InertN4PlaceThenDock = AutonPaths.InertN4PlaceThenDock(s);
-    Command InertN4PlaceThenExploreThenDock = AutonPaths.InertN4ExploreOverStationDock(s);
-
-    autons.put("N4 Place Then Leave Community Then Dock", InertN4PlaceThenExploreThenDock);
     autons.put("N4 Place Then Dock", InertN4PlaceThenDock);
-    autons.put("N1 TwoCone", InertN1TwoConePath);
-    // autons.put("N1 Grab Then Dock", InertN1GrabThenDock);
-    // autons.put("N1 Place Then Dock", InertN1PlaceThenDock);
-    autons.put("N9 TwoCone", InertN9TwoConePath);
-    // autons.put("N9 Grab Then Dock", InertN9GrabThenDock);
-    // autons.put("N9 Place Then Dock", InertN9PlaceThenDock);
-
-    // //Forward 1 Meter
-    // Command debugForward = AutonPaths.getCommandForPath("Debug_Forward", true, AUTON.SLOW_CONSTRAINTS, swerve);
-    // autons.put("Debug Forward", debugForward);
-
-    // Command autoBalance = new AutoBalance(swerve);
-    // autons.put("Auto Balance", autoBalance);
-
   }
 }
