@@ -24,6 +24,7 @@ import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.drive.Swerve;
+import frc.robot.auton.AutonHelper;
 
 // format: off
 public class AutonPaths {
@@ -35,130 +36,52 @@ public class AutonPaths {
 
   public static Command InertN4PlaceThenDock(Subsystems s) {
     return new SequentialCommandGroup(
-        setInitPose(s, "InertN4-StartN4"),
+        AutonHelper.setInitPose(s, "InertN4-StartN4"),
 
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
 
-        getCommandForPath("InertN4-StartN4", true, defaultConstraints, s.swerve),
+        AutonHelper.getCommandForPath("InertN4-StartN4", true, defaultConstraints, s.swerve),
 
         // place game piece
-        getPlaceConeCommand(s),
+        AutonHelper.getPlaceConeCommand(s),
 
-        stowAnd(s, getCommandForPath("StartN4-PrepareDock", false, Constants.AUTON.DOCK_CONSTRAINTS, s.swerve),
-            new AutoBalance(s.swerve)));
+        AutonHelper.stowAnd(s, 
+          AutonHelper.getCommandForPath("StartN4-PrepareDock", false, Constants.AUTON.DOCK_CONSTRAINTS, s.swerve),
+          new AutoBalance(s.swerve)));
   }
 
   public static Command InertN1PlaceThenExplore(Subsystems s) {
     return new SequentialCommandGroup(
-        setInitPose(s, "InertN1-StartN1"),
+        AutonHelper.setInitPose(s, "InertN1-StartN1"),
 
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
 
-        getCommandForPath("InertN1-StartN1", true, defaultConstraints, s.swerve),
+        AutonHelper.getCommandForPath("InertN1-StartN1", true, defaultConstraints, s.swerve),
 
         // place game piece
-        getPlaceConeCommand(s),
+        AutonHelper.getPlaceConeCommand(s),
 
-        stowAnd(s, getCommandForPath("StartN1-Explore", false, defaultConstraints, s.swerve))
+        AutonHelper.stowAnd(s, AutonHelper.getCommandForPath("StartN1-Explore", false, defaultConstraints, s.swerve))
     );
   }
 
   public static Command InertN9PlaceThenExplore(Subsystems s) {
     return new SequentialCommandGroup(
-        setInitPose(s, "InertN9-StartN9"),
+        AutonHelper.setInitPose(s, "InertN9-StartN9"),
 
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
 
-        getCommandForPath("InertN9-StartN9", true, defaultConstraints, s.swerve),
+        AutonHelper.getCommandForPath("InertN9-StartN9", true, defaultConstraints, s.swerve),
 
         // place game piece
-        getPlaceConeCommand(s),
+        AutonHelper.getPlaceConeCommand(s),
 
-        stowAnd(s, getCommandForPath("StartN9-Explore", false, defaultConstraints, s.swerve))
+        AutonHelper.stowAnd(s, AutonHelper.getCommandForPath("StartN9-Explore", false, defaultConstraints, s.swerve))
     );
   }
-
-  /* Places a cone on the grid
-   * ASSUPTIONS: Cone being held, arm in correct position, alt mode corresponds to setting wrist to 0deg, and default sets it to 90deg
-   */
-  public static Command getPlaceConeCommand(Subsystems s) {
-    return new AltWristControl(s.wrist).raceWith(new SequentialCommandGroup(
-        new WaitCommand(0.5), // Wait for wrist to rotate before dropping cone
-        getGrabberOpenCommand(s.grabber)
-    )).andThen(
-      new WaitCommand(0.5), // Wait for grabber and gravity to drop cone
-      getGrabberCloseCommand(s.grabber));
-  }
-
-  public static Command getGroundPickUpCommand(Subsystems s) {
-    return new SequentialCommandGroup(getGrabberOpenCommand(s.grabber), new WaitCommand(0.25),
-        new AltWristControl(s.wrist).raceWith(new SequentialCommandGroup(new WaitCommand(0.25),
-            getGrabberCloseCommand(s.grabber), new WaitCommand(0.25))));
-  }
-
-  public static Command stowAnd(Subsystems s, Command... commands) {
-    return new ParallelRaceGroup(new SequentialCommandGroup(commands), new SequentialCommandGroup( // Start moving the arm 1 second into the path following
-        new WaitCommand(1), new StowArm(s.arm, s.wrist)));
-  }
-
-  public static Command getGrabberOpenCommand(Grabber grabber) {
-    return new InstantCommand(() -> {
-      grabber.open();
-    }, grabber);
-  }
-
-  public static Command getGrabberCloseCommand(Grabber grabber) {
-    return new InstantCommand(() -> {
-      grabber.close();
-    }, grabber);
-  }
-
-  public static PathPlannerTrajectory getPathByName(String pathName, PathConstraints constraints) {
-
-      if (DriverStation.getAlliance() == Alliance.Red) {
-        var overridePath = PathPlanner.loadPath(DriverStation.getEventName() + "Red_" + pathName, constraints);
-        if (overridePath != null)
-          return overridePath;
-      } else {
-        var overridePath = PathPlanner.loadPath(DriverStation.getEventName() + "Blue_" + pathName, constraints);
-        if (overridePath != null)
-          return overridePath;
-      }
-      /* Both alliances */
-      var path = PathPlanner.loadPath(DriverStation.getEventName() + "_" + pathName, constraints);
-      if (path != null)
-        return path;
-
-
-    /* Actual path */
-    path = PathPlanner.loadPath(pathName, constraints);
-    if (path == null) {
-      DriverStation.reportError("Failed to load path: " + pathName, true);
-    }
-    return path;
-  }
-
-  public static Command getCommandForPath(String pathName, boolean resetOdometry, PathConstraints constraints,
-      Swerve swerve) {
-    return new ProxyCommand(()->{
-      var path = PathPlanner.loadPath(pathName, constraints);
-      // var path = getPathByName(pathName, constraints);
-      return swerve.silentFollowTrajectoryCommand(path, resetOdometry, true);
-    }); 
-  }
-
-  public static Command setInitPose(Subsystems s, String pathName) {
-    return new InstantCommand(() -> {
-      PathPlannerTrajectory path = PathPlanner.loadPath(pathName, defaultConstraints);
-      path = PathPlannerTrajectory.transformTrajectoryForAlliance(path, DriverStation.getAlliance());
-      var initPose = path.getInitialPose();
-      s.swerve.setPose(initPose);
-    });
-  }
-
 
   /* NOT USED FOR WAYNE STATE (add back later)----------------------------------------------------------------------- */
     // public static CommandBase InertN4ExploreOverStationDock(Subsystems s) {
