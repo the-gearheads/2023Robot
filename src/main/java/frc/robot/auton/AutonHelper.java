@@ -35,9 +35,15 @@ public class AutonHelper {
   }
 
   public static Command getGroundPickUpCommand(Subsystems s) {
-    return new SequentialCommandGroup(getGrabberOpenCommand(s.grabber), new WaitCommand(0.25),
-        new AltWristControl(s.wrist).raceWith(new SequentialCommandGroup(new WaitCommand(0.25),
-            getGrabberCloseCommand(s.grabber), new WaitCommand(0.25))));
+    return new SequentialCommandGroup(
+        getGrabberOpenCommand(s.grabber),
+        new WaitCommand(0.25),
+        new AltWristControl(s.wrist).raceWith(new SequentialCommandGroup(
+            new WaitCommand(0.5),
+            getGrabberCloseCommand(s.grabber), 
+            new WaitCommand(0.25))),
+        new WaitCommand(0.25)
+    );
   }
 
   public static Command stowAnd(Subsystems s, Command... commands) {
