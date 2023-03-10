@@ -51,6 +51,11 @@ public class Controllers {
         operatorController = new ThrustMaster(i);
         foundOperatorController = true;
         continue;
+      } else if (!foundOperatorController && (joyName.toLowerCase().contains("USB Gamepad"))) {
+        System.out.println("Found Thrustmaster operator controller on port " + i);
+        operatorController = new SegaOperatorController(i);
+        foundOperatorController = true;
+        continue;
       }
       // Fallback
       if (!foundDriveController) {
