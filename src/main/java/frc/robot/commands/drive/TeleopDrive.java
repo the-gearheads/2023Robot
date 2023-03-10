@@ -26,7 +26,7 @@ import frc.robot.util.SwerveRateLimit;
 /** An example command that uses an example subsystem. */
 public class TeleopDrive extends CommandBase {
   private final Swerve swerve;
-  private PIDController rotPIDCnt = new PIDController(4d, 0d, 0d);
+  private PIDController rotPIDCnt = new PIDController(5d, 0d, 0d);
   private SwerveRateLimit rateLimiter = new SwerveRateLimit();
   private double angleGoal;
 
