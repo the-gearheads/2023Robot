@@ -172,7 +172,10 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Faults/Fault", hasFaults);
     Logger.getInstance().recordOutput("Arm/Faults/Sticky Fault", hasStickyFaults);
 
-    return zeroCountFault || hasFaults || hasStickyFaults;
+    if(hasStickyFaults){
+      DriverStation.reportWarning("Arm Sticky Fault", true);
+    }
+    return zeroCountFault || hasFaults;
   }
 
   public double poseControl() {

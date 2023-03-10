@@ -188,7 +188,7 @@ public class Constants extends AnnotatedClass {
     public static PathConstraints MID_CONSTRAINTS = new PathConstraints(3, 1.5);    
     public static PathConstraints FAST_CONSTRAINTS = new PathConstraints(7, 3);
 
-    // public static PathConstraints DOUBLE_CONE = new PathConstraints(4.5, 2.5);
+    public static PathConstraints DOUBLE_CONE = new PathConstraints(4.5, 2.5);
     public static final PathConstraints DOCK_CONSTRAINTS = SLOW_CONSTRAINTS;
     
     public static final String EVENT_NAME = "Wayne";

@@ -120,7 +120,7 @@ public class Wrist extends SubsystemBase {
     }
 
     if (sensorErrorHandler()) {
-      DriverStation.reportError("OUR ZERO ERROR IN WRIST", null);
+      DriverStation.reportError("OUR ZERO ERROR IN WRIST", true);
       setVoltage(0);
       if (configureHasRan == false) {
         configure();
@@ -166,7 +166,10 @@ public class Wrist extends SubsystemBase {
     Logger.getInstance().recordOutput("Wrist/Faults/Fault", hasFaults);
     Logger.getInstance().recordOutput("Wrist/Faults/Sticky Fault", hasStickyFaults);
 
-    return zeroCountFault || hasFaults || hasStickyFaults;
+    if(hasStickyFaults){
+      DriverStation.reportWarning("Wrist Sticky Fault", true);
+    }
+    return zeroCountFault || hasFaults;
   }
 
   public void setGoalByType(WristControlType wristStateType) { // check what range the arm is in and set the wrist accordingly
