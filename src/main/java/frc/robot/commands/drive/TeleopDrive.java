@@ -29,6 +29,7 @@ public class TeleopDrive extends CommandBase {
   private PIDController rotPIDCnt = new PIDController(5d, 0d, 0d);
   private SwerveRateLimit rateLimiter = new SwerveRateLimit();
   private double angleGoal;
+  private double lastRotSpdNotEqualZeroTimestamp = -1;
 
 
   /**
@@ -172,13 +173,24 @@ public class TeleopDrive extends CommandBase {
 
   /*Make sure the robot maintains its heading when we aren't toggling the rotation axis*/
   public ChassisSpeeds maintainHeading(ChassisSpeeds spds){
-    var runRotPid = SmartDashboard.getBoolean("TeleopDrive/rot pid/Turn On", false);
     var rotSpd = spds.omegaRadiansPerSecond;
-    var rotSpdEqualZero = MathUtil.applyDeadband(rotSpd, 1E-2) == 0;
-
     var ctsGyroAngle=swerve.getCtsPoseRotRad();
 
-    if (runRotPid && rotSpdEqualZero){
+    var runRotPid = SmartDashboard.getBoolean("TeleopDrive/rot pid/Turn On", false);
+    var rotSpdEqualZero = MathUtil.applyDeadband(rotSpd, 1E-2) == 0;
+
+    if(!rotSpdEqualZero){
+      lastRotSpdNotEqualZeroTimestamp = Timer.getFPGATimestamp();
+    }
+    var currentTime = Timer.getFPGATimestamp();
+    var waited = currentTime - lastRotSpdNotEqualZeroTimestamp > 0.1;
+
+    if(!waited && rotSpdEqualZero){
+      SmartDashboard.putBoolean("waiting", true);
+    }else{
+      SmartDashboard.putBoolean("waiting", false);
+    }
+    if (runRotPid && rotSpdEqualZero && waited){
       rotSpd = rotPIDCnt.calculate(ctsGyroAngle, angleGoal);
       Logger.getInstance().recordOutput("TeleopDrive/rot pid/rotSpd", rotSpd);
       rotSpd = MathUtil.clamp(rotSpd, -2.5, 2.5);
