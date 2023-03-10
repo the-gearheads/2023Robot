@@ -440,7 +440,7 @@ public class Swerve extends SubsystemBase {
   }
 
   public double getCtsPoseRotRad(){
-    return getRotation().plus(gyroOffset).getRadians();
+    return getRotation().getRadians() + gyroOffset.getRadians();
   }
 
   public double getPitch() {
