@@ -55,6 +55,7 @@ public class Swerve extends SubsystemBase {
   Field2d field = new Field2d();
   Runnable resetBuffer = () -> {
   };
+  private Rotation2d gyroOffset;
 
   /** Creates a new SwerveSubsystem. */
   public Swerve(GyroIO gyro, SwerveModuleIO... modules) {
@@ -174,6 +175,7 @@ public class Swerve extends SubsystemBase {
    * @param pose Position robot is at
    */
   public void setPose(Pose2d pose) {
+    this.gyroOffset = pose.getRotation().minus(getRotation());
     odometry.resetPosition(getRotation(), getPositionsFromInputs(lastInputs), pose);
     wheelOdometry.resetPosition(getRotation(), getPositionsFromInputs(lastInputs), pose);
     resetBuffer.run();
@@ -429,12 +431,16 @@ public class Swerve extends SubsystemBase {
     return getAngularVel();
   }
 
-  public double getContinuousGyroAngle() {
+  public double getCtsRawGyroAngle() {
     return getRotation().getDegrees();
   }
 
-  public double getContinuousGyroAngleRad() {
+  public double getCtsRawGyroRad() {
     return getRotation().getRadians();
+  }
+
+  public double getCtsPoseRotRad(){
+    return getRotation().plus(gyroOffset).getRadians();
   }
 
   public double getPitch() {

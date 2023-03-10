@@ -51,7 +51,7 @@ public class TeleopDrive extends CommandBase {
   @Override
   public void initialize() {
     // swerve.setPose(new Pose2d());
-    var ctsGyroAngle=swerve.getContinuousGyroAngleRad();
+    var ctsGyroAngle=swerve.getCtsPoseRotRad();
     angleGoal = ctsGyroAngle;
   }
 
@@ -101,7 +101,7 @@ public class TeleopDrive extends CommandBase {
     var heading180 = Controllers.driverController.getSetHeading180Btn().getAsBoolean();
     var heading270 = Controllers.driverController.getSetHeading270Btn().getAsBoolean();
 
-    var ctsGyroAngle = swerve.getContinuousGyroAngleRad();
+    var ctsGyroAngle = swerve.getCtsPoseRotRad();
 
     SmartDashboard.putNumber("Actual Heading #", Controllers.driverController.getPOV());
     if(heading0){
@@ -176,7 +176,7 @@ public class TeleopDrive extends CommandBase {
     var rotSpd = spds.omegaRadiansPerSecond;
     var rotSpdEqualZero = MathUtil.applyDeadband(rotSpd, 1E-2) == 0;
 
-    var ctsGyroAngle=swerve.getContinuousGyroAngleRad();
+    var ctsGyroAngle=swerve.getCtsPoseRotRad();
 
     if (runRotPid && rotSpdEqualZero){
       rotSpd = rotPIDCnt.calculate(ctsGyroAngle, angleGoal);
