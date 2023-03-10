@@ -3,6 +3,7 @@ package frc.robot.auton;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.server.PathPlannerServerThread;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -48,16 +49,48 @@ public class AutonPaths {
             new AutoBalance(s.swerve)));
   }
 
+  public static Command InertN1PlaceThenExplore(Subsystems s) {
+    return new SequentialCommandGroup(
+        setInitPose(s, "InertN1-StartN1"),
+
+        // Move forward
+        new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+
+        getCommandForPath("InertN1-StartN1", true, defaultConstraints, s.swerve),
+
+        // place game piece
+        getPlaceConeCommand(s),
+
+        stowAnd(s, getCommandForPath("StartN1-Explore", false, defaultConstraints, s.swerve))
+    );
+  }
+
+  public static Command InertN9PlaceThenExplore(Subsystems s) {
+    return new SequentialCommandGroup(
+        setInitPose(s, "InertN9-StartN9"),
+
+        // Move forward
+        new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+
+        getCommandForPath("InertN9-StartN9", true, defaultConstraints, s.swerve),
+
+        // place game piece
+        getPlaceConeCommand(s),
+
+        stowAnd(s, getCommandForPath("StartN9-Explore", false, defaultConstraints, s.swerve))
+    );
+  }
+
   /* Places a cone on the grid
    * ASSUPTIONS: Cone being held, arm in correct position, alt mode corresponds to setting wrist to 0deg, and default sets it to 90deg
    */
   public static Command getPlaceConeCommand(Subsystems s) {
     return new AltWristControl(s.wrist).raceWith(new SequentialCommandGroup(
-        new WaitCommand(0.25), // Wait for wrist to rotate before dropping cone
-        getGrabberOpenCommand(s.grabber),
-        new WaitCommand(0.25), // Wait for grabber and gravity to drop cone
-        getGrabberCloseCommand(s.grabber)
-    ));
+        new WaitCommand(0.5), // Wait for wrist to rotate before dropping cone
+        getGrabberOpenCommand(s.grabber)
+    )).andThen(
+      new WaitCommand(0.5), // Wait for grabber and gravity to drop cone
+      getGrabberCloseCommand(s.grabber));
   }
 
   public static Command getGroundPickUpCommand(Subsystems s) {
@@ -120,6 +153,7 @@ public class AutonPaths {
   public static Command setInitPose(Subsystems s, String pathName) {
     return new InstantCommand(() -> {
       PathPlannerTrajectory path = PathPlanner.loadPath(pathName, defaultConstraints);
+      path = PathPlannerTrajectory.transformTrajectoryForAlliance(path, DriverStation.getAlliance());
       var initPose = path.getInitialPose();
       s.swerve.setPose(initPose);
     });

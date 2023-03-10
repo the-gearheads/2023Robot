@@ -75,7 +75,13 @@ public class AutonChooser {
 
   public void initializeAutons() {//Here we define auton choices
     Subsystems s = new Subsystems(swerve, wrist, arm, grabber);
+
     Command InertN4PlaceThenDock = AutonPaths.InertN4PlaceThenDock(s);
+    Command InertN1PlaceThenExplore = AutonPaths.InertN1PlaceThenExplore(s);
+    Command InertN9PlaceThenExplore = AutonPaths.InertN9PlaceThenExplore(s);
+
+    autons.put("NO BUMP Place Then Move", InertN1PlaceThenExplore);
     autons.put("N4 Place Then Dock", InertN4PlaceThenDock);
+    autons.put("BUMP Place Then Move", InertN9PlaceThenExplore);
   }
 }
