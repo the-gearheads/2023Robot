@@ -1,5 +1,7 @@
 package frc.robot.auton;
 
+import java.sql.Driver;
+import org.littletonrobotics.junction.Logger;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -56,35 +58,43 @@ public class AutonHelper {
   }
 
   public static PathPlannerTrajectory getPathByName(String pathName, PathConstraints constraints) {
-
+    //just curious what it will give us
+    Logger.getInstance().recordOutput("Auton/Event Name", DriverStation.getEventName());
       if (DriverStation.getAlliance() == Alliance.Red) {
-        var overridePath = PathPlanner.loadPath(DriverStation.getEventName() + "Red_" + pathName, constraints);
-        if (overridePath != null)
-          return overridePath;
+        var overridePath = PathPlanner.loadPath(Constants.AUTON.EVENT_NAME+ "_Red_" + pathName, constraints);
+        if (overridePath != null){
+            Logger.getInstance().recordOutput("Auton/Last Loaded Path", Constants.AUTON.EVENT_NAME+ "_Red_" + pathName);
+            return overridePath;
+        }
       } else {
-        var overridePath = PathPlanner.loadPath(DriverStation.getEventName() + "Blue_" + pathName, constraints);
-        if (overridePath != null)
-          return overridePath;
+        var overridePath = PathPlanner.loadPath(Constants.AUTON.EVENT_NAME + "_Blue_" + pathName, constraints);
+        if (overridePath != null){
+            Logger.getInstance().recordOutput("Auton/Last Loaded Path", Constants.AUTON.EVENT_NAME+ "_Blue_" + pathName);
+            return overridePath;
+        }
       }
       /* Both alliances */
-      var path = PathPlanner.loadPath(DriverStation.getEventName() + "_" + pathName, constraints);
-      if (path != null)
+      var path = PathPlanner.loadPath(Constants.AUTON.EVENT_NAME + "_" + pathName, constraints);
+      if (path != null){
+        Logger.getInstance().recordOutput("Auton/Last Loaded Path", Constants.AUTON.EVENT_NAME + "_" + pathName);
         return path;
-
+      }
 
     /* Actual path */
     path = PathPlanner.loadPath(pathName, constraints);
     if (path == null) {
       DriverStation.reportError("Failed to load path: " + pathName, true);
     }
+
+    Logger.getInstance().recordOutput("Auton/Last Loaded Path", pathName);
     return path;
   }
 
   public static Command getCommandForPath(String pathName, boolean resetOdometry, PathConstraints constraints,
       Swerve swerve) {
     return new ProxyCommand(()->{
-      var path = PathPlanner.loadPath(pathName, constraints);
-      // var path = getPathByName(pathName, constraints);
+    //   var path = PathPlanner.loadPath(pathName, constraints);
+      var path = getPathByName(pathName, constraints);
       return swerve.silentFollowTrajectoryCommand(path, resetOdometry, true);
     }); 
   }
