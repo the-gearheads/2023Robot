@@ -1,6 +1,8 @@
 package frc.robot.controllers;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -17,39 +19,48 @@ public class SegaOperatorController implements OperatorController {
   }
 
   public Trigger armGoToMidNode() {
-    return new JoystickButton(joy, 6);
-  }
-
-  public Trigger armGoToHighNode() {
-    return new JoystickButton(joy, 7);
-  }
-
-  public Trigger armGoToFeederStationNode() {
     return new JoystickButton(joy, 3);
   }
 
-  public Trigger armGoToInsideRobotNode() {
-    return new JoystickButton(joy, 4);
-  }
-
-  public Trigger armGoToGroundPickUpNode() {
-    return new JoystickButton(joy, 4);
-  }
-
-  public Trigger setWristAlternatePose() {
+  public Trigger armGoToHighNode() {
     return new JoystickButton(joy, 2);
   }
 
-  public Trigger openGrabber() {
+  public Trigger armGoToFeederStationNode() {
+    return new JoystickButton(joy, 4);
+  }
+
+  public Trigger armGoToInsideRobotNode() {
     return new JoystickButton(joy, 1);
   }
 
-  public Trigger setArmByJoystick() {
-    return new Trigger(() -> {
-      if (Math.abs(getArmAxis()) > 0) {
-        return true;
-      }
-      return false;
-    });
+  public Trigger armGoToGroundPickUpNode() {
+    return new JoystickButton(joy, 6);
+  }
+
+  public Trigger setWristAlternatePose() {
+    return new JoystickButton(joy, 7);
+  }
+
+  public Trigger openGrabber() {
+    return new JoystickButton(joy, 8);
+  }
+
+  private Trigger downDPAD() {
+    return new JoystickButton(joy, 13);
+  }
+
+  private Trigger upDPAD() {
+    return new JoystickButton(joy, 12);
+  }
+
+  public Double getPOV() {
+    if (upDPAD().getAsBoolean()) {
+      return 0.0;
+    } else if (downDPAD().getAsBoolean()) {
+      return 180.0;
+    } else {
+      return -1.0;
+    }
   }
 }
