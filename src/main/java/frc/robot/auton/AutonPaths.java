@@ -87,15 +87,18 @@ public class AutonPaths {
         getPlaceConeCommand(s),
 
         // Go get game piece
-        stowAnd(s, getCommandForPath("StartN1-GamePiece1", false, defaultConstraints, s.swerve)),
+        new ParallelCommandGroup(new SetArmPose(s.arm, ArmPose.FLOOR),
+          getCommandForPath("StartN1-GamePiece1", false, defaultConstraints, s.swerve)
+        ),
 
         // pick up game piece
         getGroundPickUpCommand(s),
+        
 
         // go back to grid node 3 inert
         new ParallelCommandGroup(
             getCommandForPath("GamePiece1-StartN3", false, defaultConstraints, s.swerve),
-            new SetArmPose(s.arm, ArmPose.HIGH_NODE)),
+            new WaitCommand(1).andThen(new SetArmPose(s.arm, ArmPose.HIGH_NODE))),
 
         // Place game piece
         getPlaceConeCommand(s));
