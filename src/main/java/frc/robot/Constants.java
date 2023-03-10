@@ -185,10 +185,12 @@ public class Constants extends AnnotatedClass {
     public static PIDController ROT_PID = new PIDController(1.5, 0, 0);
     public static PathConstraints REALLY_SLOW_CONSTRAINTS = new PathConstraints(0.75, 0.7);
     public static PathConstraints SLOW_CONSTRAINTS = new PathConstraints(2, 1);
-    public static PathConstraints MID_CONSTRAINTS = new PathConstraints(3, 1.5);
+    public static PathConstraints MID_CONSTRAINTS = new PathConstraints(3, 1.5);    
     public static PathConstraints FAST_CONSTRAINTS = new PathConstraints(7, 3);
 
+    // public static PathConstraints DOUBLE_CONE = new PathConstraints(4.5, 2.5);
     public static final PathConstraints DOCK_CONSTRAINTS = SLOW_CONSTRAINTS;
+    
     public static final String EVENT_NAME = "Wayne";
 
     public static PIDController AUTO_BALANCE_PID = new PIDController(0.025, 0, 00);
