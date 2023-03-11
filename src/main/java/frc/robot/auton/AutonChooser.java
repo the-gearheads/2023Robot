@@ -80,7 +80,6 @@ public class AutonChooser {
     Command InertN1PlaceThenExplore = AutonPaths.InertN1PlaceThenExplore(s);
     Command InertN9PlaceThenExplore = AutonPaths.InertN9PlaceThenExplore(s);
     Command justPlace = AutonPaths.InertN1Place(s);
-    // Command InertN1PlaceThenExplore = 
     // Command doubleCone = AutonPaths.InertN12ConePrime(s);
 
     // autons.put("2 cone", doubleCone);
