@@ -171,7 +171,6 @@ public class RobotContainer {
             dest=new Pose2d(dest.getTranslation().plus(translation), dest.getRotation());
             return swerve.goTo(dest, Constants.AUTON.MID_CONSTRAINTS);
           }));
-    Controllers.driverController.testDockPath().onTrue(new TestPlaceThenDock(swerve));
     Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(()->
       {
         swerve.setPose(new Pose2d());
