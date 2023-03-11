@@ -51,6 +51,20 @@ public class AutonPaths {
           new AutoBalance(s.swerve)));
   }
 
+  public static Command InertN1Place(Subsystems s) {
+    return new SequentialCommandGroup(
+        AutonHelper.setInitPose(s, "InertN4-StartN4"),
+
+        // Move forward
+        new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+
+        AutonHelper.getCommandForPath("InertN4-StartN4", true, defaultConstraints, s.swerve),
+
+        // place game piece
+        AutonHelper.getPlaceConeCommand(s)
+    );
+  }
+
   public static Command InertN1PlaceThenExplore(Subsystems s) {
     return new SequentialCommandGroup(
         AutonHelper.setInitPose(s, "InertN1-StartN1"),
