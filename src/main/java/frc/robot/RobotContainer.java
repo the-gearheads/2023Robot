@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -122,6 +123,9 @@ public class RobotContainer {
     arm.setDefaultCommand(new JoystickArmControl(arm));
     // vision.setDefaultCommand(new UpdateSwervePoseEstimator(vision).ignoringDisable(true));
     updateControllers();
+
+    // PortForwarder.add(5800, "photonvision.local", 5800);
+    // PortForwarder.add(5801, "photonvisionpi.local", 5800);
   }
 
 
