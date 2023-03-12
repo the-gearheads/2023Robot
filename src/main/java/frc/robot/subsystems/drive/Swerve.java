@@ -27,7 +27,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -87,7 +86,7 @@ public class Swerve extends SubsystemBase {
     log();
   }
 
-  public void log(){
+  public void log() {
     field.setRobotPose(getPose());
     field.getObject("Wheels").setPose(wheelOdometry.getPoseMeters());
 
@@ -103,7 +102,7 @@ public class Swerve extends SubsystemBase {
     var states = getStatesFromInputs(lastInputs);
     Logger.getInstance().recordOutput("Swerve/CurrentModuleStates", states);
 
-    var commandName = this.getCurrentCommand() == null?"None" : this.getCurrentCommand().getName();
+    var commandName = this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName();
     Logger.getInstance().recordOutput("Swerve/Current Command", commandName);
   }
 
@@ -216,7 +215,7 @@ public class Swerve extends SubsystemBase {
         this.setPose(initPose);
         innerTraj = PathPlannerTrajectory.transformTrajectoryForAlliance(traj, DriverStation.getAlliance());
       }
-      
+
       // field.getObject("CurrentTrajectory").setTrajectory(innerTraj);
       Logger.getInstance().recordOutput("Swerve/Field/CurrentTrajectory", innerTraj);
     }), new PPSwerveControllerCommand(traj, this::getPose, // Pose supplier
@@ -235,7 +234,7 @@ public class Swerve extends SubsystemBase {
     }));
   }
 
-    /**
+  /**
    * Generates a command that will follow a given trajectory
    * 
    * @param traj The trajectory to follow
@@ -439,7 +438,7 @@ public class Swerve extends SubsystemBase {
     return getRotation().getRadians();
   }
 
-  public double getCtsPoseRotRad(){
+  public double getCtsPoseRotRad() {
     return getRotation().getRadians() + gyroOffset.getRadians();
   }
 

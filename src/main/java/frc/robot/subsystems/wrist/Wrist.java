@@ -166,7 +166,7 @@ public class Wrist extends SubsystemBase {
     Logger.getInstance().recordOutput("Wrist/Faults/Fault", hasFaults);
     Logger.getInstance().recordOutput("Wrist/Faults/Sticky Fault", hasStickyFaults);
 
-    if(hasStickyFaults){
+    if (hasStickyFaults) {
       DriverStation.reportWarning("Wrist Sticky Fault", true);
     }
     return zeroCountFault || hasFaults;

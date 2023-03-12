@@ -1,11 +1,9 @@
 package frc.robot.controllers;
 
 import org.littletonrobotics.junction.Logger;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants;
 
 public class XboxDriverController implements DriverController {
 
@@ -36,7 +34,7 @@ public class XboxDriverController implements DriverController {
     // if (Constants.getMode() == Constants.RobotMode.SIM) {
     //   return -Controllers.deadband(controller.getRawAxis(2));
     // }
-    if(getRotateButton().getAsBoolean()) {
+    if (getRotateButton().getAsBoolean()) {
       return 0;
     }
     return -Controllers.deadband(controller.getRightX());
@@ -71,7 +69,7 @@ public class XboxDriverController implements DriverController {
   }
 
   private Trigger getRotateButton() {
-    return new Trigger(()->{
+    return new Trigger(() -> {
       return controller.getRightTriggerAxis() > 0.7;
     });
   }
@@ -85,34 +83,35 @@ public class XboxDriverController implements DriverController {
     return new JoystickButton(controller, XboxController.Button.kStart.value);
   }
 
-  public Trigger getSetHeading0Btn(){
-    return new Trigger(()->{
+  public Trigger getSetHeading0Btn() {
+    return new Trigger(() -> {
       return getRotateButton().getAsBoolean() && (controller.getRightY() < -0.75);
     });
   };
-  
-  public Trigger getSetHeading90Btn(){
-    return new Trigger(()->{
+
+  public Trigger getSetHeading90Btn() {
+    return new Trigger(() -> {
       return getRotateButton().getAsBoolean() && (controller.getRightX() < -0.75);
-    });  
+    });
   };
-  
-  public Trigger getSetHeading180Btn(){
-    return new Trigger(()->{
+
+  public Trigger getSetHeading180Btn() {
+    return new Trigger(() -> {
       return getRotateButton().getAsBoolean() && (controller.getRightY() > 0.75);
-    });  
+    });
   };
-  
-  public Trigger getSetHeading270Btn(){
-    return new Trigger(()->{
+
+  public Trigger getSetHeading270Btn() {
+    return new Trigger(() -> {
       return getRotateButton().getAsBoolean() && (controller.getRightX() > 0.75);
     });
   };
-  public double getPOV(){
+
+  public double getPOV() {
     return controller.getPOV();
   };
 
-  public Trigger testDockPath(){
+  public Trigger testDockPath() {
     return new JoystickButton(controller, XboxController.Button.kY.value);
   }
 }

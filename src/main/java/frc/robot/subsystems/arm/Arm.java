@@ -172,7 +172,7 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Faults/Fault", hasFaults);
     Logger.getInstance().recordOutput("Arm/Faults/Sticky Fault", hasStickyFaults);
 
-    if(hasStickyFaults){
+    if (hasStickyFaults) {
       DriverStation.reportWarning("Arm Sticky Fault", true);
     }
     return zeroCountFault || hasFaults;

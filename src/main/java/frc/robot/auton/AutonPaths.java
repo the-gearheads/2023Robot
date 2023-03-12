@@ -1,30 +1,15 @@
 package frc.robot.auton;
 
 import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.server.PathPlannerServerThread;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.commands.arm.SetArmPose;
-import frc.robot.commands.arm.StowArm;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.AutoBalance;
-import frc.robot.commands.wrist.AltWristControl;
-import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Subsystems;
-import frc.robot.subsystems.drive.Swerve;
-import frc.robot.auton.AutonHelper;
 
 // format: off
 public class AutonPaths {
@@ -35,8 +20,7 @@ public class AutonPaths {
   private static PathConstraints defaultConstraints = Constants.AUTON.MID_CONSTRAINTS;
 
   public static Command InertN4PlaceThenDock(Subsystems s) {
-    return new SequentialCommandGroup(
-        AutonHelper.setInitPose(s, "InertN4-StartN4"),
+    return new SequentialCommandGroup(AutonHelper.setInitPose(s, "InertN4-StartN4"),
 
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
@@ -46,14 +30,13 @@ public class AutonPaths {
         // place game piece
         AutonHelper.getPlaceConeCommand(s),
 
-        AutonHelper.stowAnd(s, 
-          AutonHelper.getCommandForPath("StartN4-PrepareDock", false, Constants.AUTON.DOCK_CONSTRAINTS, s.swerve),
-          new AutoBalance(s.swerve)));
+        AutonHelper.stowAnd(s,
+            AutonHelper.getCommandForPath("StartN4-PrepareDock", false, Constants.AUTON.DOCK_CONSTRAINTS, s.swerve),
+            new AutoBalance(s.swerve)));
   }
 
   public static Command InertN1Place(Subsystems s) {
-    return new SequentialCommandGroup(
-        AutonHelper.setInitPose(s, "InertN4-StartN4"),
+    return new SequentialCommandGroup(AutonHelper.setInitPose(s, "InertN4-StartN4"),
 
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
@@ -61,13 +44,11 @@ public class AutonPaths {
         AutonHelper.getCommandForPath("InertN4-StartN4", true, defaultConstraints, s.swerve),
 
         // place game piece
-        AutonHelper.getPlaceConeCommand(s)
-    );
+        AutonHelper.getPlaceConeCommand(s));
   }
 
   public static Command InertN1PlaceThenExplore(Subsystems s) {
-    return new SequentialCommandGroup(
-        AutonHelper.setInitPose(s, "InertN1-StartN1"),
+    return new SequentialCommandGroup(AutonHelper.setInitPose(s, "InertN1-StartN1"),
 
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
@@ -77,13 +58,11 @@ public class AutonPaths {
         // place game piece
         AutonHelper.getPlaceConeCommand(s),
 
-        AutonHelper.stowAnd(s, AutonHelper.getCommandForPath("StartN1-Explore", false, defaultConstraints, s.swerve))
-    );
+        AutonHelper.stowAnd(s, AutonHelper.getCommandForPath("StartN1-Explore", false, defaultConstraints, s.swerve)));
   }
 
   public static Command InertN9PlaceThenExplore(Subsystems s) {
-    return new SequentialCommandGroup(
-        AutonHelper.setInitPose(s, "InertN9-StartN9"),
+    return new SequentialCommandGroup(AutonHelper.setInitPose(s, "InertN9-StartN9"),
 
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
@@ -93,46 +72,40 @@ public class AutonPaths {
         // place game piece
         AutonHelper.getPlaceConeCommand(s),
 
-        AutonHelper.stowAnd(s, AutonHelper.getCommandForPath("StartN9-Explore", false, defaultConstraints, s.swerve))
-    );
+        AutonHelper.stowAnd(s, AutonHelper.getCommandForPath("StartN9-Explore", false, defaultConstraints, s.swerve)));
   }
 
   /* NOT USED FOR WAYNE STATE (add back later)----------------------------------------------------------------------- */
 
-  public static Command InertN12ConePrime(Subsystems s){
-    return new SequentialCommandGroup(
-      AutonHelper.setInitPose(s, "InertN1-StartN1"),
+  public static Command InertN12ConePrime(Subsystems s) {
+    return new SequentialCommandGroup(AutonHelper.setInitPose(s, "InertN1-StartN1"),
 
-      // Move forward
-      new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+        // Move forward
+        new SetArmPose(s.arm, ArmPose.HIGH_NODE),
 
-      AutonHelper.getCommandForPath("InertN1-StartN1", true, defaultConstraints, s.swerve),
+        AutonHelper.getCommandForPath("InertN1-StartN1", true, defaultConstraints, s.swerve),
 
-      // place game piece
-      AutonHelper.getPlaceConeCommand(s),
+        // place game piece
+        AutonHelper.getPlaceConeCommand(s),
 
-      new ParallelCommandGroup(
-        AutonHelper.getCommandForPath("StartN1-GamePiece1-Prime", false, Constants.AUTON.DOUBLE_CONE, s.swerve), 
-        new SequentialCommandGroup( // Start moving the arm 1 second into the path following
-          new WaitCommand(1), new SetArmPose(s.arm, ArmPose.FLOOR)
-        )
-      ),
+        new ParallelCommandGroup(
+            AutonHelper.getCommandForPath("StartN1-GamePiece1-Prime", false, Constants.AUTON.DOUBLE_CONE, s.swerve),
+            new SequentialCommandGroup( // Start moving the arm 1 second into the path following
+                new WaitCommand(1), new SetArmPose(s.arm, ArmPose.FLOOR))),
 
-      AutonHelper.getGroundPickUpCommand(s),
+        AutonHelper.getGroundPickUpCommand(s),
 
-      AutonHelper.stowAnd(s, 
-        AutonHelper.getCommandForPath("GamePiece1-Inert3-Prime", false, Constants.AUTON.DOUBLE_CONE, s.swerve)
-      ),
+        AutonHelper.stowAnd(s,
+            AutonHelper.getCommandForPath("GamePiece1-Inert3-Prime", false, Constants.AUTON.DOUBLE_CONE, s.swerve)),
 
-      new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+        new SetArmPose(s.arm, ArmPose.HIGH_NODE),
 
-      AutonHelper.getCommandForPath("InertN3-StartN3", true, defaultConstraints, s.swerve),
+        AutonHelper.getCommandForPath("InertN3-StartN3", true, defaultConstraints, s.swerve),
 
-      // place game piece
-      AutonHelper.getPlaceConeCommand(s)
-    );
+        // place game piece
+        AutonHelper.getPlaceConeCommand(s));
   }
-    // public static CommandBase InertN4ExploreOverStationDock(Subsystems s) {
+  // public static CommandBase InertN4ExploreOverStationDock(Subsystems s) {
   //   return new SequentialCommandGroup(setInitPose(s, "InertN4-StartN4"), new SetArmPose(s.arm, ArmPose.HIGH_NODE),
   //       getCommandForPath("InertN4-StartN4", true, defaultConstraints, s.swerve),
 
@@ -177,7 +150,7 @@ public class AutonPaths {
 
   //       // pick up game piece
   //       getGroundPickUpCommand(s),
-        
+
 
   //       // go back to grid node 3 inert
   //       new ParallelCommandGroup(
