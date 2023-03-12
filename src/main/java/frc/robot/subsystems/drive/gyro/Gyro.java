@@ -45,5 +45,9 @@ public class Gyro extends AHRS implements GyroIO {
     inputs.angleRate = getRate();
     inputs.pitchDegrees = getPitch();
     inputs.rollDegrees = getRoll();
+    inputs.linearAccelY = getWorldLinearAccelY();
+    inputs.linearVelY = getVelocityY();
+    inputs.linearVelZ = getVelocityZ();
+    inputs.linearAccelZ = getWorldLinearAccelZ();
   }
 }
