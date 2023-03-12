@@ -8,11 +8,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -30,7 +27,6 @@ import frc.robot.commands.wrist.ManualWristControl;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.auton.AutonChooser;
-import frc.robot.auton.TestPlaceThenDock;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.arm.Arm;
@@ -162,19 +158,16 @@ public class RobotContainer {
     //   swerve.setPose(new Pose2d(3, 0.38, Rotation2d.fromDegrees(90)));
     // }));
 
-    Controllers.driverController.backUpFromFeeder()
-        .onTrue(new ProxyCommand(
-          ()->{
-            var currentPose = swerve.getPose();
-            var dest = MoreMath.deepCopyPose(currentPose);
-            var translation = new Translation2d(Units.inchesToMeters(-4), 0);
-            dest=new Pose2d(dest.getTranslation().plus(translation), dest.getRotation());
-            return swerve.goTo(dest, Constants.AUTON.MID_CONSTRAINTS);
-          }));
-    Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(()->
-      {
-        swerve.setPose(new Pose2d());
-      }, swerve));
+    Controllers.driverController.backUpFromFeeder().onTrue(new ProxyCommand(() -> {
+      var currentPose = swerve.getPose();
+      var dest = MoreMath.deepCopyPose(currentPose);
+      var translation = new Translation2d(Units.inchesToMeters(-4), 0);
+      dest = new Pose2d(dest.getTranslation().plus(translation), dest.getRotation());
+      return swerve.goTo(dest, Constants.AUTON.MID_CONSTRAINTS);
+    }));
+    Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(() -> {
+      swerve.setPose(new Pose2d());
+    }, swerve));
 
     Controllers.operatorController.armGoToLowNode()
         .onTrue(new SetArmPose(arm, ArmPose.LOW_NODE).andThen(new ManualWristControl(wrist, WristState.RIGHT)));
@@ -201,7 +194,8 @@ public class RobotContainer {
     swerve.setDefaultCommand(new TeleopDrive(swerve));
   }
 
-  public void clearTeleopDefault(){
-    swerve.setDefaultCommand(new InstantCommand(()->{}, swerve));
+  public void clearTeleopDefault() {
+    swerve.setDefaultCommand(new InstantCommand(() -> {
+    }, swerve));
   }
 }
