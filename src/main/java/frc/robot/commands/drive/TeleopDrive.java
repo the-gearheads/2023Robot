@@ -4,15 +4,11 @@
 
 package frc.robot.commands.drive;
 
-import java.lang.ModuleLayer.Controller;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -52,7 +48,7 @@ public class TeleopDrive extends CommandBase {
   @Override
   public void initialize() {
     // swerve.setPose(new Pose2d());
-    var ctsGyroAngle=swerve.getCtsPoseRotRad();
+    var ctsGyroAngle = swerve.getCtsPoseRotRad();
     angleGoal = ctsGyroAngle;
   }
 
@@ -72,15 +68,15 @@ public class TeleopDrive extends CommandBase {
 
     logSpds("deadbanded", spds);
 
-    spds=cube(spds);
+    spds = cube(spds);
 
     logSpds("Cubed", spds);
 
-    spds=rateLimit(spds);
+    spds = rateLimit(spds);
 
     logSpds("rate limited", spds);
 
-    spds=scaleVel(spds);
+    spds = scaleVel(spds);
 
     logSpds("scaled", spds);
 
@@ -105,32 +101,32 @@ public class TeleopDrive extends CommandBase {
     var ctsGyroAngle = swerve.getCtsPoseRotRad();
 
     SmartDashboard.putNumber("Actual Heading #", Controllers.driverController.getPOV());
-    if(heading0){
+    if (heading0) {
       SmartDashboard.putNumber("Heading #", 0);
-      angleGoal=MoreMath.getClosestRad(ctsGyroAngle,Units.degreesToRadians(0));
+      angleGoal = MoreMath.getClosestRad(ctsGyroAngle, Units.degreesToRadians(0));
       SmartDashboard.putNumber("more math", angleGoal);
-    }else if(heading90){
+    } else if (heading90) {
       SmartDashboard.putNumber("Heading #", 90);
-      angleGoal=MoreMath.getClosestRad(ctsGyroAngle, Units.degreesToRadians(90));
+      angleGoal = MoreMath.getClosestRad(ctsGyroAngle, Units.degreesToRadians(90));
       SmartDashboard.putNumber("more math", angleGoal);
-    }else if(heading180){
+    } else if (heading180) {
       SmartDashboard.putNumber("Heading #", 180);
-      angleGoal=MoreMath.getClosestRad(ctsGyroAngle,Units.degreesToRadians(180));
+      angleGoal = MoreMath.getClosestRad(ctsGyroAngle, Units.degreesToRadians(180));
       SmartDashboard.putNumber("more math", angleGoal);
-    }else if(heading270){
+    } else if (heading270) {
       SmartDashboard.putNumber("Heading #", 270);
-      angleGoal=MoreMath.getClosestRad(ctsGyroAngle,Units.degreesToRadians(270));
+      angleGoal = MoreMath.getClosestRad(ctsGyroAngle, Units.degreesToRadians(270));
       SmartDashboard.putNumber("more math", angleGoal);
-    }else{
+    } else {
       SmartDashboard.putNumber("Heading #", -1);
     }
   }
 
-  public ChassisSpeeds cube(ChassisSpeeds spds){
-    var xSpd=spds.vxMetersPerSecond;
-    var ySpd=spds.vyMetersPerSecond;
-    var rotSpd=spds.omegaRadiansPerSecond;
-    
+  public ChassisSpeeds cube(ChassisSpeeds spds) {
+    var xSpd = spds.vxMetersPerSecond;
+    var ySpd = spds.vyMetersPerSecond;
+    var rotSpd = spds.omegaRadiansPerSecond;
+
     boolean useExponentialJoystickControl = SmartDashboard.getBoolean("TeleopDrive/ExponentialJoystickControl", false);
     if (useExponentialJoystickControl) {
       Pair<Double, Double> xyPair = MoreMath.poseExp(xSpd, ySpd);
@@ -146,14 +142,14 @@ public class TeleopDrive extends CommandBase {
     return new ChassisSpeeds(xSpd, ySpd, rotSpd);
   }
 
-  public ChassisSpeeds rateLimit(ChassisSpeeds spds){
+  public ChassisSpeeds rateLimit(ChassisSpeeds spds) {
     if (SmartDashboard.getBoolean("TeleopDrive/RateLimitDrive", false)) {
-        return rateLimiter.rateLimit(spds);
+      return rateLimiter.rateLimit(spds);
     }
     return spds;
   }
 
-  public ChassisSpeeds scaleVel(ChassisSpeeds spds){
+  public ChassisSpeeds scaleVel(ChassisSpeeds spds) {
     var lin_mult = Constants.DRIVE.MID_LIN_VEL;
     var rot_mult = Constants.DRIVE.MID_ROT_VEL;
 
@@ -172,33 +168,33 @@ public class TeleopDrive extends CommandBase {
   }
 
   /*Make sure the robot maintains its heading when we aren't toggling the rotation axis*/
-  public ChassisSpeeds maintainHeading(ChassisSpeeds spds){
+  public ChassisSpeeds maintainHeading(ChassisSpeeds spds) {
     var rotSpd = spds.omegaRadiansPerSecond;
-    var ctsGyroAngle=swerve.getCtsPoseRotRad();
+    var ctsGyroAngle = swerve.getCtsPoseRotRad();
 
     var runRotPid = SmartDashboard.getBoolean("TeleopDrive/rot pid/Turn On", false);
     var rotSpdEqualZero = MathUtil.applyDeadband(rotSpd, 1E-2) == 0;
 
-    if(!rotSpdEqualZero){
+    if (!rotSpdEqualZero) {
       lastRotSpdNotEqualZeroTimestamp = Timer.getFPGATimestamp();
     }
     var currentTime = Timer.getFPGATimestamp();
     var waited = currentTime - lastRotSpdNotEqualZeroTimestamp > 0.1;
 
-    if(!waited && rotSpdEqualZero){
+    if (!waited && rotSpdEqualZero) {
       SmartDashboard.putBoolean("waiting", true);
-    }else{
+    } else {
       SmartDashboard.putBoolean("waiting", false);
     }
-    if (runRotPid && rotSpdEqualZero && waited){
+    if (runRotPid && rotSpdEqualZero && waited) {
       rotSpd = rotPIDCnt.calculate(ctsGyroAngle, angleGoal);
       Logger.getInstance().recordOutput("TeleopDrive/rot pid/rotSpd", rotSpd);
       rotSpd = MathUtil.clamp(rotSpd, -2.5, 2.5);
       Logger.getInstance().recordOutput("TeleopDrive/rot pid/clamped rotSpd", rotSpd);
 
-      spds.omegaRadiansPerSecond=rotSpd;
+      spds.omegaRadiansPerSecond = rotSpd;
       SmartDashboard.putBoolean("TeleopDrive/rot pid/running", true);
-    }else{
+    } else {
       angleGoal = ctsGyroAngle;
       SmartDashboard.putBoolean("TeleopDrive/rot pid/running", false);
     }
@@ -209,14 +205,14 @@ public class TeleopDrive extends CommandBase {
     return spds;
   }
 
-  public void logSpds(String subPath, ChassisSpeeds spds){
-    var xSpd=spds.vxMetersPerSecond;
-    var ySpd=spds.vyMetersPerSecond;
-    var rotSpd=spds.omegaRadiansPerSecond;
+  public void logSpds(String subPath, ChassisSpeeds spds) {
+    var xSpd = spds.vxMetersPerSecond;
+    var ySpd = spds.vyMetersPerSecond;
+    var rotSpd = spds.omegaRadiansPerSecond;
 
-    Logger.getInstance().recordOutput("TeleopDrive/"+subPath+"/xSpd", xSpd);
-    Logger.getInstance().recordOutput("TeleopDrive/"+subPath+"/ySpd", ySpd);
-    Logger.getInstance().recordOutput("TeleopDrive/"+subPath+"/rotSpd", rotSpd);
+    Logger.getInstance().recordOutput("TeleopDrive/" + subPath + "/xSpd", xSpd);
+    Logger.getInstance().recordOutput("TeleopDrive/" + subPath + "/ySpd", ySpd);
+    Logger.getInstance().recordOutput("TeleopDrive/" + subPath + "/rotSpd", rotSpd);
   }
 
   // Called once the command ends or is interrupted.

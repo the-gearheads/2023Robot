@@ -5,15 +5,12 @@
 package frc.robot.auton;
 
 import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.MoreMath;
@@ -21,7 +18,7 @@ import frc.robot.util.MoreMath;
 public class TestPlaceThenDock extends ProxyCommand {
   /** Creates a new TestPlaceThenDock. */
   public TestPlaceThenDock(Swerve s) {
-    super(()->{
+    super(() -> {
 
       var defaultPath = AutonHelper.getPathByName("StartN4-PrepareDock", Constants.AUTON.DOCK_CONSTRAINTS);
       // defaultPath = PathPlannerTrajectory.transformTrajectoryForAlliance(defaultPath, DriverStation.getAlliance());
@@ -33,28 +30,20 @@ public class TestPlaceThenDock extends ProxyCommand {
       var acc = SmartDashboard.getNumber("DOCK TESTING/test acc", 0);
 
       var translation = new Translation2d(x, 0);
-      endPose = new Pose2d(
-      endPose.getTranslation().plus(translation),
-      endPose.getRotation());
+      endPose = new Pose2d(endPose.getTranslation().plus(translation), endPose.getRotation());
       var end = endPose;
 
-      var constraints = new PathConstraints(vel,acc);
-      
-      return new InstantCommand(()->{
+      var constraints = new PathConstraints(vel, acc);
+
+      return new InstantCommand(() -> {
         s.setPose(startPose);
-      }, s)
-      .andThen(
-        new ProxyCommand(
-          ()->{
-            return s.goTo(end, constraints);
-          }
-        )
-      );
-    }
-    );
+      }, s).andThen(new ProxyCommand(() -> {
+        return s.goTo(end, constraints);
+      }));
+    });
   }
 
-  public static void initDockTestingTelemetry(){
+  public static void initDockTestingTelemetry() {
     var defaultVel = Constants.AUTON.DOCK_CONSTRAINTS.maxVelocity;
     var defaultAcc = Constants.AUTON.DOCK_CONSTRAINTS.maxAcceleration;
 
@@ -65,7 +54,7 @@ public class TestPlaceThenDock extends ProxyCommand {
     var transform = new Transform2d(startPose, endPose);
 
     var translation = transform.getTranslation();
-    
+
     var defaultX = translation.getX();
 
     SmartDashboard.putNumber("DOCK TESTING/default x", defaultX);

@@ -28,8 +28,9 @@ public class GyroSim implements GyroIO {
   public double getRate() {
     return this.rate;
   }
+
   public void setRate(double omegaRadiansPerSecond) {
-    this.rate=omegaRadiansPerSecond;
+    this.rate = omegaRadiansPerSecond;
   };
 
 
@@ -39,9 +40,9 @@ public class GyroSim implements GyroIO {
 
   public void updateInputs(GyroIOInputs inputs) {
     var noise = StateSpaceUtil.makeWhiteNoiseVector(VecBuilder.fill(0.01)).get(0, 0);
-    noise=0;
+    noise = 0;
     var delta = (getRate() + noise) * 0.02;
-    this.rot = new Rotation2d(this.rot.getRadians()+delta);
+    this.rot = new Rotation2d(this.rot.getRadians() + delta);
     inputs.angleRadians = this.rot.getRadians();
     inputs.angleRate = rate;
   }
