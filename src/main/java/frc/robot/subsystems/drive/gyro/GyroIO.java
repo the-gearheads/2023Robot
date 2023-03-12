@@ -16,6 +16,10 @@ public interface GyroIO {
     public double angleRate;
     public double pitchDegrees;
     public double rollDegrees;
+    public double linearAccelY;
+    public double linearVelY;
+    public double linearAccelZ;
+    public double linearVelZ;
   }
 
   public default void setRotation2d(Rotation2d newRotation2d) {};
