@@ -293,6 +293,16 @@ public class Swerve extends SubsystemBase {
     return fullCommand;
   }
 
+  public Command followTrajectoriesCommand(ArrayList<PathPlannerTrajectory> trajectories, boolean resetPose, boolean stopWhenDone) {
+    Command fullCommand = new InstantCommand();
+    boolean isFirstTrajectory = resetPose;
+    for (PathPlannerTrajectory trajectory : trajectories) {
+      fullCommand = fullCommand.andThen(followTrajectoryCommand(trajectory, isFirstTrajectory, false));
+      isFirstTrajectory = false;
+    }
+    return fullCommand;
+  }
+
   public Command goTo(Pose2d endPose, PathConstraints constraints) {
     Pose2d startPose = getPose();
     Rotation2d startHeading = endPose.getTranslation().minus(startPose.getTranslation()).getAngle();

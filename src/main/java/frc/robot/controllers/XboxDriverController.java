@@ -40,24 +40,11 @@ public class XboxDriverController implements DriverController {
     return -Controllers.deadband(controller.getRightX());
   }
 
-  public Trigger getPPLoadDebugForwardPath() {
-    return new JoystickButton(controller, XboxController.Button.kY.value);
-  }
-
-  public Trigger getPPLoadDebugBackwardPath() {
-    return new JoystickButton(controller, XboxController.Button.kA.value);
-  }
-
-  public Trigger getPPLoadDebugLeftPath() {
-    return new JoystickButton(controller, XboxController.Button.kX.value);
-  }
-
-  public Trigger getPPLoadDebugRightPath() {
+  public Trigger alignToFeederStation() {
     return new JoystickButton(controller, XboxController.Button.kB.value);
   }
-
-  public Trigger getPPGotoTag8() {
-    return new JoystickButton(controller, XboxController.Button.kRightBumper.value);
+  public Trigger alignToGrid() {
+    return new JoystickButton(controller, XboxController.Button.kY.value);
   }
 
   public Trigger HIGH_SPEED() {

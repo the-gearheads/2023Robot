@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -21,6 +22,8 @@ import frc.robot.commands.arm.JoystickArmControl;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.StowArm;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
+import frc.robot.commands.drive.AlignToFeederStation;
+import frc.robot.commands.drive.AlignToGrid;
 import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.commands.wrist.ManualWristControl;
@@ -168,6 +171,8 @@ public class RobotContainer {
     Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(() -> {
       swerve.setPose(new Pose2d());
     }, swerve));
+    Controllers.driverController.alignToFeederStation().onTrue(new AlignToFeederStation(swerve, arm));
+    Controllers.driverController.alignToGrid().onTrue(new AlignToGrid(swerve, arm, new Pose2d(2.3, 2, Rotation2d.fromDegrees(180))));
 
     Controllers.operatorController.armGoToLowNode()
         .onTrue(new SetArmPose(arm, ArmPose.LOW_NODE).andThen(new ManualWristControl(wrist, WristState.RIGHT)));
