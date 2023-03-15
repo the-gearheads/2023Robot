@@ -1,10 +1,14 @@
 package frc.robot.commands.drive;
 
+import java.sql.Driver;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.Constants;
+import frc.robot.util.MoreMath;
 
 public class PointLeaf {
     public enum NodeY{
@@ -50,7 +54,7 @@ public class PointLeaf {
     }
   
 
-  final Pose2d pose;
+  Pose2d pose;
   final List<PointLeaf> children;
 
   public PointLeaf(Pose2d pose, PointLeaf... children) {
@@ -70,6 +74,15 @@ public class PointLeaf {
 
   public double getDistance(PointLeaf other) {
     return this.pose.getTranslation().getDistance(other.pose.getTranslation());
+  }
+
+  public void transformByAlliance(){
+    if(DriverStation.getAlliance() == DriverStation.Alliance.Blue) return;
+
+    this.pose = MoreMath.transformByAlliance(this.pose);
+    for(var child:children){
+      child.transformByAlliance();
+    }
   }
 
   public PointLeaf getClosestChild(PointLeaf other) {
@@ -99,6 +112,8 @@ public class PointLeaf {
 
     var level3 = new PointLeaf(new Pose2d(2.3, endPose.getY(), rot), level2Left, level2Right);
     var endNode = new PointLeaf(endPose, level3);
+
+    endNode.transformByAlliance();
     return endNode;
   }
 }

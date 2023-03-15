@@ -5,6 +5,8 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.Constants;
 
 public class MoreMath {
 
@@ -79,5 +81,12 @@ public class MoreMath {
     var deepCopy = new Pose2d();
     deepCopy = deepCopy.plus(new Transform2d(new Pose2d(), pose));
     return deepCopy;
+  }
+
+  public static Pose2d transformByAlliance(Pose2d pose){
+    if(DriverStation.getAlliance() == DriverStation.Alliance.Red){
+      return new Pose2d(pose.getX(), Constants.FIELD_CONSTANTS.WIDTH - pose.getY(), pose.getRotation());
+    }
+    return pose;
   }
 }

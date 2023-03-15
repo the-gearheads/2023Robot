@@ -25,6 +25,7 @@ import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.Swerve;
+import frc.robot.util.MoreMath;
 import frc.robot.Constants.AUTO_ALIGN;
 
 public class AlignToFeederStation extends ProxyCommand {
@@ -61,6 +62,9 @@ public class AlignToFeederStation extends ProxyCommand {
     var startPose = swerve.getPose();
     var midPose = AUTO_ALIGN.FEEDER_MID_POSE;
     var endPose = AUTO_ALIGN.FEEDER_END_POSE;
+    
+    midPose = MoreMath.transformByAlliance(midPose);
+    endPose = MoreMath.transformByAlliance(endPose);
 
     var startHeading = midPose.getTranslation().minus(startPose.getTranslation()).getAngle();
     var startPoint = new PathPoint(startPose.getTranslation(), startHeading, startPose.getRotation());
@@ -73,6 +77,7 @@ public class AlignToFeederStation extends ProxyCommand {
 
     var traj = PathPlanner.generatePath(constraints, startPoint, midPoint, endPoint);
     // traj = PathPlannerTrajectory.transformTrajectoryForAlliance(traj, DriverStation.getAlliance());
+
     return swerve.silentFollowTrajectoryCommand(traj, false, true);
     };
 

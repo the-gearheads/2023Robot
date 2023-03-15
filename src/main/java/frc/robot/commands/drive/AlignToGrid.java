@@ -12,10 +12,12 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
+import frc.robot.Constants;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.PointLeaf.NodeX;
@@ -113,7 +115,9 @@ public class AlignToGrid extends ProxyCommand {
 
       var lastPoint = new PathPoint(lastPose.getTranslation(), heading, lastPose.getRotation());
       var currentPoint = new PathPoint(currentPose.getTranslation(), heading, currentPose.getRotation());
-      paths.add(PathPlanner.generatePath(constraints, lastPoint, currentPoint));
+      var path = PathPlanner.generatePath(constraints, lastPoint, currentPoint);
+      // path = PathPlannerTrajectory.transformTrajectoryForAlliance(path, DriverStation.getAlliance());
+      paths.add(path);
     }
     return paths;
   }
@@ -148,6 +152,9 @@ public class AlignToGrid extends ProxyCommand {
   public static boolean onChargingStation(Pose2d pose) {
     var xCheck = pose.getX() < 4.45 && pose.getX() > 3.342;
     var yCheck = pose.getY() < 3.7 && pose.getX() > 1.875;
+    if(DriverStation.getAlliance() == DriverStation.Alliance.Red){
+      yCheck = pose.getY() > (Constants.FIELD_CONSTANTS.WIDTH - 3.7) && pose.getY() < (Constants.FIELD_CONSTANTS.WIDTH - 1.875);
+    }
 
     return xCheck && yCheck;
   }
@@ -156,6 +163,9 @@ public class AlignToGrid extends ProxyCommand {
     var xCheck = pose.getX() < 6.309;
     var yCheck = pose.getY() > 5.877;
 
+    if(DriverStation.getAlliance() == DriverStation.Alliance.Red){
+      yCheck = pose.getY() < (Constants.FIELD_CONSTANTS.WIDTH - 5.877);
+    }
     return xCheck && yCheck;
   }
 
