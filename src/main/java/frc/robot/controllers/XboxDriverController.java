@@ -43,6 +43,7 @@ public class XboxDriverController implements DriverController {
   public Trigger alignToFeederStation() {
     return new JoystickButton(controller, XboxController.Button.kB.value);
   }
+
   public Trigger alignToGrid() {
     return new JoystickButton(controller, XboxController.Button.kY.value);
   }

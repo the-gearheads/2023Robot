@@ -293,7 +293,8 @@ public class Swerve extends SubsystemBase {
     return fullCommand;
   }
 
-  public Command followTrajectoriesCommand(ArrayList<PathPlannerTrajectory> trajectories, boolean resetPose, boolean stopWhenDone) {
+  public Command followTrajectoriesCommand(ArrayList<PathPlannerTrajectory> trajectories, boolean resetPose,
+      boolean stopWhenDone) {
     Command fullCommand = new InstantCommand();
     boolean isFirstTrajectory = resetPose;
     for (PathPlannerTrajectory trajectory : trajectories) {
