@@ -172,8 +172,6 @@ public class RobotContainer {
       swerve.setPose(new Pose2d());
     }, swerve));
     Controllers.driverController.alignToFeederStation().onTrue(new AlignToFeederStation(swerve, arm));
-    Controllers.driverController.alignToGrid()
-        .onTrue(new AlignToGrid(swerve, arm, new Pose2d(2.3, 2, Rotation2d.fromDegrees(180))));
 
     Controllers.operatorController.armGoToLowNode()
         .onTrue(new SetArmPose(arm, ArmPose.LOW_NODE).andThen(new ManualWristControl(wrist, WristState.RIGHT)));
@@ -183,8 +181,10 @@ public class RobotContainer {
     Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
     Controllers.operatorController.setWristAlternatePose().whileTrue(new AltWristControl(wrist).repeatedly());
     Controllers.operatorController.openGrabber().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
-
     Controllers.operatorController.setArmByJoystick().onTrue(new JoystickArmControl(arm));
+
+    Controllers.alignController.alignToGrid()
+    .onTrue(new AlignToGrid(swerve, arm));
   }
 
   /**

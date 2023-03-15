@@ -179,7 +179,7 @@ public class Constants extends AnnotatedClass {
   }
 
   public static class AUTO_ALIGN{
-    public static Pose2d FEEDER_MID_POSE = new Pose2d(13.5, 7.5, Rotation2d.fromDegrees(180));
+    public static Pose2d FEEDER_MID_POSE = new Pose2d(14.5, 7.5, Rotation2d.fromDegrees(180));
     public static Pose2d FEEDER_END_POSE = new Pose2d(15.5, 7.5, Rotation2d.fromDegrees(180));
     public static PathConstraints FEEDER_CONSTRAINTS = new PathConstraints(2,1);
   }

@@ -18,6 +18,9 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
+import frc.robot.commands.drive.PointLeaf.NodeX;
+import frc.robot.commands.drive.PointLeaf.NodeY;
+import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.Swerve;
 
@@ -25,71 +28,82 @@ public class AlignToGrid extends ProxyCommand {
   /** Creates a new AlignToGrid. */
   public static PathConstraints constraints = new PathConstraints(2, 1);
 
-  public AlignToGrid(Swerve swerve, Arm arm, Pose2d nodePose) {
+  public AlignToGrid(Swerve swerve, Arm arm) {
     super(() -> {
-      var currentPose = swerve.getPose();
-
-      if (onChargingStation(currentPose) || inOpponentLoadingZone(currentPose) || farAway(currentPose)) {
-        return new InstantCommand(() -> {
-        });
-      }
-
-      var startLeaf = new PointLeaf(swerve.getPose());
-      var nodeLeaf = PointLeaf.createTree(nodePose);
-
-      var leavesTraj = new ArrayList<PointLeaf>();
-      leavesTraj.add(0, nodeLeaf);
-
-      while (leavesTraj.get(0) != startLeaf) {
-        var firstLeaf = leavesTraj.get(0);
-        var closestChild = firstLeaf.getClosestChild(startLeaf);
-
-        if (closestChild == null) {
-          leavesTraj.add(0, startLeaf);
-          continue;
-        }
-
-        var startLeafDist = firstLeaf.getDistance(startLeaf);
-        var closestChildDist = firstLeaf.getDistance(closestChild);
-
-        if (startLeafDist < closestChildDist) {
-          leavesTraj.add(0, startLeaf);
-        } else {
-          leavesTraj.add(0, closestChild);
-        }
-      }
-
-      var paths = trajLeavesToPaths(leavesTraj);
-
-      var command = pathsToCommand(swerve, arm, paths, nodePose);
-      return command;
+      return proxy(swerve, arm);
     });
+  }
+
+  public static Command proxy(Swerve swerve, Arm arm){
+    var nodePose = getDesiredNodePose();
+    var currentPose = swerve.getPose();
+
+    if (onChargingStation(currentPose) || inOpponentLoadingZone(currentPose) || farAway(currentPose)) {
+      return new InstantCommand();
+    }
+
+    var startLeaf = new PointLeaf(swerve.getPose());
+    var nodeLeaf = PointLeaf.createTree(nodePose);
+
+    var leavesTraj = new ArrayList<PointLeaf>();
+    leavesTraj.add(0, nodeLeaf);
+    leavesTraj.add(0, nodeLeaf.getClosestChild(startLeaf));
+
+    while (leavesTraj.get(0) != startLeaf) {
+      var firstLeaf = leavesTraj.get(0);
+      var closestChild = firstLeaf.getClosestChild(startLeaf);
+
+      if (closestChild == null) {
+        leavesTraj.add(0, startLeaf);
+        continue;
+      }
+
+      var startLeafDist = firstLeaf.getDistance(startLeaf);
+      var closestChildDist = firstLeaf.getDistance(closestChild);
+
+      if (startLeafDist < closestChildDist) {
+        leavesTraj.add(0, startLeaf);
+      } else {
+        leavesTraj.add(0, closestChild);
+      }
+    }
+
+    var paths = leavesTrajToPaths(leavesTraj);
+
+    var command = pathsToCommand(swerve, arm, paths, nodePose);
+    return command;
+  }
+
+  public static Pose2d getDesiredNodePose(){
+    /* Assuming they have a range of 1-3 */
+    var chosenGrid = Controllers.alignController.getChosenGrid();
+    var chosenY = Controllers.alignController.getChosenY();
+    var chosenX = Controllers.alignController.getChosenX();
+
+    chosenGrid--;
+
+    var yIndex = chosenGrid * 3 + chosenY;
+    var yVal = NodeY.getByIndex(yIndex).y;
+
+    var xIndex = chosenX;
+    var xVal = NodeX.getByIndex(xIndex).x;
+
+    return new Pose2d(xVal, yVal, Rotation2d.fromDegrees(180));
   }
 
   public static Command pathsToCommand(Swerve swerve, Arm arm, ArrayList<PathPlannerTrajectory> paths, Pose2d endPose) {
     Command command = new InstantCommand();
-    if (paths.size() < 2) {
-      command =
-          swerve.followTrajectoryCommand(paths.get(0), false, true).andThen(new SetArmPose(arm, ArmPose.HIGH_NODE));
-    } else {
-      for (var i = 0; i < paths.size() - 1; i++) {
-        command = command.andThen(swerve.followTrajectoryCommand(paths.get(i), false, true));
-      }
-      command = command
-          .andThen(new ParallelCommandGroup(swerve.followTrajectoryCommand(paths.get(paths.size() - 1), false, true),
-              new SetArmPose(arm, ArmPose.HIGH_NODE)));
+    for (var i = 0; i < paths.size() - 1; i++) {
+      command = command.andThen(swerve.followTrajectoryCommand(paths.get(i), false, true));
     }
-    var lastPose = new Pose2d(1.9, endPose.getY(), endPose.getRotation());
-    var heading = lastPose.getTranslation().minus(endPose.getTranslation()).getAngle();
-    var lastPoint = new PathPoint(lastPose.getTranslation(), heading, lastPose.getRotation());
-    var endPoint = new PathPoint(endPose.getTranslation(), heading, endPose.getRotation());
-    var path = PathPlanner.generatePath(constraints, endPoint, lastPoint);
-    command = command.andThen(swerve.followTrajectoryCommand(path, false, false));
+    command =command.andThen(
+      swerve.followTrajectoryCommand(paths.get(paths.size()-1), false, true)
+      .alongWith(new SetArmPose(arm, ArmPose.HIGH_NODE)));
 
     return command;
   }
 
-  public static ArrayList<PathPlannerTrajectory> trajLeavesToPaths(ArrayList<PointLeaf> leavesTraj) {
+  public static ArrayList<PathPlannerTrajectory> leavesTrajToPaths(ArrayList<PointLeaf> leavesTraj) {
     var paths = new ArrayList<PathPlannerTrajectory>();
     for (int i = 1; i < leavesTraj.size(); i++) {
       var lastPose = leavesTraj.get(i - 1).pose;
