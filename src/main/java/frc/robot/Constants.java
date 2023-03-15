@@ -170,13 +170,18 @@ public class Constants extends AnnotatedClass {
 
     public static double LOW_ROT_VEL = 0.5;
 
-
     @NTPublish
     public static double MAX_MODULE_SPEED = 5;
     @NTPublish
     public static double MAX_TRANSLATIONAL_SPEED = 2;
     @NTPublish
     public static double MAX_ROTATIONAL_SPEED = 1;
+  }
+
+  public static class AUTO_ALIGN{
+    public static Pose2d FEEDER_MID_POSE = new Pose2d(13.5, 7.5, Rotation2d.fromDegrees(180));
+    public static Pose2d FEEDER_END_POSE = new Pose2d(15.5, 7.5, Rotation2d.fromDegrees(180));
+    public static PathConstraints FEEDER_CONSTRAINTS = new PathConstraints(2,1);
   }
 
   public static class AUTON {
