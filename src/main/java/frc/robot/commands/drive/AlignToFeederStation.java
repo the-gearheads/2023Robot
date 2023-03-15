@@ -4,6 +4,7 @@
 
 package frc.robot.commands.drive;
 
+import java.sql.Driver;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -14,6 +15,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
+import frc.robot.Constants;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.subsystems.arm.Arm;
@@ -25,10 +27,14 @@ public class AlignToFeederStation extends ProxyCommand {
     super(() -> {
       var startPose = swerve.getPose();
       var midPose = new Pose2d(14.5, 7.5, Rotation2d.fromDegrees(180));
-      var endPose = new Pose2d(15.5, 7.5, Rotation2d.fromDegrees(180));
+      var transformedMidPose = midPose;
+
+      if(DriverStation.getAlliance() == DriverStation.Alliance.Red){
+        transformedMidPose = new Pose2d(midPose.getX(), Constants.FIELD_CONSTANTS.WIDTH - midPose.getY(), midPose.getRotation());
+      }
 
       //please transform this (only works with blue)
-      if (midPose.getTranslation().getDistance(startPose.getTranslation()) > 4.5) {
+      if (transformedMidPose.getTranslation().getDistance(startPose.getTranslation()) > 4.5) {
         return new InstantCommand();
       }
 
