@@ -24,7 +24,6 @@ import frc.robot.subsystems.drive.Swerve;
 /** Add your docs here. */
 public class VisionSim extends Vision{
     ArrayList<SimVisionSystem> simCams;
-    private Optional<EstimatedRobotPose> singleCamEstimate;
     private Field2d field;
     private Field2d staticField;
     private Pose2d actualStaticPose = new Pose2d(1.5,1.5, Rotation2d.fromDegrees(90));
@@ -52,7 +51,7 @@ public class VisionSim extends Vision{
 
         var estimate = getEstimate();
         if(isEstimatePresent(estimate)){
-            var pose = estimate.get().estimatedPose.toPose2d();
+            var pose = estimate.get().best.toPose2d();
             this.field.getObject("vision est").setPose(pose);
             Logger.getInstance().recordOutput("Vision/logging vision est", true);
 
