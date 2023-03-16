@@ -84,7 +84,7 @@ public class SysidCommand extends CommandBase {
 
     data.add(velocities[0]);
     data.add(velocities[1]);
-    data.add(drive.getCtsRawGyroRad());
+    data.add(drive.getCtsGyroRotWithOffset().getRadians());
     data.add(drive.getAngularVelRad());
 
     SmartDashboard.putBoolean("is being dynmaic", isDynamicTest);

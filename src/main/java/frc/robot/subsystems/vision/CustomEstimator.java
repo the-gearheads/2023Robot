@@ -33,17 +33,24 @@
  import edu.wpi.first.math.geometry.Transform3d;
  import edu.wpi.first.math.geometry.Translation3d;
  import edu.wpi.first.wpilibj.DriverStation;
- import java.util.ArrayList;
- import java.util.HashSet;
+import frc.robot.util.MoreMath;
+import frc.robot.util.multicamvision.PoseBufferWrapper;
+import java.security.cert.CertStore;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
  import java.util.List;
  import java.util.Optional;
  import java.util.Set;
+import java.util.stream.Collectors;
+import org.apache.commons.io.filefilter.CanExecuteFileFilter;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.estimation.VisionEstimation;
  import org.photonvision.targeting.PhotonPipelineResult;
  import org.photonvision.targeting.PhotonTrackedTarget;
  import org.photonvision.targeting.TargetCorner;
+import com.fasterxml.jackson.databind.cfg.BaseSettings;
  
  /**
   * The PhotonPoseEstimator class filters or combines readings from all the AprilTags visible at a
@@ -53,20 +60,19 @@ import org.photonvision.estimation.VisionEstimation;
  public class CustomEstimator {
      /** Position estimation strategies that can be used by the {@link PhotonPoseEstimator} class. */
      public enum PoseStrategy {
-         /** Choose the Pose with the lowest ambiguity. */
-         LOWEST_AMBIGUITY,
- 
-         /** Use all visible tags to compute a single pose estimate.. */
-         MULTI_TAG_PNP
+         /* Multi_TAG_PNP and then disambiguiate based on gyro */
+         CLOSEST_TO_GYRO,
+         CLOSEST_TO_BUFFER_POSE,
+         CLOSEST_TO_GYRO_PRIME,
+         CLOSEST_TO_BUFFER_POSE_PRIME,
+         MIN_AMBIGUITY
      }
  
      private AprilTagFieldLayout fieldTags;
      private PoseStrategy primaryStrategy;
-     private PoseStrategy multiTagFallbackStrategy = PoseStrategy.LOWEST_AMBIGUITY;
      private final PhotonCamera camera;
      private Transform3d robotToCamera;
  
-     private Pose3d referencePose;
      protected double poseCacheTimestampSeconds = -1;
      private final Set<Integer> reportedErrors = new HashSet<>();
  
@@ -143,53 +149,7 @@ import org.photonvision.estimation.VisionEstimation;
          checkUpdate(this.primaryStrategy, strategy);
          this.primaryStrategy = strategy;
      }
- 
-     /**
-      * Set the Position Estimation Strategy used in multi-tag mode when only one tag can be seen. Must
-      * NOT be MULTI_TAG_PNP
-      *
-      * @param strategy the strategy to set
-      */
-     public void setMultiTagFallbackStrategy(PoseStrategy strategy) {
-         checkUpdate(this.multiTagFallbackStrategy, strategy);
-         if (strategy == PoseStrategy.MULTI_TAG_PNP) {
-             DriverStation.reportWarning(
-                     "Fallback cannot be set to MULTI_TAG_PNP! Setting to lowest ambiguity", null);
-             strategy = PoseStrategy.LOWEST_AMBIGUITY;
-         }
-         this.multiTagFallbackStrategy = strategy;
-     }
- 
-     /**
-      * Return the reference position that is being used by the estimator.
-      *
-      * @return the referencePose
-      */
-     public Pose3d getReferencePose() {
-         return referencePose;
-     }
- 
-     /**
-      * Update the stored reference pose for use when using the <b>CLOSEST_TO_REFERENCE_POSE</b>
-      * strategy.
-      *
-      * @param referencePose the referencePose to set
-      */
-     public void setReferencePose(Pose3d referencePose) {
-         checkUpdate(this.referencePose, referencePose);
-         this.referencePose = referencePose;
-     }
- 
-     /**
-      * Update the stored reference pose for use when using the <b>CLOSEST_TO_REFERENCE_POSE</b>
-      * strategy.
-      *
-      * @param referencePose the referencePose to set
-      */
-     public void setReferencePose(Pose2d referencePose) {
-         setReferencePose(new Pose3d(referencePose));
-     }
- 
+
      /** @return The current transform from the center of the robot to the camera mount position */
      public Transform3d getRobotToCameraTransform() {
          return robotToCamera;
@@ -257,14 +217,24 @@ import org.photonvision.estimation.VisionEstimation;
  
      private Optional<CustomEstimate> update(
              PhotonPipelineResult cameraResult, PoseStrategy strat) {
+        
+         cameraResult = filterTargets(cameraResult);
          Optional<CustomEstimate> estimatedPose;
          switch (strat) {
-             case LOWEST_AMBIGUITY:
-                 estimatedPose = lowestAmbiguityStrategy(cameraResult);
+             case CLOSEST_TO_GYRO:
+                 estimatedPose = closestToGyroStrategy(cameraResult);
                  break;
-             case MULTI_TAG_PNP:
-                 estimatedPose = multiTagPNPStrategy(cameraResult);
+             case CLOSEST_TO_BUFFER_POSE:
+                 estimatedPose = closestToBufferPoseStrategy(cameraResult);
                  break;
+             case CLOSEST_TO_GYRO_PRIME:
+                 estimatedPose = closestToGyroPrimeStrategy(cameraResult);
+                 break;
+             case CLOSEST_TO_BUFFER_POSE_PRIME:
+                 estimatedPose = closestToBufferPosePrimeStrategy(cameraResult);
+                 break;
+             case MIN_AMBIGUITY:
+                 estimatedPose = minAmbiguityStrategy(cameraResult);
              default:
                  DriverStation.reportError(
                          "[PhotonPoseEstimator] Unknown Position Estimation Strategy!", false);
@@ -274,28 +244,174 @@ import org.photonvision.estimation.VisionEstimation;
          return estimatedPose;
      }
  
-     private Optional<CustomEstimate> multiTagPNPStrategy(PhotonPipelineResult result) {
+     private PhotonPipelineResult filterTargets(PhotonPipelineResult cameraResult) {
+        var filteredTargets = cameraResult.targets.stream().filter((target)->{
+            Optional<Pose3d> targetPose = fieldTags.getTagPose(target.getFiducialId());
+            return targetPose.isPresent();
+        }).collect(Collectors.toList());
+        
+        var filteredRes = new PhotonPipelineResult(cameraResult.getLatencyMillis(), filteredTargets);
+        filteredRes.setTimestampSeconds(cameraResult.getTimestampSeconds());
+        return filteredRes; 
+    }
+
+    private Optional<CustomEstimate> minAmbiguityStrategy(PhotonPipelineResult cameraResult){
+        Optional<ExtendedCustomEstimate> optEstimate = getMultiTagEstimate(cameraResult);
+        if(optEstimate.isEmpty()){
+            return Optional.empty();
+        }
+        var estimate = optEstimate.get();
+
+        if(estimate.targetsUsed.size() > 1){
+            return Optional.of(estimate.getBestEstimate());
+        }else{
+            if(estimate.ambiguity < 0.15){
+                return Optional.of(estimate.getBestEstimate());
+            }else{
+                return Optional.empty();
+            }
+        }
+    }
+
+    private Optional<CustomEstimate> closestToGyroPrimeStrategy(PhotonPipelineResult cameraResult){
+        Optional<ExtendedCustomEstimate> optEstimate = getMultiTagEstimate(cameraResult);
+        if(optEstimate.isEmpty()){
+            return Optional.empty();
+        }
+        var estimate = optEstimate.get();
+
+        if(estimate.targetsUsed.size() > 1){
+            return Optional.of(estimate.getBestEstimate());
+        }else{
+            var contemporaryGyroRad = PoseBufferWrapper.getPoseInstance().getSample(estimate.timestampSeconds).get().gyroAngle.getRadians();
+        
+            var bestRad = estimate.best.getRotation().getZ();
+            var altRad = estimate.alt.getRotation().getZ();
+
+            var closestToBestRad = MoreMath.getClosestRad(bestRad, contemporaryGyroRad);
+            var closestToAltRad = MoreMath.getClosestRad(altRad, contemporaryGyroRad);
+
+            var distFromBest = Math.abs(bestRad - closestToBestRad);
+            var distFromAlt = Math.abs(altRad - closestToAltRad);
+
+            if(distFromBest <= distFromAlt){
+                return Optional.of(estimate.getBestEstimate());
+            }else{
+                return Optional.of(estimate.getAltEstimate());
+            }
+        }
+    }
+
+    private Optional<CustomEstimate> closestToBufferPosePrimeStrategy(PhotonPipelineResult cameraResult){
+        Optional<ExtendedCustomEstimate> optEstimate = getMultiTagEstimate(cameraResult);
+        if(optEstimate.isEmpty()){
+            return Optional.empty();
+        }
+        var estimate = optEstimate.get();
+
+        if(estimate.targetsUsed.size() > 1){
+            return Optional.of(estimate.getBestEstimate());
+        }else{
+            var contemporaryPose = new Pose3d(PoseBufferWrapper.getPoseInstance().getSample(estimate.timestampSeconds).get().poseMeters);
+            var bestDistance = calculateDifference(contemporaryPose, estimate.best);
+            var altDistance = calculateDifference(contemporaryPose, estimate.alt);
+
+            if(bestDistance <= altDistance){
+                return Optional.of(estimate.getBestEstimate());
+            }else{
+                return Optional.of(estimate.getAltEstimate());
+            }
+        }
+    }
+
+    private Optional<CustomEstimate> closestToGyroStrategy(PhotonPipelineResult cameraResult) {
+        Optional<ExtendedCustomEstimate> optEstimate = getMultiTagEstimate(cameraResult);
+        if(optEstimate.isEmpty()){
+            return Optional.empty();
+        }
+        var estimate = optEstimate.get();
+
+        var contemporaryGyroRad = PoseBufferWrapper.getPoseInstance().getSample(estimate.timestampSeconds).get().gyroAngle.getRadians();
+        
+        var bestRad = estimate.best.getRotation().getZ();
+        var altRad = estimate.alt.getRotation().getZ();
+
+        var closestToBestRad = MoreMath.getClosestRad(bestRad, contemporaryGyroRad);
+        var closestToAltRad = MoreMath.getClosestRad(altRad, contemporaryGyroRad);
+
+        var distFromBest = Math.abs(bestRad - closestToBestRad);
+        var distFromAlt = Math.abs(altRad - closestToAltRad);
+
+        if(distFromBest <= distFromAlt){
+            return Optional.of(estimate.getBestEstimate());
+        }else{
+            return Optional.of(estimate.getAltEstimate());
+        }
+    }
+
+    private Optional<CustomEstimate> closestToBufferPoseStrategy(PhotonPipelineResult cameraResult) {
+        Optional<ExtendedCustomEstimate> optEstimate = getMultiTagEstimate(cameraResult);
+        if(optEstimate.isEmpty()){
+            return Optional.empty();
+        }
+        var estimate = optEstimate.get();
+
+        var contemporaryPose = new Pose3d(PoseBufferWrapper.getPoseInstance().getSample(estimate.timestampSeconds).get().poseMeters);
+        var bestDistance = calculateDifference(contemporaryPose, estimate.best);
+        var altDistance = calculateDifference(contemporaryPose, estimate.alt);
+
+        if(bestDistance <= altDistance){
+            return Optional.of(estimate.getBestEstimate());
+        }else{
+            return Optional.of(estimate.getAltEstimate());
+        }
+    }
+
+private Optional<ExtendedCustomEstimate> getMultiTagEstimate(PhotonPipelineResult result){
+    ExtendedCustomEstimate estimate;
+    var numTargets = result.getTargets().size();
+    if(numTargets == 0){
+        return Optional.empty();
+    }else if(numTargets == 1){
+        var target = result.targets.get(0);
+
+        /* make sure target exists and is valid */
+        var targetPosition = fieldTags.getTagPose(target.getFiducialId()).get();
+
+        var best = targetPosition
+        .transformBy(target.getBestCameraToTarget().inverse())
+        .transformBy(robotToCamera.inverse());
+
+        var alt = targetPosition
+        .transformBy(target.getAlternateCameraToTarget().inverse())
+        .transformBy(robotToCamera.inverse());
+
+        estimate = new ExtendedCustomEstimate(best, alt, target.getPoseAmbiguity(),
+         result.getTimestampSeconds(), result.getTargets());
+        
+         return Optional.of(estimate);
+    }else{
+        var customEstimateOpt = innerMultiTag(result);
+        return customEstimateOpt;
+    }
+}
+private Optional<ExtendedCustomEstimate> innerMultiTag(PhotonPipelineResult result) {
          // Arrays we need declared up front
          var visCorners = new ArrayList<TargetCorner>();
          var knownVisTags = new ArrayList<AprilTag>();
          var fieldToCams = new ArrayList<Pose3d>();
          var fieldToCamsAlt = new ArrayList<Pose3d>();
  
-         if (result.getTargets().size() < 2) {
-             // Run fallback strategy instead
-             return update(result, this.multiTagFallbackStrategy);
-         }
- 
          for (var target : result.getTargets()) {
+             visCorners.addAll(target.getDetectedCorners());
+ 
              var tagPoseOpt = fieldTags.getTagPose(target.getFiducialId());
              if (tagPoseOpt.isEmpty()) {
                  reportFiducialPoseError(target.getFiducialId());
                  continue;
              }
-             var tagPose = tagPoseOpt.get();
  
-             /* Used to be before empty tag pose check */
-             visCorners.addAll(target.getDetectedCorners());
+             var tagPose = tagPoseOpt.get();
  
              // actual layout poses of visible tags -- not exposed, so have to recreate
              knownVisTags.add(new AprilTag(target.getFiducialId(), tagPose));
@@ -323,64 +439,12 @@ import org.photonvision.estimation.VisionEstimation;
              .plus(robotToCamera.inverse()); // field-to-robot
  
              return Optional.of(
-                     new CustomEstimate(best, alt, pnpResults.bestReprojErr, pnpResults.altReprojErr, result.getTimestampSeconds(), result.getTargets()));
+                     new ExtendedCustomEstimate(best, alt, pnpResults.bestReprojErr / pnpResults.altReprojErr, result.getTimestampSeconds(), result.getTargets()));
          } else {
              // TODO fallback strategy? Should we just always do solvePNP?
              return Optional.empty();
          }
-     }
- 
-     /**
-      * Return the estimated position of the robot with the lowest position ambiguity from a List of
-      * pipeline results.
-      *
-      * @param result pipeline result
-      * @return the estimated position of the robot in the FCS and the estimated timestamp of this
-      *     estimation.
-      */
-     private Optional<CustomEstimate> singleTagStrategy(PhotonPipelineResult result) {
-         PhotonTrackedTarget lowestAmbiguityTarget = null;
- 
-         double lowestAmbiguityScore = 10;
- 
-         for (PhotonTrackedTarget target : result.targets) {
-             double targetPoseAmbiguity = target.getPoseAmbiguity();
-             // Make sure the target is a Fiducial target.
-             if (targetPoseAmbiguity != -1 && targetPoseAmbiguity < lowestAmbiguityScore) {
-                 lowestAmbiguityScore = targetPoseAmbiguity;
-                 lowestAmbiguityTarget = target;
-             }
-         }
- 
-         // Although there are confirmed to be targets, none of them may be fiducial
-         // targets.
-         if (lowestAmbiguityTarget == null) return Optional.empty();
- 
-         int targetFiducialId = lowestAmbiguityTarget.getFiducialId();
- 
-         Optional<Pose3d> targetPosition = fieldTags.getTagPose(targetFiducialId);
- 
-         if (targetPosition.isEmpty()) {
-             reportFiducialPoseError(targetFiducialId);
-             return Optional.empty();
-         }
- 
-         /* The ambiguity for the alt estimate is not exposed */
-         return Optional.of(
-                 new CustomEstimate(
-                         targetPosition
-                                 .get()
-                                 .transformBy(lowestAmbiguityTarget.getBestCameraToTarget().inverse())
-                                 .transformBy(robotToCamera.inverse()),
-                        targetPosition
-                                 .get()
-                                 .transformBy(lowestAmbiguityTarget.getAlternateCameraToTarget().inverse())
-                                 .transformBy(robotToCamera.inverse()),
-                        lowestAmbiguityScore,
-                        lowestAmbiguityScore,
-                         result.getTimestampSeconds(),
-                         result.getTargets()));
-     }
+        }
  
      /**
       * Difference is defined as the vector magnitude between the two poses

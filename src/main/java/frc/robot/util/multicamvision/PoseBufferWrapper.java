@@ -16,22 +16,35 @@ public class PoseBufferWrapper {
   private Supplier<Rotation2d> gyroLambda;
   private Supplier<Pose2d> poseLambda;
   private TimeInterpolatableBuffer<InterpolationRecord> poseBuffer;
-  private static PoseBufferWrapper instance;
+  private static PoseBufferWrapper wheelBufferInstance;
+  private static PoseBufferWrapper poseBufferInstance;
 
-  public PoseBufferWrapper(Supplier<Pose2d> poseLambda, Supplier<SwerveModulePosition[]> modulePoseLambda,
-      Supplier<Rotation2d> gyroLambda, SwerveDriveKinematics kinematics, Consumer<Runnable> setResetBuffer) {
+  private PoseBufferWrapper(Supplier<Pose2d> poseLambda, Supplier<SwerveModulePosition[]> modulePoseLambda,
+      Supplier<Rotation2d> gyroLambda, SwerveDriveKinematics kinematics) {
     this.poseLambda = poseLambda;
     this.gyroLambda = gyroLambda;
     this.modulePoseLambda = modulePoseLambda;
     this.kinematics = kinematics;
     this.poseBuffer = TimeInterpolatableBuffer.createBuffer(1.5);
-    setResetBuffer.accept(this::reset);
-
-    instance = this;
   }
 
-  public static PoseBufferWrapper getInstance(){
-    return instance;
+  public static void createBuffers(
+    Supplier<Pose2d> poseLambda, Supplier<Pose2d> wheelPoseLambda, Supplier<SwerveModulePosition[]> modulePoseLambda,
+    Supplier<Rotation2d> gyroLambda, SwerveDriveKinematics kinematics, Consumer<Runnable> setResetBuffer
+  ){
+    PoseBufferWrapper.wheelBufferInstance = new PoseBufferWrapper(wheelPoseLambda, modulePoseLambda, gyroLambda, kinematics);
+    PoseBufferWrapper.poseBufferInstance = new PoseBufferWrapper(poseLambda, modulePoseLambda, gyroLambda, kinematics);
+    setResetBuffer.accept(()->{
+      PoseBufferWrapper.wheelBufferInstance.reset();
+      PoseBufferWrapper.poseBufferInstance.reset();
+    });
+  }
+
+  public static PoseBufferWrapper getPoseInstance(){
+    return PoseBufferWrapper.poseBufferInstance;
+  }
+  public static PoseBufferWrapper getWheelInstance(){
+    return PoseBufferWrapper.wheelBufferInstance;
   }
 
   public void update() {

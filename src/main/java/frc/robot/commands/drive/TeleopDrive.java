@@ -48,7 +48,7 @@ public class TeleopDrive extends CommandBase {
   @Override
   public void initialize() {
     // swerve.setPose(new Pose2d());
-    var ctsGyroAngle = swerve.getCtsPoseRotRad();
+    var ctsGyroAngle = swerve.getCtsGyroRotWithOffset().getRadians();
     angleGoal = ctsGyroAngle;
   }
 
@@ -98,7 +98,7 @@ public class TeleopDrive extends CommandBase {
     var heading180 = Controllers.driverController.getSetHeading180Btn().getAsBoolean();
     var heading270 = Controllers.driverController.getSetHeading270Btn().getAsBoolean();
 
-    var ctsGyroAngle = swerve.getCtsPoseRotRad();
+    var ctsGyroAngle = swerve.getCtsGyroRotWithOffset().getRadians();
 
     SmartDashboard.putNumber("Actual Heading #", Controllers.driverController.getPOV());
     if (heading0) {
@@ -170,7 +170,7 @@ public class TeleopDrive extends CommandBase {
   /*Make sure the robot maintains its heading when we aren't toggling the rotation axis*/
   public ChassisSpeeds maintainHeading(ChassisSpeeds spds) {
     var rotSpd = spds.omegaRadiansPerSecond;
-    var ctsGyroAngle = swerve.getCtsPoseRotRad();
+    var ctsGyroAngle = swerve.getCtsGyroRotWithOffset().getRadians();
 
     var runRotPid = SmartDashboard.getBoolean("TeleopDrive/rot pid/Turn On", false);
     var rotSpdEqualZero = MathUtil.applyDeadband(rotSpd, 1E-2) == 0;

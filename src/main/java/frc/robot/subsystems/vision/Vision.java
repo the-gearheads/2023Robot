@@ -13,7 +13,6 @@ import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.TargetCorner;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -28,18 +27,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.Swerve;
+import frc.robot.subsystems.vision.CustomEstimator.PoseStrategy;
 import frc.robot.util.MoreMath;
-import frc.robot.util.multicamvision.ClosestEstimateFinder;
+import frc.robot.util.multicamvision.PoseBufferWrapper;
 
 public class Vision extends SubsystemBase {
   public Swerve swerve;
 
-  public ClosestEstimateFinder closestEstimateFinder;
-  public List<PhotonPoseEstimator> estimators;
+  public List<CustomEstimator> estimators;
   private Field2d field = new Field2d();
 
   public List<List<PhotonTrackedTarget>> targetsPerCam;
-  public List<Optional<EstimatedRobotPose>> estimates;
+  public List<Optional<CustomEstimate>> estimates;
 
   private AprilTagFieldLayout atfl;
 
@@ -49,14 +48,24 @@ public class Vision extends SubsystemBase {
     initAtfl();
     initPoseEstimators();
     initEstimates();
-    initClosestEstimateFinder();
+    initBuffer();
     initField();
+  }
+
+  private void initBuffer() {
+    PoseBufferWrapper.createBuffers(
+      swerve::getPose,
+      swerve::getWheelPose, 
+      swerve::getModulePositions, 
+      swerve::getCtsGyroRotWithOffset, 
+      swerve.kinematics, 
+      swerve::setResetBuffer 
+      );
   }
 
   public void periodic() {
     updateAtflOrigin();
     updateEstimates();
-    closestEstimateFinder.update();
     logTagPoses();
   }
 
@@ -99,17 +108,14 @@ public class Vision extends SubsystemBase {
       var targets = cam.getLatestResult().getTargets();
       targetsPerCam.add(targets);
 
-      var lastPose = swerve.getPose();
-      poseEstimator.setReferencePose(lastPose);
-
       var estimate = poseEstimator.update();
       estimates.add(estimate);
     }
   }
 
-  public static boolean isEstimatePresent(Optional<EstimatedRobotPose> estimatedRobotPos) {
-    return estimatedRobotPos.isPresent() && estimatedRobotPos.get().estimatedPose != null
-        && estimatedRobotPos.get().estimatedPose.getRotation() != null;
+  public static boolean isEstimatePresent(Optional<CustomEstimate> estimatedRobotPos) {
+    return estimatedRobotPos.isPresent() && estimatedRobotPos.get().best != null
+        && estimatedRobotPos.get().best.getRotation() != null;
   }
 
   private void initAtfl() {
@@ -124,14 +130,9 @@ public class Vision extends SubsystemBase {
   private void initPoseEstimators() {
     estimators = new ArrayList<>();
     for (var camAndTransform : Constants.VISION.CAMS_AND_TRANS.entrySet()) {
-      estimators.add(new PhotonPoseEstimator(atfl, PoseStrategy.MULTI_TAG_PNP, camAndTransform.getKey(),
+      estimators.add(new CustomEstimator(atfl, PoseStrategy.MIN_AMBIGUITY, camAndTransform.getKey(),
           camAndTransform.getValue()));
     }
-  }
-
-  private void initClosestEstimateFinder() {
-    this.closestEstimateFinder =
-        new ClosestEstimateFinder(Constants.VISION.CAMS_AND_TRANS, getAtfl(), swerve.kinematics);
   }
 
   public void logTagPoses() {
@@ -185,7 +186,7 @@ public class Vision extends SubsystemBase {
       var estimateStr = "invalid";
       if (isEstimatePresent(optEstimate)) {
         var estimate = optEstimate.get();
-        var pose = estimate.estimatedPose.toPose2d();
+        var pose = estimate.best.toPose2d();
         this.field.getObject(cam.getName()).setPose(pose);
         estimateStr = MoreMath.pos2dToString(pose, 1);
       }

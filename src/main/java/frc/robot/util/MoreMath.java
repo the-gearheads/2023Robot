@@ -61,6 +61,7 @@ public class MoreMath {
     return closest;
   }
 
+  /* find desired's closest congruence class representative to to current */
   public static double getClosestRad(double current, double desired) {
     var result = getClosest(Units.radiansToDegrees(current), Units.radiansToDegrees(desired));
     return Units.degreesToRadians(result);

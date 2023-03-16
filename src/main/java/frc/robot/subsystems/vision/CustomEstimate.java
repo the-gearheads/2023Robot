@@ -5,6 +5,7 @@
 package frc.robot.subsystems.vision;
 
 import java.util.List;
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -20,15 +21,11 @@ public class CustomEstimate {
         /** A list of the targets used to compute this pose */
         public final List<PhotonTrackedTarget> targetsUsed;
 
-        private Pose3d altEstimate;
+        public final Pose3d best;
 
-        private Pose3d bestEstimate;
+        public Matrix<N3, N1> confidence;
 
-        private Matrix<N3, N1> confidence;
-
-        private double algAmbiguity;
-
-        private double bestAmbiguity;
+        public final double ambiguity;
     
         /**
          * Constructs an EstimatedRobotPose
@@ -37,24 +34,17 @@ public class CustomEstimate {
          * @param timestampSeconds timestamp of the estimate
          */
         public CustomEstimate(
-                Pose3d bestEstimate, Pose3d altEstimate, double bestAmbiguity, double altAmbiguity, double timestampSeconds, List<PhotonTrackedTarget> targetsUsed, Matrix<N3, N1> confidence) {
-            this.bestEstimate = bestEstimate;
-            this.altEstimate = altEstimate;
-            this.bestAmbiguity = bestAmbiguity;
-            this.algAmbiguity = altAmbiguity;
+                Pose3d best, double ambiguity, double timestampSeconds, List<PhotonTrackedTarget> targetsUsed, Matrix<N3, N1> confidence) {
+            this.best = best;
+            this.ambiguity = ambiguity;
             this.timestampSeconds = timestampSeconds;
             this.targetsUsed = targetsUsed;
             this.confidence=confidence;
         }
 
         public CustomEstimate(
-            Pose3d bestEstimate, Pose3d altEstimate, double bestAmbiguity, double altAmbiguity, double timestampSeconds, List<PhotonTrackedTarget> targetsUsed) {
-        this(bestEstimate, altEstimate, bestAmbiguity, altAmbiguity, timestampSeconds, targetsUsed, VecBuilder.fill(0.9, 0.9, 0.9));
-        }
-
-        public CustomEstimate(
-            Pose3d bestEstimate, double bestAmbiguity, double timestampSeconds, List<PhotonTrackedTarget> targetsUsed) {
-        this(bestEstimate, null, bestAmbiguity, -1, timestampSeconds, targetsUsed, VecBuilder.fill(0.9, 0.9, 0.9));
+            Pose3d best, double ambiguity, double timestampSeconds, List<PhotonTrackedTarget> targetsUsed) {
+        this(best, ambiguity, timestampSeconds, targetsUsed, VecBuilder.fill(0.9, 0.9, 0.9));
         }
 
 

@@ -34,14 +34,14 @@ public class rotateTo extends CommandBase {
   @Override
   public void initialize() {
     this.satisfactionNumber = 0;
-    var ctsGyroAngle = swerve.getCtsPoseRotRad();
+    var ctsGyroAngle = swerve.getCtsGyroRotWithOffset().getRadians();
     this.optimizedRotGoal=MoreMath.getClosestRad(ctsGyroAngle, rotGoal.getRadians());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    var ctsGyroAngle = swerve.getCtsPoseRotRad();
+    var ctsGyroAngle = swerve.getCtsGyroRotWithOffset().getRadians();
 
     var rotSpd = rotPIDCnt.calculate(ctsGyroAngle, optimizedRotGoal);
     rotSpd = MathUtil.clamp(rotSpd, -3.5, 3.5);
@@ -58,7 +58,7 @@ public class rotateTo extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    var ctsGyroAngle = swerve.getCtsPoseRotRad();
+    var ctsGyroAngle = swerve.getCtsGyroRotWithOffset().getRadians();
 
     if(Math.abs(ctsGyroAngle - optimizedRotGoal) < 0.05){
       satisfactionNumber++;
