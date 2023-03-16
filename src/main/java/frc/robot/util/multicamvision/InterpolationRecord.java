@@ -19,7 +19,7 @@ public class InterpolationRecord implements Interpolatable<InterpolationRecord> 
   public final Pose2d poseMeters;
 
   // The current gyro angle.
-  private final Rotation2d gyroAngle;
+  public final Rotation2d gyroAngle;
 
   // The distances and rotations measured at each module.
   private final SwerveModulePosition[] modulePositions;

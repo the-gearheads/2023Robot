@@ -3,6 +3,7 @@ package frc.robot.util;
 import org.photonvision.targeting.TargetCorner;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -89,4 +90,8 @@ public class MoreMath {
     }
     return pose;
   }
+
+  private static double calculateDifference(Pose3d x, Pose3d y) {
+    return x.getTranslation().getDistance(y.getTranslation());
+}
 }

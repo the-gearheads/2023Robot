@@ -16,6 +16,7 @@ public class PoseBufferWrapper {
   private Supplier<Rotation2d> gyroLambda;
   private Supplier<Pose2d> poseLambda;
   private TimeInterpolatableBuffer<InterpolationRecord> poseBuffer;
+  private static PoseBufferWrapper instance;
 
   public PoseBufferWrapper(Supplier<Pose2d> poseLambda, Supplier<SwerveModulePosition[]> modulePoseLambda,
       Supplier<Rotation2d> gyroLambda, SwerveDriveKinematics kinematics, Consumer<Runnable> setResetBuffer) {
@@ -24,8 +25,13 @@ public class PoseBufferWrapper {
     this.modulePoseLambda = modulePoseLambda;
     this.kinematics = kinematics;
     this.poseBuffer = TimeInterpolatableBuffer.createBuffer(1.5);
-
     setResetBuffer.accept(this::reset);
+
+    instance = this;
+  }
+
+  public static PoseBufferWrapper getInstance(){
+    return instance;
   }
 
   public void update() {
