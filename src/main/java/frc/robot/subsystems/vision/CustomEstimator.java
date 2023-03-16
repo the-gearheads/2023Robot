@@ -30,7 +30,7 @@
  import edu.wpi.first.math.geometry.Transform3d;
  import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.util.MoreMath;
-import frc.robot.util.multicamvision.PoseBufferWrapper;
+import frc.robot.util.vision.PoseBufferWrapper;
 import java.util.ArrayList;
 import java.util.HashSet;
  import java.util.Optional;

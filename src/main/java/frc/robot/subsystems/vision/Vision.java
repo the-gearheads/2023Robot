@@ -29,7 +29,7 @@ import frc.robot.Constants;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.vision.CustomEstimator.PoseStrategy;
 import frc.robot.util.MoreMath;
-import frc.robot.util.multicamvision.PoseBufferWrapper;
+import frc.robot.util.vision.PoseBufferWrapper;
 
 public class Vision extends SubsystemBase {
   public Swerve swerve;

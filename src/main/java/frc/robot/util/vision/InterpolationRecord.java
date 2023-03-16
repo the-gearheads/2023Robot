@@ -1,4 +1,4 @@
-package frc.robot.util.multicamvision;
+package frc.robot.util.vision;
 
 import java.util.Arrays;
 import java.util.Objects;
