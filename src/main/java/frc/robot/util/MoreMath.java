@@ -89,8 +89,8 @@ public class MoreMath {
     return deepCopy;
   }
 
-  public static Pose2d transformByAlliance(Pose2d pose){
-    if(DriverStation.getAlliance() == DriverStation.Alliance.Red){
+  public static Pose2d transformByAlliance(Pose2d pose) {
+    if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
       return new Pose2d(pose.getX(), Constants.FIELD_CONSTANTS.WIDTH - pose.getY(), pose.getRotation());
     }
     return pose;
@@ -98,22 +98,22 @@ public class MoreMath {
 
   private static double calculateDifference(Pose3d x, Pose3d y) {
     return x.getTranslation().getDistance(y.getTranslation());
-}
+  }
 
-/* horizFOV and verFOV expected in degrees */
-public static Matrix<N3, N3> calcCamMatrix(double resWidth, double resHeight, double horizFOV, double verFOV){
-  horizFOV = Units.degreesToRadians(horizFOV);
-  verFOV = Units.degreesToRadians(verFOV);
+  /* horizFOV and verFOV expected in degrees */
+  public static Matrix<N3, N3> calcCamMatrix(double resWidth, double resHeight, double horizFOV, double verFOV) {
+    horizFOV = Units.degreesToRadians(horizFOV);
+    verFOV = Units.degreesToRadians(verFOV);
 
-  
-  var f_x = resWidth / (Math.tan(horizFOV / 2)*2);
-  var f_y = resHeight / (Math.tan(verFOV / 2)*2);
 
-  var camMatrix = new Matrix<>(Nat.N3(), Nat.N3());
-  camMatrix.setColumn(0, VecBuilder.fill(f_x, 0, 0));
-  camMatrix.setColumn(1, VecBuilder.fill(0, f_y, 0));
-  camMatrix.setColumn(2, VecBuilder.fill(resWidth/2, resHeight/2, 1));
+    var f_x = resWidth / (Math.tan(horizFOV / 2) * 2);
+    var f_y = resHeight / (Math.tan(verFOV / 2) * 2);
 
-  return camMatrix;
-}
+    var camMatrix = new Matrix<>(Nat.N3(), Nat.N3());
+    camMatrix.setColumn(0, VecBuilder.fill(f_x, 0, 0));
+    camMatrix.setColumn(1, VecBuilder.fill(0, f_y, 0));
+    camMatrix.setColumn(2, VecBuilder.fill(resWidth / 2, resHeight / 2, 1));
+
+    return camMatrix;
+  }
 }

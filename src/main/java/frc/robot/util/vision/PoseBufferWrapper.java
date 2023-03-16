@@ -28,22 +28,23 @@ public class PoseBufferWrapper {
     this.poseBuffer = TimeInterpolatableBuffer.createBuffer(1.5);
   }
 
-  public static void createBuffers(
-    Supplier<Pose2d> poseLambda, Supplier<Pose2d> wheelPoseLambda, Supplier<SwerveModulePosition[]> modulePoseLambda,
-    Supplier<Rotation2d> gyroLambda, SwerveDriveKinematics kinematics, Consumer<Runnable> setResetBuffer
-  ){
-    PoseBufferWrapper.wheelBufferInstance = new PoseBufferWrapper(wheelPoseLambda, modulePoseLambda, gyroLambda, kinematics);
+  public static void createBuffers(Supplier<Pose2d> poseLambda, Supplier<Pose2d> wheelPoseLambda,
+      Supplier<SwerveModulePosition[]> modulePoseLambda, Supplier<Rotation2d> gyroLambda,
+      SwerveDriveKinematics kinematics, Consumer<Runnable> setResetBuffer) {
+    PoseBufferWrapper.wheelBufferInstance =
+        new PoseBufferWrapper(wheelPoseLambda, modulePoseLambda, gyroLambda, kinematics);
     PoseBufferWrapper.poseBufferInstance = new PoseBufferWrapper(poseLambda, modulePoseLambda, gyroLambda, kinematics);
-    setResetBuffer.accept(()->{
+    setResetBuffer.accept(() -> {
       PoseBufferWrapper.wheelBufferInstance.reset();
       PoseBufferWrapper.poseBufferInstance.reset();
     });
   }
 
-  public static PoseBufferWrapper getPoseInstance(){
+  public static PoseBufferWrapper getPoseInstance() {
     return PoseBufferWrapper.poseBufferInstance;
   }
-  public static PoseBufferWrapper getWheelInstance(){
+
+  public static PoseBufferWrapper getWheelInstance() {
     return PoseBufferWrapper.wheelBufferInstance;
   }
 

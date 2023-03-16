@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Map.Entry;
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.TargetCorner;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -55,14 +53,8 @@ public class Vision extends SubsystemBase {
   }
 
   private void initBuffer() {
-    PoseBufferWrapper.createBuffers(
-      swerve::getPose,
-      swerve::getWheelPose, 
-      swerve::getModulePositions, 
-      swerve::getCtsGyroRotWithOffset, 
-      swerve.kinematics, 
-      swerve::setResetBuffer 
-      );
+    PoseBufferWrapper.createBuffers(swerve::getPose, swerve::getWheelPose, swerve::getModulePositions,
+        swerve::getCtsGyroRotWithOffset, swerve.kinematics, swerve::setResetBuffer);
   }
 
   public void periodic() {
@@ -132,8 +124,8 @@ public class Vision extends SubsystemBase {
   private void initPoseEstimators() {
     estimators = new ArrayList<>();
     for (var camAndTransform : Constants.VISION.CAMS_AND_TRANS.entrySet()) {
-      estimators.add(new CustomEstimator(atfl, PoseStrategy.MIN_AMBIGUITY, camAndTransform.getKey(),
-          camAndTransform.getValue()));
+      estimators.add(
+          new CustomEstimator(atfl, PoseStrategy.MIN_AMBIGUITY, camAndTransform.getKey(), camAndTransform.getValue()));
     }
   }
 

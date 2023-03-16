@@ -8,7 +8,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -184,8 +183,7 @@ public class RobotContainer {
     Controllers.operatorController.openGrabber().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
     Controllers.operatorController.setArmByJoystick().onTrue(new JoystickArmControl(arm));
 
-    Controllers.alignController.alignToGrid()
-    .onTrue(new AlignToGrid(swerve, arm));
+    Controllers.alignController.alignToGrid().onTrue(new AlignToGrid(swerve, arm));
   }
 
   /**

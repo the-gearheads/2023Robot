@@ -1,58 +1,56 @@
 package frc.robot.commands.drive;
 
-import java.sql.Driver;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.Constants;
 import frc.robot.util.MoreMath;
 
 public class PointLeaf {
-    public enum NodeY{
-      N1(1,4.93), N2(2,4.41), N3(3,3.85), 
-      N4(4,3.32), N5(5,2.76), N6(6,2.175),
-      N7(7,1.63), N8(8,1.083), N9(9,0.544);
-      
-      public final double y;
-      public final int index;
-  
-      NodeY(int index, double y){
-        this.index=index;
-        this.y=y;
-      }
+  public enum NodeY {
+    N1(1, 4.93), N2(2, 4.41), N3(3, 3.85), N4(4, 3.32), N5(5, 2.76), N6(6, 2.175), N7(7, 1.63), N8(8, 1.083), N9(9,
+        0.544);
 
-      public static NodeY getByIndex(int index){
-        for(var node : NodeY.values()){
-          if(node.index==index){
-            return node;
-          }
-        }
-        return null;
-      }
+    public final double y;
+    public final int index;
+
+    NodeY(int index, double y) {
+      this.index = index;
+      this.y = y;
     }
-    public enum NodeX{
-      LOW(1, 2.15), MID(2, 2.05), HIGH(3, 1.9);
 
-      public final double x;
-      public final int index;
-
-      NodeX(int index, double x){
-        this.index=index;
-        this.x=x;
-      }
-      public static NodeX getByIndex(int index){
-        for(var node : NodeX.values()){
-          if(node.index==index){
-            return node;
-          }
+    public static NodeY getByIndex(int index) {
+      for (var node : NodeY.values()) {
+        if (node.index == index) {
+          return node;
         }
-        return null;
       }
+      return null;
     }
-  
+  }
+  public enum NodeX {
+    LOW(1, 2.15), MID(2, 2.05), HIGH(3, 1.9);
+
+    public final double x;
+    public final int index;
+
+    NodeX(int index, double x) {
+      this.index = index;
+      this.x = x;
+    }
+
+    public static NodeX getByIndex(int index) {
+      for (var node : NodeX.values()) {
+        if (node.index == index) {
+          return node;
+        }
+      }
+      return null;
+    }
+  }
+
 
   Pose2d pose;
   final List<PointLeaf> children;
@@ -76,11 +74,12 @@ public class PointLeaf {
     return this.pose.getTranslation().getDistance(other.pose.getTranslation());
   }
 
-  public void transformByAlliance(){
-    if(DriverStation.getAlliance() == DriverStation.Alliance.Blue) return;
+  public void transformByAlliance() {
+    if (DriverStation.getAlliance() == DriverStation.Alliance.Blue)
+      return;
 
     this.pose = MoreMath.transformByAlliance(this.pose);
-    for(var child:children){
+    for (var child : children) {
       child.transformByAlliance();
     }
   }

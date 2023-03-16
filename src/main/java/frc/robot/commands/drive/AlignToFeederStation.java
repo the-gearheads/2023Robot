@@ -4,7 +4,6 @@
 
 package frc.robot.commands.drive;
 
-import java.sql.Driver;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -30,9 +29,9 @@ import frc.robot.Constants.AUTO_ALIGN;
 
 public class AlignToFeederStation extends ProxyCommand {
 
-  public AlignToFeederStation(Swerve swerve, Arm arm){
-    super(()->{
-      if(isFarAway(swerve)){
+  public AlignToFeederStation(Swerve swerve, Arm arm) {
+    super(() -> {
+      if (isFarAway(swerve)) {
         return new InstantCommand();
       }
 
@@ -44,51 +43,48 @@ public class AlignToFeederStation extends ProxyCommand {
     var startPose = swerve.getPose();
     var midPose = AUTO_ALIGN.FEEDER_MID_POSE;
 
-    if(DriverStation.getAlliance() == DriverStation.Alliance.Red){
+    if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
       midPose = new Pose2d(midPose.getX(), Constants.FIELD_CONSTANTS.WIDTH - midPose.getY(), midPose.getRotation());
     }
 
     if (midPose.getTranslation().getDistance(startPose.getTranslation()) > 4.5) {
       return true;
-    }else{
+    } else {
       return false;
     }
   }
 
-  public static Command rotateThenRaiseWhileMove(Swerve swerve, Arm arm){
-    Supplier<Command> lambda = ()->{
-    var constraints = new PathConstraints(2, 1);
+  public static Command rotateThenRaiseWhileMove(Swerve swerve, Arm arm) {
+    Supplier<Command> lambda = () -> {
+      var constraints = new PathConstraints(2, 1);
 
-    var startPose = swerve.getPose();
-    var midPose = AUTO_ALIGN.FEEDER_MID_POSE;
-    var endPose = AUTO_ALIGN.FEEDER_END_POSE;
-    
-    midPose = MoreMath.transformByAlliance(midPose);
-    endPose = MoreMath.transformByAlliance(endPose);
+      var startPose = swerve.getPose();
+      var midPose = AUTO_ALIGN.FEEDER_MID_POSE;
+      var endPose = AUTO_ALIGN.FEEDER_END_POSE;
 
-    var startHeading = midPose.getTranslation().minus(startPose.getTranslation()).getAngle();
-    var startPoint = new PathPoint(startPose.getTranslation(), startHeading, startPose.getRotation());
+      midPose = MoreMath.transformByAlliance(midPose);
+      endPose = MoreMath.transformByAlliance(endPose);
 
-    var midHeading = endPose.getTranslation().minus(midPose.getTranslation()).getAngle();
-    var midPoint = new PathPoint(midPose.getTranslation(), midHeading, midPose.getRotation(), 2);
+      var startHeading = midPose.getTranslation().minus(startPose.getTranslation()).getAngle();
+      var startPoint = new PathPoint(startPose.getTranslation(), startHeading, startPose.getRotation());
 
-    var endHeading = midHeading;
-    var endPoint = new PathPoint(endPose.getTranslation(), endHeading, endPose.getRotation());
+      var midHeading = endPose.getTranslation().minus(midPose.getTranslation()).getAngle();
+      var midPoint = new PathPoint(midPose.getTranslation(), midHeading, midPose.getRotation(), 2);
 
-    var traj = PathPlanner.generatePath(constraints, startPoint, midPoint, endPoint);
-    // traj = PathPlannerTrajectory.transformTrajectoryForAlliance(traj, DriverStation.getAlliance());
+      var endHeading = midHeading;
+      var endPoint = new PathPoint(endPose.getTranslation(), endHeading, endPose.getRotation());
 
-    return swerve.silentFollowTrajectoryCommand(traj, false, true);
+      var traj = PathPlanner.generatePath(constraints, startPoint, midPoint, endPoint);
+      // traj = PathPlannerTrajectory.transformTrajectoryForAlliance(traj, DriverStation.getAlliance());
+
+      return swerve.silentFollowTrajectoryCommand(traj, false, true);
     };
 
     return new rotateTo(swerve, Rotation2d.fromDegrees(180))
-    .andThen(
-      new ProxyCommand(lambda)
-      .alongWith(new SetArmPose(arm, ArmPose.FEEDER_STATION))
-    );
+        .andThen(new ProxyCommand(lambda).alongWith(new SetArmPose(arm, ArmPose.FEEDER_STATION)));
   }
 
-  public static Command raiseWhileMoveSlowerOption(Swerve swerve, Arm arm){
+  public static Command raiseWhileMoveSlowerOption(Swerve swerve, Arm arm) {
     var startPose = swerve.getPose();
     var midPose = Constants.AUTO_ALIGN.FEEDER_MID_POSE;
     var endPose = Constants.AUTO_ALIGN.FEEDER_END_POSE;
@@ -110,39 +106,33 @@ public class AlignToFeederStation extends ProxyCommand {
     traj1 = PathPlannerTrajectory.transformTrajectoryForAlliance(traj1, DriverStation.getAlliance());
     traj2 = PathPlannerTrajectory.transformTrajectoryForAlliance(traj2, DriverStation.getAlliance());
 
-    return swerve.followTrajectoryCommand(traj1, false, false)
-    .andThen(
-      new SetArmPose(arm, ArmPose.FEEDER_STATION)
-      .alongWith(swerve.followTrajectoryCommand(traj2, false, true))
-    );
+    return swerve.followTrajectoryCommand(traj1, false, false).andThen(
+        new SetArmPose(arm, ArmPose.FEEDER_STATION).alongWith(swerve.followTrajectoryCommand(traj2, false, true)));
   }
 
   public static Command raiseAndMoveOption(Swerve swerve, Arm arm) {
-      var constraints = new PathConstraints(2, 1);
-      var eventMarkers =Collections.singletonList(
-        new EventMarker(
-          Collections.singletonList( "raise arm" ), 1)
-        );
+    var constraints = new PathConstraints(2, 1);
+    var eventMarkers = Collections.singletonList(new EventMarker(Collections.singletonList("raise arm"), 1));
 
-      var startPose = swerve.getPose();
-      var midPose = AUTO_ALIGN.FEEDER_MID_POSE;
-      var endPose = AUTO_ALIGN.FEEDER_END_POSE;
+    var startPose = swerve.getPose();
+    var midPose = AUTO_ALIGN.FEEDER_MID_POSE;
+    var endPose = AUTO_ALIGN.FEEDER_END_POSE;
 
-      var startHeading = midPose.getTranslation().minus(startPose.getTranslation()).getAngle();
-      var startPoint = new PathPoint(startPose.getTranslation(), startHeading, startPose.getRotation());
+    var startHeading = midPose.getTranslation().minus(startPose.getTranslation()).getAngle();
+    var startPoint = new PathPoint(startPose.getTranslation(), startHeading, startPose.getRotation());
 
-      var midHeading = endPose.getTranslation().minus(midPose.getTranslation()).getAngle();
-      var midPoint = new PathPoint(midPose.getTranslation(), midHeading, midPose.getRotation(), 0.5);
+    var midHeading = endPose.getTranslation().minus(midPose.getTranslation()).getAngle();
+    var midPoint = new PathPoint(midPose.getTranslation(), midHeading, midPose.getRotation(), 0.5);
 
-      var endHeading = midHeading;
-      var endPoint = new PathPoint(endPose.getTranslation(), endHeading, endPose.getRotation());
+    var endHeading = midHeading;
+    var endPoint = new PathPoint(endPose.getTranslation(), endHeading, endPose.getRotation());
 
-      var traj = PathPlanner.generatePath(constraints, eventMarkers, startPoint, midPoint, endPoint);
-      traj = PathPlannerTrajectory.transformTrajectoryForAlliance(traj, DriverStation.getAlliance());
+    var traj = PathPlanner.generatePath(constraints, eventMarkers, startPoint, midPoint, endPoint);
+    traj = PathPlannerTrajectory.transformTrajectoryForAlliance(traj, DriverStation.getAlliance());
 
-      Map<String, Command> eventMap = Collections.singletonMap("raise arm",new SetArmPose(arm, ArmPose.FEEDER_STATION));
+    Map<String, Command> eventMap = Collections.singletonMap("raise arm", new SetArmPose(arm, ArmPose.FEEDER_STATION));
 
-      return new FollowPathWithEvents(swerve.followTrajectoryCommand(traj, false, true), eventMarkers, eventMap);
+    return new FollowPathWithEvents(swerve.followTrajectoryCommand(traj, false, true), eventMarkers, eventMap);
   }
 
   public static Command raiseThenMoveOption(Swerve swerve, Arm arm) {
@@ -152,7 +142,7 @@ public class AlignToFeederStation extends ProxyCommand {
     } else {
       return raiseThenMoveSuboption(swerve, arm);
     }
-}
+  }
 
   public static Command raiseWhileMovingSuboption(Swerve swerve, Arm arm) {
     var startPose = swerve.getPose();

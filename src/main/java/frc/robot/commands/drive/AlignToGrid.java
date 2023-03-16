@@ -15,7 +15,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import frc.robot.Constants;
 import frc.robot.commands.arm.SetArmPose;
@@ -36,7 +35,7 @@ public class AlignToGrid extends ProxyCommand {
     });
   }
 
-  public static Command proxy(Swerve swerve, Arm arm){
+  public static Command proxy(Swerve swerve, Arm arm) {
     var nodePose = getDesiredNodePose();
     var currentPose = swerve.getPose();
 
@@ -76,7 +75,7 @@ public class AlignToGrid extends ProxyCommand {
     return command;
   }
 
-  public static Pose2d getDesiredNodePose(){
+  public static Pose2d getDesiredNodePose() {
     /* Assuming they have a range of 1-3 */
     var chosenGrid = Controllers.alignController.getChosenGrid();
     var chosenY = Controllers.alignController.getChosenY();
@@ -98,9 +97,8 @@ public class AlignToGrid extends ProxyCommand {
     for (var i = 0; i < paths.size() - 1; i++) {
       command = command.andThen(swerve.followTrajectoryCommand(paths.get(i), false, true));
     }
-    command =command.andThen(
-      swerve.followTrajectoryCommand(paths.get(paths.size()-1), false, true)
-      .alongWith(new SetArmPose(arm, ArmPose.HIGH_NODE)));
+    command = command.andThen(swerve.followTrajectoryCommand(paths.get(paths.size() - 1), false, true)
+        .alongWith(new SetArmPose(arm, ArmPose.HIGH_NODE)));
 
     return command;
   }
@@ -152,8 +150,9 @@ public class AlignToGrid extends ProxyCommand {
   public static boolean onChargingStation(Pose2d pose) {
     var xCheck = pose.getX() < 4.45 && pose.getX() > 3.342;
     var yCheck = pose.getY() < 3.7 && pose.getX() > 1.875;
-    if(DriverStation.getAlliance() == DriverStation.Alliance.Red){
-      yCheck = pose.getY() > (Constants.FIELD_CONSTANTS.WIDTH - 3.7) && pose.getY() < (Constants.FIELD_CONSTANTS.WIDTH - 1.875);
+    if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+      yCheck = pose.getY() > (Constants.FIELD_CONSTANTS.WIDTH - 3.7)
+          && pose.getY() < (Constants.FIELD_CONSTANTS.WIDTH - 1.875);
     }
 
     return xCheck && yCheck;
@@ -163,7 +162,7 @@ public class AlignToGrid extends ProxyCommand {
     var xCheck = pose.getX() < 6.309;
     var yCheck = pose.getY() > 5.877;
 
-    if(DriverStation.getAlliance() == DriverStation.Alliance.Red){
+    if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
       yCheck = pose.getY() < (Constants.FIELD_CONSTANTS.WIDTH - 5.877);
     }
     return xCheck && yCheck;

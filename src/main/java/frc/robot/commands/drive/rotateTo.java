@@ -23,9 +23,9 @@ public class rotateTo extends CommandBase {
 
   /** Creates a new rotateTo. */
   public rotateTo(Swerve swerve, Rotation2d rot) {
-    this.swerve=swerve;
+    this.swerve = swerve;
     this.rotGoal = rot;
-  
+
     // Use addRequirements() here to declare subsystem dependencies
     addRequirements(swerve);
   }
@@ -35,7 +35,7 @@ public class rotateTo extends CommandBase {
   public void initialize() {
     this.satisfactionNumber = 0;
     var ctsGyroAngle = swerve.getCtsGyroRotWithOffset().getRadians();
-    this.optimizedRotGoal=MoreMath.getClosestRad(ctsGyroAngle, rotGoal.getRadians());
+    this.optimizedRotGoal = MoreMath.getClosestRad(ctsGyroAngle, rotGoal.getRadians());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -46,7 +46,7 @@ public class rotateTo extends CommandBase {
     var rotSpd = rotPIDCnt.calculate(ctsGyroAngle, optimizedRotGoal);
     rotSpd = MathUtil.clamp(rotSpd, -3.5, 3.5);
 
-    swerve.driveFieldRelative(new ChassisSpeeds(0,0,rotSpd));
+    swerve.driveFieldRelative(new ChassisSpeeds(0, 0, rotSpd));
   }
 
   // Called once the command ends or is interrupted.
@@ -60,12 +60,12 @@ public class rotateTo extends CommandBase {
   public boolean isFinished() {
     var ctsGyroAngle = swerve.getCtsGyroRotWithOffset().getRadians();
 
-    if(Math.abs(ctsGyroAngle - optimizedRotGoal) < 0.05){
+    if (Math.abs(ctsGyroAngle - optimizedRotGoal) < 0.05) {
       satisfactionNumber++;
-    }else{
-      satisfactionNumber=0;
+    } else {
+      satisfactionNumber = 0;
     }
 
-    return satisfactionNumber>5; 
+    return satisfactionNumber > 5;
   }
 }

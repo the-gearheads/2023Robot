@@ -7,15 +7,10 @@ package frc.robot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import org.photonvision.PhotonCamera;
 import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -24,14 +19,10 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.annotations.*;
-import frc.robot.subsystems.drive.Swerve;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.vision.SimCamParams;
 
 /**
@@ -188,10 +179,10 @@ public class Constants extends AnnotatedClass {
     public static double MAX_ROTATIONAL_SPEED = 1;
   }
 
-  public static class AUTO_ALIGN{
+  public static class AUTO_ALIGN {
     public static Pose2d FEEDER_MID_POSE = new Pose2d(14.5, 7.5, Rotation2d.fromDegrees(180));
     public static Pose2d FEEDER_END_POSE = new Pose2d(15.5, 7.5, Rotation2d.fromDegrees(180));
-    public static PathConstraints FEEDER_CONSTRAINTS = new PathConstraints(2,1);
+    public static PathConstraints FEEDER_CONSTRAINTS = new PathConstraints(2, 1);
   }
 
   public static class AUTON {
@@ -243,20 +234,19 @@ public class Constants extends AnnotatedClass {
       }
     };
     public static final AprilTagFieldLayout TEST_ATFL = new AprilTagFieldLayout(TEST_TAGS, 5, 5);
-    }
+  }
 
-    public static final class VISION_SIM{
-      public static final List<SimCamParams> SIM_CAMS_PARAMS = new ArrayList<SimCamParams>(){{
-        add(new SimCamParams(360,
-        9000,1500, 1500, 0,
-        new Transform3d(new Translation3d(0, 0, 1), new Rotation3d()), "target 1"));
-  
-        add(new SimCamParams(360,
-        9000, 1500, 1500, 0,
-        new Transform3d(new Translation3d(0, 1, 1), new Rotation3d()), "target 2"));
-        add(new SimCamParams(360,
-        9000, 1500, 1500, 0,
-        new Transform3d(new Translation3d(0, 1, 1), new Rotation3d(0,0,Math.PI)), "target 3"));
-      }};
-    }
+  public static final class VISION_SIM {
+    public static final List<SimCamParams> SIM_CAMS_PARAMS = new ArrayList<SimCamParams>() {
+      {
+        add(new SimCamParams(360, 9000, 1500, 1500, 0, new Transform3d(new Translation3d(0, 0, 1), new Rotation3d()),
+            "target 1"));
+
+        add(new SimCamParams(360, 9000, 1500, 1500, 0, new Transform3d(new Translation3d(0, 1, 1), new Rotation3d()),
+            "target 2"));
+        add(new SimCamParams(360, 9000, 1500, 1500, 0,
+            new Transform3d(new Translation3d(0, 1, 1), new Rotation3d(0, 0, Math.PI)), "target 3"));
+      }
+    };
+  }
 }

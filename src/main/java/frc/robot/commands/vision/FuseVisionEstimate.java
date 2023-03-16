@@ -4,12 +4,9 @@
 
 package frc.robot.commands.vision;
 
-import org.photonvision.EstimatedRobotPose;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -41,7 +38,7 @@ public class FuseVisionEstimate extends CommandBase {
 
   private void initChooser() {
     trustChooser = new SendableChooser<ConfidenceStrat>();
-    for(var visionTrustType : ConfidenceStrat.values()){
+    for (var visionTrustType : ConfidenceStrat.values()) {
       var key = visionTrustType.name();
       var val = visionTrustType;
       trustChooser.addOption(key, val);
@@ -56,32 +53,33 @@ public class FuseVisionEstimate extends CommandBase {
   @Override
   public void execute() {
     confidenceStrat = trustChooser.getSelected();
-    for(var optEstimate : vision.estimates){
-      if(optEstimate.isEmpty()) continue;
+    for (var optEstimate : vision.estimates) {
+      if (optEstimate.isEmpty())
+        continue;
       var estimate = optEstimate.get();
       Matrix<N3, N1> confidence;
-      switch(confidenceStrat){
+      switch (confidenceStrat) {
         case IRON_PANTHERS:
           confidence = VisionHelper.ironPanthersStdDevs(estimate);
           estimate.setConfidence(confidence);
           fuseEstimate(estimate);
           break;
-         case CASSEROLE:
+        case CASSEROLE:
           confidence = VisionHelper.ROBOT_CASSEROLE_STDEV;
           estimate.setConfidence(confidence);
           var closeTargets = VisionHelper.getAverageTargetToCamDist(estimate) < Constants.FIELD_CONSTANTS.LENGTH * 0.25;
           var isPoseInField = VisionHelper.isPoseInField(estimate);
           var isLevel = VisionHelper.isLevel(vision);
           var acceptableAmbiguity = estimate.ambiguity < 0.15;
-          if(closeTargets && isPoseInField && isLevel && acceptableAmbiguity){
+          if (closeTargets && isPoseInField && isLevel && acceptableAmbiguity) {
             fuseEstimate(estimate);
           }
           break;
-         case MECH_ADV:
+        case MECH_ADV:
           estimate.setConfidence(VisionHelper.mechAdvStdDevs(estimate));
           fuseEstimate(estimate);
-         break;
-         case TEST:
+          break;
+        case TEST:
           fuseEstimate(estimate);
           break;
         default:
