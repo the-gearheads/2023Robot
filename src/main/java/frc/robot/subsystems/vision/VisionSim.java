@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
+import frc.robot.util.MoreMath;
 import frc.robot.util.vision.SimCamParams;
 import frc.robot.util.vision.SimVisionSystem;
 import edu.wpi.first.math.VecBuilder;
@@ -80,7 +81,7 @@ public class VisionSim extends Vision{
             double hypotPixels = Math.hypot(simCamParams.camResWidth, simCamParams.camResHeight);
             var camHorizFOVDegrees = simCamParams.camDiagFOV * simCamParams.camResWidth / hypotPixels;
             var camVertFOVDegrees = simCamParams.camDiagFOV * simCamParams.camResHeight / hypotPixels;
-            var camMatrix = MultiCamPoseEstimator.calcCamMatrix(simCamParams.camResWidth,
+            var camMatrix = MoreMath.calcCamMatrix(simCamParams.camResWidth,
              simCamParams.camResHeight, 
              camHorizFOVDegrees, camVertFOVDegrees);
             simCam.getSimCam().setCameraIntrinsicsMat(camMatrix);

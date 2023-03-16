@@ -1,10 +1,14 @@
 package frc.robot.util;
 
 import org.photonvision.targeting.TargetCorner;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
@@ -94,5 +98,22 @@ public class MoreMath {
 
   private static double calculateDifference(Pose3d x, Pose3d y) {
     return x.getTranslation().getDistance(y.getTranslation());
+}
+
+/* horizFOV and verFOV expected in degrees */
+public static Matrix<N3, N3> calcCamMatrix(double resWidth, double resHeight, double horizFOV, double verFOV){
+  horizFOV = Units.degreesToRadians(horizFOV);
+  verFOV = Units.degreesToRadians(verFOV);
+
+  
+  var f_x = resWidth / (Math.tan(horizFOV / 2)*2);
+  var f_y = resHeight / (Math.tan(verFOV / 2)*2);
+
+  var camMatrix = new Matrix<>(Nat.N3(), Nat.N3());
+  camMatrix.setColumn(0, VecBuilder.fill(f_x, 0, 0));
+  camMatrix.setColumn(1, VecBuilder.fill(0, f_y, 0));
+  camMatrix.setColumn(2, VecBuilder.fill(resWidth/2, resHeight/2, 1));
+
+  return camMatrix;
 }
 }
