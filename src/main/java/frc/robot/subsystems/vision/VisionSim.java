@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
+import frc.robot.util.vision.SimCamParams;
 import frc.robot.util.vision.SimVisionSystem;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
