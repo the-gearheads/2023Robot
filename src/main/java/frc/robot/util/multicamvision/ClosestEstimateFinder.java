@@ -5,19 +5,24 @@
 package frc.robot.util.multicamvision;
 
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N5;
+import edu.wpi.first.wpilibj.Timer;
 
 /** Add your docs here. */
 public class ClosestEstimateFinder {
@@ -52,100 +57,100 @@ public class ClosestEstimateFinder {
     this.poseBuffer.update();
   }
 
-  // public Optional<EstimatedRobotPose> getClosestEstimate(PhotonPoseEstimator estimator, Optional<EstimatedRobotPose> optEstimate) {
-  //   if(!Vision.isEstimatePresent(optEstimate)){
-  //       return optEstimate;
-  //   }
-  //   var estimate = optEstimate.get();
-  //   var altEstimate = getAltEstimate(estimator, estimate);
+  public Optional<EstimatedRobotPose> getClosestEstimate(PhotonPoseEstimator estimator, Optional<EstimatedRobotPose> optEstimate) {
+    if(!Vision.isEstimatePresent(optEstimate)){
+        return optEstimate;
+    }
+    var estimate = optEstimate.get();
+    var altEstimate = getAltEstimate(estimator, estimate);
 
-  //   var syncEstimate = syncEstimate(estimate);
-  //   var syncAltEstimate = syncEstimate(altEstimate);
+    var syncEstimate = syncEstimate(estimate);
+    var syncAltEstimate = syncEstimate(altEstimate);
 
-  //   var diff = diffFromWheelPose(syncEstimate);
-  //   var altDiff = diffFromWheelPose(syncAltEstimate);
-  //   if(diff<altDiff){
-  //       return Optional.of(estimate);
-  //   }else{
-  //       return Optional.of(altEstimate);
-  //   }
-  // }
+    var diff = diffFromWheelPose(syncEstimate);
+    var altDiff = diffFromWheelPose(syncAltEstimate);
+    if(diff<altDiff){
+        return Optional.of(estimate);
+    }else{
+        return Optional.of(altEstimate);
+    }
+  }
 
-  // public EstimatedRobotPose syncEstimate(EstimatedRobotPose estimate) {
-  //   var contempWheelPose = poseBuffer.getSample(estimate.timestampSeconds).get().poseMeters;
-  //   var currentWheelPose = poseBuffer.getSample(Timer.getFPGATimestamp()).get().poseMeters;
-  //   var twist2d = currentWheelPose.log(contempWheelPose);
-  //   var twist3d = new Twist3d(twist2d.dx, twist2d.dy, 0, 0, 0, twist2d.dtheta);
+  public EstimatedRobotPose syncEstimate(EstimatedRobotPose estimate) {
+    var contempWheelPose = poseBuffer.getSample(estimate.timestampSeconds).get().poseMeters;
+    var currentWheelPose = poseBuffer.getSample(Timer.getFPGATimestamp()).get().poseMeters;
+    var twist2d = currentWheelPose.log(contempWheelPose);
+    var twist3d = new Twist3d(twist2d.dx, twist2d.dy, 0, 0, 0, twist2d.dtheta);
 
-  //   var syncPose = estimate.estimatedPose.exp(twist3d);
-  //   var syncEstimate = new EstimatedRobotPose(syncPose, estimate.timestampSeconds, estimate.targetsUsed);
+    var syncPose = estimate.estimatedPose.exp(twist3d);
+    var syncEstimate = new EstimatedRobotPose(syncPose, estimate.timestampSeconds, estimate.targetsUsed);
 
-  //   return syncEstimate;
-  // }
+    return syncEstimate;
+  }
 
-  // private EstimatedRobotPose getAltEstimate(PhotonPoseEstimator estimator, EstimatedRobotPose bestEstimate) {
-  //     // Arrays we need declared up front
-  //     var visCorners = new ArrayList<TargetCorner>();
-  //     var knownVisTags = new ArrayList<AprilTag>();
-  //     var fieldToCams = new ArrayList<Pose3d>();
-  //     var fieldToCamsAlt = new ArrayList<Pose3d>();
+  private EstimatedRobotPose getAltEstimate(PhotonPoseEstimator estimator, EstimatedRobotPose bestEstimate) {
+      // Arrays we need declared up front
+      var visCorners = new ArrayList<TargetCorner>();
+      var knownVisTags = new ArrayList<AprilTag>();
+      var fieldToCams = new ArrayList<Pose3d>();
+      var fieldToCamsAlt = new ArrayList<Pose3d>();
 
-  //     var result = estimator.getCam().getLatestResult();
-  //     var fieldTags = estimator.getFieldTags();
-  //     var camera = estimator.getCam();
-  //     var robotToCamera = estimator.getRobot2Cam();
+      var result = estimator.getCam().getLatestResult();
+      var fieldTags = estimator.getFieldTags();
+      var camera = estimator.getCam();
+      var robotToCamera = estimator.getRobot2Cam();
 
-  //     if (result.getTargets().size() < 2) {
-  //         // Run fallback strategy instead
-  //         var tag = result.getTargets().get(0);
-  //         Pose3d fieldToTag = fieldTags.getTagPose(tag.getFiducialId()).get();
-  //         var altCamToTag = result.targets.get(0).getAlternateCameraToTarget();
-  //         var fieldToRobot = fieldToTag
-  //         .plus(altCamToTag.inverse())
-  //         .plus(estimator.getRobot2Cam().inverse());
-  //         return new EstimatedRobotPose(fieldToRobot, result.getTimestampSeconds(), List.of(tag));
-  //     }
+      if (result.getTargets().size() < 2) {
+          // Run fallback strategy instead
+          var tag = result.getTargets().get(0);
+          Pose3d fieldToTag = fieldTags.getTagPose(tag.getFiducialId()).get();
+          var altCamToTag = result.targets.get(0).getAlternateCameraToTarget();
+          var fieldToRobot = fieldToTag
+          .plus(altCamToTag.inverse())
+          .plus(estimator.getRobot2Cam().inverse());
+          return new EstimatedRobotPose(fieldToRobot, result.getTimestampSeconds(), List.of(tag));
+      }
 
-  //     for (var target : bestEstimate.targetsUsed) {
-  //         visCorners.addAll(target.getDetectedCorners());
+      for (var target : bestEstimate.targetsUsed) {
+          visCorners.addAll(target.getDetectedCorners());
 
-  //         var tagPoseOpt = fieldTags.getTagPose(target.getFiducialId());
-  //         var tagPose = tagPoseOpt.get();
+          var tagPoseOpt = fieldTags.getTagPose(target.getFiducialId());
+          var tagPose = tagPoseOpt.get();
 
-  //         // actual layout poses of visible tags -- not exposed, so have to recreate
-  //         knownVisTags.add(new AprilTag(target.getFiducialId(), tagPose));
+          // actual layout poses of visible tags -- not exposed, so have to recreate
+          knownVisTags.add(new AprilTag(target.getFiducialId(), tagPose));
 
-  //         fieldToCams.add(tagPose.transformBy(target.getBestCameraToTarget().inverse()));
-  //         fieldToCamsAlt.add(tagPose.transformBy(target.getAlternateCameraToTarget().inverse()));
-  //     }
+          fieldToCams.add(tagPose.transformBy(target.getBestCameraToTarget().inverse()));
+          fieldToCamsAlt.add(tagPose.transformBy(target.getAlternateCameraToTarget().inverse()));
+      }
 
-  //     var cameraMatrixOpt = camera.getCameraMatrix();
-  //     var distCoeffsOpt = camera.getDistCoeffs();
-  //     boolean hasCalibData = cameraMatrixOpt.isPresent() && distCoeffsOpt.isPresent();
+      var cameraMatrixOpt = camera.getCameraMatrix();
+      var distCoeffsOpt = camera.getDistCoeffs();
+      boolean hasCalibData = cameraMatrixOpt.isPresent() && distCoeffsOpt.isPresent();
 
-  //     // multi-target solvePNP
-  //     if (hasCalibData) {
-  //         var cameraMatrix = cameraMatrixOpt.get();
-  //         var distCoeffs = distCoeffsOpt.get();
-  //         var pnpResults =
-  //                 VisionEstimation.estimateCamPosePNP(cameraMatrix, distCoeffs, visCorners, knownVisTags);
-  //         var alt = new Pose3d()
-  //         .plus(pnpResults.alt) // field-to-camera
-  //         .plus(robotToCamera.inverse()); // field-to-robot
+      // multi-target solvePNP
+      if (hasCalibData) {
+          var cameraMatrix = cameraMatrixOpt.get();
+          var distCoeffs = distCoeffsOpt.get();
+          var pnpResults =
+                  VisionEstimation.estimateCamPosePNP(cameraMatrix, distCoeffs, visCorners, knownVisTags);
+          var alt = new Pose3d()
+          .plus(pnpResults.alt) // field-to-camera
+          .plus(robotToCamera.inverse()); // field-to-robot
 
-  //         return new EstimatedRobotPose(alt, result.getTimestampSeconds(), result.getTargets());
-  //     } else {
-  //         // TODO fallback strategy? Should we just always do solvePNP?
-  //         return null;
-  //     }
-  // }
+          return new EstimatedRobotPose(alt, result.getTimestampSeconds(), result.getTargets());
+      } else {
+          // TODO fallback strategy? Should we just always do solvePNP?
+          return null;
+      }
+  }
 
-  // private double calculateDifference(Pose3d x, Pose3d y) {
-  //     return x.getTranslation().getDistance(y.getTranslation());
-  // }
+  private double calculateDifference(Pose3d x, Pose3d y) {
+      return x.getTranslation().getDistance(y.getTranslation());
+  }
 
-  // private double diffFromWheelPose(EstimatedRobotPose estimate){
-  //     var currentWheelPose = poseBuffer.getSample(estimate.timestampSeconds).get().poseMeters;
-  //     return calculateDifference(new Pose3d(currentWheelPose), estimate.estimatedPose);
-  // }
+  private double diffFromWheelPose(EstimatedRobotPose estimate){
+      var currentWheelPose = poseBuffer.getSample(estimate.timestampSeconds).get().poseMeters;
+      return calculateDifference(new Pose3d(currentWheelPose), estimate.estimatedPose);
+  }
 }

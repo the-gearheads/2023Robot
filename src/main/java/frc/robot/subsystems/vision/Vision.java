@@ -54,7 +54,7 @@ public class Vision extends SubsystemBase {
   }
 
   public void periodic() {
-    // updateAtflOrigin();
+    updateAtflOrigin();
     updateEstimates();
     closestEstimateFinder.update();
     logTagPoses();
@@ -132,14 +132,6 @@ public class Vision extends SubsystemBase {
   private void initClosestEstimateFinder() {
     this.closestEstimateFinder =
         new ClosestEstimateFinder(Constants.VISION.CAMS_AND_TRANS, getAtfl(), swerve.kinematics);
-    // this.multiCamPoseEstimator = new MultiCamPoseEstimator(
-    //   Constants.VISION.CAMS_AND_TRANS, 
-    //   getAtfl(), 
-    //   swerve::getWheelPose, 
-    //   swerve::getModulePositions, 
-    //   swerve::getRotation,
-    //   swerve.kinematics, 
-    //   swerve::setResetBuffer);
   }
 
   public void logTagPoses() {
