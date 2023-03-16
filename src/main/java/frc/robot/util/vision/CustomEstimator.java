@@ -22,13 +22,14 @@
  * SOFTWARE.
  */
 
- package frc.robot.subsystems.vision;
+ package frc.robot.util.vision;
 
  import edu.wpi.first.apriltag.AprilTag;
  import edu.wpi.first.apriltag.AprilTagFieldLayout;
  import edu.wpi.first.math.geometry.Pose3d;
  import edu.wpi.first.math.geometry.Transform3d;
  import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.util.vision.ExtendedCustomEstimate;
 import frc.robot.util.MoreMath;
 import frc.robot.util.vision.PoseBufferWrapper;
 import java.util.ArrayList;

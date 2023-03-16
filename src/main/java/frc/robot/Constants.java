@@ -31,7 +31,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.annotations.*;
 import frc.robot.subsystems.drive.Swerve;
-import frc.robot.subsystems.vision.CustomEstimate;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.vision.SimCamParams;
 
@@ -244,52 +243,6 @@ public class Constants extends AnnotatedClass {
       }
     };
     public static final AprilTagFieldLayout TEST_ATFL = new AprilTagFieldLayout(TEST_TAGS, 5, 5);
-
-    public static final Function<CustomEstimate, Matrix<N3, N1>> IRON_PANTHERS_FUNC = (estimate)->{
-      double POSE_AMBIGUITY_SHIFTER = 0.2;
-      double POSE_AMBIGUITY_MULTIPLIER = 4;
-      double NOISY_DISTANCE_METERS = 2.5;
-      double DISTANCE_WEIGHT = 7;  
-      int TAG_PRESENCE_WEIGHT = 10;
-      Matrix<N3, N1> VISION_MEASUREMENT_STANDARD_DEVIATIONS = Matrix.mat(Nat.N3(), Nat.N1())
-      .fill(
-          // if these numbers are less than one, multiplying will do bad things
-          1, // x
-          1, // y
-          1 * Math.PI // theta
-          );
-      
-      double smallestDistance = Double.POSITIVE_INFINITY;
-      for (var target : estimate.targetsUsed) {
-        var t3d = target.getBestCameraToTarget();
-        var distance =
-            Math.sqrt(Math.pow(t3d.getX(), 2) + Math.pow(t3d.getY(), 2) + Math.pow(t3d.getZ(), 2));
-        if (distance < smallestDistance) smallestDistance = distance;
-      }
-      double poseAmbiguityFactor =
-          estimate.targetsUsed.size() != 1
-              ? 1
-              : Math.max(
-                  1,
-                  (estimate.targetsUsed.get(0).getPoseAmbiguity()
-                          + POSE_AMBIGUITY_SHIFTER)
-                      * POSE_AMBIGUITY_MULTIPLIER);
-      double confidenceMultiplier =
-          Math.max(
-              1,
-              (Math.max(
-                          1,
-                          Math.max(0, smallestDistance - NOISY_DISTANCE_METERS)
-                              * DISTANCE_WEIGHT)
-                      * poseAmbiguityFactor)
-                  / (1
-                      + ((estimate.targetsUsed.size() - 1) * TAG_PRESENCE_WEIGHT)));
-      
-      var confidence = VISION_MEASUREMENT_STANDARD_DEVIATIONS.times(confidenceMultiplier);
-      return confidence;
-      };
-
-    public static final Matrix<N3, N1> ROBOT_CASSEROLE_STDEV = VecBuilder.fill(0.9, 0.9, 0.009);
     }
 
     public static final class VISION_SIM{

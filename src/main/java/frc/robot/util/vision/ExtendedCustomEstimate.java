@@ -1,4 +1,4 @@
-package frc.robot.subsystems.vision;
+package frc.robot.util.vision;
 
 import java.util.List;
 import org.photonvision.targeting.PhotonTrackedTarget;

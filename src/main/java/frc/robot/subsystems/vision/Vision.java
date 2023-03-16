@@ -27,8 +27,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.Swerve;
-import frc.robot.subsystems.vision.CustomEstimator.PoseStrategy;
+import frc.robot.util.vision.CustomEstimator.PoseStrategy;
 import frc.robot.util.MoreMath;
+import frc.robot.util.vision.CustomEstimate;
+import frc.robot.util.vision.CustomEstimator;
 import frc.robot.util.vision.PoseBufferWrapper;
 
 public class Vision extends SubsystemBase {
