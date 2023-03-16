@@ -32,6 +32,7 @@ import frc.robot.subsystems.drive.Swerve;
 import frc.robot.auton.AutonChooser;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.leds.Leds;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmSim;
 import frc.robot.subsystems.wrist.Wrist;
@@ -59,7 +60,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Swerve swerve;
   @SuppressWarnings("unused")
-  // private final Vision vision;
+  private final Vision vision;
   private final AutonChooser autonChooser;
   private final Arm arm;
   private Wrist wrist;
@@ -113,7 +114,7 @@ public class RobotContainer {
     }
 
     grabber = new Grabber();
-    // vision = new Vision(swerve);
+    vision = new Vision(swerve);
     autonChooser = new AutonChooser(swerve, arm, wrist, grabber);
     leds = new Leds();
     // Configure the button binding

@@ -26,31 +26,20 @@
 
  import edu.wpi.first.apriltag.AprilTag;
  import edu.wpi.first.apriltag.AprilTagFieldLayout;
- import edu.wpi.first.math.Pair;
- import edu.wpi.first.math.geometry.Pose2d;
  import edu.wpi.first.math.geometry.Pose3d;
- import edu.wpi.first.math.geometry.Rotation3d;
  import edu.wpi.first.math.geometry.Transform3d;
- import edu.wpi.first.math.geometry.Translation3d;
  import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.util.MoreMath;
 import frc.robot.util.multicamvision.PoseBufferWrapper;
-import java.security.cert.CertStore;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
- import java.util.List;
  import java.util.Optional;
  import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.commons.io.filefilter.CanExecuteFileFilter;
-import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.estimation.VisionEstimation;
  import org.photonvision.targeting.PhotonPipelineResult;
- import org.photonvision.targeting.PhotonTrackedTarget;
  import org.photonvision.targeting.TargetCorner;
-import com.fasterxml.jackson.databind.cfg.BaseSettings;
  
  /**
   * The PhotonPoseEstimator class filters or combines readings from all the AprilTags visible at a

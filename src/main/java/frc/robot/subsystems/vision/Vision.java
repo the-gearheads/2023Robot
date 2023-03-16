@@ -232,6 +232,9 @@ public class Vision extends SubsystemBase {
       var akPath = path + "ak/";
       Logger.getInstance().recordOutput(akPath + "tag poses", akTagPosesArray);
       Logger.getInstance().recordOutput(akPath + "tag ids", akTagIdsArray);
+
+      field.getObject("Robot Pose").setPose(swerve.getPose());
+      field.getObject("Wheel Pose").setPose(swerve.getWheelPose());
     }
   }
 }
