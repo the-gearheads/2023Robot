@@ -219,7 +219,9 @@ public class Constants extends AnnotatedClass {
     public static final HashMap<PhotonCamera, Transform3d> CAMS_AND_TRANS = new HashMap<PhotonCamera, Transform3d>() {
       {
         put(new PhotonCamera("ov9281"), 
-        new Transform3d());
+        new Transform3d(new Translation3d(0,0,0),new Rotation3d(
+          Units.degreesToRadians(0),
+          Units.degreesToRadians(-80),0)));
         // new Transform3d(
         //   new Translation3d(
         //     Units.inchesToMeters(21.552), 
@@ -233,7 +235,7 @@ public class Constants extends AnnotatedClass {
     public static final List<AprilTag> TEST_TAGS = new ArrayList<AprilTag>() {
       {
         var id1Pose = new Pose3d(2.5, 2.5, 0, new Rotation3d(0,0,0));
-        var id1Toid8 = new Transform3d(new Translation3d(0, 0.2413, 0), new Rotation3d(0,0,0));
+        var id1Toid8 = new Transform3d(new Translation3d(0, 0.2159, 0), new Rotation3d(0,0,0));
         var id8Pose = id1Pose.plus(id1Toid8);
 
         add(new AprilTag(1, id1Pose));
