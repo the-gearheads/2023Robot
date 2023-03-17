@@ -6,7 +6,6 @@ package frc.robot.commands.drive;
 
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -22,8 +21,8 @@ import frc.robot.util.SwerveRateLimit;
 /** An example command that uses an example subsystem. */
 public class TeleopDrive extends CommandBase {
   private final Swerve swerve;
-  private PIDController rotPIDCnt = new PIDController(5d, 0d, 0d);
-  private SwerveRateLimit rateLimiter = new SwerveRateLimit();
+  private final PIDController rotPIDCnt = new PIDController(5d, 0d, 0d);
+  private final SwerveRateLimit rateLimiter = new SwerveRateLimit();
   private double angleGoal;
   private double lastRotSpdNotEqualZeroTimestamp = -1;
 
@@ -38,7 +37,6 @@ public class TeleopDrive extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerve);
     SmartDashboard.putBoolean("TeleopDrive/UseFieldRelative", true);
-    SmartDashboard.putBoolean("TeleopDrive/ExponentialJoystickControl", false);
     SmartDashboard.putBoolean("TeleopDrive/RateLimitDrive", false);
     SmartDashboard.putBoolean("TeleopDrive/rot pid/Turn On", true);
     SmartDashboard.putData("TeleopDrive/rot pid/PID Controller", rotPIDCnt);
@@ -48,8 +46,7 @@ public class TeleopDrive extends CommandBase {
   @Override
   public void initialize() {
     // swerve.setPose(new Pose2d());
-    var ctsGyroAngle = swerve.getCtsPoseRotRad();
-    angleGoal = ctsGyroAngle;
+    angleGoal = swerve.getCtsPoseRotRad();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -65,25 +62,21 @@ public class TeleopDrive extends CommandBase {
     var rotSpd = Controllers.driverController.getRotateAxis();
 
     var spds = new ChassisSpeeds(xSpd, ySpd, rotSpd);
-
-    logSpds("deadbanded", spds);
+    logSpds("Inputs", spds);
 
     spds = cube(spds);
-
     logSpds("Cubed", spds);
 
-    spds = rateLimit(spds);
-
-    logSpds("rate limited", spds);
+    if(SmartDashboard.getBoolean("TeleopDrive/RateLimitDrive", false)) {
+      spds = rateLimit(spds);
+      logSpds("Rate Limited", spds);
+    }
 
     spds = scaleVel(spds);
-
-    logSpds("scaled", spds);
+    logSpds("Scaled", spds);
 
     cardinalBtns();
     spds = maintainHeading(spds);
-
-    logSpds("final", spds);
 
     if (SmartDashboard.getBoolean("TeleopDrive/UseFieldRelative", true)) {
       swerve.driveFieldRelative(spds);
@@ -93,33 +86,10 @@ public class TeleopDrive extends CommandBase {
   }
 
   private void cardinalBtns() {
-    var heading0 = Controllers.driverController.getSetHeading0Btn().getAsBoolean();
-    var heading90 = Controllers.driverController.getSetHeading90Btn().getAsBoolean();
-    var heading180 = Controllers.driverController.getSetHeading180Btn().getAsBoolean();
-    var heading270 = Controllers.driverController.getSetHeading270Btn().getAsBoolean();
-
+    double heading = Controllers.driverController.getSetHeadingPOV();
     var ctsGyroAngle = swerve.getCtsPoseRotRad();
-
-    SmartDashboard.putNumber("Actual Heading #", Controllers.driverController.getPOV());
-    if (heading0) {
-      SmartDashboard.putNumber("Heading #", 0);
-      angleGoal = MoreMath.getClosestRad(ctsGyroAngle, Units.degreesToRadians(0));
-      SmartDashboard.putNumber("more math", angleGoal);
-    } else if (heading90) {
-      SmartDashboard.putNumber("Heading #", 90);
-      angleGoal = MoreMath.getClosestRad(ctsGyroAngle, Units.degreesToRadians(90));
-      SmartDashboard.putNumber("more math", angleGoal);
-    } else if (heading180) {
-      SmartDashboard.putNumber("Heading #", 180);
-      angleGoal = MoreMath.getClosestRad(ctsGyroAngle, Units.degreesToRadians(180));
-      SmartDashboard.putNumber("more math", angleGoal);
-    } else if (heading270) {
-      SmartDashboard.putNumber("Heading #", 270);
-      angleGoal = MoreMath.getClosestRad(ctsGyroAngle, Units.degreesToRadians(270));
-      SmartDashboard.putNumber("more math", angleGoal);
-    } else {
-      SmartDashboard.putNumber("Heading #", -1);
-    }
+    if(heading == -1) return;
+    angleGoal = MoreMath.getClosestRad(ctsGyroAngle, Units.degreesToRadians(0));
   }
 
   public ChassisSpeeds cube(ChassisSpeeds spds) {
@@ -127,17 +97,10 @@ public class TeleopDrive extends CommandBase {
     var ySpd = spds.vyMetersPerSecond;
     var rotSpd = spds.omegaRadiansPerSecond;
 
-    boolean useExponentialJoystickControl = SmartDashboard.getBoolean("TeleopDrive/ExponentialJoystickControl", false);
-    if (useExponentialJoystickControl) {
-      Pair<Double, Double> xyPair = MoreMath.poseExp(xSpd, ySpd);
-      xSpd = xyPair.getFirst();
-      ySpd = xyPair.getSecond();
-    } else {
-      //Cubic axis control (yes, i intentionally put the signum there in case we want to change to an even power)
-      xSpd = Math.abs(Math.pow(xSpd, 3)) * Math.signum(xSpd);
-      ySpd = Math.abs(Math.pow(ySpd, 3)) * Math.signum(ySpd);
-      rotSpd = Math.abs(Math.pow(rotSpd, 3)) * Math.signum(rotSpd);
-    }
+    //Cubic axis control (yes, i intentionally put the signum there in case we want to change to an even power)
+    xSpd = Math.abs(Math.pow(xSpd, 3)) * Math.signum(xSpd);
+    ySpd = Math.abs(Math.pow(ySpd, 3)) * Math.signum(ySpd);
+    rotSpd = Math.abs(Math.pow(rotSpd, 3)) * Math.signum(rotSpd);
 
     return new ChassisSpeeds(xSpd, ySpd, rotSpd);
   }
@@ -181,11 +144,7 @@ public class TeleopDrive extends CommandBase {
     var currentTime = Timer.getFPGATimestamp();
     var waited = currentTime - lastRotSpdNotEqualZeroTimestamp > 0.1;
 
-    if (!waited && rotSpdEqualZero) {
-      SmartDashboard.putBoolean("waiting", true);
-    } else {
-      SmartDashboard.putBoolean("waiting", false);
-    }
+    SmartDashboard.putBoolean("waiting", !waited && rotSpdEqualZero);
     if (runRotPid && rotSpdEqualZero && waited) {
       rotSpd = rotPIDCnt.calculate(ctsGyroAngle, angleGoal);
       Logger.getInstance().recordOutput("TeleopDrive/rot pid/rotSpd", rotSpd);

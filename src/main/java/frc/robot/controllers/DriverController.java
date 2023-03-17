@@ -59,21 +59,7 @@ public interface DriverController {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getSetHeading0Btn() {
-    return new Trigger(() -> false);
-  };
-
-  public default Trigger getSetHeading90Btn() {
-    return new Trigger(() -> false);
-  };
-
-  public default Trigger getSetHeading180Btn() {
-    return new Trigger(() -> false);
-  };
-
-  public default Trigger getSetHeading270Btn() {
-    return new Trigger(() -> false);
-  };
+  public default double getSetHeadingPOV() { return -1; }
 
   public default double getPOV() {
     return -1;
