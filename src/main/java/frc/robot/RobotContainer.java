@@ -32,6 +32,7 @@ import frc.robot.auton.AutonChooser;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionSim;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmSim;
 import frc.robot.subsystems.wrist.Wrist;
@@ -91,6 +92,7 @@ public class RobotContainer {
             new SwerveModule(3, DRIVE.RR_IDS[0], DRIVE.RR_IDS[1], DRIVE.RR_OFFSETS, "RR"));
         arm = new Arm();
         wrist = new Wrist(arm);
+        vision = new Vision(swerve);
         break;
       case SIM:
         SmartDashboard.putString("/Mode", "SIM");
@@ -101,6 +103,7 @@ public class RobotContainer {
                 new SwerveModuleSim(3, DRIVE.RR_IDS[0], DRIVE.RR_IDS[1], DRIVE.RR_OFFSETS, "RR"));
         arm = new ArmSim();
         wrist = new WristSim((ArmSim) arm);
+        vision = new Vision(swerve);
         break;
       default:
       case SIM_REPLAY:
@@ -109,11 +112,11 @@ public class RobotContainer {
             new SwerveModuleIO() {});
         arm = new ArmSim();
         wrist = new WristSim((ArmSim) arm);
+        vision = new Vision(swerve);
         break;
     }
 
     grabber = new Grabber();
-    vision = new Vision(swerve);
     autonChooser = new AutonChooser(swerve, arm, wrist, grabber);
     leds = new Leds();
     // Configure the button binding

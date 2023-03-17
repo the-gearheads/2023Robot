@@ -1,5 +1,7 @@
 package frc.robot.util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import org.photonvision.targeting.TargetCorner;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -14,23 +16,29 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 
 public class MoreMath {
+  
+  public static double round(double value, int places) {
+    if (places < 0) throw new IllegalArgumentException();
+    if (Double.isNaN(value)) return value;
+    if (Double.isInfinite(value)) return value;
 
-  private MoreMath() {}
-
-  // More or less https://stackoverflow.com/a/5295202 but could be easily reimplemented
-  public static double round(double num, int places) {
-    return ((int) (num * Math.pow(10, places))) / (double) Math.pow(10, places);
-  }
+      BigDecimal bd = new BigDecimal(Double.toString(value));
+      bd = bd.setScale(places, RoundingMode.HALF_UP);
+      return bd.doubleValue();
+}
 
   public static String pos2dToString(Pose2d pos, int places) {
-    return "X="  + round(pos.getX(), places) + 
-         "; Y="  + round(pos.getY(), places) + 
-         "; Deg="+ round(pos.getRotation().getDegrees(), places);
-    return "X=" + pos.getX() + "; Y=" + pos.getY() + "; Deg=" + pos.getRotation().getDegrees();
+    return "("  + round(pos.getX(), places) + 
+         ", "  + round(pos.getY(), places) + 
+         ", "+ round(pos.getRotation().getDegrees(), places) + 
+         ")";
+    // return "X=" + pos.getX() + "; Y=" + pos.getY() + "; Deg=" + pos.getRotation().getDegrees();
   }
 
-  public static String cornerToString(TargetCorner corner, int places) {
-    return "(" + round(corner.x, places) + ", " + round(corner.y, places) + ")";
+  public static String cornerToString(TargetCorner corner, int places){
+    return "("  + round(corner.x, places) + 
+         ", "  + round(corner.y, places)+
+         ")";
   }
 
   /* Pose exp for teleop drive. Takes in controller x and y axises and outputs pose exped ones */

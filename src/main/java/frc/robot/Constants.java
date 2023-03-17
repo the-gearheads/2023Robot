@@ -222,7 +222,7 @@ public class Constants extends AnnotatedClass {
         new Translation3d(
         Units.inchesToMeters(21.552), 
         Units.inchesToMeters(12.855-7.5),
-        48.24), 
+        Units.inchesToMeters(48.24)), 
         new Rotation3d(0,0,Units.degreesToRadians(-36))));
         // put(new PhotonCamera("lifecam"), new Transform3d(new Translation3d(0, 0.05, 0), new Rotation3d()));
       }
@@ -244,13 +244,13 @@ public class Constants extends AnnotatedClass {
   public static final class VISION_SIM {
     public static final List<SimCamParams> SIM_CAMS_PARAMS = new ArrayList<SimCamParams>() {
       {
-        add(new SimCamParams(360, 9000, 1500, 1500, 0, new Transform3d(new Translation3d(0, 0, 1), new Rotation3d()),
-            "target 1"));
-
-        add(new SimCamParams(360, 9000, 1500, 1500, 0, new Transform3d(new Translation3d(0, 1, 1), new Rotation3d()),
-            "target 2"));
-        add(new SimCamParams(360, 9000, 1500, 1500, 0,
-            new Transform3d(new Translation3d(0, 1, 1), new Rotation3d(0, 0, Math.PI)), "target 3"));
+        add(new SimCamParams(92, 9000, 640, 400, 0, new Transform3d(
+          new Translation3d(
+          Units.inchesToMeters(21.552), 
+          Units.inchesToMeters(12.855-7.5),
+          Units.inchesToMeters(48.24)), 
+          new Rotation3d(0,0,Units.degreesToRadians(-36))),
+            "ov9281"));
       }
     };
   }

@@ -108,9 +108,9 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  public static boolean isEstimatePresent(Optional<CustomEstimate> estimatedRobotPos) {
-    return estimatedRobotPos.isPresent() && estimatedRobotPos.get().best != null
-        && estimatedRobotPos.get().best.getRotation() != null;
+  public static boolean isEstimatePresent(Optional<CustomEstimate> estimate) {
+    return estimate.isPresent() && estimate.get().best != null
+        && estimate.get().best.getRotation() != null;
   }
 
   private void initAtfl() {
@@ -184,6 +184,8 @@ public class Vision extends SubsystemBase {
         var pose = estimate.best.toPose2d();
         this.field.getObject(cam.getName()).setPose(pose);
         estimateStr = MoreMath.pos2dToString(pose, 1);
+      }else{
+        var the =1;
       }
 
       var timestamp = cam.getLatestResult().getTimestampSeconds();
@@ -213,7 +215,8 @@ public class Vision extends SubsystemBase {
 
       var path = "vision/" + cam.getName() + "/";
       Logger.getInstance().recordOutput(path + "status", statusStr);
-      Logger.getInstance().recordOutput(path + "estimate", estimateStr);
+      if(!estimateStr.equals("invalid"))
+        Logger.getInstance().recordOutput(path + "estimate", estimateStr);
       Logger.getInstance().recordOutput(path + "timestamp", timestamp);
       Logger.getInstance().recordOutput(path + "cam matrix", camMatrixPresent);
       Logger.getInstance().recordOutput(path + "dist coeff", distCoeffPresent);
