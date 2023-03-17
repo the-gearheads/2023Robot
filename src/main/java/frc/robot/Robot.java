@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.revrobotics.CANSparkMaxLowLevel;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -119,6 +120,7 @@ public class Robot extends LoggedRobot {
     }
     TestPlaceThenDock.initDockTestingTelemetry();
     robotContainer.setTeleopDefault();
+    CANSparkMaxLowLevel.enableExternalUSBControl(false);
   }
 
   /** This function is called periodically during operator control. */
@@ -129,6 +131,7 @@ public class Robot extends LoggedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+    CANSparkMaxLowLevel.enableExternalUSBControl(true);
   }
 
   /** This function is called periodically during test mode. */
