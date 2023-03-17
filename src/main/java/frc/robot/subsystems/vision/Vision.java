@@ -115,8 +115,8 @@ public class Vision extends SubsystemBase {
 
   private void initAtfl() {
     try {
-      // this.atfl = Constants.VISION.;
-      this.atfl = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
+      this.atfl = Constants.VISION.TEST_ATFL;
+      // this.atfl = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
     } catch (Exception e) {//I really wish we could be doing this in constants.java, not here lol (if you can fix this, plz do)
       DriverStation.reportError("Welp, if ur reading this, imma guess ur getting a nullpointer exception.", true);
     }
@@ -131,17 +131,19 @@ public class Vision extends SubsystemBase {
   }
 
   public void logTagPoses() {
-    /* Loop through estimators */
+    /* Loop through estimators/cams */
     for (var i = 0; i < estimators.size(); i++) {
+      //create camera and transform variables to ease access
       var camAndTrans = (Entry<PhotonCamera, Transform3d>) Constants.VISION.CAMS_AND_TRANS.entrySet().toArray()[i];
       var cam = camAndTrans.getKey();
       var robot2Cam = camAndTrans.getValue();
-      var optEstimate = estimates.get(i);
 
+      //prepare arrays
       var tagIds = new ArrayList<Integer>();
-      var tagPoses = new ArrayList<Pose3d>();
-      var robotEstPerTag = new ArrayList<Pose2d>();
       var tagCorners = new ArrayList<TargetCorner>();
+      var fieldToTags = new ArrayList<Pose3d>();
+      var fieldToRobots = new ArrayList<Pose2d>();
+      var camToTags = new ArrayList<Transform3d>();
 
       /* Loop through targets */
       for (var target : cam.getLatestResult().getTargets()) {
@@ -150,42 +152,45 @@ public class Vision extends SubsystemBase {
 
         var tagPoseOpt = atfl.getTagPose(id);
         if (tagPoseOpt.isEmpty()) {
-          tagPoses.add(new Pose3d());
-          robotEstPerTag.add(new Pose2d());
+          fieldToTags.add(new Pose3d());
+          fieldToRobots.add(new Pose2d());
+          camToTags.add(new Transform3d());
+          tagCorners.addAll(Collections.emptyList());
           continue;
         }
 
-        var tagPose = tagPoseOpt.get();
-        var estRobotPose =
-            tagPose.transformBy(target.getBestCameraToTarget().inverse()).transformBy(robot2Cam.inverse()).toPose2d();
+        var fieldToTag = tagPoseOpt.get();
+        var fieldToRobot =
+            fieldToTag.transformBy(target.getBestCameraToTarget().inverse()).transformBy(robot2Cam.inverse()).toPose2d();
+        var corners = target.getDetectedCorners(); // actually 4, but who cares about understandable variable naming lol
 
-        var corner = target.getDetectedCorners(); // actually 4, but who cares about understandable variable naming lol
-
-        tagPoses.add(tagPose);
-        robotEstPerTag.add(estRobotPose);
-        tagCorners.addAll(corner);
+        fieldToTags.add(fieldToTag);
+        fieldToRobots.add(fieldToRobot);
+        tagCorners.addAll(corners);
+        camToTags.add(target.getBestCameraToTarget());
       }
 
       /* Prepare values for logging */
       var tagIdsArray = tagIds.stream().mapToLong(Long::valueOf).toArray();
 
-      var robotEstPerTagStrs = robotEstPerTag.stream().map((estRobotPose) -> MoreMath.pos2dToString(estRobotPose, 1))
+      var fieldToRobotStrs = fieldToRobots.stream().map((estRobotPose) -> MoreMath.pos2dToString(estRobotPose, 1))
           .toList().toArray(new String[0]);
 
-      var tagPoseStrs = tagPoses.stream().map((tagPose) -> (MoreMath.pos2dToString(tagPose.toPose2d(), 1))).toList()
+      var fieldToTagStrs = fieldToTags.stream().map((tagPose) -> (MoreMath.pos2dToString(tagPose.toPose2d(), 1))).toList()
           .toArray(new String[0]);
 
       var tagCornersStr =
           tagCorners.stream().map((corner) -> MoreMath.cornerToString(corner, 1)).toList().toArray(new String[0]);
 
-      var estimateStr = "invalid";
+      var optEstimate = estimates.get(i);
+      var estimateStatus = "invalid";
+      var estimateStr = "";
       if (isEstimatePresent(optEstimate)) {
+        estimateStatus = "valid";
         var estimate = optEstimate.get();
         var pose = estimate.best.toPose2d();
         this.field.getObject(cam.getName()).setPose(pose);
         estimateStr = MoreMath.pos2dToString(pose, 1);
-      }else{
-        var the =1;
       }
 
       var timestamp = cam.getLatestResult().getTimestampSeconds();
@@ -200,7 +205,7 @@ public class Vision extends SubsystemBase {
         distCoeffPresent = "valid";
       }
 
-      var statusStr = cam.isConnected() ? "connected" : "disconnected";
+      var camPresent = cam.isConnected() ? "connected" : "disconnected";
 
       List<Pose3d> akTagPoses = new ArrayList<>();
       List<Integer> akTagIds = new ArrayList<>();
@@ -209,13 +214,14 @@ public class Vision extends SubsystemBase {
         akTagPoses.add(swervePose.transformBy(target.getBestCameraToTarget()));
         akTagIds.add(target.getFiducialId());
       }
-      var akTagPosesArray = tagPoses.toArray(new Pose3d[tagPoses.size()]);
+      var akTagPosesArray = fieldToTags.toArray(new Pose3d[fieldToTags.size()]);
       /* May be slightly cursed */
       var akTagIdsArray = tagIds.stream().mapToLong(Long::valueOf).toArray();
 
       var path = "vision/" + cam.getName() + "/";
-      Logger.getInstance().recordOutput(path + "status", statusStr);
-      if(!estimateStr.equals("invalid"))
+      Logger.getInstance().recordOutput(path + "cam status", camPresent);
+      Logger.getInstance().recordOutput(path + "estimate status", estimateStatus);
+      if(!estimateStatus.equals("invalid"))
         Logger.getInstance().recordOutput(path + "estimate", estimateStr);
       Logger.getInstance().recordOutput(path + "timestamp", timestamp);
       Logger.getInstance().recordOutput(path + "cam matrix", camMatrixPresent);
@@ -224,8 +230,8 @@ public class Vision extends SubsystemBase {
       var targetPath = path + "targets/";
       Logger.getInstance().recordOutput(targetPath + "tag ids", tagIdsArray);
       Logger.getInstance().recordOutput(targetPath + "tag corners", tagCornersStr);
-      Logger.getInstance().recordOutput(targetPath + "tag poses", tagPoseStrs);
-      Logger.getInstance().recordOutput(targetPath + "robot est per tag", robotEstPerTagStrs);
+      Logger.getInstance().recordOutput(targetPath + "tag poses", fieldToTagStrs);
+      Logger.getInstance().recordOutput(targetPath + "robot est per tag", fieldToRobotStrs);
 
       var akPath = path + "ak/";
       Logger.getInstance().recordOutput(akPath + "tag poses", akTagPosesArray);
