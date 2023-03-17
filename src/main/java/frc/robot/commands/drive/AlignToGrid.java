@@ -92,13 +92,24 @@ public class AlignToGrid extends ProxyCommand {
     return new Pose2d(xVal, yVal, Rotation2d.fromDegrees(180));
   }
 
+  public static ArmPose getDesiredArmPose(){
+    var chosenX = Controllers.alignController.getChosenX();
+    if(chosenX == 1){
+      return ArmPose.HIGH_NODE;
+    }else if(chosenX == 2){
+      return ArmPose.MID_NODE;
+    }else{
+      return ArmPose.LOW_NODE;
+    }
+  }
+
   public static Command pathsToCommand(Swerve swerve, Arm arm, ArrayList<PathPlannerTrajectory> paths, Pose2d endPose) {
     Command command = new InstantCommand();
     for (var i = 0; i < paths.size() - 1; i++) {
       command = command.andThen(swerve.followTrajectoryCommand(paths.get(i), false, true));
     }
     command = command.andThen(swerve.followTrajectoryCommand(paths.get(paths.size() - 1), false, true)
-        .alongWith(new SetArmPose(arm, ArmPose.HIGH_NODE)));
+        .alongWith(new SetArmPose(arm, getDesiredArmPose())));
 
     return command;
   }

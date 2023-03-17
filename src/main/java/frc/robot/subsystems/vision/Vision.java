@@ -14,6 +14,7 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.TargetCorner;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -114,8 +115,8 @@ public class Vision extends SubsystemBase {
 
   private void initAtfl() {
     try {
-      this.atfl = Constants.VISION.TEST_ATFL;
-      // this.atfl = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
+      // this.atfl = Constants.VISION.;
+      this.atfl = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
     } catch (Exception e) {//I really wish we could be doing this in constants.java, not here lol (if you can fix this, plz do)
       DriverStation.reportError("Welp, if ur reading this, imma guess ur getting a nullpointer exception.", true);
     }

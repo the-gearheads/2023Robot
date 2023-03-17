@@ -23,9 +23,9 @@ public class MoreMath {
   }
 
   public static String pos2dToString(Pose2d pos, int places) {
-    // return "X="  + round(pos.getX(), places) + 
-    //      "; Y="  + round(pos.getY(), places) + 
-    //      "; Deg="+ round(pos.getRotation().getDegrees(), places);
+    return "X="  + round(pos.getX(), places) + 
+         "; Y="  + round(pos.getY(), places) + 
+         "; Deg="+ round(pos.getRotation().getDegrees(), places);
     return "X=" + pos.getX() + "; Y=" + pos.getY() + "; Deg=" + pos.getRotation().getDegrees();
   }
 

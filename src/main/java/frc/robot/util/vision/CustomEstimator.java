@@ -200,6 +200,7 @@ public class CustomEstimator {
         break;
       case MIN_AMBIGUITY:
         estimatedPose = minAmbiguityStrategy(cameraResult);
+        break;
       default:
         DriverStation.reportError("[PhotonPoseEstimator] Unknown Position Estimation Strategy!", false);
         return Optional.empty();

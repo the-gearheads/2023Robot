@@ -218,8 +218,13 @@ public class Constants extends AnnotatedClass {
   public static final class VISION {
     public static final HashMap<PhotonCamera, Transform3d> CAMS_AND_TRANS = new HashMap<PhotonCamera, Transform3d>() {
       {
-        put(new PhotonCamera("ov9281"), new Transform3d());
-        put(new PhotonCamera("lifecam"), new Transform3d(new Translation3d(0, 0.05, 0), new Rotation3d()));
+        put(new PhotonCamera("ov9281"), new Transform3d(
+        new Translation3d(
+        Units.inchesToMeters(21.552), 
+        Units.inchesToMeters(12.855-7.5),
+        48.24), 
+        new Rotation3d(0,0,Units.degreesToRadians(-36))));
+        // put(new PhotonCamera("lifecam"), new Transform3d(new Translation3d(0, 0.05, 0), new Rotation3d()));
       }
     };
 
