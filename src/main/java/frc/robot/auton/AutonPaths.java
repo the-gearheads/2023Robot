@@ -133,14 +133,15 @@ public class AutonPaths {
         AutonHelper.getGroundPickUpCommand(s),
 
         AutonHelper.stowAnd(s,
-            AutonHelper.getCommandForPath("GamePiece1-Inert3-Prime", false, defaultConstraints, s.swerve)),
+            AutonHelper.getCommandForPath("GamePiece1-Inert3-Prime", false, defaultConstraints, s.swerve))
 
-        new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+        // new SetArmPose(s.arm, ArmPose.HIGH_NODE),
 
-        AutonHelper.getCommandForPath("InertN3-StartN3", true, defaultConstraints, s.swerve),
+        // AutonHelper.getCommandForPath("InertN3-StartN3", true, defaultConstraints, s.swerve),
 
-        // place game piece
-        AutonHelper.getPlaceConeCommand(s));
+        // // place game piece
+        // AutonHelper.getPlaceConeCommand(s)
+        );
   }
 
   public static Command InertN92Cone(Subsystems s){
