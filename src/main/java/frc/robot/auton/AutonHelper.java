@@ -56,30 +56,34 @@ public class AutonHelper {
   }
 
   public static PathPlannerTrajectory getPathByName(String pathName, PathConstraints constraints) {
+    return getPathByName(pathName, constraints, false);
+  }
+
+  public static PathPlannerTrajectory getPathByName(String pathName, PathConstraints constraints, boolean reversed) {
     //just curious what it will give us
     Logger.getInstance().recordOutput("Auton/Event Name", DriverStation.getEventName());
     if (DriverStation.getAlliance() == Alliance.Red) {
-      var overridePath = PathPlanner.loadPath(Constants.AUTON.EVENT_NAME + "_Red_" + pathName, constraints);
+      var overridePath = PathPlanner.loadPath(Constants.AUTON.EVENT_NAME + "_Red_" + pathName, constraints, reversed);
       if (overridePath != null) {
         Logger.getInstance().recordOutput("Auton/Last Loaded Path", Constants.AUTON.EVENT_NAME + "_Red_" + pathName);
         return overridePath;
       }
     } else {
-      var overridePath = PathPlanner.loadPath(Constants.AUTON.EVENT_NAME + "_Blue_" + pathName, constraints);
+      var overridePath = PathPlanner.loadPath(Constants.AUTON.EVENT_NAME + "_Blue_" + pathName, constraints, reversed);
       if (overridePath != null) {
         Logger.getInstance().recordOutput("Auton/Last Loaded Path", Constants.AUTON.EVENT_NAME + "_Blue_" + pathName);
         return overridePath;
       }
     }
     /* Both alliances */
-    var path = PathPlanner.loadPath(Constants.AUTON.EVENT_NAME + "_" + pathName, constraints);
+    var path = PathPlanner.loadPath(Constants.AUTON.EVENT_NAME + "_" + pathName, constraints, reversed);
     if (path != null) {
       Logger.getInstance().recordOutput("Auton/Last Loaded Path", Constants.AUTON.EVENT_NAME + "_" + pathName);
       return path;
     }
 
     /* Actual path */
-    path = PathPlanner.loadPath(pathName, constraints);
+    path = PathPlanner.loadPath(pathName, constraints, reversed);
     if (path == null) {
       DriverStation.reportError("Failed to load path: " + pathName, true);
     }
@@ -87,12 +91,15 @@ public class AutonHelper {
     Logger.getInstance().recordOutput("Auton/Last Loaded Path", pathName);
     return path;
   }
-
   public static Command getCommandForPath(String pathName, boolean resetOdometry, PathConstraints constraints,
       Swerve swerve) {
+    return getCommandForPath(pathName, resetOdometry, constraints, swerve, false);
+      }
+  public static Command getCommandForPath(String pathName, boolean resetOdometry, PathConstraints constraints,
+      Swerve swerve, boolean reversed) {
     return new CustomProxy(() -> {
       //   var path = PathPlanner.loadPath(pathName, constraints);
-      var path = getPathByName(pathName, constraints);
+      var path = getPathByName(pathName, constraints, reversed);
       return swerve.followTrajectoryCommand(path, resetOdometry, true);
     });
   }

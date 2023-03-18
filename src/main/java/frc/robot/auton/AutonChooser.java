@@ -81,7 +81,9 @@ public class AutonChooser {
     Command justPlace = AutonPaths.InertN1Place(s);
     Command doubleCone = AutonPaths.InertN12ConePrime(s);
     Command InertN1Safe2Cone = AutonPaths.InertN1SafeTwoCone(s);
+    Command N92Cone = AutonPaths.InertN92Cone(s);
 
+    autons.put("BUMP 2 cone", N92Cone);
     autons.put("2 cone", doubleCone);
     autons.put("NO BUMP Place Then Move", InertN1PlaceThenExplore);
     autons.put("N4 Place Then Dock", InertN4PlaceThenDock);
