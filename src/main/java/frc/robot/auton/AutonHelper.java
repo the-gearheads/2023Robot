@@ -18,6 +18,7 @@ import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.drive.Swerve;
+import frc.robot.util.CustomProxy;
 
 public class AutonHelper {
 
@@ -89,10 +90,10 @@ public class AutonHelper {
 
   public static Command getCommandForPath(String pathName, boolean resetOdometry, PathConstraints constraints,
       Swerve swerve) {
-    return new ProxyCommand(() -> {
+    return new CustomProxy(() -> {
       //   var path = PathPlanner.loadPath(pathName, constraints);
       var path = getPathByName(pathName, constraints);
-      return swerve.silentFollowTrajectoryCommand(path, resetOdometry, true);
+      return swerve.followTrajectoryCommand(path, resetOdometry, true);
     });
   }
 
