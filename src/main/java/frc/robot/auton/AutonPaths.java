@@ -140,13 +140,13 @@ public class AutonPaths {
           var path = AutonHelper.getPathByName("GamePiece1-StartN9", defaultConstraints);
           var pathCommand = AutonHelper.getCommandForPath("GamePiece1-StartN9", false, defaultConstraints, s.swerve);
           HashMap<String, Command> eventMap = new HashMap<>();
-          eventMap.put("arm_toggle", new SetArmPose(s.arm, ArmPose.HIGH_NODE));
+          eventMap.put("arm_toggle", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT));
 
           return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);
-        }),
+        }));
 
         // place game piece
-        AutonHelper.getPlaceConeCommand(s));
+        // AutonHelper.getPlaceConeCommand(s));
   }
   // public static CommandBase InertN4ExploreOverStationDock(Subsystems s) {
   //   return new SequentialCommandGroup(setInitPose(s, "InertN4-StartN4"), new SetArmPose(s.arm, ArmPose.HIGH_NODE),
