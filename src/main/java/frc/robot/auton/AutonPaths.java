@@ -1,6 +1,9 @@
 package frc.robot.auton;
 
+import java.util.HashMap;
 import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.commands.FollowPathWithEvents;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -9,7 +12,9 @@ import frc.robot.Constants;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.AutoBalance;
+import frc.robot.commands.drive.rotateTo;
 import frc.robot.subsystems.Subsystems;
+import frc.robot.util.CustomProxy;
 
 // format: off
 public class AutonPaths {
@@ -101,6 +106,44 @@ public class AutonPaths {
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
 
         AutonHelper.getCommandForPath("InertN3-StartN3", true, defaultConstraints, s.swerve),
+
+        // place game piece
+        AutonHelper.getPlaceConeCommand(s));
+  }
+
+  public static Command InertN92Cone(Subsystems s){
+    return new SequentialCommandGroup(
+      AutonHelper.setInitPose(s, "InertN9-StartN9"),
+
+        // Move forward
+        new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+
+        AutonHelper.getCommandForPath("InertN9-StartN9", true, defaultConstraints, s.swerve),
+
+        // place game piece
+        AutonHelper.getPlaceConeCommand(s),
+
+        new CustomProxy(()->{
+          var path = AutonHelper.getPathByName("StartN9-GamePiece1", defaultConstraints);
+          var pathCommand = AutonHelper.getCommandForPath("StartN9-GamePiece1", false, defaultConstraints, s.swerve);
+          HashMap<String, Command> eventMap = new HashMap<>();
+          eventMap.put("arm_toggle", new SetArmPose(s.arm, ArmPose.FLOOR));
+
+          return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);
+        }),
+
+        new rotateTo(s.swerve, Rotation2d.fromDegrees(0)),
+        AutonHelper.getGroundPickUpCommand(s),
+        new rotateTo(s.swerve, Rotation2d.fromDegrees(180)),
+
+        new CustomProxy(()->{
+          var path = AutonHelper.getPathByName("GamePiece1-StartN9", defaultConstraints);
+          var pathCommand = AutonHelper.getCommandForPath("GamePiece1-StartN9", false, defaultConstraints, s.swerve);
+          HashMap<String, Command> eventMap = new HashMap<>();
+          eventMap.put("arm_toggle", new SetArmPose(s.arm, ArmPose.HIGH_NODE));
+
+          return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);
+        }),
 
         // place game piece
         AutonHelper.getPlaceConeCommand(s));
