@@ -101,7 +101,7 @@ public class AutonPaths {
 
         new rotateTo(s.swerve, Rotation2d.fromDegrees(180)),
         
-        AutonHelper.stowAnd(s, AutonHelper.getCommandForPath("GamePiece1-InertN3-No-Turn", false, defaultConstraints, s.swerve)),
+        AutonHelper.stowAnd(s, AutonHelper.getCommandForPath("GamePiece1-InertN3-No-Turn", false, defaultConstraints, s.swerve))
 
         // places cone
         // new SetArmPose(s.arm, ArmPose.HIGH_NODE),
