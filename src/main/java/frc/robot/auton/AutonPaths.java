@@ -131,6 +131,7 @@ public class AutonPaths {
                 new WaitCommand(1), new SetArmPose(s.arm, ArmPose.FLOOR))),
 
         AutonHelper.getGroundPickUpCommand(s),
+        new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT),
 
         AutonHelper.stowAnd(s,
             AutonHelper.getCommandForPath("GamePiece1-Inert3-Prime", false, defaultConstraints, s.swerve))
