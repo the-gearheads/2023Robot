@@ -19,7 +19,10 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -161,19 +164,13 @@ public class Vision extends SubsystemBase {
         }
 
         var fieldToTag = tagPoseOpt.get();
-        // var fieldToRobot =
-        //     fieldToTag
-        //     .transformBy(target.getBestCameraToTarget().inverse())
-        //     .transformBy(robot2Cam.inverse());
+        var fieldToRobot =
+            fieldToTag
+            .transformBy(target.getBestCameraToTarget().inverse())
+            .transformBy(robot2Cam.inverse());
         var fieldToCam = fieldToTag
             .transformBy(target.getBestCameraToTarget().inverse());
 
-        var fieldToRobot = 
-        MoreMath.transformBy(
-        MoreMath.transformBy(fieldToTag, 
-        target.getBestCameraToTarget().inverse()),
-        robot2Cam.inverse());
-        
         var corners = target.getDetectedCorners(); // actually 4, but who cares about understandable variable naming lol
 
         fieldToCams.add(fieldToCam);

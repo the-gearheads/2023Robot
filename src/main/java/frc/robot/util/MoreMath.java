@@ -158,6 +158,10 @@ public class MoreMath {
       current.getTranslation().plus(other.getTranslation().rotateBy(current.getRotation())),
       addRotation3d(current.getRotation(), other.getRotation()));
   }
+
+  public static Pose3d transformTwice(Pose3d current, Transform3d other, Transform3d another){
+    return transformBy(transformBy(current, other), another);
+  }
   
   public static Rotation3d addRotation3d(Rotation3d current, Rotation3d other){
     return new Rotation3d(
