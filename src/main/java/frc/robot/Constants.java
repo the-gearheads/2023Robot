@@ -5,13 +5,16 @@
 package frc.robot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.photonvision.PhotonCamera;
 import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagDetection;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -212,26 +215,53 @@ public class Constants extends AnnotatedClass {
   }
 
   public static final class VISION {
-    public static final HashMap<PhotonCamera, Transform3d> CAMS_AND_TRANS = new HashMap<PhotonCamera, Transform3d>() {
-      {
-        put(new PhotonCamera("ov9281"), 
-        new Transform3d(new Translation3d(
-          Units.inchesToMeters(13.625),
-          Units.inchesToMeters(-18),
-          Units.inchesToMeters(9.5)),
+    public static final HashMap<PhotonCamera, Transform3d> CAMS_AND_TRANS = new HashMap<PhotonCamera, Transform3d>() {{
+        var robotTip = new Transform3d(
+          new Translation3d(
+            Units.inchesToMeters(12.9 - 1),
+            Units.inchesToMeters(12.875),
+            Units.inchesToMeters(48.1)
+          ),
+          new Rotation3d(0,0,0));
+
+         var ov9281Delta = new Transform3d(
+          new Translation3d(
+            Units.inchesToMeters(0),
+            Units.inchesToMeters(-7.375),
+            Units.inchesToMeters(1)
+          ),
           new Rotation3d(
-          Units.degreesToRadians(0),
-          Units.degreesToRadians(7.5),
-          Units.degreesToRadians(-45))));
-        // new Transform3d(
-        //   new Translation3d(
-        //     Units.inchesToMeters(21.552), 
-        //     Units.inchesToMeters(12.855-7.5),
-        //     Units.inchesToMeters(48.24)), 
-        //     new Rotation3d(0,0,Units.degreesToRadians(-36))));
-        // put(new PhotonCamera("lifecam"), new Transform3d(new Translation3d(0, 0.05, 0), new Rotation3d()));
+            Units.degreesToRadians(29+180),
+            7.4,0
+          )
+        );
+        var lifecamDelta = new Transform3d(
+          new Translation3d(
+            Units.inchesToMeters(0),
+            Units.inchesToMeters(-18.5),
+            Units.inchesToMeters(1)
+          ),
+          new Rotation3d(
+            Units.degreesToRadians(-29+180),
+            0,0
+          )
+        );
+
+      put(new PhotonCamera("ov9281"),
+      robotTip.plus(ov9281Delta)
+      );
+      put(new PhotonCamera("lifecam"),
+      robotTip.plus(lifecamDelta)
+      );
+    }};
+
+    public static AprilTagFieldLayout FIELD_ATFL = null;
+    static {
+      try{
+        FIELD_ATFL = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
+      }catch(Exception e){
       }
-    };
+    }
 
     public static final List<AprilTag> TEST_TAGS = new ArrayList<AprilTag>() {
       {
@@ -244,6 +274,23 @@ public class Constants extends AnnotatedClass {
       }
     };
     public static final AprilTagFieldLayout TEST_ATFL = new AprilTagFieldLayout(TEST_TAGS, 5, 5);
+
+    public static final AprilTagFieldLayout SHOP_ATFL;
+    static{
+      var apriltagsCopy = new ArrayList<AprilTag>();
+      for(var apriltag : FIELD_ATFL.getTags()){
+        apriltagsCopy.add(new AprilTag(apriltag.ID, apriltag.pose));
+      }
+
+      apriltagsCopy.get(4-1).pose = new Pose3d(
+        Units.inchesToMeters(340),
+        apriltagsCopy.get(6-1).pose.getY() + Units.inchesToMeters(-133 + 49.875),
+        apriltagsCopy.get(4-1).pose.getZ(),
+        apriltagsCopy.get(4-1).pose.getRotation()
+      );
+
+      SHOP_ATFL = new AprilTagFieldLayout(apriltagsCopy, FIELD_CONSTANTS.LENGTH, FIELD_CONSTANTS.WIDTH);
+    }
   }
 
   public static final class VISION_SIM {
