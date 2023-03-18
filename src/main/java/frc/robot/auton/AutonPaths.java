@@ -103,11 +103,12 @@ public class AutonPaths {
         
         AutonHelper.stowAnd(s, AutonHelper.getCommandForPath("GamePiece1-InertN3-No-Turn", false, defaultConstraints, s.swerve)),
 
-        new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+        // places cone
+        // new SetArmPose(s.arm, ArmPose.HIGH_NODE),
 
-        AutonHelper.getCommandForPath("InertN3-StartN3", false, defaultConstraints, s.swerve),
+        // AutonHelper.getCommandForPath("InertN3-StartN3", false, defaultConstraints, s.swerve),
 
-        AutonHelper.getPlaceConeCommand(s)
+        // AutonHelper.getPlaceConeCommand(s)
     );
   }
 
