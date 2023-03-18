@@ -3,12 +3,17 @@ package frc.robot.util;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import org.photonvision.targeting.TargetCorner;
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -101,7 +106,7 @@ public class MoreMath {
     return closest;
   }
 
-  /* find desired's closest congruence class representative to to current */
+  /* find desired's closest congruence class representative to current */
   public static double getClosestRad(double current, double desired) {
     var result = getClosest(Units.radiansToDegrees(current), Units.radiansToDegrees(desired));
     return Units.degreesToRadians(result);
@@ -169,5 +174,41 @@ public class MoreMath {
       current.getY() + other.getY(),
       current.getZ() + other.getZ()
     );
+  }
+
+  public static Rotation2d calcHeading(Pose2d start, Pose2d end){
+    var heading = end.getTranslation().minus(start.getTranslation()).getAngle();
+    return heading;
+  }
+
+  public static PathPlannerTrajectory createStraightPath(Pose2d start, Pose2d end, PathConstraints constraints){
+      var heading = calcHeading(start, end);      
+      var startPoint = createPathPoint(start, heading);
+      var endPoint = createPathPoint(end, heading);
+
+      var traj = PathPlanner.generatePath(constraints, startPoint, endPoint);
+      return traj;
+  }
+
+  public static PathPoint createPathPoint(Pose2d pose, Rotation2d heading){
+    return new PathPoint(pose.getTranslation(), heading, pose.getRotation());
+  }
+
+  public static boolean within(double val, double firstBound, double secondBound){
+      double lowerBound;
+      double upperBound;
+      if(firstBound<secondBound){
+        lowerBound = firstBound;
+        upperBound = secondBound;
+      }else{
+        lowerBound = secondBound;
+        upperBound = firstBound;
+      }
+
+      return val > lowerBound && val < upperBound;
+  }
+
+  public static boolean isBlue(){
+    return DriverStation.getAlliance() == DriverStation.Alliance.Blue;
   }
 }

@@ -91,4 +91,14 @@ public class VisionHelper {
 
   public static final Matrix<N3, N1> ROBOT_CASSEROLE_STDEV = VecBuilder.fill(0.9, 0.9, 0.009);
 
+  public static boolean casseroleShouldFuse(CustomEstimate estimate, Vision vision){
+    var closeTargets = VisionHelper.getAverageTargetToCamDist(estimate) < Constants.FIELD_CONSTANTS.LENGTH * 0.25;
+    var isPoseInField = VisionHelper.isPoseInField(estimate);
+    var isLevel = VisionHelper.isLevel(vision);
+    var acceptableAmbiguity = estimate.ambiguity < 0.15;
+    if (closeTargets && isPoseInField && isLevel && acceptableAmbiguity) {
+      return true;
+    }
+    return false;
+  }
 }

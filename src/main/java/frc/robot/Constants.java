@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -179,12 +180,6 @@ public class Constants extends AnnotatedClass {
     public static double MAX_ROTATIONAL_SPEED = 1;
   }
 
-  public static class AUTO_ALIGN {
-    public static Pose2d FEEDER_MID_POSE = new Pose2d(14.5, 7.5, Rotation2d.fromDegrees(180));
-    public static Pose2d FEEDER_END_POSE = new Pose2d(15.5, 7.5, Rotation2d.fromDegrees(180));
-    public static PathConstraints FEEDER_CONSTRAINTS = new PathConstraints(2, 1);
-  }
-
   public static class AUTON {
     public static PIDController X_PID = new PIDController(5, 0, 0);//0.5
     public static PIDController Y_PID = new PIDController(5, 0, 0);//0.5
@@ -262,5 +257,45 @@ public class Constants extends AnnotatedClass {
             "ov9281"));
       }
     };
+  }
+  
+  public static class AUTO_ALIGN {
+    public enum FieldType{
+      SHOP, REAL;
+    }
+    public static FieldType fieldType = FieldType.REAL;
+
+    public static class FEEDER{
+      public static final double Y_THRESHOLD = 0.5;
+      public static final double ROT_THRESHOLD = 20;//in degrees
+      public static final double ARM_THRESHOLD = 20;//in degrees
+      public static final double MIN_X = 10;
+    public static final double MIN_Y = 5.6;
+    public static final double MAX_Y = FIELD_CONSTANTS.WIDTH;
+    public static final double MAX_X = FIELD_CONSTANTS.LENGTH;
+    
+      public static double DIST_THRESHOLD = 1;
+      public static Pose2d PREP_POSE;
+      public static Pose2d DEST_POSE;
+      public static Transform2d PREP2DEST = new Transform2d(new Translation2d(-1, 0), new Rotation2d());
+      public static PathConstraints CONSTRAINTS = new PathConstraints(2, 1);
+
+      static{
+        switch(fieldType){
+          case REAL:
+            FEEDER.DEST_POSE = new Pose2d(15.5, 7.5, Rotation2d.fromDegrees(180));
+            FEEDER.PREP_POSE = FEEDER.DEST_POSE.transformBy(FEEDER.PREP2DEST.inverse());
+          break;
+          case SHOP:
+            FEEDER.DEST_POSE = new Pose2d(7.5, 2.5, Rotation2d.fromDegrees(180));
+            FEEDER.PREP_POSE = FEEDER.DEST_POSE.transformBy(FEEDER.PREP2DEST.inverse());
+          break;
+        }
+      }
+    }
+
+
+    
+
   }
 }

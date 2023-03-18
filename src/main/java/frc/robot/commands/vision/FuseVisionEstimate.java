@@ -46,7 +46,7 @@ public class FuseVisionEstimate extends CommandBase {
 
     trustChooser.setDefaultOption(confidenceStrat.name(), confidenceStrat);
 
-    SmartDashboard.putData(trustChooser);
+    SmartDashboard.putData("vision/trust chooser", trustChooser);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -67,11 +67,7 @@ public class FuseVisionEstimate extends CommandBase {
         case CASSEROLE:
           confidence = VisionHelper.ROBOT_CASSEROLE_STDEV;
           estimate.setConfidence(confidence);
-          var closeTargets = VisionHelper.getAverageTargetToCamDist(estimate) < Constants.FIELD_CONSTANTS.LENGTH * 0.25;
-          var isPoseInField = VisionHelper.isPoseInField(estimate);
-          var isLevel = VisionHelper.isLevel(vision);
-          var acceptableAmbiguity = estimate.ambiguity < 0.15;
-          if (closeTargets && isPoseInField && isLevel && acceptableAmbiguity) {
+          if(VisionHelper.casseroleShouldFuse(estimate, vision)) {
             fuseEstimate(estimate);
           }
           break;

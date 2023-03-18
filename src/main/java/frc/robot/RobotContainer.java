@@ -106,7 +106,7 @@ public class RobotContainer {
         arm = new ArmSim();
         wrist = new WristSim((ArmSim) arm);
         vision = new Vision(swerve);
-        vision.setDefaultCommand(new FuseVisionEstimate(vision, ConfidenceStrat.MECH_ADV));
+        // vision.setDefaultCommand(new FuseVisionEstimate(vision, ConfidenceStrat.MECH_ADV));
         break;
       default:
       case SIM_REPLAY:
