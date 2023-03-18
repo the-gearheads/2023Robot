@@ -114,6 +114,37 @@ public class AutonPaths {
 
   /* NOT USED FOR WAYNE STATE (add back later)----------------------------------------------------------------------- */
 
+  public static Command InertN4GrabThenDock(Subsystems s) {
+    return new SequentialCommandGroup(
+      AutonHelper.setInitPose(s, "InertN4-StartN4"),
+
+        // Move forward
+        new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+
+        AutonHelper.getCommandForPath("InertN4-StartN4", true, defaultConstraints, s.swerve),
+
+        // place game piece
+        AutonHelper.getPlaceConeCommand(s),
+
+        new CustomProxy(()->{
+          var path = AutonHelper.getPathByName("StartN4-ExploreOverStation-GamePiece2", defaultConstraints);
+          var pathCommand = AutonHelper.getCommandForPath("StartN4-ExploreOverStation-GamePiece2", false, defaultConstraints, s.swerve);
+          HashMap<String, Command> eventMap = new HashMap<>();
+          eventMap.put("stow_arm", new SetArmPose(s.arm, ArmPose.FLOOR));
+
+          return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);
+        }),
+        
+        AutonHelper.getGroundPickUpCommand(s),
+        new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT),
+
+        AutonHelper.stowAnd(s,
+            AutonHelper.getCommandForPath("ExploreOverStation-Dock", false, defaultConstraints, s.swerve)),
+
+        new AutoBalance(s.swerve)
+        );
+  }
+
   public static Command InertN12ConePrime(Subsystems s) {
     return new SequentialCommandGroup(AutonHelper.setInitPose(s, "InertN1-StartN1"),
 
@@ -191,7 +222,8 @@ public class AutonPaths {
   //       stowAnd(s,
   //           getCommandForPath("StartN4-ExploreOverStation", false, defaultConstraints, s.swerve),
   //           getCommandForPath("ExploreOverStation-Dock", false, defaultConstraints, s.swerve),
-  //           new AutoBalance(s.swerve)));
+  //           new AutoBalance(s.swerve))
+        // );
   // }
 
   // public static CommandBase InertN1PlaceThenDock(Subsystems s) {
