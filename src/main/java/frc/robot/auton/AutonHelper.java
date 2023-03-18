@@ -22,6 +22,7 @@ import frc.robot.util.CustomProxy;
 
 public class AutonHelper {
 
+  //format:off
   /* Places a cone on the grid
    * ASSUPTIONS: Cone being held, arm in correct position, alt mode corresponds to setting wrist to 0deg, and default sets it to 90deg
    */
@@ -32,10 +33,13 @@ public class AutonHelper {
   }
 
   public static Command getGroundPickUpCommand(Subsystems s) {
-    return new SequentialCommandGroup(getGrabberOpenCommand(s.grabber), new WaitCommand(0.25),
+    return  new SequentialCommandGroup(getGrabberOpenCommand(s.grabber), new WaitCommand(0.25),
         new AltWristControl(s.wrist).raceWith(
-            new SequentialCommandGroup(new WaitCommand(0.5), getGrabberCloseCommand(s.grabber), new WaitCommand(0.25))),
-        new WaitCommand(0.25));
+            new SequentialCommandGroup(
+              new WaitCommand(1), 
+              getGrabberCloseCommand(s.grabber), 
+              new WaitCommand(1))),
+        new WaitCommand(1));
   }
 
   public static Command stowAnd(Subsystems s, Command... commands) {
@@ -113,3 +117,4 @@ public class AutonHelper {
     });
   }
 }
+//format:on

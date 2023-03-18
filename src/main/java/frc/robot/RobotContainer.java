@@ -58,7 +58,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Swerve swerve;
   @SuppressWarnings("unused")
-  private final Vision vision;
+  private Vision vision;
   private final AutonChooser autonChooser;
   private final Arm arm;
   private Wrist wrist;
@@ -90,7 +90,7 @@ public class RobotContainer {
             new SwerveModule(3, DRIVE.RR_IDS[0], DRIVE.RR_IDS[1], DRIVE.RR_OFFSETS, "RR"));
         arm = new Arm();
         wrist = new Wrist(arm);
-        vision = new Vision(swerve);
+        // vision = new Vision(swerve);
         break;
       case SIM:
         SmartDashboard.putString("/Mode", "SIM");
@@ -170,10 +170,10 @@ public class RobotContainer {
       dest = new Pose2d(dest.getTranslation().plus(translation), dest.getRotation());
       return swerve.goTo(dest, Constants.AUTON.MID_CONSTRAINTS);
     }));
-    // Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(() -> {
-    //   swerve.setPose(new Pose2d());
-    // }, swerve));
-    Controllers.driverController.getAutoAlign().onTrue(new AutoAlign(swerve, arm));
+    Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(() -> {
+      swerve.setPose(new Pose2d());
+    }, swerve));
+    // Controllers.driverController.getAutoAlign().onTrue(new AutoAlign(swerve, arm));
 
     Controllers.operatorController.armGoToLowNode()
         .onTrue(new SetArmPose(arm, ArmPose.LOW_NODE).andThen(new ManualWristControl(wrist, WristState.RIGHT)));
