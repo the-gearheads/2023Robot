@@ -141,9 +141,6 @@ public class AutonPaths {
         // place game piece
         AutonHelper.getPlaceConeCommand(s));
   }
-<<<<<<< HEAD
-  
-=======
 
   public static Command InertN92Cone(Subsystems s){
     return new SequentialCommandGroup(
@@ -182,7 +179,6 @@ public class AutonPaths {
         // place game piece
         // AutonHelper.getPlaceConeCommand(s));
   }
->>>>>>> 29ab24473f0639a63981ea58813be2451097704e
   // public static CommandBase InertN4ExploreOverStationDock(Subsystems s) {
   //   return new SequentialCommandGroup(setInitPose(s, "InertN4-StartN4"), new SetArmPose(s.arm, ArmPose.HIGH_NODE),
   //       getCommandForPath("InertN4-StartN4", true, defaultConstraints, s.swerve),
