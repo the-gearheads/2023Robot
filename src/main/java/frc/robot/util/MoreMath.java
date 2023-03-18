@@ -193,6 +193,9 @@ public class MoreMath {
   public static PathPoint createPathPoint(Pose2d pose, Rotation2d heading){
     return new PathPoint(pose.getTranslation(), heading, pose.getRotation());
   }
+  public static PathPoint createPathPoint(Pose2d pose, Rotation2d heading, double speed){
+    return new PathPoint(pose.getTranslation(), heading, pose.getRotation(), speed);
+  }
 
   public static boolean within(double val, double firstBound, double secondBound){
       double lowerBound;

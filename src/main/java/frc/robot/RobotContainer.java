@@ -21,11 +21,8 @@ import frc.robot.commands.arm.JoystickArmControl;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.StowArm;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
-import frc.robot.commands.drive.AlignToFeederStation;
-import frc.robot.commands.drive.AlignToGrid;
+import frc.robot.commands.drive.AutoAlign;
 import frc.robot.commands.drive.TeleopDrive;
-import frc.robot.commands.vision.FuseVisionEstimate;
-import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
 import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.commands.wrist.ManualWristControl;
 import frc.robot.controllers.Controllers;
@@ -34,7 +31,6 @@ import frc.robot.auton.AutonChooser;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionSim;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmSim;
 import frc.robot.subsystems.wrist.Wrist;
@@ -174,10 +170,10 @@ public class RobotContainer {
       dest = new Pose2d(dest.getTranslation().plus(translation), dest.getRotation());
       return swerve.goTo(dest, Constants.AUTON.MID_CONSTRAINTS);
     }));
-    Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(() -> {
-      swerve.setPose(new Pose2d());
-    }, swerve));
-    Controllers.driverController.alignToFeederStation().onTrue(new AlignToFeederStation(swerve, arm));
+    // Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(() -> {
+    //   swerve.setPose(new Pose2d());
+    // }, swerve));
+    Controllers.driverController.getAutoAlign().onTrue(new AutoAlign(swerve, arm));
 
     Controllers.operatorController.armGoToLowNode()
         .onTrue(new SetArmPose(arm, ArmPose.LOW_NODE).andThen(new ManualWristControl(wrist, WristState.RIGHT)));
@@ -188,8 +184,6 @@ public class RobotContainer {
     Controllers.operatorController.setWristAlternatePose().whileTrue(new AltWristControl(wrist).repeatedly());
     Controllers.operatorController.openGrabber().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
     Controllers.operatorController.setArmByJoystick().onTrue(new JoystickArmControl(arm));
-
-    Controllers.alignController.alignToGrid().onTrue(new AlignToGrid(swerve, arm));
   }
 
   /**

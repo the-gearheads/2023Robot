@@ -102,4 +102,26 @@ public class XboxDriverController implements DriverController {
   public Trigger testDockPath() {
     return new JoystickButton(controller, XboxController.Button.kY.value);
   }
+
+  public Trigger getAutoAlign(){
+
+    return new Trigger(()->{
+      var left = getAutoLeft().getAsBoolean();
+      var center = getAutoCenter().getAsBoolean();
+      var right = getAutoRight().getAsBoolean();
+      return (left || center || right);
+    });
+  }
+
+  public Trigger getAutoLeft(){
+    return new JoystickButton(controller, XboxController.Button.kX.value);
+  };
+  
+  public Trigger getAutoCenter(){
+    return new JoystickButton(controller, XboxController.Button.kY.value);
+  };
+  
+  public Trigger getAutoRight(){
+    return new JoystickButton(controller, XboxController.Button.kB.value);
+  };
 }

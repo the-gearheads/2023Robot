@@ -7,6 +7,7 @@ package frc.robot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.photonvision.PhotonCamera;
 import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.apriltag.AprilTag;
@@ -265,6 +266,13 @@ public class Constants extends AnnotatedClass {
     }
     public static FieldType fieldType = FieldType.REAL;
 
+    public static class GRID{
+      public static final double ARM_THRESHOLD = 20;//in degrees
+    public static final double ROT_THRESHOLD = 20;
+    public static final double DIST_THRESHOLD = 1;
+    public static final PathConstraints CONSTRAINTS = new PathConstraints(2,1);
+    public static final double COMMUNITY_THRESHOLD = 3;
+    }
     public static class FEEDER{
       public static final double Y_THRESHOLD = 0.5;
       public static final double ROT_THRESHOLD = 20;//in degrees
@@ -275,27 +283,27 @@ public class Constants extends AnnotatedClass {
     public static final double MAX_X = FIELD_CONSTANTS.LENGTH;
     
       public static double DIST_THRESHOLD = 1;
-      public static Pose2d PREP_POSE;
-      public static Pose2d DEST_POSE;
+      public static Pose2d RIGHT_PREP_POSE;
+      public static Pose2d LEFT_PREP_POSE;
+      public static Pose2d RIGHT_DEST_POSE;
+      public static Pose2d LEFT_DEST_POSE;
       public static Transform2d PREP2DEST = new Transform2d(new Translation2d(-1, 0), new Rotation2d());
       public static PathConstraints CONSTRAINTS = new PathConstraints(2, 1);
 
       static{
         switch(fieldType){
           case REAL:
-            FEEDER.DEST_POSE = new Pose2d(15.5, 7.5, Rotation2d.fromDegrees(180));
-            FEEDER.PREP_POSE = FEEDER.DEST_POSE.transformBy(FEEDER.PREP2DEST.inverse());
+            RIGHT_DEST_POSE = new Pose2d(15.5, 6, Rotation2d.fromDegrees(180));
+            LEFT_DEST_POSE = new Pose2d(15.5, 7.5, Rotation2d.fromDegrees(180));
           break;
           case SHOP:
-            FEEDER.DEST_POSE = new Pose2d(7.5, 2.5, Rotation2d.fromDegrees(180));
-            FEEDER.PREP_POSE = FEEDER.DEST_POSE.transformBy(FEEDER.PREP2DEST.inverse());
+            RIGHT_DEST_POSE = new Pose2d(7.5, 1.5, Rotation2d.fromDegrees(180));
+            LEFT_DEST_POSE = new Pose2d(7.5, 2.5, Rotation2d.fromDegrees(180));
           break;
         }
+        RIGHT_PREP_POSE = RIGHT_DEST_POSE.transformBy(PREP2DEST.inverse());
+        LEFT_PREP_POSE = LEFT_DEST_POSE.transformBy(PREP2DEST.inverse());
       }
     }
-
-
-    
-
   }
 }

@@ -1,4 +1,4 @@
-package frc.robot.commands.drive;
+package frc.robot.commands.drive.obsolete;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,49 +9,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.util.MoreMath;
 
 public class PointLeaf {
-  public enum NodeY {
-    N1(1, 4.93), N2(2, 4.41), N3(3, 3.85), N4(4, 3.32), N5(5, 2.76), N6(6, 2.175), N7(7, 1.63), N8(8, 1.083), N9(9,
-        0.544);
-
-    public final double y;
-    public final int index;
-
-    NodeY(int index, double y) {
-      this.index = index;
-      this.y = y;
-    }
-
-    public static NodeY getByIndex(int index) {
-      for (var node : NodeY.values()) {
-        if (node.index == index) {
-          return node;
-        }
-      }
-      return null;
-    }
-  }
-  public enum NodeX {
-    LOW(1, 2.15), MID(2, 2.05), HIGH(3, 1.9);
-
-    public final double x;
-    public final int index;
-
-    NodeX(int index, double x) {
-      this.index = index;
-      this.x = x;
-    }
-
-    public static NodeX getByIndex(int index) {
-      for (var node : NodeX.values()) {
-        if (node.index == index) {
-          return node;
-        }
-      }
-      return null;
-    }
-  }
-
-
   Pose2d pose;
   final List<PointLeaf> children;
 

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.drive;
+package frc.robot.commands.drive.obsolete;
 
 import java.sql.Driver;
 import java.util.Collections;
@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
+import frc.robot.commands.drive.rotateTo;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.CustomProxy;
@@ -50,7 +51,7 @@ public class AlignToFeederStation extends CustomProxy {
     && isArmRaised(arm)
     && isClose(swerve)
     && isRotated(swerve)){
-      return goToDest(swerve, arm);
+      return simpleAlign(swerve, arm);
     }else{
       return prepThenGoToDest(swerve, arm);
     }
@@ -59,8 +60,8 @@ public class AlignToFeederStation extends CustomProxy {
   private static Command prepThenGoToDest(Swerve swerve, Arm arm) {
 
       var startPose = swerve.getPose();
-      var prepPose = FEEDER.PREP_POSE;
-      var destPose = FEEDER.DEST_POSE;
+      var prepPose = FEEDER.LEFT_PREP_POSE;
+      var destPose = FEEDER.LEFT_DEST_POSE;
 
       prepPose = MoreMath.transformByAlliance(prepPose);
       destPose = MoreMath.transformByAlliance(destPose);
@@ -92,9 +93,9 @@ public class AlignToFeederStation extends CustomProxy {
       );
 }
 
-  private static Command goToDest(Swerve swerve, Arm arm) {
+  private static Command simpleAlign(Swerve swerve, Arm arm) {
     var startPose = swerve.getPose();
-    var endPose = FEEDER.DEST_POSE;
+    var endPose = FEEDER.LEFT_DEST_POSE;
     var traj = MoreMath.createStraightPath(startPose, endPose, FEEDER.CONSTRAINTS);
 
     var trajCommand = swerve.followTrajectoryCommand(traj, false, true);
@@ -123,7 +124,7 @@ public class AlignToFeederStation extends CustomProxy {
 
   private static boolean isYAligned(Swerve swerve){
     var currentPose = swerve.getPose();
-    var destPose = FEEDER.DEST_POSE;
+    var destPose = FEEDER.LEFT_DEST_POSE;
 
     destPose = MoreMath.transformByAlliance(destPose);
 
@@ -146,7 +147,7 @@ public class AlignToFeederStation extends CustomProxy {
 
   private static boolean isRotated(Swerve swerve){
     var currentPose = swerve.getPose();
-    var destPose = FEEDER.DEST_POSE;
+    var destPose = FEEDER.LEFT_DEST_POSE;
 
     destPose = MoreMath.transformByAlliance(destPose);
 
@@ -162,7 +163,7 @@ public class AlignToFeederStation extends CustomProxy {
 
   private static boolean isClose(Swerve swerve) {
     var currentPose = swerve.getPose();
-    var destPose = FEEDER.DEST_POSE;
+    var destPose = FEEDER.LEFT_DEST_POSE;
 
     destPose = MoreMath.transformByAlliance(destPose);
 
