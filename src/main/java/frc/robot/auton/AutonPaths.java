@@ -101,7 +101,8 @@ public class AutonPaths {
 
         new rotateTo(s.swerve, Rotation2d.fromDegrees(180)),
         
-        AutonHelper.stowAnd(s, AutonHelper.getCommandForPath("GamePiece1-InertN3-No-Turn", false, defaultConstraints, s.swerve)),
+        AutonHelper.stowAnd(s, AutonHelper.getCommandForPath("GamePiece1-InertN3-No-Turn", false, defaultConstraints, s.swerve)
+        )
 
         // places cone
         // new SetArmPose(s.arm, ArmPose.HIGH_NODE),
@@ -126,14 +127,14 @@ public class AutonPaths {
         AutonHelper.getPlaceConeCommand(s),
 
         new ParallelCommandGroup(
-            AutonHelper.getCommandForPath("StartN1-GamePiece1-Prime", false, Constants.AUTON.DOUBLE_CONE, s.swerve),
+            AutonHelper.getCommandForPath("StartN1-GamePiece1-Prime", false, defaultConstraints, s.swerve),
             new SequentialCommandGroup( // Start moving the arm 1 second into the path following
                 new WaitCommand(1), new SetArmPose(s.arm, ArmPose.FLOOR))),
 
         AutonHelper.getGroundPickUpCommand(s),
 
         AutonHelper.stowAnd(s,
-            AutonHelper.getCommandForPath("GamePiece1-Inert3-Prime", false, Constants.AUTON.DOUBLE_CONE, s.swerve)),
+            AutonHelper.getCommandForPath("GamePiece1-Inert3-Prime", false, defaultConstraints, s.swerve)),
 
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
 
