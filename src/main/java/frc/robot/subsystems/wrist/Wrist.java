@@ -41,10 +41,11 @@ public class Wrist extends SubsystemBase {
   private double pidval;
   private double ffval;
 
-  private double lastValidPose = 90;
+  private double lastNonWrapRangePose = 90;
 
   private Arm arm;
-  private boolean invalidReached = false;
+  private boolean wrapRangeEntered = false;
+  private double volts;
 
   public Wrist(Arm arm) {
     this.arm = arm;
@@ -62,11 +63,6 @@ public class Wrist extends SubsystemBase {
     return goal;
   }
 
-  public void setGoal(WristState state) {
-    goal = state.getWristGoal(arm.getPose());
-    setControlState(state.type);
-  }
-
   public double getPose() {
     return encoder.getPosition() + Constants.WRIST.ANGLE_OFFSET;
   }
@@ -81,78 +77,87 @@ public class Wrist extends SubsystemBase {
   }
 
   public void setVoltage(double volts) {
+    this.volts=volts;
     motor.setVoltage(volts);
+  }
+
+  public void setGoal(WristState state) {
+    var desiredGoal = state.getWristGoal(arm.getPose());
+
+    if(angersWrapRangeHandler(desiredGoal) 
+    || angersInsideRobotHandler(desiredGoal)) return;
+
+    goal = desiredGoal;
+    setControlState(state.type);
+  }
+
+  private boolean angersInsideRobotHandler(double goal){
+    var armInsideBot = WristState.INSIDE_ROBOT.inRange(getArmPose());
+    return armInsideBot && goal < 0;
+  }
+
+  private boolean angersWrapRangeHandler(double goal){
+    return goal < WRIST.WRAP_RANGE_UPPER_BOUND || goal > WRIST.WRAP_RANGE_LOWER_BOUND;
   }
 
   @Override
   public void periodic() {
-    if (controlState == WristControlType.DEFAULT) {
-      setGoalByType(WristControlType.DEFAULT);
-    }
+    runPid();
+    wrapRangeHandler();
+    insideRobotHandler();
+    sensorFaultHandler();
+    log();
+  }
 
+  private void runPid(){
     double currentPose = getPose();
     this.pidval = pid.calculate(currentPose, goal);
     this.ffval = ff.calculate(currentPose, 0);
 
     setVoltage(ffval + pidval);
+  }
 
-    if (inInvalidRange()) {
-      invalidReached = true;
-      var goal = WristState.VARIABLE;
-      goal.setWristGoal(lastValidPose);
-      setGoal(goal);
-    } else {
-      if (invalidReached == false) {
-        lastValidPose = currentPose;
-      }
+  private void wrapRangeHandler(){
+    var inWrapRange = getPose() > WRIST.WRAP_RANGE_UPPER_BOUND || getPose() < WRIST.WRAP_RANGE_LOWER_BOUND;
+    if(inWrapRange) wrapRangeEntered = true;
+    else{
+      var didLoopBack = Math.signum(lastNonWrapRangePose) == Math.signum(getPose());
+      if(didLoopBack) wrapRangeEntered=false;
     }
 
-    if (invalidReached) {
-      if (!inInvalidRange() && (Math.signum(lastValidPose) == Math.signum(currentPose))) {
-        invalidReached = false;
-      } else {
-        if (lastValidPose > 0) {
-          setVoltage(-2);
-        } else {
-          setVoltage(2);
-        }
-      }
+    if(wrapRangeEntered){
+      var direction = -1 * Math.signum(lastNonWrapRangePose);
+      setVoltage(direction * WRIST.WRAP_RANGE_SPEED);
     }
+    else lastNonWrapRangePose=getPose();
+  }
 
-    if (sensorErrorHandler()) {
-      DriverStation.reportError("OUR ZERO ERROR IN WRIST", true);
+  /* Don't move towards the base of the robot if inside it (not good) */
+  private void insideRobotHandler() {
+    var armInsideBot = WristState.INSIDE_ROBOT.inRange(getArmPose());
+    var inQuad3 = MoreMath.within(getPose(), -180, -90); 
+    var inQuad4 = MoreMath.within(getPose(), -90,0); 
+    var wristMovingDown = (inQuad3 && volts > 0) || (inQuad4 && volts < 0);
+    
+    var overrideTriggered=false;
+    if (armInsideBot && wristMovingDown){
       setVoltage(0);
-      if (configureHasRan == false) {
-        configure();
-      }
-      configureHasRan = true;
+      overrideTriggered=true;
     }
-    log();
-    setControlState(WristControlType.DEFAULT);
+    Logger.getInstance().recordOutput("Wrist/AntiDestructionTriggered", overrideTriggered);
   }
 
-  private boolean inInvalidRange() {
-    var currentPose = getPose();
-    return currentPose > 135 || currentPose < -135;
+  public void setGoalByType(WristControlType wristStateType) { // check what range the arm is in and set the wrist accordingly
+    double armPos = arm.getPose();
+    for (WristState wristState : WristState.values()) {
+      if (wristState.type == wristStateType && wristState.inRange(armPos)) {
+        setGoal(wristState);
+        return;
+      }
+    }
   }
 
-  private void log() {
-    Logger.getInstance().recordOutput("Wrist/invalid reached", invalidReached);
-    Logger.getInstance().recordOutput("Wrist/Last Valid Pose", lastValidPose);
-    Logger.getInstance().recordOutput("Wrist/ReConfigure has ran", configureHasRan);
-    Logger.getInstance().recordOutput("Wrist/control state", controlState.name());
-    Logger.getInstance().recordOutput("Wrist/Pose", MoreMath.round(getPose(), 1));
-    Logger.getInstance().recordOutput("Wrist/Vel", MoreMath.round(getVelocity(), 1));
-    Logger.getInstance().recordOutput("Wrist/Goal", MoreMath.round(goal, 1));
-    Logger.getInstance().recordOutput("Wrist/Error", MoreMath.round(pid.getPositionError(), 1));
-    Logger.getInstance().recordOutput("Wrist/PIDVal", MoreMath.round(pidval, 1));
-    Logger.getInstance().recordOutput("Wrist/FFVal", MoreMath.round(ffval, 1));
-    Logger.getInstance().recordOutput("Wrist/Appliedvolts", MoreMath.round(motor.getAppliedOutput(), 1));
-    Logger.getInstance().recordOutput("Wrist/Current Command",
-        this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "");
-  }
-
-  public boolean sensorErrorHandler() {
+  private void sensorFaultHandler(){
     boolean hasFaults = motor.getFault(FaultID.kCANTX) || motor.getFault(FaultID.kCANRX);
     boolean hasStickyFaults = motor.getStickyFault(FaultID.kCANTX) || motor.getStickyFault(FaultID.kCANRX);
     var pose = encoder.getPosition();
@@ -169,17 +174,32 @@ public class Wrist extends SubsystemBase {
     if (hasStickyFaults) {
       DriverStation.reportWarning("Wrist Sticky Fault", true);
     }
-    return zeroCountFault || hasFaults;
+    
+    var shouldPanic = zeroCountFault || hasFaults;
+    if (shouldPanic) {
+      DriverStation.reportError("OUR ZERO ERROR IN WRIST", true);
+      setVoltage(0);
+      if (configureHasRan == false) {
+        configure();
+      }
+      configureHasRan = true;
+    }
   }
 
-  public void setGoalByType(WristControlType wristStateType) { // check what range the arm is in and set the wrist accordingly
-    double armPos = arm.getPose();
-    for (WristState wristState : WristState.values()) {
-      if (wristState.type == wristStateType && wristState.inRange(armPos)) {
-        setGoal(wristState);
-        return;
-      }
-    }
+  private void log() {
+    Logger.getInstance().recordOutput("Wrist/invalid reached", wrapRangeEntered);
+    Logger.getInstance().recordOutput("Wrist/Last Valid Pose", lastNonWrapRangePose);
+    Logger.getInstance().recordOutput("Wrist/ReConfigure has ran", configureHasRan);
+    Logger.getInstance().recordOutput("Wrist/control state", controlState.name());
+    Logger.getInstance().recordOutput("Wrist/Pose", MoreMath.round(getPose(), 1));
+    Logger.getInstance().recordOutput("Wrist/Vel", MoreMath.round(getVelocity(), 1));
+    Logger.getInstance().recordOutput("Wrist/Goal", MoreMath.round(goal, 1));
+    Logger.getInstance().recordOutput("Wrist/Error", MoreMath.round(pid.getPositionError(), 1));
+    Logger.getInstance().recordOutput("Wrist/PIDVal", MoreMath.round(pidval, 1));
+    Logger.getInstance().recordOutput("Wrist/FFVal", MoreMath.round(ffval, 1));
+    Logger.getInstance().recordOutput("Wrist/Appliedvolts", MoreMath.round(motor.getAppliedOutput(), 1));
+    Logger.getInstance().recordOutput("Wrist/Current Command",
+        this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "");
   }
 
   private void configure() {
@@ -207,17 +227,5 @@ public class Wrist extends SubsystemBase {
     } catch (Exception e) {
       e.printStackTrace();
     } ;
-  }
-
-  /* Don't move towards the base of the robot if inside it (not good) */
-  public double applySoftLimit(double volts) {
-    if (WristState.INSIDE_ROBOT.inRange(getArmPose())) {
-      if ((Math.signum(volts) == Math.signum(getPose() - 90) && getPose() > -90) || (getPose() < -90 && volts > 0)) {
-        Logger.getInstance().recordOutput("Wrist/AntiDestructionTriggered", true);
-        return 0;
-      }
-    }
-    Logger.getInstance().recordOutput("Wrist/AntiDestructionTriggered", false);
-    return volts;
   }
 }

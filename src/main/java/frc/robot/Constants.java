@@ -104,6 +104,9 @@ public class Constants extends AnnotatedClass {
 
     public static final double[] WRIST_FF = {0, 0.5, 0};
     public static final double ANGLE_OFFSET = -180;
+    public static final double WRAP_RANGE_SPEED = 2;
+    public static final double WRAP_RANGE_UPPER_BOUND = 135;
+    public static final double WRAP_RANGE_LOWER_BOUND = -135;
   }
 
   public static final class GRABBER {

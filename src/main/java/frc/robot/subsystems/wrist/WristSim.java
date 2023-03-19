@@ -75,7 +75,7 @@ public class WristSim extends Wrist {
     return Units.radiansToDegrees(sim.getVelocityRadPerSec());
   }
 
-  public boolean sensorErrorHandler() {
+  public boolean hasSensorFault() {
     return false;
   }
 
