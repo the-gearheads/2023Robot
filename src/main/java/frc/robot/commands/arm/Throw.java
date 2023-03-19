@@ -20,7 +20,7 @@ public class Throw extends CommandBase {
   private ThrowState initState;
   private ThrowState finalState;
   private int phase;
-  private ThrowState lastStartState;
+  private ThrowState lastState;
 
   /** Creates a new Throw. */
   public Throw(Arm arm, Wrist wrist, Grabber grabber, double releaseArmPose, double releaseArmSpeed, double releaseWristPose) {
@@ -47,7 +47,7 @@ public class Throw extends CommandBase {
 
     this.phase=1;
 
-    this.lastStartState=new ThrowState(arm.getPose(), 0, wrist.getPose());
+    this.lastState=new ThrowState(arm.getPose(), 0, wrist.getPose());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -58,21 +58,21 @@ public class Throw extends CommandBase {
       setThrowState(this.initState);
       if(reached(this.initState)){ 
         phase++;
-        this.lastStartState=getCurrentState();
+        this.lastState=getCurrentState();
       }
       break;
       case 2:
       setThrowState(this.releaseState);
       if(reached(this.initState)){ 
         phase++;
-        this.lastStartState=getCurrentState();
+        this.lastState=getCurrentState();
       }
       break;
       case 3:
       setThrowState(this.finalState);
       if(reached(this.initState)){ 
         phase++;
-        this.lastStartState=getCurrentState();
+        this.lastState=getCurrentState();
       }
       break;
     }
@@ -87,7 +87,7 @@ public class Throw extends CommandBase {
   }
 
   private boolean reached(ThrowState state) {
-    var moveDir = Math.signum(state.armPose - lastStartState.armPose);
+    var moveDir = Math.signum(state.armPose - lastState.armPose);
     if(moveDir>0){
       return arm.getPose() >= state.armPose;
     }else{
