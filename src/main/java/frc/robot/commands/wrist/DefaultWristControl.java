@@ -12,7 +12,7 @@ public class DefaultWristControl extends CommandBase {
   private Wrist wrist;
 
   public DefaultWristControl(Wrist wrist) {
-    this.wrist=wrist;
+    this.wrist = wrist;
     addRequirements(wrist);
   }
 

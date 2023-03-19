@@ -21,7 +21,6 @@ import frc.robot.commands.arm.JoystickArmControl;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.StowArm;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
-import frc.robot.commands.drive.AutoAlign;
 import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.commands.wrist.ManualWristControl;

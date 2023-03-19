@@ -10,16 +10,16 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /** Add your docs here. */
-public class CustomProxy extends CommandBase{
-    private Supplier<Command> supplier;
-    private Command command;
+public class CustomProxy extends CommandBase {
+  private Supplier<Command> supplier;
+  private Command command;
 
-    public CustomProxy(Supplier<Command> supplier, Subsystem... requirements){
-        this.supplier = supplier;
-        addRequirements(requirements);
-    }
+  public CustomProxy(Supplier<Command> supplier, Subsystem... requirements) {
+    this.supplier = supplier;
+    addRequirements(requirements);
+  }
 
-    
+
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {

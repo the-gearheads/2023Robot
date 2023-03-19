@@ -4,25 +4,12 @@
 
 package frc.robot.commands.drive.obsolete;
 
-import java.sql.Driver;
-import java.util.Collections;
-import java.util.Map;
-import java.util.function.Supplier;
-import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory.EventMarker;
-import com.pathplanner.lib.commands.FollowPathWithEvents;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.rotateTo;
@@ -30,68 +17,59 @@ import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.CustomProxy;
 import frc.robot.util.MoreMath;
-import frc.robot.Constants.AUTO_ALIGN;
 import frc.robot.Constants.FIELD_CONSTANTS;
 import frc.robot.Constants.AUTO_ALIGN.FEEDER;
 
 public class AlignToFeederStation extends CustomProxy {
 
   public AlignToFeederStation(Swerve swerve, Arm arm) {
-    super(()->{
+    super(() -> {
       return proxy(swerve, arm);
     }, swerve, arm);
   }
 
-  private static Command proxy(Swerve swerve, Arm arm){
-    if(!inFeederArea(swerve)){
+  private static Command proxy(Swerve swerve, Arm arm) {
+    if (!inFeederArea(swerve)) {
       return new InstantCommand();
     }
-    
-    if(isYAligned(swerve)
-    && isArmRaised(arm)
-    && isClose(swerve)
-    && isRotated(swerve)){
+
+    if (isYAligned(swerve) && isArmRaised(arm) && isClose(swerve) && isRotated(swerve)) {
       return simpleAlign(swerve, arm);
-    }else{
+    } else {
       return prepThenGoToDest(swerve, arm);
     }
   }
 
   private static Command prepThenGoToDest(Swerve swerve, Arm arm) {
 
-      var startPose = swerve.getPose();
-      var prepPose = FEEDER.LEFT_PREP_POSE;
-      var destPose = FEEDER.LEFT_DEST_POSE;
+    var startPose = swerve.getPose();
+    var prepPose = FEEDER.LEFT_PREP_POSE;
+    var destPose = FEEDER.LEFT_DEST_POSE;
 
-      prepPose = MoreMath.transformByAlliance(prepPose);
-      destPose = MoreMath.transformByAlliance(destPose);
+    prepPose = MoreMath.transformByAlliance(prepPose);
+    destPose = MoreMath.transformByAlliance(destPose);
 
-      var startHeading = MoreMath.calcHeading(startPose, prepPose);
-      var startPoint = MoreMath.createPathPoint(startPose, startHeading);
+    var startHeading = MoreMath.calcHeading(startPose, prepPose);
+    var startPoint = MoreMath.createPathPoint(startPose, startHeading);
 
-      var prepHeading = MoreMath.calcHeading(prepPose, destPose);
-      var prepPoint = MoreMath.createPathPoint(prepPose, prepHeading);
+    var prepHeading = MoreMath.calcHeading(prepPose, destPose);
+    var prepPoint = MoreMath.createPathPoint(prepPose, prepHeading);
 
-      var destHeading = prepHeading;
-      var destPoint = MoreMath.createPathPoint(destPose, destHeading);
+    var destHeading = prepHeading;
+    var destPoint = MoreMath.createPathPoint(destPose, destHeading);
 
-      var startToPrepTraj = PathPlanner.generatePath(FEEDER.CONSTRAINTS, startPoint, prepPoint);
-      var startToPrepCommand = swerve.followTrajectoryCommand(startToPrepTraj, false, true);
+    var startToPrepTraj = PathPlanner.generatePath(FEEDER.CONSTRAINTS, startPoint, prepPoint);
+    var startToPrepCommand = swerve.followTrajectoryCommand(startToPrepTraj, false, true);
 
-      var prepToDestTraj = PathPlanner.generatePath(FEEDER.CONSTRAINTS, prepPoint, destPoint);
-      var prepToDestCommand = swerve.followTrajectoryCommand(prepToDestTraj, false, true);
+    var prepToDestTraj = PathPlanner.generatePath(FEEDER.CONSTRAINTS, prepPoint, destPoint);
+    var prepToDestCommand = swerve.followTrajectoryCommand(prepToDestTraj, false, true);
 
-      var rotateCommand=new rotateTo(swerve, Rotation2d.fromDegrees(180));
+    var rotateCommand = new rotateTo(swerve, Rotation2d.fromDegrees(180));
 
-      var raiseArmCommand=new SetArmPose(arm, ArmPose.FEEDER_STATION);
+    var raiseArmCommand = new SetArmPose(arm, ArmPose.FEEDER_STATION);
 
-      return new SequentialCommandGroup(
-        startToPrepCommand,
-        rotateCommand,
-        raiseArmCommand,
-        prepToDestCommand
-      );
-}
+    return new SequentialCommandGroup(startToPrepCommand, rotateCommand, raiseArmCommand, prepToDestCommand);
+  }
 
   private static Command simpleAlign(Swerve swerve, Arm arm) {
     var startPose = swerve.getPose();
@@ -104,25 +82,18 @@ public class AlignToFeederStation extends CustomProxy {
     return trajCommand.alongWith(armCommand);
   }
 
-  private static boolean inFeederArea(Swerve swerve){
+  private static boolean inFeederArea(Swerve swerve) {
     var currentPose = swerve.getPose();
-    var xCheck = MoreMath.within(
-      currentPose.getX(), 
-      FEEDER.MIN_X, 
-      FEEDER.MAX_X);
-    var yCheck = MoreMath.within(
-      currentPose.getY(), 
-      FEEDER.MIN_Y, 
-      FEEDER.MAX_Y);
-    if(!MoreMath.isBlue()){
-      yCheck = MoreMath.within(currentPose.getY(),
-      FIELD_CONSTANTS.WIDTH - FEEDER.MIN_Y,
-      FIELD_CONSTANTS.WIDTH - FEEDER.MAX_Y);
+    var xCheck = MoreMath.within(currentPose.getX(), FEEDER.MIN_X, FEEDER.MAX_X);
+    var yCheck = MoreMath.within(currentPose.getY(), FEEDER.MIN_Y, FEEDER.MAX_Y);
+    if (!MoreMath.isBlue()) {
+      yCheck = MoreMath.within(currentPose.getY(), FIELD_CONSTANTS.WIDTH - FEEDER.MIN_Y,
+          FIELD_CONSTANTS.WIDTH - FEEDER.MAX_Y);
     }
     return xCheck && yCheck;
   }
 
-  private static boolean isYAligned(Swerve swerve){
+  private static boolean isYAligned(Swerve swerve) {
     var currentPose = swerve.getPose();
     var destPose = FEEDER.LEFT_DEST_POSE;
 
@@ -136,7 +107,7 @@ public class AlignToFeederStation extends CustomProxy {
     return false;
   }
 
-  private static boolean isArmRaised(Arm arm){
+  private static boolean isArmRaised(Arm arm) {
     var currentPose = arm.getPose();
     var destPose = ArmPose.FEEDER_STATION.val;
 
@@ -145,7 +116,7 @@ public class AlignToFeederStation extends CustomProxy {
     return armDist < FEEDER.ARM_THRESHOLD;
   }
 
-  private static boolean isRotated(Swerve swerve){
+  private static boolean isRotated(Swerve swerve) {
     var currentPose = swerve.getPose();
     var destPose = FEEDER.LEFT_DEST_POSE;
 

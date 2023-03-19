@@ -5,14 +5,11 @@
 package frc.robot;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.photonvision.PhotonCamera;
 import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.apriltag.AprilTagDetection;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.PIDController;
@@ -220,58 +217,36 @@ public class Constants extends AnnotatedClass {
   }
 
   public static final class VISION {
-    public static final HashMap<PhotonCamera, Transform3d> CAMS_AND_TRANS = new HashMap<PhotonCamera, Transform3d>() {{
+    public static final HashMap<PhotonCamera, Transform3d> CAMS_AND_TRANS = new HashMap<PhotonCamera, Transform3d>() {
+      {
         var robotTip = new Transform3d(
-          new Translation3d(
-            Units.inchesToMeters(12.9 - 1),
-            Units.inchesToMeters(12.875),
-            Units.inchesToMeters(48.1)
-          ),
-          new Rotation3d(0,0,0));
+            new Translation3d(Units.inchesToMeters(12.9 - 1), Units.inchesToMeters(12.875), Units.inchesToMeters(48.1)),
+            new Rotation3d(0, 0, 0));
 
-         var ov9281Delta = new Transform3d(
-          new Translation3d(
-            Units.inchesToMeters(0),
-            Units.inchesToMeters(-7.375),
-            Units.inchesToMeters(1)
-          ),
-          new Rotation3d(
-            Units.degreesToRadians(29+180),
-            7.4,0
-          )
-        );
+        var ov9281Delta = new Transform3d(
+            new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-7.375), Units.inchesToMeters(1)),
+            new Rotation3d(Units.degreesToRadians(29 + 180), 7.4, 0));
         var lifecamDelta = new Transform3d(
-          new Translation3d(
-            Units.inchesToMeters(0),
-            Units.inchesToMeters(-18.5),
-            Units.inchesToMeters(1)
-          ),
-          new Rotation3d(
-            Units.degreesToRadians(-29+180),
-            0,0
-          )
-        );
+            new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-18.5), Units.inchesToMeters(1)),
+            new Rotation3d(Units.degreesToRadians(-29 + 180), 0, 0));
 
-      put(new PhotonCamera("ov9281"),
-      robotTip.plus(ov9281Delta)
-      );
-      put(new PhotonCamera("lifecam"),
-      robotTip.plus(lifecamDelta)
-      );
-    }};
+        put(new PhotonCamera("ov9281"), robotTip.plus(ov9281Delta));
+        put(new PhotonCamera("lifecam"), robotTip.plus(lifecamDelta));
+      }
+    };
 
     public static AprilTagFieldLayout FIELD_ATFL = null;
     static {
-      try{
+      try {
         FIELD_ATFL = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
-      }catch(Exception e){
+      } catch (Exception e) {
       }
     }
 
     public static final List<AprilTag> TEST_TAGS = new ArrayList<AprilTag>() {
       {
-        var id1Pose = new Pose3d(2.5, 2.5, 0, new Rotation3d(0,0,0));
-        var id1Toid8 = new Transform3d(new Translation3d(0, 0.2159, 0), new Rotation3d(0,0,0));
+        var id1Pose = new Pose3d(2.5, 2.5, 0, new Rotation3d(0, 0, 0));
+        var id1Toid8 = new Transform3d(new Translation3d(0, 0.2159, 0), new Rotation3d(0, 0, 0));
         var id8Pose = id1Pose.plus(id1Toid8);
 
         add(new AprilTag(1, id1Pose));
@@ -281,18 +256,15 @@ public class Constants extends AnnotatedClass {
     public static final AprilTagFieldLayout TEST_ATFL = new AprilTagFieldLayout(TEST_TAGS, 5, 5);
 
     public static final AprilTagFieldLayout SHOP_ATFL;
-    static{
+    static {
       var apriltagsCopy = new ArrayList<AprilTag>();
-      for(var apriltag : FIELD_ATFL.getTags()){
+      for (var apriltag : FIELD_ATFL.getTags()) {
         apriltagsCopy.add(new AprilTag(apriltag.ID, apriltag.pose));
       }
 
-      apriltagsCopy.get(4-1).pose = new Pose3d(
-        Units.inchesToMeters(340),
-        apriltagsCopy.get(6-1).pose.getY() + Units.inchesToMeters(-133 + 49.875),
-        apriltagsCopy.get(4-1).pose.getZ(),
-        apriltagsCopy.get(4-1).pose.getRotation()
-      );
+      apriltagsCopy.get(4 - 1).pose = new Pose3d(Units.inchesToMeters(340),
+          apriltagsCopy.get(6 - 1).pose.getY() + Units.inchesToMeters(-133 + 49.875),
+          apriltagsCopy.get(4 - 1).pose.getZ(), apriltagsCopy.get(4 - 1).pose.getRotation());
 
       SHOP_ATFL = new AprilTagFieldLayout(apriltagsCopy, FIELD_CONSTANTS.LENGTH, FIELD_CONSTANTS.WIDTH);
     }
@@ -301,39 +273,37 @@ public class Constants extends AnnotatedClass {
   public static final class VISION_SIM {
     public static final List<SimCamParams> SIM_CAMS_PARAMS = new ArrayList<SimCamParams>() {
       {
-        add(new SimCamParams(92, 9000, 640, 400, 0, new Transform3d(
-          new Translation3d(
-          Units.inchesToMeters(21.552), 
-          Units.inchesToMeters(12.855-7.5),
-          Units.inchesToMeters(48.24)), 
-          new Rotation3d(0,0,Units.degreesToRadians(-36))),
+        add(new SimCamParams(92, 9000, 640, 400, 0,
+            new Transform3d(new Translation3d(Units.inchesToMeters(21.552), Units.inchesToMeters(12.855 - 7.5),
+                Units.inchesToMeters(48.24)), new Rotation3d(0, 0, Units.degreesToRadians(-36))),
             "ov9281"));
       }
     };
   }
-  
+
   public static class AUTO_ALIGN {
-    public enum FieldType{
+    public enum FieldType {
       SHOP, REAL;
     }
+
     public static FieldType fieldType = FieldType.REAL;
 
-    public static class GRID{
+    public static class GRID {
       public static final double ARM_THRESHOLD = 20;//in degrees
-    public static final double ROT_THRESHOLD = 20;
-    public static final double DIST_THRESHOLD = 1;
-    public static final PathConstraints CONSTRAINTS = new PathConstraints(2,1);
-    public static final double COMMUNITY_THRESHOLD = 3;
+      public static final double ROT_THRESHOLD = 20;
+      public static final double DIST_THRESHOLD = 1;
+      public static final PathConstraints CONSTRAINTS = new PathConstraints(2, 1);
+      public static final double COMMUNITY_THRESHOLD = 3;
     }
-    public static class FEEDER{
+    public static class FEEDER {
       public static final double Y_THRESHOLD = 0.5;
       public static final double ROT_THRESHOLD = 20;//in degrees
       public static final double ARM_THRESHOLD = 20;//in degrees
       public static final double MIN_X = 10;
-    public static final double MIN_Y = 5.6;
-    public static final double MAX_Y = FIELD_CONSTANTS.WIDTH;
-    public static final double MAX_X = FIELD_CONSTANTS.LENGTH;
-    
+      public static final double MIN_Y = 5.6;
+      public static final double MAX_Y = FIELD_CONSTANTS.WIDTH;
+      public static final double MAX_X = FIELD_CONSTANTS.LENGTH;
+
       public static double DIST_THRESHOLD = 1;
       public static Pose2d RIGHT_PREP_POSE;
       public static Pose2d LEFT_PREP_POSE;
@@ -342,16 +312,16 @@ public class Constants extends AnnotatedClass {
       public static Transform2d PREP2DEST = new Transform2d(new Translation2d(-1, 0), new Rotation2d());
       public static PathConstraints CONSTRAINTS = new PathConstraints(2, 1);
 
-      static{
-        switch(fieldType){
+      static {
+        switch (fieldType) {
           case REAL:
             RIGHT_DEST_POSE = new Pose2d(15.5, 6, Rotation2d.fromDegrees(180));
             LEFT_DEST_POSE = new Pose2d(15.5, 7.5, Rotation2d.fromDegrees(180));
-          break;
+            break;
           case SHOP:
             RIGHT_DEST_POSE = new Pose2d(7.5, 1.5, Rotation2d.fromDegrees(180));
             LEFT_DEST_POSE = new Pose2d(7.5, 2.5, Rotation2d.fromDegrees(180));
-          break;
+            break;
         }
         RIGHT_PREP_POSE = RIGHT_DEST_POSE.transformBy(PREP2DEST.inverse());
         LEFT_PREP_POSE = LEFT_DEST_POSE.transformBy(PREP2DEST.inverse());

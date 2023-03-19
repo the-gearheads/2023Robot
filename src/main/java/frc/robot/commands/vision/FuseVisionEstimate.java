@@ -10,7 +10,6 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.util.vision.CustomEstimate;
 import frc.robot.subsystems.vision.Vision;
 
@@ -67,7 +66,7 @@ public class FuseVisionEstimate extends CommandBase {
         case CASSEROLE:
           confidence = VisionHelper.ROBOT_CASSEROLE_STDEV;
           estimate.setConfidence(confidence);
-          if(VisionHelper.casseroleShouldFuse(estimate, vision)) {
+          if (VisionHelper.casseroleShouldFuse(estimate, vision)) {
             fuseEstimate(estimate);
           }
           break;

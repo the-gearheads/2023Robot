@@ -4,21 +4,12 @@
 
 package frc.robot.commands.drive.obsolete;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
-import frc.robot.Constants;
-import frc.robot.Constants.AUTO_ALIGN;
 import frc.robot.Constants.AUTO_ALIGN.GRID;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
@@ -40,10 +31,10 @@ public class AlignToGrid extends CustomProxy {
     });
   }
 
-  public static Command proxy(Swerve swerve, Arm arm){
-    if(isArmRaised(arm) && isRotated(swerve) && isClose(swerve)){
+  public static Command proxy(Swerve swerve, Arm arm) {
+    if (isArmRaised(arm) && isRotated(swerve) && isClose(swerve)) {
       return simpleAlign(swerve, arm);
-    }else{
+    } else {
       return new InstantCommand();
     }
   }
@@ -58,7 +49,7 @@ public class AlignToGrid extends CustomProxy {
     return pathCommand.alongWith(armCommand);
   }
 
-  private static boolean isArmRaised(Arm arm){
+  private static boolean isArmRaised(Arm arm) {
     var currentPose = arm.getPose();
     var destPose = getDesiredArmPose().val;
 
@@ -67,7 +58,7 @@ public class AlignToGrid extends CustomProxy {
     return armDist < GRID.ARM_THRESHOLD;
   }
 
-  private static boolean isRotated(Swerve swerve){
+  private static boolean isRotated(Swerve swerve) {
     var currentPose = swerve.getPose();
     var destPose = getDesiredNodePose();
 
@@ -148,13 +139,13 @@ public class AlignToGrid extends CustomProxy {
     return new Pose2d(xVal, yVal, Rotation2d.fromDegrees(180));
   }
 
-  public static ArmPose getDesiredArmPose(){
+  public static ArmPose getDesiredArmPose() {
     var chosenX = Controllers.alignController.getChosenX();
-    if(chosenX == 1){
+    if (chosenX == 1) {
       return ArmPose.LOW_NODE;
-    }else if(chosenX == 2){
+    } else if (chosenX == 2) {
       return ArmPose.MID_NODE;
-    }else{
+    } else {
       return ArmPose.HIGH_NODE;
     }
   }

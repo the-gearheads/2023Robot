@@ -91,19 +91,19 @@ public interface DriverController {
     return new Trigger(() -> false);
   }
 
-public default Trigger getAutoLeft(){
-  return new Trigger(() -> false);
-};
+  public default Trigger getAutoLeft() {
+    return new Trigger(() -> false);
+  };
 
-public default Trigger getAutoCenter(){
-  return new Trigger(() -> false);
-};
+  public default Trigger getAutoCenter() {
+    return new Trigger(() -> false);
+  };
 
-public default Trigger getAutoRight(){
-  return new Trigger(() -> false);
-};
+  public default Trigger getAutoRight() {
+    return new Trigger(() -> false);
+  };
 
-public default Trigger getAutoAlign(){
-  return new Trigger(() -> false);
-}
+  public default Trigger getAutoAlign() {
+    return new Trigger(() -> false);
+  }
 }

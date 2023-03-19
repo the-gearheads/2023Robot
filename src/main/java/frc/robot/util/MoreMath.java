@@ -17,61 +17,52 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 
 public class MoreMath {
-  
-  public static double round(double value, int places) {
-    if (places < 0) throw new IllegalArgumentException();
-    if (Double.isNaN(value)) return value;
-    if (Double.isInfinite(value)) return value;
 
-      BigDecimal bd = new BigDecimal(Double.toString(value));
-      bd = bd.setScale(places, RoundingMode.HALF_UP);
-      return bd.doubleValue();
-}
+  public static double round(double value, int places) {
+    if (places < 0)
+      throw new IllegalArgumentException();
+    if (Double.isNaN(value))
+      return value;
+    if (Double.isInfinite(value))
+      return value;
+
+    BigDecimal bd = new BigDecimal(Double.toString(value));
+    bd = bd.setScale(places, RoundingMode.HALF_UP);
+    return bd.doubleValue();
+  }
 
   public static String pose2dToString(Pose2d pos, int places) {
-    return "("  + round(pos.getX(), places) + 
-         ", "  + round(pos.getY(), places) + 
-         ", "+ round(pos.getRotation().getDegrees(), places) + 
-         ")";
+    return "(" + round(pos.getX(), places) + ", " + round(pos.getY(), places) + ", "
+        + round(pos.getRotation().getDegrees(), places) + ")";
     // return "X=" + pos.getX() + "; Y=" + pos.getY() + "; Deg=" + pos.getRotation().getDegrees();
   }
 
-  
+
   public static String pose3dToString(Pose3d pose, int places) {
-    return "("  + round(pose.getX(), places) + 
-         ", "  + round(pose.getY(), places) + 
-         ", "  + round(pose.getZ(), places) +
-         ";" + 
-         " "+ round(Units.radiansToDegrees(pose.getRotation().getX()), places) + 
-         ", "+ round(Units.radiansToDegrees(pose.getRotation().getY()), places) + 
-         ", "+ round(Units.radiansToDegrees(pose.getRotation().getZ()), places) + 
-         ")";
+    return "(" + round(pose.getX(), places) + ", " + round(pose.getY(), places) + ", " + round(pose.getZ(), places)
+        + ";" + " " + round(Units.radiansToDegrees(pose.getRotation().getX()), places) + ", "
+        + round(Units.radiansToDegrees(pose.getRotation().getY()), places) + ", "
+        + round(Units.radiansToDegrees(pose.getRotation().getZ()), places) + ")";
     // return "X=" + pos.getX() + "; Y=" + pos.getY() + "; Deg=" + pos.getRotation().getDegrees();
   }
 
   public static String transform3dToString(Transform3d transform, int places) {
-    return "("  + round(transform.getX(), places) + 
-         ", "  + round(transform.getY(), places) + 
-         ", "  + round(transform.getZ(), places) +
-         ";" + 
-         " "+ round(Units.radiansToDegrees(transform.getRotation().getX()), places) + 
-         ", "+ round(Units.radiansToDegrees(transform.getRotation().getY()), places) + 
-         ", "+ round(Units.radiansToDegrees(transform.getRotation().getZ()), places) + 
-         ")";
+    return "(" + round(transform.getX(), places) + ", " + round(transform.getY(), places) + ", "
+        + round(transform.getZ(), places) + ";" + " "
+        + round(Units.radiansToDegrees(transform.getRotation().getX()), places) + ", "
+        + round(Units.radiansToDegrees(transform.getRotation().getY()), places) + ", "
+        + round(Units.radiansToDegrees(transform.getRotation().getZ()), places) + ")";
     // return "X=" + pos.getX() + "; Y=" + pos.getY() + "; Deg=" + pos.getRotation().getDegrees();
   }
 
-  public static String cornerToString(TargetCorner corner, int places){
-    return "("  + round(corner.x, places) + 
-         ", "  + round(corner.y, places)+
-         ")";
+  public static String cornerToString(TargetCorner corner, int places) {
+    return "(" + round(corner.x, places) + ", " + round(corner.y, places) + ")";
   }
 
   /* Pose exp for teleop drive. Takes in controller x and y axises and outputs pose exped ones */
@@ -158,60 +149,56 @@ public class MoreMath {
     return camMatrix;
   }
 
-  public static Pose3d transformBy(Pose3d current, Transform3d other){
-    return new Pose3d(
-      current.getTranslation().plus(other.getTranslation().rotateBy(current.getRotation())),
-      addRotation3d(current.getRotation(), other.getRotation()));
+  public static Pose3d transformBy(Pose3d current, Transform3d other) {
+    return new Pose3d(current.getTranslation().plus(other.getTranslation().rotateBy(current.getRotation())),
+        addRotation3d(current.getRotation(), other.getRotation()));
   }
 
-  public static Pose3d transformTwice(Pose3d current, Transform3d other, Transform3d another){
+  public static Pose3d transformTwice(Pose3d current, Transform3d other, Transform3d another) {
     return transformBy(transformBy(current, other), another);
   }
-  
-  public static Rotation3d addRotation3d(Rotation3d current, Rotation3d other){
-    return new Rotation3d(
-      current.getX() + other.getX(),
-      current.getY() + other.getY(),
-      current.getZ() + other.getZ()
-    );
+
+  public static Rotation3d addRotation3d(Rotation3d current, Rotation3d other) {
+    return new Rotation3d(current.getX() + other.getX(), current.getY() + other.getY(), current.getZ() + other.getZ());
   }
 
-  public static Rotation2d calcHeading(Pose2d start, Pose2d end){
+  public static Rotation2d calcHeading(Pose2d start, Pose2d end) {
     var heading = end.getTranslation().minus(start.getTranslation()).getAngle();
     return heading;
   }
 
-  public static PathPlannerTrajectory createStraightPath(Pose2d start, Pose2d end, PathConstraints constraints){
-      var heading = calcHeading(start, end);      
-      var startPoint = createPathPoint(start, heading);
-      var endPoint = createPathPoint(end, heading);
+  public static PathPlannerTrajectory createStraightPath(Pose2d start, Pose2d end, PathConstraints constraints) {
+    var heading = calcHeading(start, end);
+    var startPoint = createPathPoint(start, heading);
+    var endPoint = createPathPoint(end, heading);
 
-      var traj = PathPlanner.generatePath(constraints, startPoint, endPoint);
-      return traj;
+    var traj = PathPlanner.generatePath(constraints, startPoint, endPoint);
+    return traj;
   }
 
-  public static PathPoint createPathPoint(Pose2d pose, Rotation2d heading){
+  public static PathPoint createPathPoint(Pose2d pose, Rotation2d heading) {
     return new PathPoint(pose.getTranslation(), heading, pose.getRotation());
   }
-  public static PathPoint createPathPoint(Pose2d pose, Rotation2d heading, double speed){
+
+  public static PathPoint createPathPoint(Pose2d pose, Rotation2d heading, double speed) {
     return new PathPoint(pose.getTranslation(), heading, pose.getRotation(), speed);
   }
 
-  public static boolean within(double val, double firstBound, double secondBound){
-      double lowerBound;
-      double upperBound;
-      if(firstBound<secondBound){
-        lowerBound = firstBound;
-        upperBound = secondBound;
-      }else{
-        lowerBound = secondBound;
-        upperBound = firstBound;
-      }
+  public static boolean within(double val, double firstBound, double secondBound) {
+    double lowerBound;
+    double upperBound;
+    if (firstBound < secondBound) {
+      lowerBound = firstBound;
+      upperBound = secondBound;
+    } else {
+      lowerBound = secondBound;
+      upperBound = firstBound;
+    }
 
-      return val > lowerBound && val < upperBound;
+    return val > lowerBound && val < upperBound;
   }
 
-  public static boolean isBlue(){
+  public static boolean isBlue() {
     return DriverStation.getAlliance() == DriverStation.Alliance.Blue;
   }
 }

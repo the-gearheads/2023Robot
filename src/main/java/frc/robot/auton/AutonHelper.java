@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
@@ -33,12 +32,9 @@ public class AutonHelper {
   }
 
   public static Command getGroundPickUpCommand(Subsystems s) {
-    return  new SequentialCommandGroup(getGrabberOpenCommand(s.grabber), new WaitCommand(0.25),
+    return new SequentialCommandGroup(getGrabberOpenCommand(s.grabber), new WaitCommand(0.25),
         new AltWristControl(s.wrist).raceWith(
-            new SequentialCommandGroup(
-              new WaitCommand(1), 
-              getGrabberCloseCommand(s.grabber), 
-              new WaitCommand(1))),
+            new SequentialCommandGroup(new WaitCommand(1), getGrabberCloseCommand(s.grabber), new WaitCommand(1))),
         new WaitCommand(1));
   }
 
@@ -95,10 +91,12 @@ public class AutonHelper {
     Logger.getInstance().recordOutput("Auton/Last Loaded Path", pathName);
     return path;
   }
+
   public static Command getCommandForPath(String pathName, boolean resetOdometry, PathConstraints constraints,
       Swerve swerve) {
     return getCommandForPath(pathName, resetOdometry, constraints, swerve, false);
-      }
+  }
+
   public static Command getCommandForPath(String pathName, boolean resetOdometry, PathConstraints constraints,
       Swerve swerve, boolean reversed) {
     return new CustomProxy(() -> {

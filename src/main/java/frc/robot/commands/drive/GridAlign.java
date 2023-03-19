@@ -23,8 +23,8 @@ public class GridAlign extends SequentialCommandGroup {
     addCommands(simpleAlign(swerve, arm));
   }
 
-  
-  public static Command simpleAlign(Swerve swerve, Arm arm){
+
+  public static Command simpleAlign(Swerve swerve, Arm arm) {
     var destPose = getDestPose(swerve, arm);
     var desiredArmPose = getDesiredArmPose(arm);
 
@@ -33,17 +33,17 @@ public class GridAlign extends SequentialCommandGroup {
     return pathCommand.alongWith(armCommand);
   }
 
-  public static Pose2d getDestPose(Swerve swerve, Arm arm){
+  public static Pose2d getDestPose(Swerve swerve, Arm arm) {
     /* Assuming they have a range of 1-3 */
     var x = getDesiredNodeX(arm).x;
     var y = getDesiredNodeY(swerve).getY();
 
     return new Pose2d(x, y, Rotation2d.fromDegrees(180));
   }
-  
-  public static NodeX getDesiredNodeX(Arm arm){
+
+  public static NodeX getDesiredNodeX(Arm arm) {
     var desiredArmPose = getDesiredArmPose(arm);
-    switch(desiredArmPose){
+    switch (desiredArmPose) {
       case HIGH_NODE:
         return NodeX.HIGH;
       case MID_NODE:
@@ -51,19 +51,19 @@ public class GridAlign extends SequentialCommandGroup {
       case LOW_NODE:
         return NodeX.LOW;
       default:
-       return NodeX.HIGH;
+        return NodeX.HIGH;
     }
   }
 
-  public static ArmPose getDesiredArmPose(Arm arm){
+  public static ArmPose getDesiredArmPose(Arm arm) {
     ArmPose[] armPoses = {ArmPose.LOW_NODE, ArmPose.MID_NODE, ArmPose.HIGH_NODE};
-    
+
     var smallestDist = Double.POSITIVE_INFINITY;
     ArmPose closestArmPose = ArmPose.HIGH_NODE;
 
-    for(var armPose: armPoses){
+    for (var armPose : armPoses) {
       var dist = Math.abs(armPose.val - arm.getPose());
-      if(dist < smallestDist){
+      if (dist < smallestDist) {
         smallestDist = dist;
         closestArmPose = armPose;
       }
@@ -71,37 +71,37 @@ public class GridAlign extends SequentialCommandGroup {
     return closestArmPose;
   }
 
-  public static NodeY getDesiredNodeY(Swerve swerve){
-    var indexDelta=0;
-    if(Controllers.driverController.getAutoLeft().getAsBoolean()){
+  public static NodeY getDesiredNodeY(Swerve swerve) {
+    var indexDelta = 0;
+    if (Controllers.driverController.getAutoLeft().getAsBoolean()) {
       indexDelta = -1;
-    }else if(Controllers.driverController.getAutoCenter().getAsBoolean()){
-      indexDelta=0;
-    }else if(Controllers.driverController.getAutoRight().getAsBoolean()){
-      indexDelta=1;
+    } else if (Controllers.driverController.getAutoCenter().getAsBoolean()) {
+      indexDelta = 0;
+    } else if (Controllers.driverController.getAutoRight().getAsBoolean()) {
+      indexDelta = 1;
     }
-    
+
     //I hate mirrored fields
-    if(!MoreMath.isBlue()){
-      indexDelta*=-1;
+    if (!MoreMath.isBlue()) {
+      indexDelta *= -1;
     }
 
     var closestCenterNodeIndex = getClosestCenterNode(swerve.getPose()).index;
-    var nodeY = NodeY.getByIndex(closestCenterNodeIndex+indexDelta);
+    var nodeY = NodeY.getByIndex(closestCenterNodeIndex + indexDelta);
     return nodeY;
   }
 
-  public static NodeY getClosestCenterNode(Pose2d currentPose){
+  public static NodeY getClosestCenterNode(Pose2d currentPose) {
     NodeY[] centerNodes = {NodeY.N2, NodeY.N5, NodeY.N8};
-    
+
     var smallestDist = Double.POSITIVE_INFINITY;
     NodeY closestNode = NodeY.getByIndex(1);
 
-    for(var centerNode : centerNodes){
+    for (var centerNode : centerNodes) {
       var dist = Math.abs(centerNode.getY() - currentPose.getY());
-      if(dist < smallestDist){
+      if (dist < smallestDist) {
         smallestDist = dist;
-        closestNode=centerNode;
+        closestNode = centerNode;
       }
     }
     return closestNode;

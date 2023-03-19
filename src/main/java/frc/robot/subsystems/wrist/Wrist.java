@@ -77,26 +77,26 @@ public class Wrist extends SubsystemBase {
   }
 
   public void setVoltage(double volts) {
-    this.volts=volts;
+    this.volts = volts;
     motor.setVoltage(volts);
   }
 
   public void setGoal(WristState state) {
     var desiredGoal = state.getWristGoal(arm.getPose());
 
-    if(angersWrapRangeHandler(desiredGoal) 
-    || angersInsideRobotHandler(desiredGoal)) return;
+    if (angersWrapRangeHandler(desiredGoal) || angersInsideRobotHandler(desiredGoal))
+      return;
 
     goal = desiredGoal;
     setControlState(state.type);
   }
 
-  private boolean angersInsideRobotHandler(double goal){
+  private boolean angersInsideRobotHandler(double goal) {
     var armInsideBot = WristState.INSIDE_ROBOT.inRange(getArmPose());
     return armInsideBot && goal < 0;
   }
 
-  private boolean angersWrapRangeHandler(double goal){
+  private boolean angersWrapRangeHandler(double goal) {
     return goal < WRIST.WRAP_RANGE_UPPER_BOUND || goal > WRIST.WRAP_RANGE_LOWER_BOUND;
   }
 
@@ -109,7 +109,7 @@ public class Wrist extends SubsystemBase {
     log();
   }
 
-  private void runPid(){
+  private void runPid() {
     double currentPose = getPose();
     this.pidval = pid.calculate(currentPose, goal);
     this.ffval = ff.calculate(currentPose, 0);
@@ -117,32 +117,34 @@ public class Wrist extends SubsystemBase {
     setVoltage(ffval + pidval);
   }
 
-  private void wrapRangeHandler(){
+  private void wrapRangeHandler() {
     var inWrapRange = getPose() > WRIST.WRAP_RANGE_UPPER_BOUND || getPose() < WRIST.WRAP_RANGE_LOWER_BOUND;
-    if(inWrapRange) wrapRangeEntered = true;
-    else{
+    if (inWrapRange)
+      wrapRangeEntered = true;
+    else {
       var didLoopBack = Math.signum(lastNonWrapRangePose) == Math.signum(getPose());
-      if(didLoopBack) wrapRangeEntered=false;
+      if (didLoopBack)
+        wrapRangeEntered = false;
     }
 
-    if(wrapRangeEntered){
+    if (wrapRangeEntered) {
       var direction = -1 * Math.signum(lastNonWrapRangePose);
       setVoltage(direction * WRIST.WRAP_RANGE_SPEED);
-    }
-    else lastNonWrapRangePose=getPose();
+    } else
+      lastNonWrapRangePose = getPose();
   }
 
   /* Don't move towards the base of the robot if inside it (not good) */
   private void insideRobotHandler() {
     var armInsideBot = WristState.INSIDE_ROBOT.inRange(getArmPose());
-    var inQuad3 = MoreMath.within(getPose(), -180, -90); 
-    var inQuad4 = MoreMath.within(getPose(), -90,0); 
+    var inQuad3 = MoreMath.within(getPose(), -180, -90);
+    var inQuad4 = MoreMath.within(getPose(), -90, 0);
     var wristMovingDown = (inQuad3 && volts > 0) || (inQuad4 && volts < 0);
-    
-    var overrideTriggered=false;
-    if (armInsideBot && wristMovingDown){
+
+    var overrideTriggered = false;
+    if (armInsideBot && wristMovingDown) {
       setVoltage(0);
-      overrideTriggered=true;
+      overrideTriggered = true;
     }
     Logger.getInstance().recordOutput("Wrist/AntiDestructionTriggered", overrideTriggered);
   }
@@ -157,7 +159,7 @@ public class Wrist extends SubsystemBase {
     }
   }
 
-  private void sensorFaultHandler(){
+  private void sensorFaultHandler() {
     boolean hasFaults = motor.getFault(FaultID.kCANTX) || motor.getFault(FaultID.kCANRX);
     boolean hasStickyFaults = motor.getStickyFault(FaultID.kCANTX) || motor.getStickyFault(FaultID.kCANRX);
     var pose = encoder.getPosition();
@@ -174,7 +176,7 @@ public class Wrist extends SubsystemBase {
     if (hasStickyFaults) {
       DriverStation.reportWarning("Wrist Sticky Fault", true);
     }
-    
+
     var shouldPanic = zeroCountFault || hasFaults;
     if (shouldPanic) {
       DriverStation.reportError("OUR ZERO ERROR IN WRIST", true);

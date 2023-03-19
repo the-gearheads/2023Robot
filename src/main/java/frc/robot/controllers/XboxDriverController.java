@@ -103,9 +103,9 @@ public class XboxDriverController implements DriverController {
     return new JoystickButton(controller, XboxController.Button.kY.value);
   }
 
-  public Trigger getAutoAlign(){
+  public Trigger getAutoAlign() {
 
-    return new Trigger(()->{
+    return new Trigger(() -> {
       var left = getAutoLeft().getAsBoolean();
       var center = getAutoCenter().getAsBoolean();
       var right = getAutoRight().getAsBoolean();
@@ -113,15 +113,15 @@ public class XboxDriverController implements DriverController {
     });
   }
 
-  public Trigger getAutoLeft(){
+  public Trigger getAutoLeft() {
     return new JoystickButton(controller, XboxController.Button.kX.value);
   };
-  
-  public Trigger getAutoCenter(){
+
+  public Trigger getAutoCenter() {
     return new JoystickButton(controller, XboxController.Button.kY.value);
   };
-  
-  public Trigger getAutoRight(){
+
+  public Trigger getAutoRight() {
     return new JoystickButton(controller, XboxController.Button.kB.value);
   };
 }

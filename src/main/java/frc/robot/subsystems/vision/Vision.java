@@ -14,15 +14,11 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.TargetCorner;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -112,8 +108,7 @@ public class Vision extends SubsystemBase {
   }
 
   public static boolean isEstimatePresent(Optional<CustomEstimate> estimate) {
-    return estimate.isPresent() && estimate.get().best != null
-        && estimate.get().best.getRotation() != null;
+    return estimate.isPresent() && estimate.get().best != null && estimate.get().best.getRotation() != null;
   }
 
   private void initAtfl() {
@@ -165,11 +160,8 @@ public class Vision extends SubsystemBase {
 
         var fieldToTag = tagPoseOpt.get();
         var fieldToRobot =
-            fieldToTag
-            .transformBy(target.getBestCameraToTarget().inverse())
-            .transformBy(robot2Cam.inverse());
-        var fieldToCam = fieldToTag
-            .transformBy(target.getBestCameraToTarget().inverse());
+            fieldToTag.transformBy(target.getBestCameraToTarget().inverse()).transformBy(robot2Cam.inverse());
+        var fieldToCam = fieldToTag.transformBy(target.getBestCameraToTarget().inverse());
 
         var corners = target.getDetectedCorners(); // actually 4, but who cares about understandable variable naming lol
 
@@ -186,11 +178,11 @@ public class Vision extends SubsystemBase {
       var fieldToRobotStrs = fieldToRobots.stream().map((estRobotPose) -> MoreMath.pose3dToString(estRobotPose, 1))
           .toList().toArray(new String[0]);
 
-      var fieldToCamStrs = fieldToCams.stream().map((estRobotPose) -> MoreMath.pose3dToString(estRobotPose, 1))
-          .toList().toArray(new String[0]);
-
-      var fieldToTagStrs = fieldToTags.stream().map((tagPose) -> (MoreMath.pose2dToString(tagPose.toPose2d(), 1))).toList()
+      var fieldToCamStrs = fieldToCams.stream().map((estRobotPose) -> MoreMath.pose3dToString(estRobotPose, 1)).toList()
           .toArray(new String[0]);
+
+      var fieldToTagStrs = fieldToTags.stream().map((tagPose) -> (MoreMath.pose2dToString(tagPose.toPose2d(), 1)))
+          .toList().toArray(new String[0]);
 
       var camToTagStrs = camToTags.stream().map((camToTag) -> (MoreMath.transform3dToString(camToTag, 1))).toList()
           .toArray(new String[0]);
@@ -243,7 +235,7 @@ public class Vision extends SubsystemBase {
       var path = "vision/" + cam.getName() + "/";
       Logger.getInstance().recordOutput(path + "cam status", camPresent);
       Logger.getInstance().recordOutput(path + "estimate status", estimateStatus);
-      if(!estimateStatus.equals("invalid")){
+      if (!estimateStatus.equals("invalid")) {
         Logger.getInstance().recordOutput(path + "estimate", estimateStr);
         Logger.getInstance().recordOutput(path + "3d estimate", estimate3dStr);
       }
