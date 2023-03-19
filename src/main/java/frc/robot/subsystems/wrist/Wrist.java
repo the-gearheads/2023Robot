@@ -82,7 +82,7 @@ public class Wrist extends SubsystemBase {
   }
 
   public void setGoal(WristState state) {
-    var desiredGoal = state.getWristGoal(arm.getPose());
+    var desiredGoal = state.getGoal();
 
     if (angersWrapRangeHandler(desiredGoal) || angersInsideRobotHandler(desiredGoal))
       return;
