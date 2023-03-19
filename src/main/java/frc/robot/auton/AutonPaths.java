@@ -142,7 +142,7 @@ public class AutonPaths {
         AutonHelper.stowAnd(s,
             AutonHelper.getCommandForPath("ExploreOverStation-Dock", false, defaultConstraints, s.swerve)),
 
-        new AutoBalance(s.swerve)
+        new AutoBalDriveToPivot(s.swerve).andThen(new AutoBalance(s.swerve))
         );
   }
 
@@ -223,7 +223,7 @@ public class AutonPaths {
   //       stowAnd(s,
   //           getCommandForPath("StartN4-ExploreOverStation", false, defaultConstraints, s.swerve),
   //           getCommandForPath("ExploreOverStation-Dock", false, defaultConstraints, s.swerve),
-  //           new AutoBalance(s.swerve))
+  //           new AutoBalDriveToPivot(s.swerve).andThen(new AutoBalance(s.swerve))
         // );
   // }
 
@@ -240,7 +240,7 @@ public class AutonPaths {
 
   //       // Go to charging station
   //       stowAnd(s, getCommandForPath("StartN1-Explore-PrepareDock", false, defaultConstraints, s.swerve),
-  //           new AutoBalance(s.swerve)));
+  //           new AutoBalDriveToPivot(s.swerve).andThen(new AutoBalance(s.swerve)));
   // }
 
   // public static CommandBase InertN1TwoConePath(Subsystems s) {
@@ -310,7 +310,7 @@ public class AutonPaths {
   //       // Go to charging station
   //       stowAnd(s, getCommandForPath("StartN9-Explore-PrepareDock", false, defaultConstraints, s.swerve)),
 
-  //       new AutoBalance(s.swerve)
+  //       new AutoBalDriveToPivot(s.swerve).andThen(new AutoBalance(s.swerve)
 
   //   );
   // }
@@ -336,7 +336,7 @@ public class AutonPaths {
   //           new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT)),
 
   //       // run autobalance 
-  //       new AutoBalance(s.swerve));
+  //       new AutoBalDriveToPivot(s.swerve).andThen(new AutoBalance(s.swerve));
 
   // }
 
@@ -360,7 +360,7 @@ public class AutonPaths {
   //           getCommandForPath("GamePiece9-PrepareDock", false, defaultConstraints, s.swerve),
   //           new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT)),
 
-  //       new AutoBalance(s.swerve));
+  //       new AutoBalDriveToPivot(s.swerve).andThen(new AutoBalance(s.swerve));
 
   // }
 
@@ -377,7 +377,7 @@ public class AutonPaths {
   //       stowAnd(s, getCommandForPath("InertN9-PrepareDock", false, defaultConstraints, s.swerve)),
 
   //       // run autobalance here
-  //       new AutoBalance(s.swerve));
+  //       new AutoBalDriveToPivot(s.swerve).andThen(new AutoBalance(s.swerve));
   // }
 
   // public static CommandBase InertN1StraightToDock(Subsystems s) {
@@ -393,7 +393,7 @@ public class AutonPaths {
   //       stowAnd(s, getCommandForPath("InertN1-PrepareDock", false, defaultConstraints, s.swerve)),
 
   //       // run autobalance here
-  //       new AutoBalance(s.swerve));
+  //       new AutoBalDriveToPivot(s.swerve).andThen(new AutoBalance(s.swerve));
   // }
 }
 
