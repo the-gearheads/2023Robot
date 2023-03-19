@@ -84,11 +84,12 @@ public class Wrist extends SubsystemBase {
   public void setGoal(WristState state) {
     var desiredGoal = state.getGoal();
 
-    if (angersWrapRangeHandler(desiredGoal) || angersInsideRobotHandler(desiredGoal))
-      return;
-
-    goal = desiredGoal;
-    setControlState(state.type);
+    if (angersWrapRangeHandler(desiredGoal) || angersInsideRobotHandler(desiredGoal)){
+      setGoalByType(WristControlType.DEFAULT);
+    }else{
+      goal = desiredGoal;
+      setControlState(state.type);
+    }
   }
 
   private boolean angersInsideRobotHandler(double goal) {

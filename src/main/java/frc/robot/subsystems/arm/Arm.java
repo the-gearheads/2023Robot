@@ -15,6 +15,7 @@ import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -26,7 +27,7 @@ public class Arm extends SubsystemBase {
   /** Creates a new arm. */
   public boolean configureHasRan = false;
   private int zeroCount = 0;
-  private double poseGoal = 0;
+  private TrapezoidProfile.State poseGoal = new TrapezoidProfile.State();
   private double velGoal = 0;
   protected CANSparkMax motor = new CANSparkMax(ARM.ARM_ID, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
@@ -74,12 +75,16 @@ public class Arm extends SubsystemBase {
     velPid.reset(getVelocity(), 0);
   }
 
-  public double getPoseGoal() {
+  public TrapezoidProfile.State getPoseGoal() {
     return poseGoal;
   }
 
-  public void setPoseGoal(double newGoal) {
-    poseGoal = newGoal;
+  public void setPoseGoal(double poseGoal) {
+    this.poseGoal = new TrapezoidProfile.State(poseGoal, 0);
+  }
+
+  public void setPoseGoal(TrapezoidProfile.State poseGoal){
+    this.poseGoal= poseGoal; 
   }
 
   public double getVelGoal() {
@@ -135,7 +140,8 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/CurrentPose", pose);
     Logger.getInstance().recordOutput("Arm/CurrentVel", vel);
     Logger.getInstance().recordOutput("Arm/Acceleration", acceleration);
-    Logger.getInstance().recordOutput("Arm/Pose/Goal", poseGoal);
+    Logger.getInstance().recordOutput("Arm/Pose/Pose Goal", poseGoal.position);
+    Logger.getInstance().recordOutput("Arm/Pose/Vel Goal", poseGoal.velocity);
     Logger.getInstance().recordOutput("Arm/Vel/Goal", velGoal);
     Logger.getInstance().recordOutput("Arm/ControlMode", controlMode.name);
     Logger.getInstance().recordOutput("Arm/Pose/Setpoint", pid.getSetpoint().position);

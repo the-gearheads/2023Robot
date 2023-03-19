@@ -55,7 +55,7 @@ public class SetArmPose extends CommandBase {
       return true;
     }
 
-    double goal = arm.getPoseGoal();
+    double goal = armPose.val;
     double currentPose = arm.getPose();
     double poseError = goal - currentPose;
     poseError = Math.abs(poseError);
