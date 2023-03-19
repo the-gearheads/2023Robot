@@ -202,6 +202,8 @@ public class Constants extends AnnotatedClass {
     public static final String EVENT_NAME = "Wayne";
 
     public static PIDController AUTO_BALANCE_PID = new PIDController(0.025, 0, 00);
+    public static double AUTO_BALANCE_VEL = 2.5;
+    public static double AUTO_BALANCE_PIVOT_ROLL = 7.5;
   }
   public static final class FIELD_CONSTANTS {
     public static final double WIDTH = 8.02;
