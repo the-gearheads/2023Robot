@@ -128,7 +128,7 @@ public class Constants extends AnnotatedClass {
     public static final double WHEEL_DIAMETER = Units.inchesToMeters(3);
     public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
 
-    public static final double DRIVE_PINION_TOOTH_COUNT = 14;
+    public static final double DRIVE_PINION_TOOTH_COUNT = 13;
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the bevel pinion
     public static final double DRIVE_GEAR_RATIO = (45.0 * 22) / (DRIVE_PINION_TOOTH_COUNT * 15);
 
