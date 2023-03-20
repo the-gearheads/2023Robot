@@ -18,8 +18,8 @@ import frc.robot.subsystems.wrist.WristState;
 
 public class Throw extends CommandBase {
   private static final double waitTime = 0.2;
-  private static final double wristTolerance = 0.5;
-  private static final double armTolerance = 0.5;
+  private static final double wristTolerance = 1;
+  private static final double armTolerance = 1;
   private Arm arm;
   private Wrist wrist;
   private Grabber grabber;

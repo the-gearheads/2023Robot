@@ -178,12 +178,8 @@ public class RobotContainer {
     }, swerve));
     // Controllers.driverController.getAutoAlign().onTrue(new AutoAlign(swerve, arm));
 
-    // Controllers.operatorController.armGoToLowNode()
-    //     .onTrue(new SetArmPose(arm, ArmPose.LOW_NODE).andThen(new ManualWristControl(wrist, WristState.RIGHT)));
-
     Controllers.operatorController.armGoToLowNode()
-    .onTrue(new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 20, 0)));
-
+        .onTrue(new SetArmPose(arm, ArmPose.LOW_NODE).andThen(new ManualWristControl(wrist, WristState.RIGHT)));
     Controllers.operatorController.armGoToMidNode().onTrue(new SetArmPose(arm, ArmPose.MID_NODE));
     Controllers.operatorController.armGoToHighNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
     Controllers.operatorController.armGoToInsideRobotNode().onTrue(new StowArm(arm, wrist));
@@ -191,6 +187,9 @@ public class RobotContainer {
     Controllers.operatorController.setWristAlternatePose().whileTrue(new AltWristControl(wrist).repeatedly());
     Controllers.operatorController.openGrabber().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
     Controllers.operatorController.setArmByJoystick().onTrue(new JoystickArmControl(arm));
+
+    Controllers.operatorController.throwCube().onTrue(
+      new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 30, 0)));
   }
 
   /**

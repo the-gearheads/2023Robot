@@ -46,4 +46,8 @@ public interface OperatorController {
   public default Trigger openGrabber() {
     return new Trigger(() -> false);
   }
+
+  public default Trigger throwCube() {
+    return new Trigger(() -> false);
+  }
 }
