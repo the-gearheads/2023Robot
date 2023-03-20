@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
 
 public enum LedState {
-  GREEN(Color.kGreen), WHITE(Color.kWhite);
+  GREEN(Color.kGreen), WHITE(Color.kWhite), ORANGE(Color.kOrange);
 
   private Consumer<AddressableLEDBuffer> updateBufferLambda;
 

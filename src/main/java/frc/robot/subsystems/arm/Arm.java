@@ -71,8 +71,8 @@ public class Arm extends SubsystemBase {
   }
 
   public void resetPIDs() {
-    pid.reset(getPose(), getVelocity());
-    velPid.reset(getVelocity(), 0);
+    pid.reset(getPose(), getVel());
+    velPid.reset(getVel(), 0);
   }
 
   public TrapezoidProfile.State getPoseGoal() {
@@ -99,7 +99,7 @@ public class Arm extends SubsystemBase {
     return encoder.getPosition() + ARM.ANGLE_OFFSET;
   }
 
-  public double getVelocity() {
+  public double getVel() {
     return encoder.getVelocity();
   }
 
@@ -131,7 +131,7 @@ public class Arm extends SubsystemBase {
     }
 
     var pose = getPose();
-    var vel = getVelocity();
+    var vel = getVel();
     var volts = 0.0;
 
     /* Calculate accleration. IT'S DOUBLE DIFFERENTIATION TIME*/
@@ -144,20 +144,22 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Pose/Vel Goal", poseGoal.velocity);
     Logger.getInstance().recordOutput("Arm/Vel/Goal", velGoal);
     Logger.getInstance().recordOutput("Arm/ControlMode", controlMode.name);
-    Logger.getInstance().recordOutput("Arm/Pose/Setpoint", pid.getSetpoint().position);
+    Logger.getInstance().recordOutput("Arm/Pose/pose setpoint", pid.getSetpoint().position);
+    Logger.getInstance().recordOutput("Arm/Pose/vel setpoint", pid.getSetpoint().velocity);
+
     Logger.getInstance().recordOutput("Arm/Vel/Setpoint", velPid.getSetpoint().position);
 
     /* Controlled entirely via setVoltage() */
     if (controlMode == ArmControlMode.VOLTAGE)
       return;
 
-    if (controlMode == ArmControlMode.VEL && MathUtil.applyDeadband(velGoal, 0.1) != 0) {
+    if (controlMode == ArmControlMode.VEL) {
       volts = velControl();
     } else {
       volts = poseControl();
     }
 
-    lastVel = getVelocity();
+    lastVel = getVel();
     lastTime = Timer.getFPGATimestamp();
 
     volts = applySoftLimit(volts);
@@ -193,13 +195,13 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Pose/PIDval", pidval);
     Logger.getInstance().recordOutput("Arm/Pose/Error", pid.getPositionError());
 
-    velPid.reset(getVelocity(), acceleration);
+    velPid.reset(getVel(), 0); // do not replace 0 with acceleration
     return ffval + pidval;
   }
 
   public double velControl() {
     var pose = getPose();
-    var vel = getVelocity();
+    var vel = getVel();
 
     /* Prospective Soft Limit */
     if ((getPose() + velGoal * 0.02 > ARM.MAX_ANGLE)) {
@@ -216,7 +218,7 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Vel/Error", velPid.getPositionError());
 
     setPoseGoal(pose);
-    pid.reset(getPose(), getVelocity());
+    pid.reset(getPose(), getVel());
     return ffval + pidval;
   }
 

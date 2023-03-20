@@ -66,7 +66,7 @@ public enum WristState {
 
   //this is cursed
   public static WristState getStateWithGoal(double goal){
-    VARIABLE.setGoal(5);
+    VARIABLE.setGoal(goal);
     return VARIABLE;
   }
 }

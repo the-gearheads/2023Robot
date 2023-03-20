@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.arm;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -44,13 +45,13 @@ public class ArmSim extends Arm {
   }
 
   @Override
-  public double getVelocity() {
+  public double getVel() {
     return Units.radiansToDegrees(m_armSim.getVelocityRadPerSec());
   }
 
   @Override
   public void setVoltage(double volts) {
-    this.simVolts = volts;
+    this.simVolts = MathUtil.clamp(volts,-12,12);
   }
 
   @Override
@@ -58,6 +59,7 @@ public class ArmSim extends Arm {
     return this.simVolts;
   }
 
+  @Override
   public boolean sensorErrorHandler() {
     return false;
   }

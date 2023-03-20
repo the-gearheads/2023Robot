@@ -49,7 +49,7 @@ public class WristSim extends Wrist {
 
   @Override
   public void setVoltage(double volts) {
-    this.simVolts = volts;
+    this.simVolts = MathUtil.clamp(volts,-12,12);
   }
 
   @Override
@@ -77,6 +77,11 @@ public class WristSim extends Wrist {
 
   public boolean hasSensorFault() {
     return false;
+  }
+
+  @Override
+  public void sensorFaultHandler(){
+
   }
 
   public void simulationPeriodic() {

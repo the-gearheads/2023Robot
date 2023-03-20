@@ -98,7 +98,7 @@ public class Wrist extends SubsystemBase {
   }
 
   private boolean angersWrapRangeHandler(double goal) {
-    return goal < WRIST.WRAP_RANGE_UPPER_BOUND || goal > WRIST.WRAP_RANGE_LOWER_BOUND;
+    return goal > WRIST.WRAP_RANGE_UPPER_BOUND || goal < WRIST.WRAP_RANGE_LOWER_BOUND;
   }
 
   @Override
@@ -131,8 +131,12 @@ public class Wrist extends SubsystemBase {
     if (wrapRangeEntered) {
       var direction = -1 * Math.signum(lastNonWrapRangePose);
       setVoltage(direction * WRIST.WRAP_RANGE_SPEED);
-    } else
+      Logger.getInstance().recordOutput("Wrist/wrap range handler triggered", true);
+    } else{
       lastNonWrapRangePose = getPose();
+      Logger.getInstance().recordOutput("Wrist/wrap range handler triggered", false);
+    }
+
   }
 
   /* Don't move towards the base of the robot if inside it (not good) */
@@ -147,7 +151,7 @@ public class Wrist extends SubsystemBase {
       setVoltage(0);
       overrideTriggered = true;
     }
-    Logger.getInstance().recordOutput("Wrist/AntiDestructionTriggered", overrideTriggered);
+    Logger.getInstance().recordOutput("Wrist/Inside Robot Handler Triggered", overrideTriggered);
   }
 
   public void setGoalByType(WristControlType wristStateType) { // check what range the arm is in and set the wrist accordingly
@@ -160,7 +164,7 @@ public class Wrist extends SubsystemBase {
     }
   }
 
-  private void sensorFaultHandler() {
+  public void sensorFaultHandler() {
     boolean hasFaults = motor.getFault(FaultID.kCANTX) || motor.getFault(FaultID.kCANRX);
     boolean hasStickyFaults = motor.getStickyFault(FaultID.kCANTX) || motor.getStickyFault(FaultID.kCANRX);
     var pose = encoder.getPosition();
@@ -190,8 +194,8 @@ public class Wrist extends SubsystemBase {
   }
 
   private void log() {
-    Logger.getInstance().recordOutput("Wrist/invalid reached", wrapRangeEntered);
-    Logger.getInstance().recordOutput("Wrist/Last Valid Pose", lastNonWrapRangePose);
+    Logger.getInstance().recordOutput("Wrist/wrap range entered", wrapRangeEntered);
+    Logger.getInstance().recordOutput("Wrist/Last non wrap pose", lastNonWrapRangePose);
     Logger.getInstance().recordOutput("Wrist/ReConfigure has ran", configureHasRan);
     Logger.getInstance().recordOutput("Wrist/control state", controlState.name());
     Logger.getInstance().recordOutput("Wrist/Pose", MoreMath.round(getPose(), 1));

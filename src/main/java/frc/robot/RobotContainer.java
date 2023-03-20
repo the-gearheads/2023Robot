@@ -20,9 +20,12 @@ import frc.robot.Constants.DRIVE;
 import frc.robot.commands.arm.JoystickArmControl;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.StowArm;
+import frc.robot.commands.arm.Throw;
+import frc.robot.commands.arm.ThrowState;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.wrist.AltWristControl;
+import frc.robot.commands.wrist.DefaultWristControl;
 import frc.robot.commands.wrist.ManualWristControl;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
@@ -117,6 +120,7 @@ public class RobotContainer {
     grabber = new Grabber();
     autonChooser = new AutonChooser(swerve, arm, wrist, grabber);
     leds = new Leds();
+    wrist.setDefaultCommand(new DefaultWristControl(wrist));
     // Configure the button binding
 
     // swerve.setDefaultCommand(new TeleopDrive(swerve));
@@ -174,8 +178,12 @@ public class RobotContainer {
     }, swerve));
     // Controllers.driverController.getAutoAlign().onTrue(new AutoAlign(swerve, arm));
 
+    // Controllers.operatorController.armGoToLowNode()
+    //     .onTrue(new SetArmPose(arm, ArmPose.LOW_NODE).andThen(new ManualWristControl(wrist, WristState.RIGHT)));
+
     Controllers.operatorController.armGoToLowNode()
-        .onTrue(new SetArmPose(arm, ArmPose.LOW_NODE).andThen(new ManualWristControl(wrist, WristState.RIGHT)));
+    .onTrue(new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 20, 0)));
+
     Controllers.operatorController.armGoToMidNode().onTrue(new SetArmPose(arm, ArmPose.MID_NODE));
     Controllers.operatorController.armGoToHighNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
     Controllers.operatorController.armGoToInsideRobotNode().onTrue(new StowArm(arm, wrist));
