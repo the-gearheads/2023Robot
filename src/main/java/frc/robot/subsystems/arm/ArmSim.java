@@ -24,6 +24,10 @@ public class ArmSim extends Arm {
   public ArmSim() {
     super();
     SmartDashboard.putData("Arm", m_mech2d);
+
+    super.velPid.setP(MECH_PLOT.SIM_ARM_VEL_PID[0]);
+    super.velPid.setI(MECH_PLOT.SIM_ARM_VEL_PID[1]);
+    super.velPid.setD(MECH_PLOT.SIM_ARM_VEL_PID[2]);
   }
 
   public void simulationPeriodic() {

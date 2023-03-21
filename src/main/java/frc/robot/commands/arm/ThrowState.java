@@ -15,4 +15,8 @@ public class ThrowState{
       this.armSpeed=armSpeed;
       this.wristPose=wristPose;
     }
+
+    public enum ThrowPhase{
+      INIT, PRE_RELEASE, RELEASE, WAIT, FINAL, END; 
+    }
   }

@@ -181,11 +181,6 @@ public class TeleopDrive extends CommandBase {
     var currentTime = Timer.getFPGATimestamp();
     var waited = currentTime - lastRotSpdNotEqualZeroTimestamp > 0.1;
 
-    if (!waited && rotSpdEqualZero) {
-      SmartDashboard.putBoolean("waiting", true);
-    } else {
-      SmartDashboard.putBoolean("waiting", false);
-    }
     if (runRotPid && rotSpdEqualZero && waited) {
       rotSpd = rotPIDCnt.calculate(ctsGyroAngle, angleGoal);
       Logger.getInstance().recordOutput("TeleopDrive/rot pid/rotSpd", rotSpd);

@@ -189,7 +189,7 @@ public class RobotContainer {
     Controllers.operatorController.setArmByJoystick().onTrue(new JoystickArmControl(arm));
 
     Controllers.operatorController.throwCube().onTrue(
-      new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 30, 0)));
+      new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 40, 20)));
   }
 
   /**

@@ -33,7 +33,7 @@ public class Arm extends SubsystemBase {
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
   private ProfiledPIDController pid =
       new ProfiledPIDController(ARM.ARM_POS_PID[0], ARM.ARM_POS_PID[1], ARM.ARM_POS_PID[2], ARM.ARM_CONSTRAINTS);
-  private ProfiledPIDController velPid =
+  protected ProfiledPIDController velPid =
       new ProfiledPIDController(ARM.ARM_VEL_PID[0], ARM.ARM_VEL_PID[1], ARM.ARM_VEL_PID[2], ARM.ARM_VEL_CONSTRAINTS);
   private SendableArmFeedforward ff =
       new SendableArmFeedforward(ARM.ARM_FF[0], ARM.ARM_FF[1], ARM.ARM_FF[2], ARM.ARM_FF[3]);
@@ -80,10 +80,16 @@ public class Arm extends SubsystemBase {
   }
 
   public void setPoseGoal(double poseGoal) {
-    this.poseGoal = new TrapezoidProfile.State(poseGoal, 0);
+    this.setPoseGoal(new TrapezoidProfile.State(poseGoal, 0));
   }
 
   public void setPoseGoal(TrapezoidProfile.State poseGoal){
+    if(!inAllowableRange(poseGoal.position)){
+      DriverStation.reportWarning("Arm Pose Handler TRIGGERED!!!", true);
+      Logger.getInstance().recordOutput("Arm Pose Handler TRIGGERED!!!", true);
+      return;
+    }
+    Logger.getInstance().recordOutput("Arm Pose Handler TRIGGERED!!!", false);
     this.poseGoal= poseGoal; 
   }
 
@@ -228,6 +234,10 @@ public class Arm extends SubsystemBase {
       return 0;
     }
     return volts;
+  }
+
+  public boolean inAllowableRange(double pose){
+    return pose <= ARM.MAX_ANGLE && pose >=ARM.MIN_ANGLE;
   }
 
   private void configure() {

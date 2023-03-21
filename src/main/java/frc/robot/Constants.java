@@ -75,6 +75,7 @@ public class Constants extends AnnotatedClass {
     public static final double WRIST_MASS = Units.lbsToKilograms(0.5);//should be 3.5 but whatev
 
     public static final double[] SIM_WRIST_PID = {3, 0.5, 1};
+    public static final double[] SIM_ARM_VEL_PID = {0.009, 0, 0};
   }
 
   public static class ARM {
@@ -89,7 +90,7 @@ public class Constants extends AnnotatedClass {
     public static final double POSE_TOLERANCE = 5;
     public static final double ANGLE_OFFSET = -270;
     public static final Constraints ARM_CONSTRAINTS = new Constraints(120, 150);
-    public static final Constraints ARM_VEL_CONSTRAINTS = new Constraints(VELOCITY, 10);
+    public static final Constraints ARM_VEL_CONSTRAINTS = new Constraints(50, 10);// change to 50, 10
     public static final double MAX_ANGLE = 10;
     public static final double MIN_ANGLE = -190;
   }
