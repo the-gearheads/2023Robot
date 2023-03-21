@@ -25,6 +25,10 @@ public class ThrustMaster implements OperatorController {
     return new JoystickButton(joy, 5);
   }
 
+  public Trigger throwCube() {
+    return new JoystickButton(joy, 8);
+  }
+
   public Trigger armGoToMidNode() {
     return new JoystickButton(joy, 6);
   }
@@ -38,10 +42,6 @@ public class ThrustMaster implements OperatorController {
   }
 
   public Trigger armGoToInsideRobotNode() {
-    return new JoystickButton(joy, 4);
-  }
-
-  public Trigger armGoToGroundPickUpNode() {
     return new JoystickButton(joy, 4);
   }
 
