@@ -22,7 +22,7 @@ public class AutoBalDriveToPivot extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    swerve.drive(new ChassisSpeeds(Math.signum(swerve.getPitch()) * AUTON.AUTO_BALANCE_VEL, 0, 0)); // 2.5 m/s
+    swerve.drive(new ChassisSpeeds(Math.signum(swerve.getRoll()) * AUTON.AUTO_BALANCE_VEL, 0, 0)); // 2.5 m/s
   }
 
   // Called once the commak nd ends or is interrupted.
