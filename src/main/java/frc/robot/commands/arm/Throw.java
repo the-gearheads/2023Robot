@@ -22,16 +22,19 @@ public class Throw extends CommandBase {
   private static final double wristTolerance = 10;
   private static final double armTolerance = 2;
   private static final double grabber_wait_time = 1;
+
   private Arm arm;
   private Wrist wrist;
   private Grabber grabber;
-  private ThrowState releaseState;
+  private Leds leds;
+  
   private ThrowState initState;
+  private ThrowState preReleaseState;
+  private ThrowState releaseState;
   private ThrowState finalState;
+
   private ThrowPhase phase;
   private ThrowState lastState;
-  private Leds leds;
-  private ThrowState preReleaseState;
 
   /** Creates a new Throw. */
   public Throw(Arm arm, Wrist wrist, Grabber grabber, Leds leds, ThrowState releaseState) {

@@ -21,11 +21,11 @@ import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.CustomProxy;
 import frc.robot.util.MoreMath;
 
-public class AlignToGrid extends CustomProxy {
+public class OldAlignToGrid extends CustomProxy {
   /** Creates a new AlignToGrid. */
   public static PathConstraints constraints = new PathConstraints(2, 1);
 
-  public AlignToGrid(Swerve swerve, Arm arm) {
+  public OldAlignToGrid(Swerve swerve, Arm arm) {
     super(() -> {
       return proxy(swerve, arm);
     });

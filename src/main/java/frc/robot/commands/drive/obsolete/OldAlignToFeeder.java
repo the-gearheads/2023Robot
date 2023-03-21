@@ -20,9 +20,9 @@ import frc.robot.util.MoreMath;
 import frc.robot.Constants.FIELD_CONSTANTS;
 import frc.robot.Constants.AUTO_ALIGN.FEEDER;
 
-public class AlignToFeederStation extends CustomProxy {
+public class OldAlignToFeeder extends CustomProxy {
 
-  public AlignToFeederStation(Swerve swerve, Arm arm) {
+  public OldAlignToFeeder(Swerve swerve, Arm arm) {
     super(() -> {
       return proxy(swerve, arm);
     }, swerve, arm);
