@@ -6,7 +6,6 @@ package frc.robot.commands.arm;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ARM;
@@ -20,9 +19,9 @@ import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristState;
 
 public class Throw extends CommandBase {
-  private static final double wristTolerance =10;
+  private static final double wristTolerance = 10;
   private static final double armTolerance = 2;
-  private static final double grabber_wait_time = 0.1;
+  private static final double grabber_wait_time = 1;
   private Arm arm;
   private Wrist wrist;
   private Grabber grabber;
@@ -38,8 +37,8 @@ public class Throw extends CommandBase {
   public Throw(Arm arm, Wrist wrist, Grabber grabber, Leds leds, ThrowState releaseState) {
     this.arm = arm;
     this.wrist = wrist;
-    this.grabber=grabber;
-    this.leds=leds;
+    this.grabber = grabber;
+    this.leds = leds;
     this.releaseState = releaseState;
     addRequirements(arm, wrist, grabber, leds);
   }
@@ -52,27 +51,28 @@ public class Throw extends CommandBase {
     var preReleaseDeltaPose = releaseState.armSpeed * grabber_wait_time;
     var preReleaseArmPose = releaseState.armPose - preReleaseDeltaPose;
     this.preReleaseState = new ThrowState(preReleaseArmPose, releaseState.armSpeed, releaseState.wristPose);
-    
+
     // calculate init state
-    //calculate min distance for arm to reach pre-release state
+    // calculate min distance for arm to reach pre-release state
     // v^2=2ax
     // x = v^2/(2a)
     var accSign = Math.signum(releaseState.armSpeed);
     var acc = accSign * ARM.ARM_CONSTRAINTS.maxAcceleration;
-    var deltaPose = Math.pow(releaseState.armSpeed,2)/(2*acc);
+    var deltaPose = Math.pow(releaseState.armSpeed, 2) / (2 * acc);
 
     var toleranceDelta = 15 * Math.signum(releaseState.armSpeed);
     var initArmPose = preReleaseState.armPose - deltaPose - toleranceDelta;
-    this.initState = new ThrowState(initArmPose,0,this.releaseState.wristPose);
+    this.initState = new ThrowState(initArmPose, 0, this.releaseState.wristPose);
 
+    // calculate final state (give arm time to slow down)
     var finalDelta = 10 * Math.signum(releaseState.armSpeed);
     var finalArmPose = this.releaseState.armPose + finalDelta;
     this.finalState = new ThrowState(finalArmPose, 0, this.releaseState.wristPose);
 
     // set fields
-    this.phase=ThrowPhase.INIT;
-    this.lastState=getCurrentState();
-    
+    this.phase = ThrowPhase.INIT;
+    this.lastState = getCurrentState();
+
     // led signals (helps for testing)
     leds.setState(LedState.WHITE);
 
@@ -82,10 +82,10 @@ public class Throw extends CommandBase {
     logState(releaseState, "release");
     logState(finalState, "final");
 
-    if(!this.arm.inAllowableRange(initState.armPose)){
+    if (!this.arm.inAllowableRange(initState.armPose)) {
       DriverStation.reportWarning("invalid init pose when throwing", true);
       this.cancel();
-    }else if(!this.arm.inAllowableRange(finalState.armPose)){
+    } else if (!this.arm.inAllowableRange(finalState.armPose)) {
       DriverStation.reportWarning("invalid final pose when throwing", true);
       this.cancel();
     }
@@ -98,54 +98,54 @@ public class Throw extends CommandBase {
     SmartDashboard.putString("throw/phase", phase.name());
 
     // main switch
-    switch(phase){
+    switch (phase) {
       case INIT:
-      setThrowState(this.initState);
-      if(armReached(this.initState, 15) && wristReached(this.initState)){ 
-        phase=ThrowPhase.PRE_RELEASE;
-        this.lastState=getCurrentState();
-      }
-      break;
+        setThrowState(this.initState);
+        if (armReached(this.initState, 15) && wristReached(this.initState)) {
+          phase = ThrowPhase.PRE_RELEASE;
+          this.lastState = getCurrentState();
+        }
+        break;
       case PRE_RELEASE:
-      setThrowState(this.preReleaseState);
-      leds.setState(LedState.PURPLE);
-      if(armReached(this.preReleaseState)){ 
-        grabber.open();
-        leds.setState(LedState.GREEN);
+        setThrowState(this.preReleaseState);
+        leds.setState(LedState.PURPLE);
+        if (armReached(this.preReleaseState)) {
+          grabber.open();
+          leds.setState(LedState.GREEN);
 
-        phase=ThrowPhase.RELEASE;
-        this.lastState=getCurrentState();
-        logState(getCurrentState(), "prerelease empirical");
-      }
-      break;
+          phase = ThrowPhase.RELEASE;
+          this.lastState = getCurrentState();
+          logState(getCurrentState(), "pre-release empirical");
+        }
+        break;
       case RELEASE:
-      arm.setControlMode(ArmControlMode.VEL);
-      arm.setVelGoal(this.releaseState.armSpeed);
+        arm.setControlMode(ArmControlMode.VEL);
+        arm.setVelGoal(this.releaseState.armSpeed);
 
-      leds.setState(LedState.YELLOW);
-      if(armReached(this.releaseState)){ 
-        phase=ThrowPhase.FINAL;
-        this.lastState=getCurrentState();
-        logState(getCurrentState(), "release empirical");
-      }
-      break;
+        leds.setState(LedState.YELLOW);
+        if (armReached(this.releaseState)) {
+          phase = ThrowPhase.FINAL;
+          this.lastState = getCurrentState();
+          logState(getCurrentState(), "release empirical");
+        }
+        break;
       case FINAL:
-      setThrowState(this.finalState);
-      leds.setState(LedState.WHITE);
-      grabber.close();
-      if(armReached(this.finalState)){ 
-        phase=ThrowPhase.END;
-        this.lastState=getCurrentState();
-      }
-      break;
+        setThrowState(this.finalState);
+        leds.setState(LedState.WHITE);
+        grabber.close();
+        if (armReached(this.finalState)) {
+          phase = ThrowPhase.END;
+          this.lastState = getCurrentState();
+        }
+        break;
     }
   }
 
-  private void setThrowState(ThrowState state){
+  private void setThrowState(ThrowState state) {
     arm.setControlMode(ArmControlMode.POS);
     var armGoal = new TrapezoidProfile.State(state.armPose, state.armSpeed);
     this.arm.setPoseGoal(armGoal);
-    
+
     var wristGoal = WristState.getStateWithGoal(state.wristPose);
     this.wrist.setGoal(wristGoal);
   }
@@ -153,11 +153,11 @@ public class Throw extends CommandBase {
   private boolean armReached(ThrowState state, double armTolerance) {
     boolean armPast;
     var armClose = Math.abs(arm.getPose() - state.armPose) < armTolerance;
-    
+
     var moveDir = Math.signum(state.armPose - lastState.armPose);
-    if(moveDir>0){
+    if (moveDir > 0) {
       armPast = arm.getPose() > state.armPose;
-    }else{
+    } else {
       armPast = arm.getPose() < state.armPose;
     }
 
@@ -165,11 +165,11 @@ public class Throw extends CommandBase {
     return armReached;
   }
 
-  private boolean wristReached(ThrowState state, double wristTolerance){
+  private boolean wristReached(ThrowState state, double wristTolerance) {
     return Math.abs(state.wristPose - wrist.getPose()) < wristTolerance;
   }
 
-  private boolean wristReached(ThrowState state){
+  private boolean wristReached(ThrowState state) {
     return wristReached(state, wristTolerance);
   }
 
@@ -177,18 +177,18 @@ public class Throw extends CommandBase {
     return this.armReached(state, Throw.armTolerance);
   }
 
-  private ThrowState getCurrentState(){
+  private ThrowState getCurrentState() {
     return new ThrowState(arm.getPose(), arm.getVel(), wrist.getPose());
   }
 
-  public void logState(ThrowState state, String path){
+  public void logState(ThrowState state, String path) {
     SmartDashboard.putNumber("throw/" + path + "/arm pose", state.armPose);
     SmartDashboard.putNumber("throw/" + path + "/arm speed", state.armSpeed);
     SmartDashboard.putNumber("throw/" + path + "/wrist pose", state.wristPose);
   }
 
   @Override
-  public void end(boolean interrupted){
+  public void end(boolean interrupted) {
     SmartDashboard.putBoolean("throw/on?", false);
     this.arm.setPoseGoal(this.arm.getPose());
   }
@@ -197,6 +197,6 @@ public class Throw extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return phase==ThrowPhase.END;
+    return phase == ThrowPhase.END;
   }
 }

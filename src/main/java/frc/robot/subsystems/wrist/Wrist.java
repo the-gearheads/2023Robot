@@ -84,9 +84,9 @@ public class Wrist extends SubsystemBase {
   public void setGoal(WristState state) {
     var desiredGoal = state.getGoal();
 
-    if (angersWrapRangeHandler(desiredGoal) || angersInsideRobotHandler(desiredGoal)){
+    if (angersWrapRangeHandler(desiredGoal) || angersInsideRobotHandler(desiredGoal)) {
       setGoalByType(WristControlType.DEFAULT);
-    }else{
+    } else {
       goal = desiredGoal;
       setControlState(state.type);
     }
@@ -132,7 +132,7 @@ public class Wrist extends SubsystemBase {
       var direction = -1 * Math.signum(lastNonWrapRangePose);
       setVoltage(direction * WRIST.WRAP_RANGE_SPEED);
       Logger.getInstance().recordOutput("Wrist/wrap range handler triggered", true);
-    } else{
+    } else {
       lastNonWrapRangePose = getPose();
       Logger.getInstance().recordOutput("Wrist/wrap range handler triggered", false);
     }

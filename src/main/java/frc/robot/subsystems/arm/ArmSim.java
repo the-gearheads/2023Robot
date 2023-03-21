@@ -55,7 +55,7 @@ public class ArmSim extends Arm {
 
   @Override
   public void setVoltage(double volts) {
-    this.simVolts = MathUtil.clamp(volts,-12,12);
+    this.simVolts = MathUtil.clamp(volts, -12, 12);
   }
 
   @Override

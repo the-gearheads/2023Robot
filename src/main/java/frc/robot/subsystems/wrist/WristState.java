@@ -1,7 +1,5 @@
 package frc.robot.subsystems.wrist;
 
-import java.util.function.Function;
-import org.ejml.equation.VariableType;
 import frc.robot.Constants.ARM;
 
 public enum WristState {
@@ -46,26 +44,26 @@ public enum WristState {
   }
 
   private WristState(double min, double max, double goal, WristControlType type) {
-    this.min=min;
-    this.max=max;
-    this.goal=goal;
-    this.type=type;
+    this.min = min;
+    this.max = max;
+    this.goal = goal;
+    this.type = type;
   }
 
   public boolean inRange(double currentWrappedPos) {
     return currentWrappedPos >= min && currentWrappedPos <= max;
   }
 
-  private void setGoal(double goal){
-    this.goal=goal;
+  private void setGoal(double goal) {
+    this.goal = goal;
   }
 
-  public double getGoal(){
+  public double getGoal() {
     return goal;
   }
 
   //this is cursed
-  public static WristState getStateWithGoal(double goal){
+  public static WristState getStateWithGoal(double goal) {
     VARIABLE.setGoal(goal);
     return VARIABLE;
   }

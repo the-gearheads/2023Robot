@@ -13,7 +13,6 @@ import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -35,7 +34,7 @@ public class Arm extends SubsystemBase {
       new ProfiledPIDController(ARM.ARM_POS_PID[0], ARM.ARM_POS_PID[1], ARM.ARM_POS_PID[2], ARM.ARM_CONSTRAINTS);
   protected ProfiledPIDController velPid =
       new ProfiledPIDController(ARM.ARM_VEL_PID[0], ARM.ARM_VEL_PID[1], ARM.ARM_VEL_PID[2], ARM.ARM_VEL_CONSTRAINTS);
-  private SendableArmFeedforward ff =
+  protected SendableArmFeedforward ff =
       new SendableArmFeedforward(ARM.ARM_FF[0], ARM.ARM_FF[1], ARM.ARM_FF[2], ARM.ARM_FF[3]);
   private double lastTime = Timer.getFPGATimestamp();
   private double lastVel = 0;
@@ -83,14 +82,14 @@ public class Arm extends SubsystemBase {
     this.setPoseGoal(new TrapezoidProfile.State(poseGoal, 0));
   }
 
-  public void setPoseGoal(TrapezoidProfile.State poseGoal){
-    if(!inAllowableRange(poseGoal.position)){
+  public void setPoseGoal(TrapezoidProfile.State poseGoal) {
+    if (!inAllowableRange(poseGoal.position)) {
       DriverStation.reportWarning("Arm Pose Handler TRIGGERED!!!", true);
       Logger.getInstance().recordOutput("Arm Pose Handler TRIGGERED!!!", true);
       return;
     }
     Logger.getInstance().recordOutput("Arm Pose Handler TRIGGERED!!!", false);
-    this.poseGoal= poseGoal; 
+    this.poseGoal = poseGoal;
   }
 
   public double getVelGoal() {
@@ -152,7 +151,8 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/ControlMode", controlMode.name);
     Logger.getInstance().recordOutput("Arm/Pose/pose setpoint", pid.getSetpoint().position);
     Logger.getInstance().recordOutput("Arm/Pose/vel setpoint", pid.getSetpoint().velocity);
-        Logger.getInstance().recordOutput("Arm/current command", this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "");
+    Logger.getInstance().recordOutput("Arm/current command",
+        this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "");
 
     Logger.getInstance().recordOutput("Arm/Vel/Setpoint", velPid.getSetpoint().position);
 
@@ -236,8 +236,8 @@ public class Arm extends SubsystemBase {
     return volts;
   }
 
-  public boolean inAllowableRange(double pose){
-    return pose <= ARM.MAX_ANGLE && pose >=ARM.MIN_ANGLE;
+  public boolean inAllowableRange(double pose) {
+    return pose <= ARM.MAX_ANGLE && pose >= ARM.MIN_ANGLE;
   }
 
   private void configure() {

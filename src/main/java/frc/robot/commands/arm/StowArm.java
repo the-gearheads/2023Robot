@@ -15,9 +15,8 @@ import frc.robot.subsystems.wrist.WristState;
 public class StowArm extends SequentialCommandGroup {
   /** Creates a new StowArm. */
   public StowArm(Arm arm, Wrist wrist) {
-    super(
-      new SetArmPose(arm, ArmPose.INSIDE_ROBOT).raceWith(new DefaultWristControl(wrist)), 
-      new ManualWristControl(wrist, WristState.RIGHT));
+    super(new SetArmPose(arm, ArmPose.INSIDE_ROBOT).raceWith(new DefaultWristControl(wrist)),
+        new ManualWristControl(wrist, WristState.RIGHT));
     // Use addRequirements() here to declare subsystem dependencies.
   }
 }

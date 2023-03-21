@@ -54,10 +54,10 @@ public class JoystickArmControl extends CommandBase {
       armvel += posvel;
     }
 
-    if(MathUtil.applyDeadband(armvel, 0.1) != 0){
+    if (MathUtil.applyDeadband(armvel, 0.1) != 0) {
       arm.setControlMode(ArmControlMode.VEL);
       arm.setVelGoal(armvel);
-    }else{
+    } else {
       arm.setControlMode(ArmControlMode.POS);
     }
   }

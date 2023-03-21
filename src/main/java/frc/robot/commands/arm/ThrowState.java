@@ -5,18 +5,18 @@
 package frc.robot.commands.arm;
 
 /** Add your docs here. */
-public class ThrowState{
-    public double wristPose;
-    public double armSpeed;
-    public double armPose;
+public class ThrowState {
+  public double wristPose;
+  public double armSpeed;
+  public double armPose;
 
-    public ThrowState(double armPose, double armSpeed, double wristPose){
-      this.armPose=armPose;
-      this.armSpeed=armSpeed;
-      this.wristPose=wristPose;
-    }
-
-    public enum ThrowPhase{
-      INIT, PRE_RELEASE, RELEASE, WAIT, FINAL, END; 
-    }
+  public ThrowState(double armPose, double armSpeed, double wristPose) {
+    this.armPose = armPose;
+    this.armSpeed = armSpeed;
+    this.wristPose = wristPose;
   }
+
+  public enum ThrowPhase {
+    INIT, PRE_RELEASE, RELEASE, WAIT, FINAL, END;
+  }
+}
