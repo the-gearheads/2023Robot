@@ -25,11 +25,6 @@ import frc.robot.util.SendableArmFeedforward;
 
 public class Wrist extends SubsystemBase {
   /** Creates a new Wrist. */
-  private int zeroCount = 0;
-  private Boolean configureHasRan = false;
-
-  private WristState goal;
-
   private CANSparkMax motor = new CANSparkMax(WRIST.WRIST_ID, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
 
@@ -39,13 +34,19 @@ public class Wrist extends SubsystemBase {
 
   private double pidval;
   private double ffval;
+  private double volts;
+
+  private WristState goal;
 
   private double lastNonWrapRangePose = 90;
+  private boolean wrapRangeEntered = false;
+
+  private int zeroCount = 0;
+  private Boolean configureHasRan = false;
+
+  private boolean shouldFallBackToDefault=true;
 
   private Arm arm;
-  private boolean wrapRangeEntered = false;
-  private double volts;
-  private boolean shouldFallBackToDefault=true;
 
   public Wrist(Arm arm) {
     this.arm = arm;
@@ -79,17 +80,23 @@ public class Wrist extends SubsystemBase {
 
   public void setGoal(WristState state) {
     if (angersWrapRangeHandler(state.getGoal()) || angersInsideRobotHandler(state.getGoal())) return;
-    shouldFallBackToDefault = false;
     goal = state;
+
+    if(state.type!=WristControlType.DEFAULT)shouldFallBackToDefault = false;
   }
 
   private boolean angersInsideRobotHandler(double goal) {
     var armInsideBot = WristState.INSIDE_ROBOT.inRange(getArmPose());
-    return armInsideBot && goal < 0;
+    var angered = armInsideBot && goal < 0;
+
+    Logger.getInstance().recordOutput("Wrist/inside robot handler/proactively triggered", angered);
+    return angered;
   }
 
   private boolean angersWrapRangeHandler(double goal) {
-    return goal > WRIST.WRAP_RANGE_UPPER_BOUND || goal < WRIST.WRAP_RANGE_LOWER_BOUND;
+    var angered = goal > WRIST.WRAP_RANGE_UPPER_BOUND || goal < WRIST.WRAP_RANGE_LOWER_BOUND;
+    Logger.getInstance().recordOutput("Wrist/wrap range handler/proactively triggered", angered);
+    return angered;
   }
 
   @Override
@@ -134,10 +141,10 @@ public class Wrist extends SubsystemBase {
     if (wrapRangeEntered) {
       var direction = -1 * Math.signum(lastNonWrapRangePose);
       setVoltage(direction * WRIST.WRAP_RANGE_SPEED);
-      Logger.getInstance().recordOutput("Wrist/wrap range handler triggered", true);
+      Logger.getInstance().recordOutput("Wrist/wrap range handler/triggered", true);
     } else {
       lastNonWrapRangePose = getPose();
-      Logger.getInstance().recordOutput("Wrist/wrap range handler triggered", false);
+      Logger.getInstance().recordOutput("Wrist/wrap range handler/triggered", false);
     }
 
   }
@@ -154,7 +161,7 @@ public class Wrist extends SubsystemBase {
       setVoltage(0);
       overrideTriggered = true;
     }
-    Logger.getInstance().recordOutput("Wrist/Inside Robot Handler Triggered", overrideTriggered);
+    Logger.getInstance().recordOutput("Wrist/inside robot handler/triggered", overrideTriggered);
   }
 
   public void setGoalByType(WristControlType wristStateType) { // check what range the arm is in and set the wrist accordingly
@@ -177,9 +184,9 @@ public class Wrist extends SubsystemBase {
     }
 
     var zeroCountFault = zeroCount > 1;
-    Logger.getInstance().recordOutput("Wrist/Faults/Zero Count Fault", zeroCountFault);
-    Logger.getInstance().recordOutput("Wrist/Faults/Fault", hasFaults);
-    Logger.getInstance().recordOutput("Wrist/Faults/Sticky Fault", hasStickyFaults);
+    Logger.getInstance().recordOutput("Wrist/fault handler/zero fault count", zeroCountFault);
+    Logger.getInstance().recordOutput("Wrist/fault handler/fault", hasFaults);
+    Logger.getInstance().recordOutput("Wrist/fault handler/sticky fault", hasStickyFaults);
 
     if (hasStickyFaults) {
       DriverStation.reportWarning("Wrist Sticky Fault", true);
@@ -197,9 +204,9 @@ public class Wrist extends SubsystemBase {
   }
 
   private void log() {
-    Logger.getInstance().recordOutput("Wrist/wrap range entered", wrapRangeEntered);
-    Logger.getInstance().recordOutput("Wrist/Last non wrap pose", lastNonWrapRangePose);
-    Logger.getInstance().recordOutput("Wrist/ReConfigure has ran", configureHasRan);
+    Logger.getInstance().recordOutput("Wrist/wrap range handler/range entered", wrapRangeEntered);
+    Logger.getInstance().recordOutput("Wrist/wrap range handler/Last non wrap pose", lastNonWrapRangePose);
+    Logger.getInstance().recordOutput("Wrist/fault handler/ReConfigure has ran", configureHasRan);
     Logger.getInstance().recordOutput("Wrist/control state", goal.type.name());
     Logger.getInstance().recordOutput("Wrist/Pose", MoreMath.round(getPose(), 1));
     Logger.getInstance().recordOutput("Wrist/Vel", MoreMath.round(getVelocity(), 1));
@@ -210,7 +217,7 @@ public class Wrist extends SubsystemBase {
     Logger.getInstance().recordOutput("Wrist/Appliedvolts", MoreMath.round(motor.getAppliedOutput(), 3));
     Logger.getInstance().recordOutput("Wrist/Current Command",
         this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "");
-    Logger.getInstance().recordOutput("Wrist/fell back to default", shouldFallBackToDefault);
+    Logger.getInstance().recordOutput("Wrist/default fallback handler/fell back to default", shouldFallBackToDefault);
 
   }
 

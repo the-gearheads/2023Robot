@@ -124,6 +124,8 @@ public class Throw extends CommandBase {
       case RELEASE:
         arm.setControlMode(ArmControlMode.VEL);
         arm.setVelGoal(this.releaseState.armSpeed);
+        var wristGoal = WristState.getStateWithGoal(releaseState.wristPose);
+        this.wrist.setGoal(wristGoal);
 
         leds.setState(LedState.YELLOW);
         if (armReached(this.releaseState)) {
