@@ -24,6 +24,7 @@ import frc.robot.commands.arm.Throw;
 import frc.robot.commands.arm.ThrowState;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.TeleopDrive;
+import frc.robot.commands.drive.autoalign.AutoAlign;
 import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.commands.wrist.DefaultWristControl;
 import frc.robot.commands.wrist.ManualWristControl;
@@ -173,10 +174,10 @@ public class RobotContainer {
       dest = new Pose2d(dest.getTranslation().plus(translation), dest.getRotation());
       return swerve.goTo(dest, Constants.AUTON.MID_CONSTRAINTS);
     }));
-    Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(() -> {
-      swerve.setPose(new Pose2d());
-    }, swerve));
-    // Controllers.driverController.getAutoAlign().onTrue(new AutoAlign(swerve, arm));
+    // Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(() -> {
+    //   swerve.setPose(new Pose2d());
+    // }, swerve));
+    Controllers.driverController.getAutoAlign().onTrue(new AutoAlign(swerve, arm));
 
     Controllers.operatorController.armGoToLowNode()
         .onTrue(new SetArmPose(arm, ArmPose.LOW_NODE).andThen(new ManualWristControl(wrist, WristState.RIGHT)));

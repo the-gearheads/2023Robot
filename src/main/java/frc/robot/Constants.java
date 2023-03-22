@@ -347,6 +347,7 @@ public class Constants extends AnnotatedClass {
 
 
       public static final ArrayList<Translation2d> DIAG_CORNERS;
+      public static final double CLOSE_THRESHOLD = 3;
 
       static {
         switch (FIELD_CONSTANTS.FIELD_TYPE) {

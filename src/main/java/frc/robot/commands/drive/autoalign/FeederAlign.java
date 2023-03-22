@@ -111,7 +111,7 @@ public class FeederAlign extends SequentialCommandGroup {
     var currentPose = swerve.getPose();
     var destPose = getDestPose(swerve.getPose());
 
-    return destPose.getTranslation().getDistance(currentPose.getTranslation()) < 1;
+    return destPose.getTranslation().getDistance(currentPose.getTranslation()) < FEEDER.CLOSE_THRESHOLD;
   }
 
   private static boolean isLeft(Pose2d pose) {
