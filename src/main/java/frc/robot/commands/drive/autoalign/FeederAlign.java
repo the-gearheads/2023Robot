@@ -115,7 +115,8 @@ public class FeederAlign extends SequentialCommandGroup {
   }
 
   private static boolean isLeft(Pose2d pose) {
-    return Controllers.driverController.getAutoLeft().getAsBoolean() == MoreMath.isBlue();
+    return (Controllers.driverController.getAutoLeft().getAsBoolean() && MoreMath.isBlue())
+    || (Controllers.driverController.getAutoRight().getAsBoolean() && !MoreMath.isBlue());
   }
 
   private static Pose2d getPrepPose(Pose2d pose) {
