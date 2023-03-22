@@ -17,7 +17,7 @@ public class DefaultWristControl extends CommandBase {
   }
 
   @Override
-  public boolean runsWhenDisabled(){
+  public boolean runsWhenDisabled() {
     return true;
   }
 

@@ -206,7 +206,7 @@ public class MoreMath {
     return val > lowerBound && val < upperBound;
   }
 
-  public static boolean within(Pose2d pose, Translation2d firstBound, Translation2d secondBound){
+  public static boolean within(Pose2d pose, Translation2d firstBound, Translation2d secondBound) {
     var xCheck = within(pose.getX(), firstBound.getX(), secondBound.getX());
     var yCheck = within(pose.getY(), firstBound.getY(), secondBound.getY());
     return xCheck && yCheck;

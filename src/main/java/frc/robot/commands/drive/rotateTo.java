@@ -13,7 +13,6 @@ import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.MoreMath;
 
 public class rotateTo extends CommandBase {
-  private double angle;
   private Swerve swerve;
   private PIDController rotPIDCnt = new PIDController(5d, 0d, 0d);
   private Rotation2d rotGoal;

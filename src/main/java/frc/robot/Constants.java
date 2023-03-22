@@ -212,6 +212,7 @@ public class Constants extends AnnotatedClass {
     public enum FieldType {
       SHOP, REAL, TEST;
     }
+
     public static final FieldType FIELD_TYPE = FieldType.REAL;
   }
   public static final class CONTROLLERS {
@@ -235,18 +236,12 @@ public class Constants extends AnnotatedClass {
             new Rotation3d(Units.degreesToRadians(29 + 180), 7.4, 0));
         //13.5, 18, 3
         var frontRightDelta = new Transform3d(
-          new Translation3d(
-            Units.inchesToMeters(3), 
-            Units.inchesToMeters(-13.5), 
-            Units.inchesToMeters(1)),
-          new Rotation3d(Units.degreesToRadians(29 + 180), 7.4, 0));
+            new Translation3d(Units.inchesToMeters(3), Units.inchesToMeters(-13.5), Units.inchesToMeters(1)),
+            new Rotation3d(Units.degreesToRadians(29 + 180), 7.4, 0));
 
         var backRightDelta = new Transform3d(
-          new Translation3d(
-            Units.inchesToMeters(3), 
-            Units.inchesToMeters(-18), 
-            Units.inchesToMeters(1)),
-          new Rotation3d(Units.degreesToRadians(180), 0, 0));
+            new Translation3d(Units.inchesToMeters(3), Units.inchesToMeters(-18), Units.inchesToMeters(1)),
+            new Rotation3d(Units.degreesToRadians(180), 0, 0));
 
         put(new PhotonCamera("Back Left"), robotTip.plus(backLeftDelta));
         put(new PhotonCamera("Front Right"), robotTip.plus(frontRightDelta));
@@ -279,7 +274,7 @@ public class Constants extends AnnotatedClass {
     }
 
     private static final AprilTagFieldLayout TEST_ATFL;
-    static {      
+    static {
       var id1Pose = new Pose3d(2.5, 2.5, 0, new Rotation3d(0, 0, 0));
       var id1Toid8 = new Transform3d(new Translation3d(0, 0.2159, 0), new Rotation3d(0, 0, 0));
       var id8Pose = id1Pose.plus(id1Toid8);
@@ -294,16 +289,16 @@ public class Constants extends AnnotatedClass {
     public static final AprilTagFieldLayout ATFL;
 
     static {
-      switch(FIELD_CONSTANTS.FIELD_TYPE){
+      switch (FIELD_CONSTANTS.FIELD_TYPE) {
         case SHOP:
-        ATFL = SHOP_ATFL;
-        break;
+          ATFL = SHOP_ATFL;
+          break;
         case TEST:
-        ATFL = TEST_ATFL;
-        break;
+          ATFL = TEST_ATFL;
+          break;
         default:
-        ATFL = FIELD_ATFL;
-        break;
+          ATFL = FIELD_ATFL;
+          break;
       }
     }
   }
@@ -325,10 +320,12 @@ public class Constants extends AnnotatedClass {
       public static final double ROT_THRESHOLD = 20;
       public static final double DIST_THRESHOLD = 1;
       public static final PathConstraints CONSTRAINTS = new PathConstraints(2, 1);
-      public static final ArrayList<Translation2d> DIAG_CORNERS = new ArrayList<Translation2d>(){{
-        add(new Translation2d(0,0));
-        add(new Translation2d(3, FIELD_CONSTANTS.WIDTH));
-      }};
+      public static final ArrayList<Translation2d> DIAG_CORNERS = new ArrayList<Translation2d>() {
+        {
+          add(new Translation2d(0, 0));
+          add(new Translation2d(3, FIELD_CONSTANTS.WIDTH));
+        }
+      };
     }
     public static class FEEDER {
       public static final double Y_THRESHOLD = 0.5;
@@ -354,19 +351,23 @@ public class Constants extends AnnotatedClass {
           case SHOP:
             RIGHT_DEST_POSE = new Pose2d(7.5, 1.5, Rotation2d.fromDegrees(180));
             LEFT_DEST_POSE = new Pose2d(7.5, 2.5, Rotation2d.fromDegrees(180));
-            DIAG_CORNERS = new ArrayList<Translation2d>(){{
-              var corner = new Translation2d(FIELD_CONSTANTS.LENGTH / 2, FIELD_CONSTANTS.WIDTH / 2);
-              add(corner);
-              add(corner.minus(new Translation2d(LENGTH, WIDTH)));
-            }};
+            DIAG_CORNERS = new ArrayList<Translation2d>() {
+              {
+                var corner = new Translation2d(FIELD_CONSTANTS.LENGTH / 2, FIELD_CONSTANTS.WIDTH / 2);
+                add(corner);
+                add(corner.minus(new Translation2d(LENGTH, WIDTH)));
+              }
+            };
             break;
           default:
             RIGHT_DEST_POSE = new Pose2d(15.5, 6, Rotation2d.fromDegrees(180));
             LEFT_DEST_POSE = new Pose2d(15.5, 7.5, Rotation2d.fromDegrees(180));
-            DIAG_CORNERS = new ArrayList<Translation2d>(){{
-              add(new Translation2d(10, 5.6));
-              add(new Translation2d(FIELD_CONSTANTS.LENGTH, FIELD_CONSTANTS.WIDTH));
-            }};
+            DIAG_CORNERS = new ArrayList<Translation2d>() {
+              {
+                add(new Translation2d(10, 5.6));
+                add(new Translation2d(FIELD_CONSTANTS.LENGTH, FIELD_CONSTANTS.WIDTH));
+              }
+            };
             break;
         }
         RIGHT_PREP_POSE = RIGHT_DEST_POSE.transformBy(PREP2DEST.inverse());

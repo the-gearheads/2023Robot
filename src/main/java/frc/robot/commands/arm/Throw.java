@@ -27,7 +27,7 @@ public class Throw extends CommandBase {
   private Wrist wrist;
   private Grabber grabber;
   private Leds leds;
-  
+
   private ThrowState initState;
   private ThrowState preReleaseState;
   private ThrowState releaseState;

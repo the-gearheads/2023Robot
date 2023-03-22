@@ -34,7 +34,6 @@ public class AutoBalance extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double pitch = swerve.getPitch();
     double roll = swerve.getRoll();
 
     var vx = balancePid.calculate(roll, 0);

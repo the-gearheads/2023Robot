@@ -18,7 +18,6 @@ import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.CustomProxy;
 import frc.robot.util.MoreMath;
-import frc.robot.Constants.FIELD_CONSTANTS;
 import frc.robot.Constants.AUTO_ALIGN.FEEDER;
 
 public class OldAlignToFeeder extends CustomProxy {
