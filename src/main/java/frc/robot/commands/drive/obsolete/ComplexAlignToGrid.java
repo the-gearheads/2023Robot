@@ -9,7 +9,14 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.util.CustomProxy;
 
 public class ComplexAlignToGrid extends CustomProxy {
-
+  // 4 checks: y alignment, rotation, arm position, close to pick up pose
+  // if all these checks pass, run the simple alignment routine
+  
+  // if any of the checks fail, run the following complex routine:
+  // ensure robot is away from walls (so arm does not hit anything upon movement) ->  
+  // if need to rotate -> put arm in
+  // calculate trajectory
+  // raise arm during last movement
   public ComplexAlignToGrid() {
     super(()->{
       return proxy();

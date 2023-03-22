@@ -224,15 +224,28 @@ public class Constants extends AnnotatedClass {
             new Translation3d(Units.inchesToMeters(12.9 - 1), Units.inchesToMeters(12.875), Units.inchesToMeters(48.1)),
             new Rotation3d(0, 0, 0));
 
-        var ov9281Delta = new Transform3d(
+        var backLeftDelta = new Transform3d(
             new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-7.375), Units.inchesToMeters(1)),
             new Rotation3d(Units.degreesToRadians(29 + 180), 7.4, 0));
-        var lifecamDelta = new Transform3d(
-            new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-18.5), Units.inchesToMeters(1)),
-            new Rotation3d(Units.degreesToRadians(-29 + 180), 0, 0));
+        //13.5, 18, 3
+        var frontRightDelta = new Transform3d(
+          new Translation3d(
+            Units.inchesToMeters(3), 
+            Units.inchesToMeters(-13.5), 
+            Units.inchesToMeters(1)),
+          new Rotation3d(Units.degreesToRadians(29 + 180), 7.4, 0));
 
-        put(new PhotonCamera("ov9281"), robotTip.plus(ov9281Delta));
-        put(new PhotonCamera("lifecam"), robotTip.plus(lifecamDelta));
+        var backRightDelta = new Transform3d(
+          new Translation3d(
+            Units.inchesToMeters(3), 
+            Units.inchesToMeters(-18), 
+            Units.inchesToMeters(1)),
+          new Rotation3d(Units.degreesToRadians(180), 0, 0));
+
+        put(new PhotonCamera("Back Left"), robotTip.plus(backLeftDelta));
+        put(new PhotonCamera("Front Right"), robotTip.plus(frontRightDelta));
+        put(new PhotonCamera("Back Right"), robotTip.plus(backRightDelta));
+
       }
     };
 
