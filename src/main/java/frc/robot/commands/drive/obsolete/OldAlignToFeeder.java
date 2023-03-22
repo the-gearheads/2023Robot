@@ -5,6 +5,7 @@
 package frc.robot.commands.drive.obsolete;
 
 import com.pathplanner.lib.PathPlanner;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,7 +30,7 @@ public class OldAlignToFeeder extends CustomProxy {
   }
 
   private static Command proxy(Swerve swerve, Arm arm) {
-    if (!inFeederArea(swerve)) {
+    if (!inFeederArea(swerve.getPose())) {
       return new InstantCommand();
     }
 
@@ -82,15 +83,11 @@ public class OldAlignToFeeder extends CustomProxy {
     return trajCommand.alongWith(armCommand);
   }
 
-  private static boolean inFeederArea(Swerve swerve) {
-    var currentPose = swerve.getPose();
-    var xCheck = MoreMath.within(currentPose.getX(), FEEDER.MIN_X, FEEDER.MAX_X);
-    var yCheck = MoreMath.within(currentPose.getY(), FEEDER.MIN_Y, FEEDER.MAX_Y);
-    if (!MoreMath.isBlue()) {
-      yCheck = MoreMath.within(currentPose.getY(), FIELD_CONSTANTS.WIDTH - FEEDER.MIN_Y,
-          FIELD_CONSTANTS.WIDTH - FEEDER.MAX_Y);
-    }
-    return xCheck && yCheck;
+  private static boolean inFeederArea(Pose2d pose) {
+    var firstCorner = MoreMath.transformByAlliance(FEEDER.DIAG_CORNERS.get(0));
+    var secondCorner = MoreMath.transformByAlliance(FEEDER.DIAG_CORNERS.get(1));
+
+    return MoreMath.within(pose, firstCorner, secondCorner);
   }
 
   private static boolean isYAligned(Swerve swerve) {

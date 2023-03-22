@@ -212,7 +212,7 @@ public class Constants extends AnnotatedClass {
     public enum FieldType {
       SHOP, REAL, TEST;
     }
-    public static FieldType FIELD_TYPE = FieldType.REAL;
+    public static final FieldType FIELD_TYPE = FieldType.REAL;
   }
   public static final class CONTROLLERS {
     public static final double JOYSTICK_DEADBAND = 0.075;
@@ -295,9 +295,6 @@ public class Constants extends AnnotatedClass {
 
     static {
       switch(FIELD_CONSTANTS.FIELD_TYPE){
-        case REAL:
-        ATFL = FIELD_ATFL;
-        break;
         case SHOP:
         ATFL = SHOP_ATFL;
         break;
@@ -323,21 +320,22 @@ public class Constants extends AnnotatedClass {
   }
 
   public static class AUTO_ALIGN {
-    public static class GRID {
+    public static class COMMUNITY {
       public static final double ARM_THRESHOLD = 20;//in degrees
       public static final double ROT_THRESHOLD = 20;
       public static final double DIST_THRESHOLD = 1;
       public static final PathConstraints CONSTRAINTS = new PathConstraints(2, 1);
-      public static final double COMMUNITY_THRESHOLD = 3;
+      public static final ArrayList<Translation2d> DIAG_CORNERS = new ArrayList<Translation2d>(){{
+        add(new Translation2d(0,0));
+        add(new Translation2d(3, FIELD_CONSTANTS.WIDTH));
+      }};
     }
     public static class FEEDER {
       public static final double Y_THRESHOLD = 0.5;
       public static final double ROT_THRESHOLD = 20;//in degrees
       public static final double ARM_THRESHOLD = 20;//in degrees
-      public static final double MIN_X = 10;
-      public static final double MIN_Y = 5.6;
-      public static final double MAX_Y = FIELD_CONSTANTS.WIDTH;
-      public static final double MAX_X = FIELD_CONSTANTS.LENGTH;
+      public static final double WIDTH = FIELD_CONSTANTS.WIDTH - 5.6;
+      public static final double LENGTH = FIELD_CONSTANTS.LENGTH - 10;
       public static final double DIST_THRESHOLD = 1;
       public static final Transform2d PREP2DEST = new Transform2d(new Translation2d(-1, 0), new Rotation2d());
       public static final PathConstraints CONSTRAINTS = new PathConstraints(2, 1);
@@ -347,19 +345,27 @@ public class Constants extends AnnotatedClass {
       public static Pose2d RIGHT_DEST_POSE;
       public static Pose2d LEFT_DEST_POSE;
 
+
+      public static final ArrayList<Translation2d> DIAG_CORNERS;
+
       static {
         switch (FIELD_CONSTANTS.FIELD_TYPE) {
-          case REAL:
-            RIGHT_DEST_POSE = new Pose2d(15.5, 6, Rotation2d.fromDegrees(180));
-            LEFT_DEST_POSE = new Pose2d(15.5, 7.5, Rotation2d.fromDegrees(180));
-            break;
           case SHOP:
             RIGHT_DEST_POSE = new Pose2d(7.5, 1.5, Rotation2d.fromDegrees(180));
             LEFT_DEST_POSE = new Pose2d(7.5, 2.5, Rotation2d.fromDegrees(180));
+            DIAG_CORNERS = new ArrayList<Translation2d>(){{
+              var corner = new Translation2d(FIELD_CONSTANTS.LENGTH / 2, FIELD_CONSTANTS.WIDTH / 2);
+              add(corner);
+              add(corner.minus(new Translation2d(LENGTH, WIDTH)));
+            }};
             break;
           default:
             RIGHT_DEST_POSE = new Pose2d(15.5, 6, Rotation2d.fromDegrees(180));
             LEFT_DEST_POSE = new Pose2d(15.5, 7.5, Rotation2d.fromDegrees(180));
+            DIAG_CORNERS = new ArrayList<Translation2d>(){{
+              add(new Translation2d(10, 5.6));
+              add(new Translation2d(FIELD_CONSTANTS.LENGTH, FIELD_CONSTANTS.WIDTH));
+            }};
             break;
         }
         RIGHT_PREP_POSE = RIGHT_DEST_POSE.transformBy(PREP2DEST.inverse());

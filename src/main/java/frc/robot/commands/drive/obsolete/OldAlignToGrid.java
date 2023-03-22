@@ -10,11 +10,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.Constants.AUTO_ALIGN.GRID;
+import frc.robot.Constants.AUTO_ALIGN.COMMUNITY;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
-import frc.robot.commands.drive.Nodes.NodeX;
-import frc.robot.commands.drive.Nodes.NodeY;
+import frc.robot.commands.drive.autoalign.Nodes.NodeX;
+import frc.robot.commands.drive.autoalign.Nodes.NodeY;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.Swerve;
@@ -41,7 +41,7 @@ public class OldAlignToGrid extends CustomProxy {
 
   private static Command simpleAlign(Swerve swerve, Arm arm) {
     var destPose = getDesiredNodePose();
-    var pathCommand = swerve.goTo(destPose, GRID.CONSTRAINTS);
+    var pathCommand = swerve.goTo(destPose, COMMUNITY.CONSTRAINTS);
 
     var destArmPose = getDesiredArmPose();
     var armCommand = new SetArmPose(arm, destArmPose);
@@ -55,7 +55,7 @@ public class OldAlignToGrid extends CustomProxy {
 
     var armDist = Math.abs(currentPose - destPose);
 
-    return armDist < GRID.ARM_THRESHOLD;
+    return armDist < COMMUNITY.ARM_THRESHOLD;
   }
 
   private static boolean isRotated(Swerve swerve) {
@@ -71,7 +71,7 @@ public class OldAlignToGrid extends CustomProxy {
 
     var radDist = Units.radiansToDegrees(Math.abs(closestDestRad - currentRad));
 
-    return radDist < GRID.ROT_THRESHOLD;
+    return radDist < COMMUNITY.ROT_THRESHOLD;
   }
 
   private static boolean isClose(Swerve swerve) {
@@ -80,7 +80,7 @@ public class OldAlignToGrid extends CustomProxy {
 
     destPose = MoreMath.transformByAlliance(destPose);
 
-    return destPose.getTranslation().getDistance(currentPose.getTranslation()) < GRID.DIST_THRESHOLD;
+    return destPose.getTranslation().getDistance(currentPose.getTranslation()) < COMMUNITY.DIST_THRESHOLD;
   }
   // public static Command proxy(Swerve swerve, Arm arm) {
   //   var nodePose = getDesiredNodePose();

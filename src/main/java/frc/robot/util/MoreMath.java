@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -128,6 +129,13 @@ public class MoreMath {
     return pose;
   }
 
+  public static Translation2d transformByAlliance(Translation2d trans) {
+    if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+      return new Translation2d(trans.getX(), Constants.FIELD_CONSTANTS.WIDTH - trans.getY());
+    }
+    return trans;
+  }
+
   private static double calculateDifference(Pose3d x, Pose3d y) {
     return x.getTranslation().getDistance(y.getTranslation());
   }
@@ -196,6 +204,12 @@ public class MoreMath {
     }
 
     return val > lowerBound && val < upperBound;
+  }
+
+  public static boolean within(Pose2d pose, Translation2d firstBound, Translation2d secondBound){
+    var xCheck = within(pose.getX(), firstBound.getX(), secondBound.getX());
+    var yCheck = within(pose.getY(), firstBound.getY(), secondBound.getY());
+    return xCheck && yCheck;
   }
 
   public static boolean isBlue() {
