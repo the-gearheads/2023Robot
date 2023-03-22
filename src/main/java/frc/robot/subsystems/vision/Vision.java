@@ -113,7 +113,7 @@ public class Vision extends SubsystemBase {
 
   private void initAtfl() {
     try {
-      this.atfl = Constants.VISION.SHOP_ATFL;
+      this.atfl = Constants.VISION.ATFL;
       // this.atfl = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
     } catch (Exception e) {//I really wish we could be doing this in constants.java, not here lol (if you can fix this, plz do)
       DriverStation.reportError("Welp, if ur reading this, imma guess ur getting a nullpointer exception.", true);

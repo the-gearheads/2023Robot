@@ -5,6 +5,7 @@
 package frc.robot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import org.photonvision.PhotonCamera;
@@ -207,6 +208,11 @@ public class Constants extends AnnotatedClass {
     public static final double WIDTH = 8.02;
     public static final double LENGTH = 15.8496;
     public static final Pose2d DEBUG_GO_TO_DEST = new Pose2d(1.9, 4.9, Rotation2d.fromDegrees(-180));
+
+    public enum FieldType {
+      SHOP, REAL, TEST;
+    }
+    public static FieldType FIELD_TYPE = FieldType.REAL;
   }
   public static final class CONTROLLERS {
     public static final double JOYSTICK_DEADBAND = 0.075;
@@ -249,27 +255,16 @@ public class Constants extends AnnotatedClass {
       }
     };
 
-    public static AprilTagFieldLayout FIELD_ATFL = null;
+    private static AprilTagFieldLayout FIELD_ATFL;
     static {
       try {
         FIELD_ATFL = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
       } catch (Exception e) {
+        FIELD_ATFL = new AprilTagFieldLayout(Collections.emptyList(), FIELD_CONSTANTS.LENGTH, FIELD_CONSTANTS.WIDTH);
       }
     }
 
-    public static final List<AprilTag> TEST_TAGS = new ArrayList<AprilTag>() {
-      {
-        var id1Pose = new Pose3d(2.5, 2.5, 0, new Rotation3d(0, 0, 0));
-        var id1Toid8 = new Transform3d(new Translation3d(0, 0.2159, 0), new Rotation3d(0, 0, 0));
-        var id8Pose = id1Pose.plus(id1Toid8);
-
-        add(new AprilTag(1, id1Pose));
-        add(new AprilTag(8, id8Pose));
-      }
-    };
-    public static final AprilTagFieldLayout TEST_ATFL = new AprilTagFieldLayout(TEST_TAGS, 5, 5);
-
-    public static final AprilTagFieldLayout SHOP_ATFL;
+    private static final AprilTagFieldLayout SHOP_ATFL;
     static {
       var apriltagsCopy = new ArrayList<AprilTag>();
       for (var apriltag : FIELD_ATFL.getTags()) {
@@ -281,6 +276,38 @@ public class Constants extends AnnotatedClass {
           apriltagsCopy.get(4 - 1).pose.getZ(), apriltagsCopy.get(4 - 1).pose.getRotation());
 
       SHOP_ATFL = new AprilTagFieldLayout(apriltagsCopy, FIELD_CONSTANTS.LENGTH, FIELD_CONSTANTS.WIDTH);
+    }
+
+    private static final AprilTagFieldLayout TEST_ATFL;
+    static {      
+      var id1Pose = new Pose3d(2.5, 2.5, 0, new Rotation3d(0, 0, 0));
+      var id1Toid8 = new Transform3d(new Translation3d(0, 0.2159, 0), new Rotation3d(0, 0, 0));
+      var id8Pose = id1Pose.plus(id1Toid8);
+
+      var testTags = new ArrayList<AprilTag>();
+      testTags.add(new AprilTag(1, id1Pose));
+      testTags.add(new AprilTag(8, id8Pose));
+
+      TEST_ATFL = new AprilTagFieldLayout(testTags, 5, 5);
+    }
+
+    public static final AprilTagFieldLayout ATFL;
+
+    static {
+      switch(FIELD_CONSTANTS.FIELD_TYPE){
+        case REAL:
+        ATFL = FIELD_ATFL;
+        break;
+        case SHOP:
+        ATFL = SHOP_ATFL;
+        break;
+        case TEST:
+        ATFL = TEST_ATFL;
+        break;
+        default:
+        ATFL = FIELD_ATFL;
+        break;
+      }
     }
   }
 
@@ -296,12 +323,6 @@ public class Constants extends AnnotatedClass {
   }
 
   public static class AUTO_ALIGN {
-    public enum FieldType {
-      SHOP, REAL;
-    }
-
-    public static FieldType fieldType = FieldType.REAL;
-
     public static class GRID {
       public static final double ARM_THRESHOLD = 20;//in degrees
       public static final double ROT_THRESHOLD = 20;
@@ -317,17 +338,17 @@ public class Constants extends AnnotatedClass {
       public static final double MIN_Y = 5.6;
       public static final double MAX_Y = FIELD_CONSTANTS.WIDTH;
       public static final double MAX_X = FIELD_CONSTANTS.LENGTH;
+      public static final double DIST_THRESHOLD = 1;
+      public static final Transform2d PREP2DEST = new Transform2d(new Translation2d(-1, 0), new Rotation2d());
+      public static final PathConstraints CONSTRAINTS = new PathConstraints(2, 1);
 
-      public static double DIST_THRESHOLD = 1;
       public static Pose2d RIGHT_PREP_POSE;
       public static Pose2d LEFT_PREP_POSE;
       public static Pose2d RIGHT_DEST_POSE;
       public static Pose2d LEFT_DEST_POSE;
-      public static Transform2d PREP2DEST = new Transform2d(new Translation2d(-1, 0), new Rotation2d());
-      public static PathConstraints CONSTRAINTS = new PathConstraints(2, 1);
 
       static {
-        switch (fieldType) {
+        switch (FIELD_CONSTANTS.FIELD_TYPE) {
           case REAL:
             RIGHT_DEST_POSE = new Pose2d(15.5, 6, Rotation2d.fromDegrees(180));
             LEFT_DEST_POSE = new Pose2d(15.5, 7.5, Rotation2d.fromDegrees(180));
@@ -335,6 +356,10 @@ public class Constants extends AnnotatedClass {
           case SHOP:
             RIGHT_DEST_POSE = new Pose2d(7.5, 1.5, Rotation2d.fromDegrees(180));
             LEFT_DEST_POSE = new Pose2d(7.5, 2.5, Rotation2d.fromDegrees(180));
+            break;
+          default:
+            RIGHT_DEST_POSE = new Pose2d(15.5, 6, Rotation2d.fromDegrees(180));
+            LEFT_DEST_POSE = new Pose2d(15.5, 7.5, Rotation2d.fromDegrees(180));
             break;
         }
         RIGHT_PREP_POSE = RIGHT_DEST_POSE.transformBy(PREP2DEST.inverse());
