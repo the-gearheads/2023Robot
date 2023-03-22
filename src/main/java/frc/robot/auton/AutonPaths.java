@@ -145,7 +145,7 @@ public class AutonPaths {
         new AutoBalDriveToPivot(s.swerve).andThen(new AutoBalance(s.swerve)));
   }
 
-  public static Command InertN12ConePrime(Subsystems s) {
+  public static Command InertN1TwoConePrime(Subsystems s) {
     return new SequentialCommandGroup(AutonHelper.setInitPose(s, "InertN1-StartN1"),
 
         // Move forward
@@ -165,17 +165,10 @@ public class AutonPaths {
 
         AutonHelper.stowAnd(s,
             AutonHelper.getCommandForPath("GamePiece1-Inert3-Prime", false, defaultConstraints, s.swerve))
-
-    // new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-
-    // AutonHelper.getCommandForPath("InertN3-StartN3", true, defaultConstraints, s.swerve),
-
-    // // place game piece
-    // AutonHelper.getPlaceConeCommand(s)
     );
   }
 
-  public static Command InertN92Cone(Subsystems s) {
+  public static Command InertN9TwoCone(Subsystems s) {
     return new SequentialCommandGroup(AutonHelper.setInitPose(s, "InertN9-StartN9"),
 
         // Move forward

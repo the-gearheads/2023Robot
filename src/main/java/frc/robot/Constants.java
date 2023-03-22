@@ -41,7 +41,6 @@ public class Constants extends AnnotatedClass {
   public static enum RobotMode {
     SIM, SIM_REPLAY, REAL
   }
-
   public static RobotMode getMode() {
     if (RobotBase.isReal()) {
       return RobotMode.REAL;

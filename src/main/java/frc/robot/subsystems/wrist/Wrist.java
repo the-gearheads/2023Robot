@@ -28,8 +28,7 @@ public class Wrist extends SubsystemBase {
   private int zeroCount = 0;
   private Boolean configureHasRan = false;
 
-  private double goal;
-  private WristControlType controlState = WristControlType.DEFAULT;
+  private WristState goal;
 
   private CANSparkMax motor = new CANSparkMax(WRIST.WRIST_ID, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
@@ -46,6 +45,7 @@ public class Wrist extends SubsystemBase {
   private Arm arm;
   private boolean wrapRangeEntered = false;
   private double volts;
+  private boolean shouldFallBackToDefault=true;
 
   public Wrist(Arm arm) {
     this.arm = arm;
@@ -55,11 +55,7 @@ public class Wrist extends SubsystemBase {
     SmartDashboard.putData("Wrist/pid", pid);
   }
 
-  private void setControlState(WristControlType controlState) {
-    this.controlState = controlState;
-  }
-
-  public double getGoal() {
+  public WristState getGoal() {
     return goal;
   }
 
@@ -82,14 +78,9 @@ public class Wrist extends SubsystemBase {
   }
 
   public void setGoal(WristState state) {
-    var desiredGoal = state.getGoal();
-
-    if (angersWrapRangeHandler(desiredGoal) || angersInsideRobotHandler(desiredGoal)) {
-      setGoalByType(WristControlType.DEFAULT);
-    } else {
-      goal = desiredGoal;
-      setControlState(state.type);
-    }
+    if (angersWrapRangeHandler(state.getGoal()) || angersInsideRobotHandler(state.getGoal())) return;
+    shouldFallBackToDefault = false;
+    goal = state;
   }
 
   private boolean angersInsideRobotHandler(double goal) {
@@ -103,16 +94,28 @@ public class Wrist extends SubsystemBase {
 
   @Override
   public void periodic() {
+    initDefaultModeHander();
     runPid();
     wrapRangeHandler();
     insideRobotHandler();
     sensorFaultHandler();
     log();
+    finalDefaultModeHander();
+  }
+
+  private void initDefaultModeHander() {
+    if(shouldFallBackToDefault){
+      setGoalByType(WristControlType.DEFAULT);
+    }
+  }
+
+  private void finalDefaultModeHander() {
+    shouldFallBackToDefault = true;
   }
 
   private void runPid() {
     double currentPose = getPose();
-    this.pidval = pid.calculate(currentPose, goal);
+    this.pidval = pid.calculate(currentPose, goal.getGoal());
     this.ffval = ff.calculate(currentPose, 0);
 
     setVoltage(ffval + pidval);
@@ -197,16 +200,18 @@ public class Wrist extends SubsystemBase {
     Logger.getInstance().recordOutput("Wrist/wrap range entered", wrapRangeEntered);
     Logger.getInstance().recordOutput("Wrist/Last non wrap pose", lastNonWrapRangePose);
     Logger.getInstance().recordOutput("Wrist/ReConfigure has ran", configureHasRan);
-    Logger.getInstance().recordOutput("Wrist/control state", controlState.name());
+    Logger.getInstance().recordOutput("Wrist/control state", goal.type.name());
     Logger.getInstance().recordOutput("Wrist/Pose", MoreMath.round(getPose(), 1));
     Logger.getInstance().recordOutput("Wrist/Vel", MoreMath.round(getVelocity(), 1));
-    Logger.getInstance().recordOutput("Wrist/Goal", MoreMath.round(goal, 1));
+    Logger.getInstance().recordOutput("Wrist/Goal", MoreMath.round(goal.getGoal(), 1));
     Logger.getInstance().recordOutput("Wrist/Error", MoreMath.round(pid.getPositionError(), 1));
     Logger.getInstance().recordOutput("Wrist/PIDVal", MoreMath.round(pidval, 1));
     Logger.getInstance().recordOutput("Wrist/FFVal", MoreMath.round(ffval, 1));
     Logger.getInstance().recordOutput("Wrist/Appliedvolts", MoreMath.round(motor.getAppliedOutput(), 3));
     Logger.getInstance().recordOutput("Wrist/Current Command",
         this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "");
+    Logger.getInstance().recordOutput("Wrist/fell back to default", shouldFallBackToDefault);
+
   }
 
   private void configure() {
