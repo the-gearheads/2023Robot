@@ -17,6 +17,11 @@ public class DefaultWristControl extends CommandBase {
   }
 
   @Override
+  public boolean runsWhenDisabled(){
+    return true;
+  }
+
+  @Override
   public void execute() {
     wrist.setGoalByType(WristControlType.DEFAULT);
   }

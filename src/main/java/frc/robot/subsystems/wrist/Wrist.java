@@ -204,7 +204,7 @@ public class Wrist extends SubsystemBase {
     Logger.getInstance().recordOutput("Wrist/Error", MoreMath.round(pid.getPositionError(), 1));
     Logger.getInstance().recordOutput("Wrist/PIDVal", MoreMath.round(pidval, 1));
     Logger.getInstance().recordOutput("Wrist/FFVal", MoreMath.round(ffval, 1));
-    Logger.getInstance().recordOutput("Wrist/Appliedvolts", MoreMath.round(motor.getAppliedOutput(), 1));
+    Logger.getInstance().recordOutput("Wrist/Appliedvolts", MoreMath.round(motor.getAppliedOutput(), 3));
     Logger.getInstance().recordOutput("Wrist/Current Command",
         this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "");
   }
