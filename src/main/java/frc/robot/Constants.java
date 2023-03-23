@@ -90,7 +90,7 @@ public class Constants extends AnnotatedClass {
     public static final double POSE_TOLERANCE = 5;
     public static final double ANGLE_OFFSET = -270;
     public static final Constraints ARM_CONSTRAINTS = new Constraints(120, 150);
-    public static final Constraints ARM_VEL_CONSTRAINTS = new Constraints(50, 10);// change to 50, 10
+    public static final Constraints ARM_VEL_CONSTRAINTS = new Constraints(150, 150);// change to 50, 10
     public static final double MAX_ANGLE = 10;
     public static final double MIN_ANGLE = -190;
   }
@@ -212,7 +212,7 @@ public class Constants extends AnnotatedClass {
       SHOP, REAL, TEST;
     }
 
-    public static final FieldType FIELD_TYPE = FieldType.REAL;
+    public static final FieldType FIELD_TYPE = FieldType.SHOP;
   }
   public static final class CONTROLLERS {
     public static final double JOYSTICK_DEADBAND = 0.075;
@@ -229,22 +229,30 @@ public class Constants extends AnnotatedClass {
         var robotTip = new Transform3d(
             new Translation3d(Units.inchesToMeters(12.9 - 1), Units.inchesToMeters(12.875), Units.inchesToMeters(48.1)),
             new Rotation3d(0, 0, 0));
+        var leftDelta = new Transform3d(
+            new Translation3d(Units.inchesToMeters(3), Units.inchesToMeters(-9.5), Units.inchesToMeters(0.5)),
+            new Rotation3d(
+              Units.degreesToRadians(0),
+               Units.degreesToRadians(30),
+               0));
 
-        var backLeftDelta = new Transform3d(
-            new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-7.375), Units.inchesToMeters(1)),
-            new Rotation3d(Units.degreesToRadians(29 + 180), 7.4, 0));
-        //13.5, 18, 3
-        var frontRightDelta = new Transform3d(
-            new Translation3d(Units.inchesToMeters(3), Units.inchesToMeters(-13.5), Units.inchesToMeters(1)),
-            new Rotation3d(Units.degreesToRadians(29 + 180), 7.4, 0));
+        var rightDelta = new Transform3d(
+            new Translation3d(Units.inchesToMeters(3), Units.inchesToMeters(-16), Units.inchesToMeters(0.5)),
+            new Rotation3d(
+              Units.degreesToRadians(0),
+               Units.degreesToRadians(38),
+                0));
 
-        var backRightDelta = new Transform3d(
-            new Translation3d(Units.inchesToMeters(3), Units.inchesToMeters(-18), Units.inchesToMeters(1)),
-            new Rotation3d(Units.degreesToRadians(180), 0, 0));
+                var backDelta = new Transform3d(
+                  new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-17.5), Units.inchesToMeters(-0.5)),
+                  new Rotation3d(
+                    Units.degreesToRadians(0),
+                    Units.degreesToRadians(17.5),
+                    Units.degreesToRadians(180-11.6)));
 
-        put(new PhotonCamera("Back Left"), robotTip.plus(backLeftDelta));
-        put(new PhotonCamera("Front Right"), robotTip.plus(frontRightDelta));
-        put(new PhotonCamera("Back Right"), robotTip.plus(backRightDelta));
+        put(new PhotonCamera("Left"), robotTip.plus(leftDelta));
+        put(new PhotonCamera("Right"), robotTip.plus(rightDelta));
+        put(new PhotonCamera("Back"), robotTip.plus(backDelta));
 
       }
     };
@@ -265,9 +273,11 @@ public class Constants extends AnnotatedClass {
         apriltagsCopy.add(new AprilTag(apriltag.ID, apriltag.pose));
       }
 
-      apriltagsCopy.get(4 - 1).pose = new Pose3d(Units.inchesToMeters(340),
-          apriltagsCopy.get(6 - 1).pose.getY() + Units.inchesToMeters(-133 + 49.875),
-          apriltagsCopy.get(4 - 1).pose.getZ(), apriltagsCopy.get(4 - 1).pose.getRotation());
+      apriltagsCopy.get(4 - 1).pose = new Pose3d(
+          7.046+Units.inchesToMeters(60),
+          2.223 + Units.inchesToMeters(2),
+          apriltagsCopy.get(4 - 1).pose.getZ(), 
+          new Rotation3d(0,0,Units.degreesToRadians(180)));
 
       SHOP_ATFL = new AprilTagFieldLayout(apriltagsCopy, FIELD_CONSTANTS.LENGTH, FIELD_CONSTANTS.WIDTH);
     }
@@ -354,7 +364,7 @@ public class Constants extends AnnotatedClass {
               {
                 var corner = new Translation2d(FIELD_CONSTANTS.LENGTH / 2, FIELD_CONSTANTS.WIDTH / 2);
                 add(corner);
-                add(corner.minus(new Translation2d(LENGTH, WIDTH)));
+                add(new Translation2d(4, 0));
               }
             };
             break;

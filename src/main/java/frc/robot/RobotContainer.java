@@ -25,6 +25,7 @@ import frc.robot.commands.arm.ThrowState;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.drive.autoalign.AutoAlign;
+import frc.robot.commands.vision.FuseVisionEstimate;
 import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.commands.wrist.ManualWristControl;
 import frc.robot.controllers.Controllers;
@@ -92,7 +93,7 @@ public class RobotContainer {
             new SwerveModule(3, DRIVE.RR_IDS[0], DRIVE.RR_IDS[1], DRIVE.RR_OFFSETS, "RR"));
         arm = new Arm();
         wrist = new Wrist(arm);
-        // vision = new Vision(swerve);
+        vision = new Vision(swerve);
         break;
       case SIM:
         SmartDashboard.putString("/Mode", "SIM");
@@ -124,7 +125,7 @@ public class RobotContainer {
 
     // swerve.setDefaultCommand(new TeleopDrive(swerve));
     arm.setDefaultCommand(new JoystickArmControl(arm));
-    // vision.setDefaultCommand(new UpdateSwervePoseEstimator(vision).ignoringDisable(true));
+    vision.setDefaultCommand(new FuseVisionEstimate(vision).ignoringDisable(true));
     updateControllers();
 
     // PortForwarder.add(5800, "photonvision.local", 5800);
