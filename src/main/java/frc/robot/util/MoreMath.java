@@ -2,6 +2,9 @@ package frc.robot.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Map.Entry;
 import org.photonvision.targeting.TargetCorner;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -215,4 +218,13 @@ public class MoreMath {
   public static boolean isBlue() {
     return DriverStation.getAlliance() == DriverStation.Alliance.Blue;
   }
+
+  public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
+    for (Entry<T, E> entry : map.entrySet()) {
+        if (Objects.equals(value, entry.getValue())) {
+            return entry.getKey();
+        }
+    }
+    return null;
+}
 }

@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import frc.robot.Constants.RobotMode;
 import frc.robot.auton.TestPlaceThenDock;
+import frc.robot.commands.vision.AutonSetupBuddy;
 import frc.robot.util.NTToAdvantageKit;
 
 /**
@@ -87,7 +88,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    robotContainer.getDisabledCommand().schedule();
+  }
 
   @Override
   public void disabledPeriodic() {}

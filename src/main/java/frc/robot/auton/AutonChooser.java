@@ -14,9 +14,9 @@ import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.wrist.Wrist;
 
 public class AutonChooser {
-  private HashMap<String, Command> autons;
+  public static HashMap<String, Command> autons;
   private Swerve swerve;//necessary to create PPSwerveCommand instances
-  private SendableChooser<Command> chooser;
+  public static SendableChooser<Command> chooser = new SendableChooser<>();
   private final String defaultChoice = "N4 Place Then Dock";
   private Wrist wrist;
   private Arm arm;
@@ -27,13 +27,12 @@ public class AutonChooser {
     this.arm = arm;
     this.wrist = wrist;
     this.grabber = grabber;
-    this.chooser = new SendableChooser<>();
     this.autons = new HashMap<>();
 
     initializeAutons();
     populateChooser();
     setDefaultAuton();
-    SmartDashboard.putData(chooser);
+    SmartDashboard.putData("Auton Chooser", chooser);
   }
 
   public void populateChooser() {

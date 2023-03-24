@@ -25,6 +25,7 @@ import frc.robot.commands.arm.ThrowState;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.drive.autoalign.AutoAlign;
+import frc.robot.commands.vision.AutonSetupBuddy;
 import frc.robot.commands.vision.FuseVisionEstimate;
 import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.commands.wrist.ManualWristControl;
@@ -208,5 +209,9 @@ public class RobotContainer {
   public void clearTeleopDefault() {
     swerve.setDefaultCommand(new InstantCommand(() -> {
     }, swerve));
+  }
+
+  public Command getDisabledCommand(){
+    return new AutonSetupBuddy(vision, leds);
   }
 }
