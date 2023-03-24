@@ -41,6 +41,7 @@ public class Constants extends AnnotatedClass {
   public static enum RobotMode {
     SIM, SIM_REPLAY, REAL
   }
+
   public static RobotMode getMode() {
     if (RobotBase.isReal()) {
       return RobotMode.REAL;
@@ -220,7 +221,8 @@ public class Constants extends AnnotatedClass {
 
   public static final class LEDS {
     public static final int PORT = 1;
-    public static final int LENGTH = 12;
+    /* Rough estimate, refine later */
+    public static final int LENGTH = 160;
   }
 
   public static final class VISION {
@@ -231,24 +233,16 @@ public class Constants extends AnnotatedClass {
             new Rotation3d(0, 0, 0));
         var leftDelta = new Transform3d(
             new Translation3d(Units.inchesToMeters(3), Units.inchesToMeters(-9.5), Units.inchesToMeters(0.5)),
-            new Rotation3d(
-              Units.degreesToRadians(0),
-               Units.degreesToRadians(30),
-               0));
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(30), 0));
 
         var rightDelta = new Transform3d(
             new Translation3d(Units.inchesToMeters(3), Units.inchesToMeters(-16), Units.inchesToMeters(0.5)),
-            new Rotation3d(
-              Units.degreesToRadians(0),
-               Units.degreesToRadians(38),
-                0));
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(38), 0));
 
-                var backDelta = new Transform3d(
-                  new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-17.5), Units.inchesToMeters(-0.5)),
-                  new Rotation3d(
-                    Units.degreesToRadians(0),
-                    Units.degreesToRadians(17.5),
-                    Units.degreesToRadians(180-11.6)));
+        var backDelta = new Transform3d(
+            new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-17.5), Units.inchesToMeters(-0.5)),
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17.5),
+                Units.degreesToRadians(180 - 11.6)));
 
         put(new PhotonCamera("Left"), robotTip.plus(leftDelta));
         put(new PhotonCamera("Right"), robotTip.plus(rightDelta));
@@ -273,11 +267,8 @@ public class Constants extends AnnotatedClass {
         apriltagsCopy.add(new AprilTag(apriltag.ID, apriltag.pose));
       }
 
-      apriltagsCopy.get(4 - 1).pose = new Pose3d(
-          7.046+Units.inchesToMeters(60),
-          2.223 + Units.inchesToMeters(2),
-          apriltagsCopy.get(4 - 1).pose.getZ(), 
-          new Rotation3d(0,0,Units.degreesToRadians(180)));
+      apriltagsCopy.get(4 - 1).pose = new Pose3d(7.046 + Units.inchesToMeters(60), 2.223 + Units.inchesToMeters(2),
+          apriltagsCopy.get(4 - 1).pose.getZ(), new Rotation3d(0, 0, Units.degreesToRadians(180)));
 
       SHOP_ATFL = new AprilTagFieldLayout(apriltagsCopy, FIELD_CONSTANTS.LENGTH, FIELD_CONSTANTS.WIDTH);
     }

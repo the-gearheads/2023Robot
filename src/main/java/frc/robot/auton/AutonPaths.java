@@ -164,8 +164,7 @@ public class AutonPaths {
         AutonHelper.getGroundPickUpCommand(s), new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT),
 
         AutonHelper.stowAnd(s,
-            AutonHelper.getCommandForPath("GamePiece1-Inert3-Prime", false, defaultConstraints, s.swerve))
-    );
+            AutonHelper.getCommandForPath("GamePiece1-Inert3-Prime", false, defaultConstraints, s.swerve)));
   }
 
   public static Command InertN9TwoCone(Subsystems s) {

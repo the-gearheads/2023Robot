@@ -13,7 +13,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.pathplanner.lib.server.PathPlannerServer;
 import com.revrobotics.REVPhysicsSim;
-
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,6 +31,10 @@ import frc.robot.util.NTToAdvantageKit;
 public class Robot extends LoggedRobot {
   private Command autonCommand;
   private RobotContainer robotContainer;
+
+  /* Globals :( */
+  public static double matchTime = -1;
+  private static double matchTimeStart = 0;
 
   /**
    * This function is run when the robot is first started up and should be used for any initialization code.
@@ -98,6 +102,7 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    matchTime = -1;
     autonCommand = robotContainer.getAutonomousCommand();
     robotContainer.clearTeleopDefault();
 
@@ -122,11 +127,15 @@ public class Robot extends LoggedRobot {
     }
     TestPlaceThenDock.initDockTestingTelemetry();
     robotContainer.setTeleopDefault();
+    matchTimeStart = Timer.getFPGATimestamp();
   }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    matchTime = 135 - (Timer.getFPGATimestamp() - matchTimeStart);
+    matchTime = matchTime < 0 ? 0 : matchTime;
+  }
 
   @Override
   public void testInit() {
