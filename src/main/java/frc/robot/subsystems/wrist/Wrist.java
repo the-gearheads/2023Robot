@@ -44,7 +44,7 @@ public class Wrist extends SubsystemBase {
   private int zeroCount = 0;
   private Boolean configureHasRan = false;
 
-  private boolean shouldFallBackToDefault=true;
+  private boolean shouldFallBackToDefault = true;
 
   private Arm arm;
 
@@ -79,10 +79,12 @@ public class Wrist extends SubsystemBase {
   }
 
   public void setGoal(WristState state) {
-    if (angersWrapRangeHandler(state.getGoal()) || angersInsideRobotHandler(state.getGoal())) return;
+    if (angersWrapRangeHandler(state.getGoal()) || angersInsideRobotHandler(state.getGoal()))
+      return;
     goal = state;
 
-    if(state.type!=WristControlType.DEFAULT)shouldFallBackToDefault = false;
+    if (state.type != WristControlType.DEFAULT)
+      shouldFallBackToDefault = false;
   }
 
   private boolean angersInsideRobotHandler(double goal) {
@@ -111,7 +113,7 @@ public class Wrist extends SubsystemBase {
   }
 
   private void initDefaultModeHander() {
-    if(shouldFallBackToDefault){
+    if (shouldFallBackToDefault) {
       setGoalByType(WristControlType.DEFAULT);
     }
   }

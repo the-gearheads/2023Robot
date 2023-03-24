@@ -54,9 +54,7 @@ public class Leds extends SubsystemBase {
   }
 
   public CommandBase setStateForTimeCommand(LedState newState, double waitSecs) {
-    return getSetStateCommand(newState)
-      .andThen(new WaitCommand(waitSecs))
-      .andThen(getSetStateCommand(defaultState));
+    return getSetStateCommand(newState).andThen(new WaitCommand(waitSecs)).andThen(getSetStateCommand(defaultState));
   }
 
   // method to flush both strips
@@ -69,7 +67,7 @@ public class Leds extends SubsystemBase {
     this.state.updateBuffer(buffer);
 
     /* Should overwrite what the above wrote to the buffer for the out-of-time warning */
-    if(DriverStation.isTeleop()) {
+    if (DriverStation.isTeleop()) {
       double timeRemaining = Robot.matchTime;
       if (timeRemaining >= 57.0 && timeRemaining < 60.0) {
         LedState.FLASH_YELLOW.updateBuffer(buffer);

@@ -6,29 +6,25 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 
 public enum LedState {
-  // @formatting:off
-  GREEN(Color.kGreen),
-  WHITE(Color.kWhite),
-  ORANGE(Color.kOrange),
-  PURPLE(Color.kPurple),
-  YELLOW(Color.kYellow),
-  BLACK(Color.kBlack),
-  FLASH_RED((AddressableLEDBuffer buf)->{
+  // spotless:off
+  GREEN(Color.kGreen), WHITE(Color.kWhite), ORANGE(Color.kOrange),
+  PURPLE(Color.kPurple), YELLOW(Color.kYellow), BLACK(Color.kBlack),
+  FLASH_RED((AddressableLEDBuffer buf) -> {
     boolean isOn = Math.floor(Timer.getFPGATimestamp() * 10) % 2 == 0;
     Color color = isOn ? Color.kRed : Color.kBlack;
-    for(int i = 0; i < buf.getLength(); i++) {
+    for (int i = 0; i < buf.getLength(); i++) {
       buf.setLED(i, color);
     }
-  }),
-  FLASH_YELLOW((AddressableLEDBuffer buf)->{
+  }), 
+  FLASH_YELLOW((AddressableLEDBuffer buf) -> {
     boolean isOn = Math.floor(Timer.getFPGATimestamp() * 10) % 2 == 0;
     Color color = isOn ? Color.kYellow : Color.kBlack;
-    for(int i = 0; i < buf.getLength(); i++) {
+    for (int i = 0; i < buf.getLength(); i++) {
       buf.setLED(i, color);
     }
   }),
   RAINBOW(LedState::rainbowFunc);
-  // @formatting:on
+  // spotless:on
 
   private Consumer<AddressableLEDBuffer> updateBufferLambda;
 
@@ -49,6 +45,7 @@ public enum LedState {
   }
 
   private static int rainbowFirstPixelHue = 0;
+
   private static void rainbowFunc(AddressableLEDBuffer buf) {
     // For every pixel
     for (var i = 0; i < buf.getLength(); i++) {
