@@ -313,14 +313,18 @@ public class Constants extends AnnotatedClass {
   }
 
   public static final class VISION_SIM {
-    public static final List<SimCamParams> SIM_CAMS_PARAMS = new ArrayList<SimCamParams>() {
-      {
-        add(new SimCamParams(92, 9000, 640, 400, 0,
-            new Transform3d(new Translation3d(Units.inchesToMeters(21.552), Units.inchesToMeters(12.855 - 7.5),
-                Units.inchesToMeters(48.24)), new Rotation3d(0, 0, Units.degreesToRadians(-36))),
-            "ov9281"));
+    public static final List<SimCamParams> SIM_CAM_PARAMS = new ArrayList<SimCamParams>();
+    static{
+      for(var camAndTrans : VISION.CAMS_AND_TRANS.entrySet()){
+        var camName = camAndTrans.getKey().getName();
+        var trans = camAndTrans.getValue();
+        SIM_CAM_PARAMS.add(new SimCamParams(92, 9000, 640, 400, 0,
+        trans,
+        camName));
       }
-    };
+
+    }
+
   }
 
   public static class AUTO_ALIGN {

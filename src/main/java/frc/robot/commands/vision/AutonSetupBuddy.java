@@ -5,17 +5,15 @@
 package frc.robot.commands.vision;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Map.Entry;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.auton.AutonChooser;
+import frc.robot.auton.AutonHelper;
 import frc.robot.subsystems.leds.LedState;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.vision.Vision;
@@ -24,10 +22,16 @@ import frc.robot.util.vision.CustomEstimate;
 
 public class AutonSetupBuddy extends CommandBase {
 
-  private static final double transThreshold = 0;
-  private static final double rotThreshold = 0;
-  private HashMap<String, Pose2d> initPoses = new HashMap<String, Pose2d>(){{
-
+  private static final double transThreshold = 0.05;
+  private static final double rotThreshold = 0.05;
+  private HashMap<String, String> initPaths = new HashMap<String, String>(){{
+    put("N4 Place Then Dock", "InertN4-StartN4");
+    put("NO BUMP Place Then Move", "InertN1-StartN1");
+    put("BUMP Place Then Move", "InertN9-StartN9");
+    put("2 cone", "InertN1-StartN1");
+    put("BUMP 2 cone", "InertN9-StartN9");
+    put("NO BUMP Safe two cone", "InertN1-StartN1");
+    put("Middle Go over station and grab, then dock", "InertN4-StartN4");
   }};
   private Vision vision;
   private Leds leds;
@@ -39,15 +43,26 @@ public class AutonSetupBuddy extends CommandBase {
     addRequirements(vision, leds);
   }
 
+  @Override
+  public boolean runsWhenDisabled(){
+    return true;
+  }
+
   private Optional<Pose2d> getTrackedPose(){
     var autonsMap = AutonChooser.autons;
     var chosenAutonCommand = AutonChooser.chooser.getSelected();
     var chosenAutonName = MoreMath.getKeyByValue(autonsMap, chosenAutonCommand);
 
-    if(chosenAutonName == null || initPoses.containsKey(chosenAutonName)){
+    if(chosenAutonName == null || !initPaths.containsKey(chosenAutonName)){
       return Optional.empty();
     }else{
-      return Optional.of(initPoses.get(chosenAutonName));
+      var initPathName = initPaths.get(chosenAutonName);
+      var initPose = AutonHelper.getPathByName(initPathName, Constants.AUTON.SLOW_CONSTRAINTS).getInitialPose();
+      if(initPose==null){
+        return Optional.empty();
+      }else{
+        return Optional.of(initPose);
+      }
     }
   }
 
@@ -69,8 +84,6 @@ public class AutonSetupBuddy extends CommandBase {
 
       totalAmbiguity += 1.0 / ambiguity;
   }
-
-
 
     Translation3d transform = new Translation3d();
     Rotation3d rotation = new Rotation3d();

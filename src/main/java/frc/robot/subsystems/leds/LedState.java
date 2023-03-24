@@ -11,16 +11,16 @@ public enum LedState {
   GREEN(Color.kGreen), WHITE(Color.kWhite), ORANGE(Color.kOrange), PURPLE(Color.kPurple), YELLOW(Color.kYellow),
   RED(Color.kRed), PINK(Color.kPink), NONE(new Color(0,0,0)),
 
- YELLOW_SOUTH(Color.kYellow, (i)->MoreMath.within(i, 0, 10)), 
- YELLOW_SW(Color.kYellow, (i)->MoreMath.within(i,10, 20)), 
- YELLOW_WEST(Color.kYellow, (i)->MoreMath.within(i, 20, 30)), 
- YELLOW_NW(Color.kYellow, (i)->MoreMath.within(i, 30, 40)),
- YELLOW_NORTH(Color.kYellow, (i)->MoreMath.within(i, 40, 50)),
- YELLOW_NE(Color.kYellow, (i)->MoreMath.within(i, 50, 60)),
- YELLOW_EAST(Color.kYellow, (i)->MoreMath.within(i, 60, 70)),
- YELLOW_SE(Color.kYellow, (i)->MoreMath.within(i, 70, 80)), 
- YELLOW_COUNTERCLOCKWISE(Color.kYellow, (i)->MoreMath.within(i, 80, 90)), 
- YELLOW_CLOCKWISE(Color.kYellow, (i)->MoreMath.within(i, 90, 100));
+ YELLOW_SOUTH(Color.kYellow, (i)->i==7), 
+ YELLOW_SW(Color.kYellow, (i)->i==6), 
+ YELLOW_WEST(Color.kYellow, (i)->i==3), 
+ YELLOW_NW(Color.kYellow, (i)->i==0), 
+ YELLOW_NORTH(Color.kYellow, (i)->i==1), 
+ YELLOW_NE(Color.kYellow, (i)->i==2), 
+ YELLOW_EAST(Color.kYellow, (i)->i==5), 
+ YELLOW_SE(Color.kYellow, (i)->i==8), 
+ YELLOW_COUNTERCLOCKWISE(Color.kYellow, (i)->i==9), 
+ YELLOW_CLOCKWISE(Color.kYellow, (i)->i==10); 
 
    //@formatter:on
 private Consumer<AddressableLEDBuffer> updateBufferLambda;

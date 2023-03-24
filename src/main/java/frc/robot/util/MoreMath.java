@@ -206,7 +206,7 @@ public class MoreMath {
       upperBound = firstBound;
     }
 
-    return val > lowerBound && val < upperBound;
+    return val >= lowerBound && val < upperBound;
   }
 
   public static boolean within(Pose2d pose, Translation2d firstBound, Translation2d secondBound) {
