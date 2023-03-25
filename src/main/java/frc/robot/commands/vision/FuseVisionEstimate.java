@@ -75,6 +75,9 @@ public class FuseVisionEstimate extends CommandBase {
           fuseEstimate(estimate);
           break;
         case TEST:
+          var stDevs = VisionHelper.ironPanthersStdDevs(estimate);
+          stDevs.set(2,0,Double.POSITIVE_INFINITY);
+          estimate.setConfidence(stDevs);
           fuseEstimate(estimate);
           break;
         default:

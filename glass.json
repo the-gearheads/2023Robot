@@ -53,21 +53,6 @@
           },
           "open": true,
           "vision": {
-            "Back": {
-              "open": true,
-              "targets": {
-                "open": true
-              }
-            },
-            "Back Left": {
-              "open": true
-            },
-            "Back Right": {
-              "open": true
-            },
-            "Front Right": {
-              "open": true
-            },
             "open": true,
             "ov9281": {
               "ak": {
@@ -88,6 +73,9 @@
             "open": true
           }
         },
+        "open": true
+      },
+      "FMSInfo": {
         "open": true
       },
       "SmartDashboard": {
@@ -122,15 +110,20 @@
         },
         "arm pPid": {
           "open": true
-        }
+        },
+        "open": true
       },
       "photonvision": {
+        "Forward Left": {
+          "open": true
+        },
         "open": true
       }
     },
     "types": {
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/AutoBalancePID": "PIDController",
+      "/SmartDashboard/Auton Chooser": "String Chooser",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/PPSwerveControllerCommand_field": "Field2d",
       "/SmartDashboard/SendableChooser[0]": "String Chooser",
@@ -152,6 +145,11 @@
       "/SmartDashboard/yPid": "PIDController"
     },
     "windows": {
+      "/SmartDashboard/Auton Chooser": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Field": {
         "Robot": {
           "arrowColor": [
@@ -169,27 +167,6 @@
           "style": "Box/Image"
         }
       },
-      "/SmartDashboard/SendableChooser[0]": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/Swerve/swerve field": {
-        "Vision": {
-          "length": 0.0,
-          "width": 0.0
-        },
-        "bottom": 544,
-        "height": 8.013679504394531,
-        "image": "C:\\Users\\alruz\\Downloads\\2023-field.png",
-        "left": 46,
-        "right": 1088,
-        "top": 36,
-        "width": 16.541748046875,
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/swerve field": {
         "Robot": {
           "length": 0.8500000238418579,
@@ -201,7 +178,10 @@
         "left": 46,
         "right": 1088,
         "top": 36,
-        "width": 16.541748046875
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
       },
       "/SmartDashboard/vision/trust chooser": {
         "window": {

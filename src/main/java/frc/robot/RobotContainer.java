@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -167,16 +168,16 @@ public class RobotContainer {
     //   swerve.setPose(new Pose2d(3, 0.38, Rotation2d.fromDegrees(90)));
     // }));
 
-    Controllers.driverController.backUpFromFeeder().onTrue(new ProxyCommand(() -> {
-      var currentPose = swerve.getPose();
-      var dest = MoreMath.deepCopyPose(currentPose);
-      var translation = new Translation2d(Units.inchesToMeters(-4), 0);
-      dest = new Pose2d(dest.getTranslation().plus(translation), dest.getRotation());
-      return swerve.goTo(dest, Constants.AUTON.MID_CONSTRAINTS);
-    }));
-    // Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(() -> {
-    //   swerve.setPose(new Pose2d());
-    // }, swerve));
+    // Controllers.driverController.backUpFromFeeder().onTrue(new ProxyCommand(() -> {
+    //   var currentPose = swerve.getPose();
+    //   var dest = MoreMath.deepCopyPose(currentPose);
+    //   var translation = new Translation2d(Units.inchesToMeters(-4), 0);
+    //   dest = new Pose2d(dest.getTranslation().plus(translation), dest.getRotation());
+    //   return swerve.goTo(dest, Constants.AUTON.MID_CONSTRAINTS);
+    // }));
+    Controllers.driverController.backUpFromFeeder().onTrue(new InstantCommand(() -> {
+      swerve.setPose(new Pose2d(0,0,Rotation2d.fromDegrees(180)));
+    }, swerve));
     Controllers.driverController.getAutoAlign().onTrue(new AutoAlign(swerve, arm));
 
     Controllers.operatorController.armGoToLowNode()

@@ -38,7 +38,7 @@ public class AutonPaths {
 
         AutonHelper.stowAnd(s,
             AutonHelper.getCommandForPath("StartN4-PrepareDock", false, Constants.AUTON.DOCK_CONSTRAINTS, s.swerve),
-            new AutoBalDriveToPivot(s.swerve).andThen(new AutoBalance(s.swerve))));
+            new AutoBalance(s.swerve)));
   }
 
   public static Command InertN1Place(Subsystems s) {

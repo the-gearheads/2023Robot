@@ -228,25 +228,63 @@ public class Constants extends AnnotatedClass {
   public static final class VISION {
     public static final HashMap<PhotonCamera, Transform3d> CAMS_AND_TRANS = new HashMap<PhotonCamera, Transform3d>() {
       {
+        //@formatter:off
         var robotTip = new Transform3d(
-            new Translation3d(Units.inchesToMeters(12.9 - 1), Units.inchesToMeters(12.875), Units.inchesToMeters(48.1)),
+            new Translation3d(
+              Units.inchesToMeters(12.9 - 1), 
+              Units.inchesToMeters(12.875), 
+              Units.inchesToMeters(48.1)),
             new Rotation3d(0, 0, 0));
-        var leftDelta = new Transform3d(
-            new Translation3d(Units.inchesToMeters(3), Units.inchesToMeters(-9.5), Units.inchesToMeters(0.5)),
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(30), 0));
 
-        var rightDelta = new Transform3d(
-            new Translation3d(Units.inchesToMeters(3), Units.inchesToMeters(-16), Units.inchesToMeters(0.5)),
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(38), 0));
+        var forwardLeftDelta = new Transform3d(
+            new Translation3d(
+              Units.inchesToMeters(2), 
+              Units.inchesToMeters(-6.5), 
+              Units.inchesToMeters(0.3)),
+            new Rotation3d(
+              Units.degreesToRadians(0), 
+              Units.degreesToRadians(40),
+              Units.degreesToRadians(-30)
+              ));
 
-        var backDelta = new Transform3d(
-            new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-17.5), Units.inchesToMeters(-0.5)),
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(17.5),
-                Units.degreesToRadians(180 - 11.6)));
+        var backwardLeftDelta = new Transform3d(
+            new Translation3d(
+              Units.inchesToMeters(0), 
+              Units.inchesToMeters(-8.5), 
+              Units.inchesToMeters(0.3)),
+            new Rotation3d(
+              Units.degreesToRadians(0), 
+              Units.degreesToRadians(-180-35),
+              Units.degreesToRadians(200)
+             ));
 
-        put(new PhotonCamera("Left"), robotTip.plus(leftDelta));
-        put(new PhotonCamera("Right"), robotTip.plus(rightDelta));
-        put(new PhotonCamera("Back"), robotTip.plus(backDelta));
+        var backwardRightDelta = new Transform3d(
+            new Translation3d(
+              Units.inchesToMeters(0), 
+              Units.inchesToMeters(-17), 
+              Units.inchesToMeters(0.3)),
+            new Rotation3d(
+              Units.degreesToRadians(0), 
+              Units.degreesToRadians(-180-35.5),
+              Units.degreesToRadians(160)
+              ));
+
+        var forwardRightDelta = new Transform3d(
+            new Translation3d(
+              Units.inchesToMeters(2), 
+              Units.inchesToMeters(-19), 
+              Units.inchesToMeters(0.3)),
+            new Rotation3d(
+              Units.degreesToRadians(0), 
+              Units.degreesToRadians(39),
+              Units.degreesToRadians(30)
+              ));
+        //@formatter:on
+
+        put(new PhotonCamera("Forward Left"), robotTip.plus(forwardLeftDelta));
+        put(new PhotonCamera("Forward Right"), robotTip.plus(forwardRightDelta));
+        put(new PhotonCamera("Backward Left"), robotTip.plus(backwardLeftDelta));
+        put(new PhotonCamera("Backward Right"), robotTip.plus(backwardRightDelta));
 
       }
     };
@@ -267,7 +305,7 @@ public class Constants extends AnnotatedClass {
         apriltagsCopy.add(new AprilTag(apriltag.ID, apriltag.pose));
       }
 
-      apriltagsCopy.get(4 - 1).pose = new Pose3d(7.046 + Units.inchesToMeters(60), 2.223 + Units.inchesToMeters(2),
+      apriltagsCopy.get(4 - 1).pose = new Pose3d(7.046 + Units.inchesToMeters(60) -0.55, 2.223 + Units.inchesToMeters(2),
           apriltagsCopy.get(4 - 1).pose.getZ(), new Rotation3d(0, 0, Units.degreesToRadians(180)));
 
       SHOP_ATFL = new AprilTagFieldLayout(apriltagsCopy, FIELD_CONSTANTS.LENGTH, FIELD_CONSTANTS.WIDTH);
@@ -353,8 +391,8 @@ public class Constants extends AnnotatedClass {
       static {
         switch (FIELD_CONSTANTS.FIELD_TYPE) {
           case SHOP:
-            RIGHT_DEST_POSE = new Pose2d(7.5, 1.5, Rotation2d.fromDegrees(180));
-            LEFT_DEST_POSE = new Pose2d(7.5, 2.5, Rotation2d.fromDegrees(180));
+            RIGHT_DEST_POSE = new Pose2d(8.132, 3.07, Rotation2d.fromDegrees(180));
+            LEFT_DEST_POSE = new Pose2d(8.132, 3.07, Rotation2d.fromDegrees(180));
             DIAG_CORNERS = new ArrayList<Translation2d>() {
               {
                 var corner = new Translation2d(FIELD_CONSTANTS.LENGTH / 2, FIELD_CONSTANTS.WIDTH / 2);
