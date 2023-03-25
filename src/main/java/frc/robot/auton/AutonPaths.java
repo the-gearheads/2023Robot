@@ -3,7 +3,9 @@ package frc.robot.auton;
 import java.util.HashMap;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -17,6 +19,7 @@ import frc.robot.commands.drive.AutoBalDriveToPivot;
 import frc.robot.commands.drive.AutoBalance;
 import frc.robot.commands.drive.rotateTo;
 import frc.robot.commands.vision.FuseVisionEstimate;
+import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristState;
@@ -87,20 +90,24 @@ public class AutonPaths {
   }
 
   public static Command InertN1TwoCone(Subsystems s){
-    return new SequentialCommandGroup(AutonHelper.setInitPose(s, "InertN1-StartN1"),
+    return new SequentialCommandGroup(
+      // AutonHelper.setInitPose(s, "InertN1-StartN1"),
+      new InstantCommand(()->{
+        s.swerve.setPose(new Pose2d(s.swerve.getPose().getX(), s.swerve.getPose().getY(), Rotation2d.fromDegrees(180)));
+      }, s.swerve),
 
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
 
-        AutonHelper.getCommandForPath("InertN1-StartN1", true, defaultConstraints, s.swerve).raceWith(new FuseVisionEstimate(s.vision)),
+        AutonHelper.getCommandForPath("InertN1-StartN1", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.TEST)),
 
         // place game piece
         AutonHelper.getPlaceConeCommand(s),
 
         new CustomProxy(()->{return AutonPaths.proxy(s);}).raceWith(new InstantCommand(()->{}, s.vision).repeatedly()),
         
-        (new InstantCommand(s.grabber::close).andThen(new WaitCommand(0.5))).raceWith(new InstantCommand(()->{
-          var wristGoal = WristState.getStateWithGoal(-90);
+        (new WaitCommand(1).andThen(new InstantCommand(s.grabber::close).andThen(new WaitCommand(0.5)))).raceWith(new InstantCommand(()->{
+          var wristGoal = WristState.getStateWithGoal(-50);
           s.wrist.setGoal(wristGoal);
           }).repeatedly()));
 
@@ -121,10 +128,10 @@ public class AutonPaths {
           defaultConstraints, s.swerve);
       HashMap<String, Command> eventMap = new HashMap<>();
       eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT));
-      eventMap.put("prepare-ground-pickup", new SetArmPose(s.arm, ArmPose.LOW_NODE)
+      eventMap.put("prepare-ground-pickup", new SetArmPose(s.arm, -77)
       .andThen(new InstantCommand(s.grabber::open))
       .raceWith(new InstantCommand(()->{
-        var wristGoal = WristState.getStateWithGoal(-45);
+        var wristGoal = WristState.getStateWithGoal(-50);
         s.wrist.setGoal(wristGoal);
         }).repeatedly()));
       return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);

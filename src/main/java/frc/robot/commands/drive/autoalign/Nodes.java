@@ -13,7 +13,7 @@ public class Nodes {
   public static enum NodeY {
     // format: off
     // no bump -> bump
-    N1(1, 4.946), N2(2, 4.33), N3(3, 3.85), N4(4, 3.32), N5(5, 2.76), N6(6, 2.175), N7(7, 1.63), N8(8, 1.083), N9(9,
+    N1(1, 4.95), N2(2, 4.33), N3(3, 3.85), N4(4, 3.32), N5(5, 2.76), N6(6, 2.175), N7(7, 1.63), N8(8, 1.083), N9(9,
         0.544);
     // format: on
 
@@ -40,7 +40,7 @@ public class Nodes {
     }
   }
   public static enum NodeX {
-    LOW(1, 2.1), MID(2, 2.35), HIGH(3, 1.94);
+    LOW(1, 2.1), MID(2, 2.35), HIGH(3, 1.89);
 
     public final double x;
     public final int index;

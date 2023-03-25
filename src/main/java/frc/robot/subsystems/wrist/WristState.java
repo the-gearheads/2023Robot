@@ -10,8 +10,8 @@ public enum WristState {
   /* DEFAULT */
   FEEDER_STATION(ARM.MIN_ANGLE, -170, -110.7), 
   TRANSITION(-170, -140, 0), 
-  INSIDE_ROBOT(-140, -70, 90), 
-  PLACE(-70,ARM.MAX_ANGLE, 90),
+  INSIDE_ROBOT(-140, -81, 90), 
+  PLACE(-81,ARM.MAX_ANGLE, 90),
 
   /* ALT */
   GROUND_PICK_UP(-66, -50, -90, WristControlType.ALT),
