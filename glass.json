@@ -25,6 +25,12 @@
               "open": true
             }
           },
+          "Swerve": {
+            "Field": {
+              "open": true
+            },
+            "open": true
+          },
           "TeleopDrive": {
             "Cubed": {
               "open": true
@@ -51,9 +57,17 @@
               "open": true
             }
           },
+          "Wrist": {
+            "open": true,
+            "wrap range handler": {
+              "open": true
+            }
+          },
           "open": true,
           "vision": {
-            "open": true,
+            "Forward Left": {
+              "open": true
+            },
             "ov9281": {
               "ak": {
                 "open": true
@@ -63,14 +77,6 @@
                 "open": true
               }
             }
-          }
-        },
-        "Swerve": {
-          "Wheel 0 (FL)": {
-            "open": true
-          },
-          "Wheel 1 (FR)": {
-            "open": true
           }
         },
         "open": true
@@ -110,14 +116,12 @@
         },
         "arm pPid": {
           "open": true
-        },
-        "open": true
+        }
       },
       "photonvision": {
         "Forward Left": {
           "open": true
-        },
-        "open": true
+        }
       }
     },
     "types": {
