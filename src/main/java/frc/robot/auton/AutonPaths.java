@@ -99,7 +99,7 @@ public class AutonPaths {
 
         new CustomProxy(()->{return AutonPaths.proxy(s);}).raceWith(new InstantCommand(()->{}, s.vision).repeatedly()),
         
-        new InstantCommand(s.grabber::close).raceWith(new InstantCommand(()->{
+        (new InstantCommand(s.grabber::close).andThen(new WaitCommand(0.5))).raceWith(new InstantCommand(()->{
           var wristGoal = WristState.getStateWithGoal(-90);
           s.wrist.setGoal(wristGoal);
           }).repeatedly()));
