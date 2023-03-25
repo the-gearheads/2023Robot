@@ -99,7 +99,10 @@ public class AutonPaths {
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
 
-        AutonHelper.getCommandForPath("InertN1-StartN1", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.TEST)),
+        new CustomProxy(()->
+        {
+          return s.swerve.goTo(new Pose2d(1.9, 4.96, Rotation2d.fromDegrees(180)), Constants.AUTON.SLOW_CONSTRAINTS);
+        }, s.swerve).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.TEST)),
 
         // place game piece
         AutonHelper.getPlaceConeCommand(s),
