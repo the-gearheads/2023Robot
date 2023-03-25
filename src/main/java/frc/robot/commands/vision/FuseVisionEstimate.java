@@ -25,7 +25,7 @@ public class FuseVisionEstimate extends CommandBase {
 
   /** Creates a new UpdateSwervePoseEstimator. */
   public FuseVisionEstimate(Vision vision) {
-    this(vision, ConfidenceStrat.NONE);
+    this(vision, ConfidenceStrat.TEST);
   }
 
   public FuseVisionEstimate(Vision vision, ConfidenceStrat confidenceStrat) {
