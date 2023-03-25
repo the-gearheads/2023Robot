@@ -16,6 +16,7 @@ import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.AutoBalDriveToPivot;
 import frc.robot.commands.drive.AutoBalance;
 import frc.robot.commands.drive.rotateTo;
+import frc.robot.commands.vision.FuseVisionEstimate;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristState;
@@ -91,27 +92,27 @@ public class AutonPaths {
         // Move forward
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
 
-        AutonHelper.getCommandForPath("InertN1-StartN1", true, defaultConstraints, s.swerve),
+        AutonHelper.getCommandForPath("InertN1-StartN1", true, defaultConstraints, s.swerve).raceWith(new FuseVisionEstimate(s.vision)),
 
         // place game piece
         AutonHelper.getPlaceConeCommand(s),
 
-        new CustomProxy(()->{return AutonPaths.proxy(s);}),
+        new CustomProxy(()->{return AutonPaths.proxy(s);}).raceWith(new InstantCommand(()->{}, s.vision).repeatedly()),
         
         new InstantCommand(s.grabber::close).raceWith(new InstantCommand(()->{
-          var wristGoal = WristState.getStateWithGoal(-45);
+          var wristGoal = WristState.getStateWithGoal(-90);
           s.wrist.setGoal(wristGoal);
-          }).repeatedly()),
+          }).repeatedly()));
 
-        new CustomProxy(() -> {
-          var path = AutonHelper.getPathByName("GamePiece1-InertN1", defaultConstraints);
-          var pathCommand = AutonHelper.getCommandForPath("GamePiece1-InertN1", false,
-              defaultConstraints, s.swerve);
-          HashMap<String, Command> eventMap = new HashMap<>();
-          eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT).alongWith(new InstantCommand(()->{new InstantCommand(()->{}, s.wrist);})));
+        // new CustomProxy(() -> {
+        //   var path = AutonHelper.getPathByName("GamePiece1-InertN1", defaultConstraints);
+        //   var pathCommand = AutonHelper.getCommandForPath("GamePiece1-InertN1", false,
+        //       defaultConstraints, s.swerve);
+        //   HashMap<String, Command> eventMap = new HashMap<>();
+        //   eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT).alongWith(new InstantCommand(()->{new InstantCommand(()->{}, s.wrist);})));
 
-          return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);
-        }));
+        //   return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);
+        // }));
       }
 
     public static Command proxy(Subsystems s){

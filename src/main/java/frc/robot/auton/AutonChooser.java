@@ -11,6 +11,7 @@ import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.Swerve;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.wrist.Wrist;
 
 public class AutonChooser {
@@ -21,12 +22,14 @@ public class AutonChooser {
   private Wrist wrist;
   private Arm arm;
   private Grabber grabber;
+  private Vision vision;
 
-  public AutonChooser(Swerve swerve, Arm arm, Wrist wrist, Grabber grabber) {
+  public AutonChooser(Swerve swerve, Arm arm, Wrist wrist, Grabber grabber, Vision vision) {
     this.swerve = swerve;
     this.arm = arm;
     this.wrist = wrist;
     this.grabber = grabber;
+    this.vision = vision;
     this.autons = new HashMap<>();
 
     initializeAutons();
@@ -72,7 +75,7 @@ public class AutonChooser {
   }
 
   public void initializeAutons() {//Here we define auton choices
-    Subsystems s = new Subsystems(swerve, wrist, arm, grabber);
+    Subsystems s = new Subsystems(swerve, wrist, arm, vision, grabber);
 
     Command InertN4PlaceThenDock = AutonPaths.InertN4PlaceThenDock(s);
     Command InertN1PlaceThenExplore = AutonPaths.InertN1PlaceThenExplore(s);
