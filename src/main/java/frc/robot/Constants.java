@@ -226,6 +226,10 @@ public class Constants extends AnnotatedClass {
   }
 
   public static final class VISION {
+
+    public static final double CORNER_THRESHOLD = 20;
+    public static final double X_RES = 640;
+    public static final double Y_RES = 400;
     public static final HashMap<PhotonCamera, Transform3d> CAMS_AND_TRANS = new HashMap<PhotonCamera, Transform3d>() {
       {
         //@formatter:off

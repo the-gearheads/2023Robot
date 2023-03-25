@@ -21,6 +21,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.Constants;
 import frc.robot.util.MoreMath;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 import org.photonvision.PhotonCamera;
 import org.photonvision.estimation.VisionEstimation;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.TargetCorner;
 
 /**
@@ -178,6 +180,18 @@ public class CustomEstimator {
       return Optional.empty();
     }
 
+    var boundaryTargets = new ArrayList<PhotonTrackedTarget>();
+    for(var target : cameraResult.targets){
+      for(var corner: target.getDetectedCorners()){
+        if(!MoreMath.within(corner.x, Constants.VISION.CORNER_THRESHOLD, Constants.VISION.X_RES - Constants.VISION.CORNER_THRESHOLD) 
+        || !MoreMath.within(corner.y, Constants.VISION.CORNER_THRESHOLD, Constants.VISION.Y_RES - Constants.VISION.CORNER_THRESHOLD)){
+          boundaryTargets.add(target);
+          break;
+        }
+      }
+    }
+
+    cameraResult.targets.removeAll(boundaryTargets);
     return update(cameraResult, this.primaryStrategy);
   }
 
