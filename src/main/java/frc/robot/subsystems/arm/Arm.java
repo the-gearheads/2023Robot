@@ -4,8 +4,10 @@
 
 package frc.robot.subsystems.arm;
 
+import java.util.ArrayList;
 import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.CANSparkMax.FaultID;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -20,6 +22,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ARM;
+import frc.robot.util.RevConfigUtils;
 import frc.robot.util.SendableArmFeedforward;
 
 public class Arm extends SubsystemBase {
@@ -55,7 +58,7 @@ public class Arm extends SubsystemBase {
 
   public Arm() {
     controlMode = ArmControlMode.VEL;
-    configure();
+    RevConfigUtils.configure(this::configure, "Arm");
 
     SmartDashboard.putData("Arm/pPid", pid);
     SmartDashboard.putData("Arm/vPid", velPid);
@@ -129,7 +132,7 @@ public class Arm extends SubsystemBase {
       DriverStation.reportError("OUR ZERO ERROR IN ARM", true);
       setVoltage(0);
       if (configureHasRan == false) {
-        configure();
+        RevConfigUtils.configure(this::configure, "Arm");
       }
       configureHasRan = true;
       return;
@@ -240,37 +243,34 @@ public class Arm extends SubsystemBase {
     return pose <= ARM.MAX_ANGLE && pose >= ARM.MIN_ANGLE;
   }
 
-  private void configure() {
-    motor.restoreFactoryDefaults();
+  private ArrayList<REVLibError> configure() {
+    ArrayList<REVLibError> e = new ArrayList<>();
+    e.add(motor.restoreFactoryDefaults());
     motor.setInverted(false);
-    motor.setSmartCurrentLimit(50);
-    encoder.setInverted(false);
-    motor.setIdleMode(IdleMode.kBrake);
-    encoder.setPositionConversionFactor(360);
-    encoder.setVelocityConversionFactor(360);
+    e.add(motor.setSmartCurrentLimit(50));
+    e.add(encoder.setInverted(false));
+    e.add(motor.setIdleMode(IdleMode.kBrake));
+    e.add(encoder.setPositionConversionFactor(360));
+    e.add(encoder.setVelocityConversionFactor(360));
 
     //currently useless
-    motor.setSoftLimit(SoftLimitDirection.kForward, (float) (ARM.MAX_ANGLE - ARM.ANGLE_OFFSET));
-    motor.setSoftLimit(SoftLimitDirection.kReverse, (float) (ARM.MIN_ANGLE - ARM.ANGLE_OFFSET));
-    motor.enableSoftLimit(SoftLimitDirection.kForward, false);
-    motor.enableSoftLimit(SoftLimitDirection.kReverse, false);
+    e.add(motor.setSoftLimit(SoftLimitDirection.kForward, (float) (ARM.MAX_ANGLE - ARM.ANGLE_OFFSET)));
+    e.add(motor.setSoftLimit(SoftLimitDirection.kReverse, (float) (ARM.MIN_ANGLE - ARM.ANGLE_OFFSET)));
+    e.add(motor.enableSoftLimit(SoftLimitDirection.kForward, false));
+    e.add(motor.enableSoftLimit(SoftLimitDirection.kReverse, false));
 
     /* Status 0 governs applied output, faults, and whether is a follower. Not important for this. */
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20));
     /* Integrated motor position isn't important here. */
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500);
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500));
     /* Don't have an analog sensor */
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 500);
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 500));
     /* Don't have an alternate encoder */
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500);
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500));
     /* Have a duty cycle encoder */
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20));
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20));
 
-    try {
-      Thread.sleep((long) 40.0);
-    } catch (Exception e) {
-      e.printStackTrace();
-    } ;
+    return e;
   }
 }

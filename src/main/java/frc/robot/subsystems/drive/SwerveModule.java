@@ -19,7 +19,7 @@ public class SwerveModule implements SwerveModuleIO {
     this.id = id;
     this.description = description;
     this.angleOffset = Rotation2d.fromDegrees(offsets[0]);
-    drive = new NeoDrive(driveId);
+    drive = new NeoDrive(driveId, getPath());
     steer = new Neo550Steer(steerId, offsets[1], getPath());
   }
 

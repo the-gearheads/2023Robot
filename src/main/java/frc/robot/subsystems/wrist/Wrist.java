@@ -4,8 +4,10 @@
 
 package frc.robot.subsystems.wrist;
 
+import java.util.ArrayList;
 import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
 import com.revrobotics.CANSparkMax.FaultID;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -21,6 +23,7 @@ import frc.robot.Constants.WRIST;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.wrist.WristState.WristControlType;
 import frc.robot.util.MoreMath;
+import frc.robot.util.RevConfigUtils;
 import frc.robot.util.SendableArmFeedforward;
 
 public class Wrist extends SubsystemBase {
@@ -50,7 +53,7 @@ public class Wrist extends SubsystemBase {
 
   public Wrist(Arm arm) {
     this.arm = arm;
-    configure();
+    RevConfigUtils.configure(this::configure, "Wrist");
 
     SmartDashboard.putData("Wrist/ff", ff);
     SmartDashboard.putData("Wrist/pid", pid);
@@ -199,7 +202,7 @@ public class Wrist extends SubsystemBase {
       DriverStation.reportError("OUR ZERO ERROR IN WRIST", true);
       setVoltage(0);
       if (configureHasRan == false) {
-        configure();
+        RevConfigUtils.configure(this::configure, "Wrist");
       }
       configureHasRan = true;
     }
@@ -223,30 +226,28 @@ public class Wrist extends SubsystemBase {
 
   }
 
-  private void configure() {
-    motor.restoreFactoryDefaults();
+  private ArrayList<REVLibError> configure() {
+    ArrayList<REVLibError> e = new ArrayList<>();
+
+    e.add(motor.restoreFactoryDefaults());
     motor.setInverted(true);
-    encoder.setInverted(true);
-    motor.setIdleMode(IdleMode.kCoast);
-    encoder.setPositionConversionFactor(360);
-    encoder.setVelocityConversionFactor(360);
+    e.add(encoder.setInverted(true));
+    e.add(motor.setIdleMode(IdleMode.kCoast));
+    e.add(encoder.setPositionConversionFactor(360));
+    e.add(encoder.setVelocityConversionFactor(360));
 
     /* Status 0 governs applied output, faults, and whether is a follower. Not important for this. */
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20));
     /* Integrated motor position isn't important here. */
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500);
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500));
     /* Don't have an analog sensor */
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 500);
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 500));
     /* Don't have an alternate encoder */
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500);
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500));
     /* Have a duty cycle encoder */
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20));
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20));
 
-    try {
-      Thread.sleep((long) 40.0);
-    } catch (Exception e) {
-      e.printStackTrace();
-    } ;
+    return e;
   }
 }
