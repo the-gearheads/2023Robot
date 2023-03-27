@@ -178,7 +178,7 @@ public class Vision extends SubsystemBase {
       var fieldToRobotStrs = fieldToRobots.stream().map((estRobotPose) -> MoreMath.pose3dToString(estRobotPose, 1))
           .toList().toArray(new String[0]);
 
-      var fieldToCamStrs = fieldToCams.stream().map((estRobotPose) -> MoreMath.pose3dToString(estRobotPose, 1)).toList()
+      var fieldToCamStrs = fieldToCams.stream().map((estRobotPose) -> MoreMath.pose3dToString(estRobotPose, 3)).toList()
           .toArray(new String[0]);
 
       var fieldToTagStrs = fieldToTags.stream().map((tagPose) -> (MoreMath.pose2dToString(tagPose.toPose2d(), 1)))

@@ -28,8 +28,7 @@
           "Swerve": {
             "Field": {
               "open": true
-            },
-            "open": true
+            }
           },
           "TeleopDrive": {
             "Cubed": {

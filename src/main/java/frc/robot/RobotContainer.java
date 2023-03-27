@@ -42,6 +42,7 @@ import frc.robot.subsystems.arm.ArmSim;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristSim;
 import frc.robot.subsystems.wrist.WristState;
+import frc.robot.util.CustomProxy;
 import frc.robot.util.MoreMath;
 import frc.robot.subsystems.drive.SwerveModule;
 import frc.robot.subsystems.drive.SwerveModuleIO;
@@ -175,9 +176,14 @@ public class RobotContainer {
     //   dest = new Pose2d(dest.getTranslation().plus(translation), dest.getRotation());
     //   return swerve.goTo(dest, Constants.AUTON.MID_CONSTRAINTS);
     // }));
-    Controllers.driverController.backUpFromFeeder().onTrue(new InstantCommand(() -> {
-      swerve.setPose(new Pose2d(0,0,Rotation2d.fromDegrees(180)));
+    Controllers.driverController.backUpFromFeeder().onTrue(new CustomProxy(() -> {
+      return new InstantCommand(
+        ()->{
+          swerve.setPose(new Pose2d(swerve.getPose().getTranslation(),Rotation2d.fromDegrees(180)));
+        }
+      );
     }, swerve));
+
     Controllers.driverController.getAutoAlign().onTrue(new AutoAlign(swerve, arm));
 
     Controllers.operatorController.armGoToLowNode()

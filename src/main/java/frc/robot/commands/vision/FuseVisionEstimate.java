@@ -5,19 +5,23 @@
 package frc.robot.commands.vision;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.util.MoreMath;
 import frc.robot.util.vision.CustomEstimate;
+import frc.robot.Constants.AUTO_ALIGN.COMMUNITY;
+import frc.robot.Constants.AUTO_ALIGN.FEEDER;
 import frc.robot.subsystems.vision.Vision;
 
 public class FuseVisionEstimate extends CommandBase {
   private Vision vision;
 
   public enum ConfidenceStrat {
-    MECH_ADV, IRON_PANTHERS, CASSEROLE, TEST, NONE;
+    MECH_ADV, IRON_PANTHERS, CASSEROLE, TEST, NONE, ONLY_COMMUNITY_AND_FEEDER, ONLY_COMMUNITY;
   }
 
   public ConfidenceStrat confidenceStrat;
@@ -25,7 +29,7 @@ public class FuseVisionEstimate extends CommandBase {
 
   /** Creates a new UpdateSwervePoseEstimator. */
   public FuseVisionEstimate(Vision vision) {
-    this(vision, ConfidenceStrat.TEST);
+    this(vision, ConfidenceStrat.ONLY_COMMUNITY_AND_FEEDER);
   }
 
   public FuseVisionEstimate(Vision vision, ConfidenceStrat confidenceStrat) {
@@ -44,7 +48,6 @@ public class FuseVisionEstimate extends CommandBase {
     }
 
     trustChooser.setDefaultOption(confidenceStrat.name(), confidenceStrat);
-
     SmartDashboard.putData("vision/trust chooser", trustChooser);
   }
 
@@ -80,6 +83,28 @@ public class FuseVisionEstimate extends CommandBase {
           estimate.setConfidence(stDevs);
           fuseEstimate(estimate);
           break;
+        case ONLY_COMMUNITY:
+        var stDev1 = VisionHelper.ironPanthersStdDevs(estimate);
+        stDev1.set(2,0,Double.POSITIVE_INFINITY);
+        estimate.setConfidence(stDev1);
+        if(inCommunity(estimate.best.toPose2d())){
+          SmartDashboard.putBoolean("fusing", true);
+          fuseEstimate(estimate);
+        }else{
+          SmartDashboard.putBoolean("fusing", false);
+        }
+        break;
+        case ONLY_COMMUNITY_AND_FEEDER:
+          var stDev = VisionHelper.ironPanthersStdDevs(estimate);
+          stDev.set(2,0,Double.POSITIVE_INFINITY);
+          estimate.setConfidence(stDev);
+          if(inCommunity(estimate.best.toPose2d()) || inFeederArea(estimate.best.toPose2d())){
+            SmartDashboard.putBoolean("fusing", true);
+            fuseEstimate(estimate);
+          }else{
+            SmartDashboard.putBoolean("fusing", false);
+          }
+          break;
         default:
           break;
       }
@@ -91,5 +116,19 @@ public class FuseVisionEstimate extends CommandBase {
     var timestamp = estimate.timestampSeconds;
     var confidence = estimate.confidence;
     this.vision.swerve.fuseVisionEstimate(poseEstimate, timestamp, confidence);
+  }
+
+  private static boolean inCommunity(Pose2d pose) {
+    var firstCorner = MoreMath.transformByAlliance(COMMUNITY.DIAG_CORNERS.get(0));
+    var secondCorner = MoreMath.transformByAlliance(COMMUNITY.DIAG_CORNERS.get(1));
+
+    return MoreMath.within(pose, firstCorner, secondCorner);
+  }
+
+  private static boolean inFeederArea(Pose2d pose) {
+    var firstCorner = MoreMath.transformByAlliance(FEEDER.DIAG_CORNERS.get(0));
+    var secondCorner = MoreMath.transformByAlliance(FEEDER.DIAG_CORNERS.get(1));
+
+    return MoreMath.within(pose, firstCorner, secondCorner);
   }
 }

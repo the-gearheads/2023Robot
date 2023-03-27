@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import frc.robot.Constants.AUTO_ALIGN.FEEDER;
+import frc.robot.commands.drive.obsolete.GridAlignWithNodes;
 import frc.robot.Constants.AUTO_ALIGN.COMMUNITY;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.Swerve;

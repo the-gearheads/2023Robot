@@ -32,43 +32,26 @@ public class FeederAlign extends SequentialCommandGroup {
     }
   }
 
-  private static Command prepThenGoToDest(Swerve swerve, Arm arm) {
-
-    var startPose = swerve.getPose();
-    var prepPose = getPrepPose(startPose);
-    var destPose = getDestPose(startPose);
-
-    var startHeading = MoreMath.calcHeading(startPose, prepPose);
-    var startPoint = MoreMath.createPathPoint(startPose, startHeading);
-
-    var prepHeading = MoreMath.calcHeading(prepPose, destPose);
-    var prepPoint = MoreMath.createPathPoint(prepPose, prepHeading);
-
-    var destHeading = prepHeading;
-    var destPoint = MoreMath.createPathPoint(destPose, destHeading);
-
-    var startToPrepTraj = PathPlanner.generatePath(FEEDER.CONSTRAINTS, startPoint, prepPoint);
-    var startToPrepCommand = swerve.followTrajectoryCommand(startToPrepTraj, false, true);
-
-    var prepToDestTraj = PathPlanner.generatePath(FEEDER.CONSTRAINTS, prepPoint, destPoint);
-    var prepToDestCommand = swerve.followTrajectoryCommand(prepToDestTraj, false, true);
-
-    var rotateCommand = new rotateTo(swerve, Rotation2d.fromDegrees(180));
-
-    var raiseArmCommand = new SetArmPose(arm, ArmPose.FEEDER_STATION);
-
-    return new SequentialCommandGroup(startToPrepCommand, rotateCommand, raiseArmCommand, prepToDestCommand);
-  }
-
   private static Command simpleAlign(Swerve swerve, Arm arm) {
     var startPose = swerve.getPose();
     var endPose = getDestPose(startPose);
     var traj = MoreMath.createStraightPath(startPose, endPose, FEEDER.CONSTRAINTS);
 
     var trajCommand = swerve.followTrajectoryCommand(traj, false, true);
-    var armCommand = new SetArmPose(arm, ArmPose.FEEDER_STATION);
+    // var armCommand = new SetArmPose(arm, ArmPose.FEEDER_STATION);
 
-    return trajCommand.alongWith(armCommand);
+    return trajCommand;
+  }
+  
+  private static Pose2d getDestPose(Pose2d pose) {
+    Pose2d destPose;
+    if (isLeft(pose)) {
+      destPose = FEEDER.LEFT_DEST_POSE;
+    } else {
+      destPose = FEEDER.RIGHT_DEST_POSE;
+    }
+    destPose = MoreMath.transformByAlliance(destPose);
+    return destPose;
   }
 
   private static boolean isYAligned(Swerve swerve) {
@@ -118,25 +101,42 @@ public class FeederAlign extends SequentialCommandGroup {
         || (Controllers.driverController.getAutoRight().getAsBoolean() && !MoreMath.isBlue());
   }
 
-  private static Pose2d getPrepPose(Pose2d pose) {
-    Pose2d prepPose;
-    if (isLeft(pose)) {
-      prepPose = FEEDER.LEFT_PREP_POSE;
-    } else {
-      prepPose = FEEDER.RIGHT_PREP_POSE;
-    }
-    prepPose = MoreMath.transformByAlliance(prepPose);
-    return prepPose;
-  }
+  // private static Pose2d getPrepPose(Pose2d pose) {
+  //   Pose2d prepPose;
+  //   if (isLeft(pose)) {
+  //     prepPose = FEEDER.LEFT_PREP_POSE;
+  //   } else {
+  //     prepPose = FEEDER.RIGHT_PREP_POSE;
+  //   }
+  //   prepPose = MoreMath.transformByAlliance(prepPose);
+  //   return prepPose;
+  // }
 
-  private static Pose2d getDestPose(Pose2d pose) {
-    Pose2d destPose;
-    if (isLeft(pose)) {
-      destPose = FEEDER.LEFT_DEST_POSE;
-    } else {
-      destPose = FEEDER.RIGHT_DEST_POSE;
-    }
-    destPose = MoreMath.transformByAlliance(destPose);
-    return destPose;
-  }
+  // private static Command prepThenGoToDest(Swerve swerve, Arm arm) {
+
+  //   var startPose = swerve.getPose();
+  //   var prepPose = getPrepPose(startPose);
+  //   var destPose = getDestPose(startPose);
+
+  //   var startHeading = MoreMath.calcHeading(startPose, prepPose);
+  //   var startPoint = MoreMath.createPathPoint(startPose, startHeading);
+
+  //   var prepHeading = MoreMath.calcHeading(prepPose, destPose);
+  //   var prepPoint = MoreMath.createPathPoint(prepPose, prepHeading);
+
+  //   var destHeading = prepHeading;
+  //   var destPoint = MoreMath.createPathPoint(destPose, destHeading);
+
+  //   var startToPrepTraj = PathPlanner.generatePath(FEEDER.CONSTRAINTS, startPoint, prepPoint);
+  //   var startToPrepCommand = swerve.followTrajectoryCommand(startToPrepTraj, false, true);
+
+  //   var prepToDestTraj = PathPlanner.generatePath(FEEDER.CONSTRAINTS, prepPoint, destPoint);
+  //   var prepToDestCommand = swerve.followTrajectoryCommand(prepToDestTraj, false, true);
+
+  //   var rotateCommand = new rotateTo(swerve, Rotation2d.fromDegrees(180));
+
+  //   var raiseArmCommand = new SetArmPose(arm, ArmPose.FEEDER_STATION);
+
+  //   return new SequentialCommandGroup(startToPrepCommand, rotateCommand, raiseArmCommand, prepToDestCommand);
+  // }
 }

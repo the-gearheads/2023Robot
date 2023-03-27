@@ -139,7 +139,41 @@ public class AutonPaths {
         }).repeatedly()));
       return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);
     }
+
+    public static Command testPath(Subsystems s){
+      return new SequentialCommandGroup(
+        new InstantCommand(()->{
+          s.swerve.setPose(new Pose2d(s.swerve.getPose().getX(), s.swerve.getPose().getY(), Rotation2d.fromDegrees(180)));
+        }, s.swerve),
+
+        new CustomProxy(()->{
+          return s.swerve.goTo(new Pose2d(1.837, 5.039, Rotation2d.fromDegrees(180)), Constants.AUTON.SLOW_CONSTRAINTS);
+        }, s.swerve),
+
+        new CustomProxy(()->{
+          return testProxy(s);
+        }),
+        // AutonHelper.getCommandForPath("pi-start-gamepiece1", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+        AutonHelper.getCommandForPath("pi-gamepiece1-placecube", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)
+
+      ).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.ONLY_COMMUNITY));
+    }
+
+  public static Command testProxy(Subsystems s){
+    var path = AutonHelper.getPathByName("pi-start-gamepiece1", Constants.AUTON.SLOW_CONSTRAINTS);
+    var pathCommand = AutonHelper.getCommandForPath("pi-start-gamepiece1", false,
+        Constants.AUTON.SLOW_CONSTRAINTS, s.swerve);
+    HashMap<String, Command> eventMap = new HashMap<>();
+    eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT));
+    eventMap.put("pickup", new SetArmPose(s.arm, -74)
+    .andThen(new InstantCommand(s.grabber::open))
+    .raceWith(new InstantCommand(()->{
+      var wristGoal = WristState.getStateWithGoal(-50);
+      s.wrist.setGoal(wristGoal);
+      }).repeatedly()));
+    return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);  
   }
+}
 
   // public static Command InertN1SafeTwoCone(Subsystems s) {
   //   return new SequentialCommandGroup(AutonHelper.setInitPose(s, "InertN1-StartN1"),

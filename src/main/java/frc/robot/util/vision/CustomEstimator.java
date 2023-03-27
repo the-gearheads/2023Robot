@@ -21,6 +21,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.util.MoreMath;
 import java.util.ArrayList;
@@ -262,8 +263,13 @@ public class CustomEstimator {
     if (estimate.targetsUsed.size() > 1) {
       return Optional.of(estimate.getBestEstimate());
     } else {
-      var contemporaryGyroRad =
-          PoseBufferWrapper.getPoseInstance().getSample(estimate.timestampSeconds).get().gyroAngle.getRadians();
+      var contemporaryPoseOpt = PoseBufferWrapper.getPoseInstance().getSample(estimate.timestampSeconds);
+      if(contemporaryPoseOpt.isEmpty()){
+        SmartDashboard.putString("contemporary pose opt does not exist", "it doesn't");
+        return Optional.empty();
+      }
+      var contemporaryGyroRad = contemporaryPoseOpt
+          .get().gyroAngle.getRadians();
 
       var bestRad = estimate.best.getRotation().getZ();
       var altRad = estimate.alt.getRotation().getZ();

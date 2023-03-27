@@ -170,13 +170,13 @@ public class Constants extends AnnotatedClass {
 
     public static double MID_LIN_VEL = 1.5;//set to 2
 
-    public static double LOW_LIN_VEL = 0.5;
+    public static double LOW_LIN_VEL = 0.2;
     @NTPublish
     public static double HIGH_ROT_VEL = 2.5;
 
     public static double MID_ROT_VEL = 1.5;
 
-    public static double LOW_ROT_VEL = 0.5;
+    public static double LOW_ROT_VEL = 0.2;
 
     @NTPublish
     public static double MAX_MODULE_SPEED = 5;
@@ -225,14 +225,77 @@ public class Constants extends AnnotatedClass {
     public static final int LENGTH = 160;
   }
 
+  public static final class ROBOT{
+    public static final double ROBOT_X = Units.inchesToMeters(30.25);//without bumpers
+    public static final double ROBOT_Y = Units.inchesToMeters(28.5);//without bumpers
+    public static final double ROBOT_X_WITH_BUMPER = Units.inchesToMeters(36);
+    public static final double ROBOT_Y_WITH_BUMPER = Units.inchesToMeters(34.5);
+  }
+
   public static final class VISION {
 
-    public static final double CORNER_THRESHOLD = 20;
+    public static final double CORNER_THRESHOLD = 3;
     public static final double X_RES = 640;
     public static final double Y_RES = 400;
     public static final HashMap<PhotonCamera, Transform3d> CAMS_AND_TRANS = new HashMap<PhotonCamera, Transform3d>() {
       {
         //@formatter:off
+        var robotKnownLocForwardCams = new Pose3d(new Pose2d(
+          1.369 + Units.inchesToMeters(40) + (Constants.ROBOT.ROBOT_X_WITH_BUMPER/2),
+          4.748 - (Constants.ROBOT.ROBOT_Y_WITH_BUMPER / 2),
+          Rotation2d.fromDegrees(180)
+        ));
+        var robotKnownLocBackwardCams = new Pose3d(new Pose2d(
+          1.369 + Units.inchesToMeters(40) + (Constants.ROBOT.ROBOT_X_WITH_BUMPER/2),
+          4.748 - (Constants.ROBOT.ROBOT_Y_WITH_BUMPER / 2),
+          Rotation2d.fromDegrees(0)
+        ));
+        var forwardLeftPose = new Pose3d(
+          2.57,
+          4.14,
+          1.374,
+          new Rotation3d(
+            Units.degreesToRadians(-2.05),//roll
+            Units.degreesToRadians(39.842),//pitch
+            Units.degreesToRadians(150.304)//yaw
+          )
+        );
+        var forwardRightPose = new Pose3d(
+          2.509,
+          4.444,
+          1.342,
+          new Rotation3d(
+            Units.degreesToRadians(3.889),//roll
+            Units.degreesToRadians(39.544),//pitch
+            Units.degreesToRadians(-145.613)//yaw
+          )
+        );
+        var backwardLeftPose = new Pose3d(
+          3.228,
+          4.411,
+          1.367,
+          new Rotation3d(
+            Units.degreesToRadians(-1.844),//roll
+            Units.degreesToRadians(35.411),//pitch
+            Units.degreesToRadians(-160.7)//yaw
+          )
+        );
+        var backwardRightPose = new Pose3d(
+          3.231,
+          4.237,
+          1.375,
+          new Rotation3d(
+            Units.degreesToRadians(1.513),//roll
+            Units.degreesToRadians(35.867),//pitch
+            Units.degreesToRadians(163.141)//yaw
+          )
+        );
+
+        put(new PhotonCamera("Forward Left"), forwardLeftPose.minus(robotKnownLocForwardCams));
+        put(new PhotonCamera("Forward Right"), forwardRightPose.minus(robotKnownLocForwardCams));
+        put(new PhotonCamera("Backward Left"), backwardLeftPose.minus(robotKnownLocBackwardCams));
+        put(new PhotonCamera("Backward Right"), backwardRightPose.minus(robotKnownLocBackwardCams));
+
         var robotTip = new Transform3d(
             new Translation3d(
               Units.inchesToMeters(12.9 - 1), 
@@ -285,10 +348,10 @@ public class Constants extends AnnotatedClass {
               ));
         //@formatter:on
 
-        put(new PhotonCamera("Forward Left"), robotTip.plus(forwardLeftDelta));
-        put(new PhotonCamera("Forward Right"), robotTip.plus(forwardRightDelta));
-        put(new PhotonCamera("Backward Left"), robotTip.plus(backwardLeftDelta));
-        put(new PhotonCamera("Backward Right"), robotTip.plus(backwardRightDelta));
+        // put(new PhotonCamera("Forward Left"), robotTip.plus(forwardLeftDelta));
+        // put(new PhotonCamera("Forward Right"), robotTip.plus(forwardRightDelta));
+        // put(new PhotonCamera("Backward Left"), robotTip.plus(backwardLeftDelta));
+        // put(new PhotonCamera("Backward Right"), robotTip.plus(backwardRightDelta));
 
       }
     };
@@ -309,8 +372,11 @@ public class Constants extends AnnotatedClass {
         apriltagsCopy.add(new AprilTag(apriltag.ID, apriltag.pose));
       }
 
-      apriltagsCopy.get(4 - 1).pose = new Pose3d(7.046 + Units.inchesToMeters(60) -0.55, 2.223 + Units.inchesToMeters(2),
-          apriltagsCopy.get(4 - 1).pose.getZ(), new Rotation3d(0, 0, Units.degreesToRadians(180)));
+      apriltagsCopy.get(4 - 1).pose = new Pose3d(
+        Units.inchesToMeters(277.4)+ Units.inchesToMeters(60),
+        Units.inchesToMeters(84.3) + Units.inchesToMeters(10),
+        apriltagsCopy.get(4 - 1).pose.getZ(),
+        new Rotation3d(0, 0, Units.degreesToRadians(180)));
 
       SHOP_ATFL = new AprilTagFieldLayout(apriltagsCopy, FIELD_CONSTANTS.LENGTH, FIELD_CONSTANTS.WIDTH);
     }
@@ -395,8 +461,8 @@ public class Constants extends AnnotatedClass {
       static {
         switch (FIELD_CONSTANTS.FIELD_TYPE) {
           case SHOP:
-            RIGHT_DEST_POSE = new Pose2d(8.132, 3.07, Rotation2d.fromDegrees(180));
-            LEFT_DEST_POSE = new Pose2d(8.132, 3.07, Rotation2d.fromDegrees(180));
+            RIGHT_DEST_POSE = new Pose2d(8.08, 3.2, Rotation2d.fromDegrees(180));
+            LEFT_DEST_POSE = new Pose2d(8.08, 3.2, Rotation2d.fromDegrees(180));
             DIAG_CORNERS = new ArrayList<Translation2d>() {
               {
                 var corner = new Translation2d(FIELD_CONSTANTS.LENGTH / 2, FIELD_CONSTANTS.WIDTH / 2);

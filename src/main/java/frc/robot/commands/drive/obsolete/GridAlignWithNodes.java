@@ -2,11 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.drive.autoalign;
+package frc.robot.commands.drive.obsolete;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.AUTO_ALIGN.COMMUNITY;
@@ -19,8 +18,8 @@ import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.MoreMath;
 
-public class GridAlign extends SequentialCommandGroup {
-  public GridAlign(Swerve swerve, Arm arm) {
+public class GridAlignWithNodes extends SequentialCommandGroup {
+  public GridAlignWithNodes(Swerve swerve, Arm arm) {
     addCommands(simpleAlign(swerve, arm));
   }
 
@@ -28,7 +27,7 @@ public class GridAlign extends SequentialCommandGroup {
   public static Command simpleAlign(Swerve swerve, Arm arm) {
     var destPose = getDestPose(swerve, arm);
     // var desiredArmPose = getDesiredArmPose(arm);
-  
+
     var pathCommand = swerve.goTo(destPose, COMMUNITY.CONSTRAINTS);
     // var armCommand = new SetArmPose(arm, desiredArmPose);
     return pathCommand;
@@ -36,28 +35,24 @@ public class GridAlign extends SequentialCommandGroup {
 
   public static Pose2d getDestPose(Swerve swerve, Arm arm) {
     /* Assuming they have a range of 1-3 */
-    var desiredGridCol = getDesiredGridCol(swerve);
-    var desiredArmPose = getDesiredArmPose(arm);
-    Translation2d desiredTrans;
+    var x = getDesiredNodeX(arm).x;
+    var y = getDesiredNodeY(swerve).getY();
 
+    return new Pose2d(x, y, Rotation2d.fromDegrees(180));
+  }
+
+  public static NodeX getDesiredNodeX(Arm arm) {
+    var desiredArmPose = getDesiredArmPose(arm);
     switch (desiredArmPose) {
       case HIGH_NODE:
-        desiredTrans = desiredGridCol.high;
-        break;
+        return NodeX.HIGH;
       case MID_NODE:
-        desiredTrans = desiredGridCol.mid;
-        break;
+        return NodeX.MID;
       case LOW_NODE:
-        desiredTrans = desiredGridCol.low;
-        break;
+        return NodeX.LOW;
       default:
-        desiredTrans = desiredGridCol.mid;
-        break;
+        return NodeX.HIGH;
     }
-
-    var destPose = new Pose2d(desiredTrans, Rotation2d.fromDegrees(180));
-    destPose = MoreMath.transformByAlliance(destPose);
-    return destPose;
   }
 
   public static ArmPose getDesiredArmPose(Arm arm) {
@@ -76,45 +71,39 @@ public class GridAlign extends SequentialCommandGroup {
     return closestArmPose;
   }
 
-  public static GridCol getDesiredGridCol(Swerve swerve) {
-    var desiredGrid = getClosestGrid(swerve.getPose());
-    var desiredGridCol = desiredGrid.leftCol;
+  public static NodeY getDesiredNodeY(Swerve swerve) {
+    var indexDelta = 0;
     if (Controllers.driverController.getAutoLeft().getAsBoolean()) {
-      desiredGridCol=desiredGrid.leftCol;
+      indexDelta = -1;
     } else if (Controllers.driverController.getAutoCenter().getAsBoolean()) {
-      desiredGridCol=desiredGrid.centerCol;
+      indexDelta = 0;
     } else if (Controllers.driverController.getAutoRight().getAsBoolean()) {
-      desiredGridCol=desiredGrid.rightCol;
+      indexDelta = 1;
     }
 
     //I hate mirrored fields
     if (!MoreMath.isBlue()) {
-      if(desiredGridCol == desiredGrid.leftCol){
-        desiredGridCol = desiredGrid.rightCol;
-      }else if(desiredGridCol == desiredGrid.rightCol){
-        desiredGridCol = desiredGrid.leftCol;
-      }
+      indexDelta *= -1;
     }
 
-    return desiredGridCol;
+    var closestCenterNodeIndex = getClosestCenterNode(swerve.getPose()).index;
+    var nodeY = NodeY.getByIndex(closestCenterNodeIndex + indexDelta);
+    return nodeY;
   }
 
-  public static Grid getClosestGrid(Pose2d currentPose) {
-    Grid[] grids = {Grid.LEFT_GRID,
-                    Grid.CENTER_GRID,
-                    Grid.RIGHT_GRID};
+  public static NodeY getClosestCenterNode(Pose2d currentPose) {
+    NodeY[] centerNodes = {NodeY.N2, NodeY.N5, NodeY.N8};
 
     var smallestDist = Double.POSITIVE_INFINITY;
-    Grid closestGrid = Grid.LEFT_GRID;
+    NodeY closestNode = NodeY.getByIndex(1);
 
-    for (var grid : grids) {
-      var gridY = MoreMath.transformByAlliance(grid.getY());
-      var dist = Math.abs(gridY - currentPose.getY());
+    for (var centerNode : centerNodes) {
+      var dist = Math.abs(centerNode.getY() - currentPose.getY());
       if (dist < smallestDist) {
         smallestDist = dist;
-        closestGrid = grid;
+        closestNode = centerNode;
       }
     }
-    return closestGrid;
+    return closestNode;
   }
 }

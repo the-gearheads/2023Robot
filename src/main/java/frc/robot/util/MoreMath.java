@@ -132,6 +132,13 @@ public class MoreMath {
     return pose;
   }
 
+  public static double transformByAlliance(double y) {
+    if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+      return Constants.FIELD_CONSTANTS.WIDTH - y;
+    }
+    return y;
+  }
+
   public static Translation2d transformByAlliance(Translation2d trans) {
     if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
       return new Translation2d(trans.getX(), Constants.FIELD_CONSTANTS.WIDTH - trans.getY());
