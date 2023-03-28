@@ -11,7 +11,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 public enum Grid {
     LEFT_GRID(
         new GridCol(
-            new Translation2d(1.837,5.039),
+            new Translation2d(1.837,5.05),
             new Translation2d(2.237,5.05),
             new Translation2d(2.0,5.162)
         ),
@@ -21,7 +21,7 @@ public enum Grid {
             new Translation2d(2.03, 4.4)
         ),
         new GridCol(
-            new Translation2d(1.803, 3.82),
+            new Translation2d(1.803, 3.87),
             new Translation2d(2.196, 3.82),
             new Translation2d(1.99, 3.8)
         )

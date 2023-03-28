@@ -1,5 +1,6 @@
 package frc.robot.auton;
 
+import java.util.Map;
 import org.littletonrobotics.junction.Logger;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -18,6 +19,7 @@ import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.CustomProxy;
+import com.pathplanner.lib.commands.FollowPathWithEvents;
 
 public class AutonHelper {
 
@@ -26,15 +28,15 @@ public class AutonHelper {
    * ASSUPTIONS: Cone being held, arm in correct position, alt mode corresponds to setting wrist to 0deg, and default sets it to 90deg
    */
   public static Command getPlaceConeCommand(Subsystems s) {
-    return new AltWristControl(s.wrist).raceWith(new SequentialCommandGroup(new WaitCommand(0.5), // Wait for wrist to rotate before dropping cone
-        getGrabberOpenCommand(s.grabber))).andThen(new WaitCommand(0.5), // Wait for grabber and gravity to drop cone
-            getGrabberCloseCommand(s.grabber));
+    return new AltWristControl(s.wrist).raceWith(new SequentialCommandGroup(new WaitCommand(0.25), // Wait for wrist to rotate before dropping cone
+        openGrabber(s.grabber))).andThen(new WaitCommand(0.25), // Wait for grabber and gravity to drop cone
+            closeGrabber(s.grabber));
   }
 
   public static Command getGroundPickUpCommand(Subsystems s) {
-    return new SequentialCommandGroup(getGrabberOpenCommand(s.grabber), new WaitCommand(0.25),
+    return new SequentialCommandGroup(openGrabber(s.grabber), new WaitCommand(0.25),
         new AltWristControl(s.wrist).raceWith(
-            new SequentialCommandGroup(new WaitCommand(1), getGrabberCloseCommand(s.grabber), new WaitCommand(1))),
+            new SequentialCommandGroup(new WaitCommand(1), closeGrabber(s.grabber), new WaitCommand(1))),
         new WaitCommand(1));
   }
 
@@ -43,16 +45,12 @@ public class AutonHelper {
         new WaitCommand(1), new StowArm(s.arm, s.wrist)));
   }
 
-  public static Command getGrabberOpenCommand(Grabber grabber) {
-    return new InstantCommand(() -> {
-      grabber.open();
-    }, grabber);
+  public static Command openGrabber(Grabber grabber) {
+    return new InstantCommand(grabber::open, grabber);
   }
 
-  public static Command getGrabberCloseCommand(Grabber grabber) {
-    return new InstantCommand(() -> {
-      grabber.close();
-    }, grabber);
+  public static Command closeGrabber(Grabber grabber) {
+    return new InstantCommand(grabber::close, grabber);
   }
 
   public static PathPlannerTrajectory getPathByName(String pathName, PathConstraints constraints) {
@@ -114,5 +112,14 @@ public class AutonHelper {
       s.swerve.setPose(initPose);
     });
   }
+
+  public static Command followWithEvents(String pathName, Map<String, Command> eventMap, boolean resetOdometry,
+  PathConstraints constrainsts, Swerve swerve, boolean reversed) {
+    var path = AutonHelper.getPathByName(pathName, constrainsts);
+    var pathCommand = AutonHelper.getCommandForPath(pathName, resetOdometry,
+        constrainsts, swerve);
+
+    return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);
+}
 }
 //format:on

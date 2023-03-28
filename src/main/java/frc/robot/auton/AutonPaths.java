@@ -6,6 +6,7 @@ import com.pathplanner.lib.commands.FollowPathWithEvents;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -18,8 +19,10 @@ import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.AutoBalDriveToPivot;
 import frc.robot.commands.drive.AutoBalance;
 import frc.robot.commands.drive.rotateTo;
+import frc.robot.commands.drive.autoalign.Grid;
 import frc.robot.commands.vision.FuseVisionEstimate;
 import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
+import frc.robot.commands.wrist.FloorPickUp;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristState;
@@ -46,7 +49,9 @@ public class AutonPaths {
 
         AutonHelper.stowAnd(s,
             AutonHelper.getCommandForPath("StartN4-PrepareDock", false, Constants.AUTON.DOCK_CONSTRAINTS, s.swerve),
-            new AutoBalance(s.swerve)));
+            new AutoBalance(s.swerve))
+        )
+        .raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.NONE));
   }
 
   public static Command InertN1Place(Subsystems s) {
@@ -58,7 +63,8 @@ public class AutonPaths {
         AutonHelper.getCommandForPath("InertN4-StartN4", true, defaultConstraints, s.swerve),
 
         // place game piece
-        AutonHelper.getPlaceConeCommand(s));
+        AutonHelper.getPlaceConeCommand(s))
+        .raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.NONE));
   }
 
   public static Command InertN1PlaceThenExplore(Subsystems s) {
@@ -72,7 +78,8 @@ public class AutonPaths {
         // place game piece
         AutonHelper.getPlaceConeCommand(s),
 
-        AutonHelper.stowAnd(s, AutonHelper.getCommandForPath("StartN1-Explore", false, defaultConstraints, s.swerve)));
+        AutonHelper.stowAnd(s, AutonHelper.getCommandForPath("StartN1-Explore", false, defaultConstraints, s.swerve)))
+        .raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.NONE));
   }
 
   public static Command InertN9PlaceThenExplore(Subsystems s) {
@@ -86,95 +93,162 @@ public class AutonPaths {
         // place game piece
         AutonHelper.getPlaceConeCommand(s),
 
-        AutonHelper.stowAnd(s, AutonHelper.getCommandForPath("StartN9-Explore", false, defaultConstraints, s.swerve)));
+        AutonHelper.stowAnd(s, AutonHelper.getCommandForPath("StartN9-Explore", false, defaultConstraints, s.swerve)))
+        .raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.NONE));
   }
 
-  public static Command InertN1TwoCone(Subsystems s){
-    return new SequentialCommandGroup(
-      // AutonHelper.setInitPose(s, "InertN1-StartN1"),
-      new InstantCommand(()->{
-        s.swerve.setPose(new Pose2d(s.swerve.getPose().getX(), s.swerve.getPose().getY(), Rotation2d.fromDegrees(180)));
-      }, s.swerve),
-
-        // Move forward
-        new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-
-        new CustomProxy(()->
-        {
-          return s.swerve.goTo(new Pose2d(1.9, 4.96, Rotation2d.fromDegrees(180)), Constants.AUTON.SLOW_CONSTRAINTS);
-        }, s.swerve).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.TEST)),
-
-        // place game piece
-        AutonHelper.getPlaceConeCommand(s),
-
-        new CustomProxy(()->{return AutonPaths.proxy(s);}).raceWith(new InstantCommand(()->{}, s.vision).repeatedly()),
-        
-        (new WaitCommand(1).andThen(new InstantCommand(s.grabber::close).andThen(new WaitCommand(0.5)))).raceWith(new InstantCommand(()->{
-          var wristGoal = WristState.getStateWithGoal(-50);
-          s.wrist.setGoal(wristGoal);
-          }).repeatedly()));
-
-        // new CustomProxy(() -> {
-        //   var path = AutonHelper.getPathByName("GamePiece1-InertN1", defaultConstraints);
-        //   var pathCommand = AutonHelper.getCommandForPath("GamePiece1-InertN1", false,
-        //       defaultConstraints, s.swerve);
-        //   HashMap<String, Command> eventMap = new HashMap<>();
-        //   eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT).alongWith(new InstantCommand(()->{new InstantCommand(()->{}, s.wrist);})));
-
-        //   return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);
-        // }));
-      }
-
-    public static Command proxy(Subsystems s){
-      var path = AutonHelper.getPathByName("StartN1-GamePiece1", defaultConstraints);
-      var pathCommand = AutonHelper.getCommandForPath("StartN1-GamePiece1", false,
-          defaultConstraints, s.swerve);
-      HashMap<String, Command> eventMap = new HashMap<>();
-      eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT));
-      eventMap.put("prepare-ground-pickup", new SetArmPose(s.arm, -77)
-      .andThen(new InstantCommand(s.grabber::open))
-      .raceWith(new InstantCommand(()->{
-        var wristGoal = WristState.getStateWithGoal(-50);
-        s.wrist.setGoal(wristGoal);
-        }).repeatedly()));
-      return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);
-    }
-
-    public static Command testPath(Subsystems s){
+    public static Command TwoGamePieceNoBump(Subsystems s){
       return new SequentialCommandGroup(
+        new InstantCommand(()->{
+          SmartDashboard.putNumber("auton phase", 1);
+        }),
+        new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+        new InstantCommand(()->{
+          SmartDashboard.putNumber("auton phase", 2);
+        }),
         new InstantCommand(()->{
           s.swerve.setPose(new Pose2d(s.swerve.getPose().getX(), s.swerve.getPose().getY(), Rotation2d.fromDegrees(180)));
         }, s.swerve),
 
         new CustomProxy(()->{
-          return s.swerve.goTo(new Pose2d(1.837, 5.039, Rotation2d.fromDegrees(180)), Constants.AUTON.SLOW_CONSTRAINTS);
+          var destTrans = Grid.LEFT_GRID.leftCol.high;
+          return s.swerve.goTo(new Pose2d(destTrans, Rotation2d.fromDegrees(180)), Constants.AUTON.SLOW_CONSTRAINTS);
         }, s.swerve),
 
+        AutonHelper.getPlaceConeCommand(s),
+
         new CustomProxy(()->{
-          return testProxy(s);
+          return twoGamePieceNoBumpPathPickUpCubeProxy(s);
         }),
-        // AutonHelper.getCommandForPath("pi-start-gamepiece1", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
-        AutonHelper.getCommandForPath("pi-gamepiece1-placecube", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve)
+
+        (AutonHelper.closeGrabber(s.grabber).andThen(new WaitCommand(0.25)))
+        .raceWith(new FloorPickUp(s.arm, s.wrist))
+        ,
+
+        new CustomProxy(()->{
+          return twoGamePieceNoBumpPathPlaceCubeProxy(s);
+        })
 
       ).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.ONLY_COMMUNITY));
     }
 
-  public static Command testProxy(Subsystems s){
-    var path = AutonHelper.getPathByName("pi-start-gamepiece1", Constants.AUTON.SLOW_CONSTRAINTS);
-    var pathCommand = AutonHelper.getCommandForPath("pi-start-gamepiece1", false,
-        Constants.AUTON.SLOW_CONSTRAINTS, s.swerve);
+  public static Command twoGamePieceNoBumpPathPickUpCubeProxy(Subsystems s){
     HashMap<String, Command> eventMap = new HashMap<>();
     eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT));
-    eventMap.put("pickup", new SetArmPose(s.arm, -74)
-    .andThen(new InstantCommand(s.grabber::open))
-    .raceWith(new InstantCommand(()->{
-      var wristGoal = WristState.getStateWithGoal(-50);
-      s.wrist.setGoal(wristGoal);
-      }).repeatedly()));
-    return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);  
+    eventMap.put("pickup", AutonHelper.openGrabber(s.grabber).alongWith(new FloorPickUp(s.arm, s.wrist)));
+
+    // eventMap.put("stow-arm", AutonHelper.openGrabber(s.grabber).alongWith(new PickUpFromGround(s.arm, s.wrist)));
+    return AutonHelper.followWithEvents("pi-start-gamepiece1", eventMap,
+     false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve, false);
+  }
+
+  public static Command twoGamePieceNoBumpPathPlaceCubeProxy(Subsystems s){
+    HashMap<String, Command> eventMap = new HashMap<>();
+    eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT));
+    eventMap.put("raise-arm", new SetArmPose(s.arm, ArmPose.HIGH_NODE));
+    return AutonHelper.followWithEvents("pi-gamepiece1-placecube", eventMap,
+     false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve, false);
+  }
+
+  public static Command TwoGamePieceCenter(Subsystems s){
+    return new SequentialCommandGroup(
+      new InstantCommand(()->{
+        SmartDashboard.putNumber("auton phase", 1);
+      }),
+      new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+
+      new InstantCommand(()->{
+        s.swerve.setPose(new Pose2d(s.swerve.getPose().getX(), s.swerve.getPose().getY(), Rotation2d.fromDegrees(180)));
+      }, s.swerve),
+
+      new CustomProxy(()->{
+        var destTrans = AutonHelper.getPathByName("startN4-gamepiece", defaultConstraints).getInitialHolonomicPose().getTranslation();
+        return s.swerve.goTo(new Pose2d(destTrans, Rotation2d.fromDegrees(180)), Constants.AUTON.SLOW_CONSTRAINTS);
+      }, s.swerve),
+
+      AutonHelper.getPlaceConeCommand(s),
+
+      new CustomProxy(()->{
+        return twoGamePieceCenterPathPickUpCubeProxy(s);
+      }),
+
+      (AutonHelper.closeGrabber(s.grabber).andThen(new WaitCommand(0.25))).raceWith(new FloorPickUp(s.arm, s.wrist)),
+
+      AutonHelper.stowAnd(s, new CustomProxy(()->{
+        return twoGamePieceCenterPathDockProxy(s);
+      })),
+      new AutoBalance(s.swerve)
+
+    ).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.ONLY_COMMUNITY));
+  }
+
+  public static Command twoGamePieceCenterPathPickUpCubeProxy(Subsystems s){
+    HashMap<String, Command> eventMap = new HashMap<>();
+    eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT));
+    eventMap.put("pickup", AutonHelper.openGrabber(s.grabber).alongWith(new FloorPickUp(s.arm, s.wrist)));
+
+    // eventMap.put("stow-arm", AutonHelper.openGrabber(s.grabber).alongWith(new PickUpFromGround(s.arm, s.wrist)));
+    return AutonHelper.followWithEvents("startN4-gamepiece", eventMap,
+     false, Constants.AUTON.MID_CONSTRAINTS, s.swerve, false);
+  }
+
+  public static Command twoGamePieceCenterPathDockProxy(Subsystems s){
+    HashMap<String, Command> eventMap = new HashMap<>();
+    return AutonHelper.followWithEvents("center-gamepiece-dock", eventMap,
+     false, Constants.AUTON.MID_CONSTRAINTS, s.swerve, false);
   }
 }
 
+  // public static Command InertN1TwoCone(Subsystems s){
+  //   return new SequentialCommandGroup(
+  //     // AutonHelper.setInitPose(s, "InertN1-StartN1"),
+  //     new InstantCommand(()->{
+  //       s.swerve.setPose(new Pose2d(s.swerve.getPose().getX(), s.swerve.getPose().getY(), Rotation2d.fromDegrees(180)));
+  //     }, s.swerve),
+
+  //       // Move forward
+  //       new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+
+  //       new CustomProxy(()->
+  //       {
+  //         return s.swerve.goTo(new Pose2d(1.9, 4.96, Rotation2d.fromDegrees(180)), Constants.AUTON.SLOW_CONSTRAINTS);
+  //       }, s.swerve).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.TEST)),
+
+  //       // place game piece
+  //       AutonHelper.getPlaceConeCommand(s),
+
+  //       new CustomProxy(()->{return AutonPaths.proxy(s);}).raceWith(new InstantCommand(()->{}, s.vision).repeatedly()),
+        
+  //       (new WaitCommand(1).andThen(new InstantCommand(s.grabber::close).andThen(new WaitCommand(0.5)))).raceWith(new InstantCommand(()->{
+  //         var wristGoal = WristState.getStateWithGoal(-50);
+  //         s.wrist.setGoal(wristGoal);
+  //         }).repeatedly()));
+
+  //       // new CustomProxy(() -> {
+  //       //   var path = AutonHelper.getPathByName("GamePiece1-InertN1", defaultConstraints);
+  //       //   var pathCommand = AutonHelper.getCommandForPath("GamePiece1-InertN1", false,
+  //       //       defaultConstraints, s.swerve);
+  //       //   HashMap<String, Command> eventMap = new HashMap<>();
+  //       //   eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT).alongWith(new InstantCommand(()->{new InstantCommand(()->{}, s.wrist);})));
+
+  //       //   return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);
+  //       // }));
+  //     }
+
+    // public static Command proxy(Subsystems s){
+    //   var path = AutonHelper.getPathByName("StartN1-GamePiece1", defaultConstraints);
+    //   var pathCommand = AutonHelper.getCommandForPath("StartN1-GamePiece1", false,
+    //       defaultConstraints, s.swerve);
+    //   HashMap<String, Command> eventMap = new HashMap<>();
+    //   eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT));
+    //   eventMap.put("prepare-ground-pickup", new SetArmPose(s.arm, -77)
+    //   .andThen(new InstantCommand(s.grabber::open))
+    //   .raceWith(new InstantCommand(()->{
+    //     var wristGoal = WristState.getStateWithGoal(-50);
+    //     s.wrist.setGoal(wristGoal);
+    //     }).repeatedly()));
+    //   return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);
+    // }
   // public static Command InertN1SafeTwoCone(Subsystems s) {
   //   return new SequentialCommandGroup(AutonHelper.setInitPose(s, "InertN1-StartN1"),
   //       AutonHelper.setInitPose(s, "InertN1-StartN1"),

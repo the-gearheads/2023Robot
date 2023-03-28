@@ -28,6 +28,7 @@ public class ArmSim extends Arm {
     super.velPid.setP(MECH_PLOT.SIM_ARM_VEL_PID[0]);
     super.velPid.setI(MECH_PLOT.SIM_ARM_VEL_PID[1]);
     super.velPid.setD(MECH_PLOT.SIM_ARM_VEL_PID[2]);
+    super.pid.setConstraints(MECH_PLOT.SIM_ARM_CONSTRAINTS);
   }
 
   public void simulationPeriodic() {

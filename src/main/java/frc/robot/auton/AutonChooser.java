@@ -85,15 +85,15 @@ public class AutonChooser {
     // Command InertN1Safe2Cone = AutonPaths.InertN1SafeTwoCone(s);
     // Command N92Cone = AutonPaths.InertN9TwoCone(s);
     // Command InertN4GrabThenDock = AutonPaths.InertN4GrabThenDock(s);
-    Command N1TwoCone = AutonPaths.InertN1TwoCone(s);
-    Command testPath = AutonPaths.testPath(s);
+    Command TwoGamePieceNoBump = AutonPaths.TwoGamePieceNoBump(s);
+    Command TwoGamePieceCenter = AutonPaths.TwoGamePieceCenter(s);
 
-    autons.put("NO BUMP 2 cone", N1TwoCone);
     autons.put("Just Place", justPlace);
     autons.put("N4 Place Then Dock", InertN4PlaceThenDock);
     autons.put("NO BUMP Place Then Move", InertN1PlaceThenExplore);
     autons.put("BUMP Place Then Move", InertN9PlaceThenExplore);
-    autons.put("test", testPath);
+    autons.put("NO BUMP 2 Gamepiece", TwoGamePieceNoBump);
+    autons.put("CENTER 2 Gamepiece", TwoGamePieceCenter);
 
     // autons.put("2 cone", twoCone);
     // autons.put("BUMP 2 cone", N92Cone);

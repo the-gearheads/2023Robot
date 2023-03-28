@@ -33,7 +33,7 @@ public class Arm extends SubsystemBase {
   private double velGoal = 0;
   protected CANSparkMax motor = new CANSparkMax(ARM.ARM_ID, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
-  private ProfiledPIDController pid =
+  protected ProfiledPIDController pid =
       new ProfiledPIDController(ARM.ARM_POS_PID[0], ARM.ARM_POS_PID[1], ARM.ARM_POS_PID[2], ARM.ARM_CONSTRAINTS);
   protected ProfiledPIDController velPid =
       new ProfiledPIDController(ARM.ARM_VEL_PID[0], ARM.ARM_VEL_PID[1], ARM.ARM_VEL_PID[2], ARM.ARM_VEL_CONSTRAINTS);

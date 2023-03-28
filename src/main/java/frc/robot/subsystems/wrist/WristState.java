@@ -14,7 +14,7 @@ public enum WristState {
   PLACE(-81,ARM.MAX_ANGLE, 90),
 
   /* ALT */
-  GROUND_PICK_UP(-66, -50, -90, WristControlType.ALT),
+  GROUND_PICK_UP(-80, -50, -50, WristControlType.ALT),
   PLACE_ON_NODE(-50, ARM.MAX_ANGLE, 0, WristControlType.ALT),
 
   /* MANUAL */
