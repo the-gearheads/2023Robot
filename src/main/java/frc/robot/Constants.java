@@ -496,7 +496,7 @@ public class Constants extends AnnotatedClass {
           default:
             BLUE_RIGHT_DEST_POSE = new Pose2d(15.5, 6.1, Rotation2d.fromDegrees(180));
             BLUE_LEFT_DEST_POSE = new Pose2d(15.5, 7.4, Rotation2d.fromDegrees(180));
-            RED_RIGHT_DEST_POSE = new Pose2d(15.5, 0.5, Rotation2d.fromDegrees(180));
+            RED_RIGHT_DEST_POSE = new Pose2d(15.63, 0.46, Rotation2d.fromDegrees(180));
             RED_LEFT_DEST_POSE = new Pose2d(15.5, 1.882, Rotation2d.fromDegrees(180));
             DIAG_CORNERS = new ArrayList<Translation2d>() {
               {

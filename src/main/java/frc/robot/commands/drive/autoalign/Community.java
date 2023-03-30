@@ -12,7 +12,7 @@ public enum Community {
     BLUE_GRID(
         new Grid(
             new GridCol(
-                new Translation2d(1.837,5.0),
+                new Translation2d(1.789,5.026),
                 new Translation2d(2.237,5.0),
                 new Translation2d(2.0,5.162)
             ),
@@ -65,8 +65,8 @@ public enum Community {
     RED_GRID(
         new Grid(//left
             new GridCol(//left
-                new Translation2d(1.837,7.517),
-                new Translation2d(2.237,7.517),
+                new Translation2d(1.777,7.558),
+                new Translation2d(2.13,7.515),
                 new Translation2d(2.0,7.517)
             ),
             new GridCol(//center
@@ -75,15 +75,15 @@ public enum Community {
                 new Translation2d(2.03, 6.971)
             ),
             new GridCol(//right
-                new Translation2d(1.803, 6.376),
-                new Translation2d(2.196, 6.376),
+                new Translation2d(1.795, 6.435),
+                new Translation2d(2.145, 6.415),
                 new Translation2d(1.99, 6.376)
             )
         ), 
         new Grid(//center
             new GridCol(
-                new Translation2d(1.837,5.839),
-                new Translation2d(2.237,5.839),
+                new Translation2d(1.77,5.85),
+                new Translation2d(2.135,5.855),
                 new Translation2d(2.0,5.839)
             ),
             new GridCol(
@@ -92,14 +92,14 @@ public enum Community {
                 new Translation2d(2.03, 5.282)
             ),
             new GridCol(
-                new Translation2d(1.803, 4.749),
+                new Translation2d(1.8, 4.75),
                 new Translation2d(2.196, 4.749),
                 new Translation2d(1.99, 4.749)
             )
         ),
         new Grid(//right
             new GridCol(
-                new Translation2d(1.837,4.159),
+                new Translation2d(1.8,4.18),
                 new Translation2d(2.237,4.159),
                 new Translation2d(2.0,4.159)
             ),
@@ -109,7 +109,7 @@ public enum Community {
                 new Translation2d(2.03, 3.581)
             ),
             new GridCol(
-                new Translation2d(1.803, 3.064),
+                new Translation2d(1.75, 3.05),
                 new Translation2d(2.196, 3.064),
                 new Translation2d(1.99, 3.064)
             )
