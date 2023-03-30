@@ -93,7 +93,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-    // robotContainer.getDisabledCommand().schedule();
+    robotContainer.setDisabledVisionCommand();
   }
 
   @Override
@@ -128,6 +128,7 @@ public class Robot extends LoggedRobot {
     TestPlaceThenDock.initDockTestingTelemetry();
     robotContainer.setTeleopDefault();
     matchTimeStart = Timer.getFPGATimestamp();
+    robotContainer.setTeleopVisionCommand();
   }
 
   /** This function is called periodically during operator control. */
@@ -135,6 +136,10 @@ public class Robot extends LoggedRobot {
   public void teleopPeriodic() {
     matchTime = 135 - (Timer.getFPGATimestamp() - matchTimeStart);
     matchTime = matchTime < 0 ? 0 : matchTime;
+
+    if(Math.floor(Timer.getFPGATimestamp()) % 2 == 0 ){
+      robotContainer.setTeleopVisionCommand();
+    }
   }
 
   @Override

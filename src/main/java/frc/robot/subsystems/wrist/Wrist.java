@@ -16,6 +16,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -201,9 +202,11 @@ public class Wrist extends SubsystemBase {
     if (shouldPanic) {
       DriverStation.reportError("OUR ZERO ERROR IN WRIST", true);
       setVoltage(0);
-      if (configureHasRan == false) {
-        RevConfigUtils.configure(this::configure, "Wrist");
-      }
+      // if (configureHasRan == false) {
+        if(Math.floor(Timer.getFPGATimestamp()) % 2 == 0){
+          RevConfigUtils.configure(this::configure, "Wrist");
+        }
+      // }
       configureHasRan = true;
     }
   }

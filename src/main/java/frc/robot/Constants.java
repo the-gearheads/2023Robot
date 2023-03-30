@@ -171,13 +171,13 @@ public class Constants extends AnnotatedClass {
 
     public static double MID_LIN_VEL = 1.5;//set to 2
 
-    public static double LOW_LIN_VEL = 0.2;
+    public static double LOW_LIN_VEL = 0.15;
     @NTPublish
     public static double HIGH_ROT_VEL = 2.5;
 
     public static double MID_ROT_VEL = 1.5;
 
-    public static double LOW_ROT_VEL = 0.2;
+    public static double LOW_ROT_VEL = 0.3;
 
     @NTPublish
     public static double MAX_MODULE_SPEED = 5;
@@ -201,7 +201,7 @@ public class Constants extends AnnotatedClass {
 
     public static final String EVENT_NAME = "Wayne";
 
-    public static PIDController AUTO_BALANCE_PID = new PIDController(0.023, 0, 00);
+    public static PIDController AUTO_BALANCE_PID = new PIDController(0.021, 0, 00);
     public static double AUTO_BALANCE_VEL = 0.5;
     public static double AUTO_BALANCE_PIVOT_ROLL = 7.5;
   }

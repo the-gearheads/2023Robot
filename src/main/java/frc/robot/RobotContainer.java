@@ -28,6 +28,7 @@ import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.drive.autoalign.AutoAlign;
 import frc.robot.commands.vision.AutonSetupBuddy;
 import frc.robot.commands.vision.FuseVisionEstimate;
+import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
 import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.commands.wrist.ManualWristControl;
 import frc.robot.controllers.Controllers;
@@ -128,7 +129,7 @@ public class RobotContainer {
 
     // swerve.setDefaultCommand(new TeleopDrive(swerve));
     arm.setDefaultCommand(new JoystickArmControl(arm));
-    vision.setDefaultCommand(new FuseVisionEstimate(vision).ignoringDisable(true));
+    // vision.setDefaultCommand(new FuseVisionEstimate(vision));
     updateControllers();
 
     // PortForwarder.add(5800, "photonvision.local", 5800);
@@ -218,7 +219,11 @@ public class RobotContainer {
     }, swerve));
   }
 
-  public Command getDisabledCommand(){
-    return new AutonSetupBuddy(vision, leds);
+  public void setDisabledVisionCommand(){
+    vision.setDefaultCommand(new FuseVisionEstimate(vision, ConfidenceStrat.IRON_PANTHERS));
+  }
+
+  public void setTeleopVisionCommand(){
+    vision.setDefaultCommand(new FuseVisionEstimate(vision, ConfidenceStrat.ONLY_COMMUNITY_AND_FEEDER));
   }
 }

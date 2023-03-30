@@ -35,8 +35,12 @@ public class FuseVisionEstimate extends CommandBase {
   public FuseVisionEstimate(Vision vision, ConfidenceStrat confidenceStrat) {
     this.vision = vision;
     this.confidenceStrat = confidenceStrat;
-    initChooser();
     addRequirements(vision);
+  }
+
+  @Override
+  public void initialize(){
+    initChooser();
   }
 
   private void initChooser() {
@@ -49,6 +53,11 @@ public class FuseVisionEstimate extends CommandBase {
 
     trustChooser.setDefaultOption(confidenceStrat.name(), confidenceStrat);
     SmartDashboard.putData("vision/trust chooser", trustChooser);
+  }
+
+  @Override
+  public boolean runsWhenDisabled(){
+    return true;
   }
 
   // Called every time the scheduler runs while the command is scheduled.

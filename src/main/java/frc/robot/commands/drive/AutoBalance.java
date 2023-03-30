@@ -36,16 +36,20 @@ public class AutoBalance extends CommandBase {
   public void execute() {
     double roll = swerve.getRoll();
 
-    var vx = balancePid.calculate(roll, 0);
+    var vx = balancePid.calculate(roll, -2.6);
 
     swerve.drive(new ChassisSpeeds(vx, 0, 0));
 
+    SmartDashboard.putNumber("autobalance/roll", roll);
+    SmartDashboard.putNumber("autobalance/vx", vx);
+    // SmartDashboard.putNumber("auto")
   }
 
   // Called once the commak nd ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     swerve.setX();
+    swerve.drive(new ChassisSpeeds());
   }
 
   // Returns true when the command should end.
