@@ -199,8 +199,8 @@ public class RobotContainer {
     Controllers.operatorController.openGrabber().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
     Controllers.operatorController.setArmByJoystick().onTrue(new JoystickArmControl(arm));
 
-    Controllers.operatorController.throwCube()
-        .onTrue(new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 80, 20)));
+    // Controllers.operatorController.throwCube()
+    //     .onTrue(new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 80, 20)));
   }
 
   /**
