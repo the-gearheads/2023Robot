@@ -167,17 +167,17 @@ public class Constants extends AnnotatedClass {
         new Translation2d(Units.inchesToMeters(-12.25), Units.inchesToMeters(-13.25));
 
     @NTPublish
-    public static double HIGH_LIN_VEL = 5.5;
+    public static double HIGH_LIN_VEL = 10;
 
     public static double MID_LIN_VEL = 1.5;//set to 2
 
-    public static double LOW_LIN_VEL = 0.15;//testing: 0.15
+    public static double LOW_LIN_VEL = 0.5;//testing: 0.15
     @NTPublish
     public static double HIGH_ROT_VEL = 2.5;
 
     public static double MID_ROT_VEL = 1.5;
 
-    public static double LOW_ROT_VEL = 0.3;//testing: 0.3
+    public static double LOW_ROT_VEL = 0.5;//testing: 0.3
 
     @NTPublish
     public static double MAX_MODULE_SPEED = 5;
@@ -495,8 +495,8 @@ public class Constants extends AnnotatedClass {
             break;
           default:
             BLUE_RIGHT_DEST_POSE = new Pose2d(15.5, 6.1, Rotation2d.fromDegrees(180));
-            BLUE_LEFT_DEST_POSE = new Pose2d(15.5, 7.4, Rotation2d.fromDegrees(180));
-            RED_RIGHT_DEST_POSE = new Pose2d(15.63, 0.46, Rotation2d.fromDegrees(180));
+            BLUE_LEFT_DEST_POSE = new Pose2d(15.8, 7.58, Rotation2d.fromDegrees(180));
+            RED_RIGHT_DEST_POSE = new Pose2d(15.71, 0.45, Rotation2d.fromDegrees(180));
             RED_LEFT_DEST_POSE = new Pose2d(15.5, 1.882, Rotation2d.fromDegrees(180));
             DIAG_CORNERS = new ArrayList<Translation2d>() {
               {
