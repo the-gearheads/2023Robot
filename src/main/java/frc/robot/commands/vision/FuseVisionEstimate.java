@@ -5,6 +5,7 @@
 package frc.robot.commands.vision;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -21,7 +22,7 @@ public class FuseVisionEstimate extends CommandBase {
   private Vision vision;
 
   public enum ConfidenceStrat {
-    MECH_ADV, IRON_PANTHERS, CASSEROLE, TEST, NONE, ONLY_COMMUNITY_AND_FEEDER, ONLY_COMMUNITY;
+    MECH_ADV, DISABLED, CASSEROLE, TEST, NONE, ONLY_COMMUNITY_AND_FEEDER, ONLY_COMMUNITY;
   }
 
   public ConfidenceStrat confidenceStrat;
@@ -40,6 +41,11 @@ public class FuseVisionEstimate extends CommandBase {
 
   @Override
   public void initialize(){
+    initChooser();
+  }
+
+  public void setConfidenceStrat(ConfidenceStrat confidenceStrat){
+    this.confidenceStrat = confidenceStrat;
     initChooser();
   }
 
@@ -70,9 +76,10 @@ public class FuseVisionEstimate extends CommandBase {
       var estimate = optEstimate.get();
       Matrix<N3, N1> confidence;
       switch (confidenceStrat) {
-        case IRON_PANTHERS:
+        case DISABLED:
           confidence = VisionHelper.ironPanthersStdDevs(estimate);
-          estimate.setConfidence(confidence);
+          var disabledStDevs = VecBuilder.fill(0.05,0.05,0.05);
+          estimate.setConfidence(disabledStDevs);
           fuseEstimate(estimate);
           break;
         case CASSEROLE:

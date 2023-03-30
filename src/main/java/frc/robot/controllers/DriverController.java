@@ -106,4 +106,8 @@ public interface DriverController {
   public default Trigger getAutoAlign() {
     return new Trigger(() -> false);
   }
+
+  public default Trigger resetYaw(){
+    return new Trigger(()->false);  
+  }
 }

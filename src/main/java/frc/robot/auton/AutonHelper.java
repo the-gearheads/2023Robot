@@ -106,7 +106,7 @@ public class AutonHelper {
 
   public static Command setInitPose(Subsystems s, String pathName) {
     return new InstantCommand(() -> {
-      PathPlannerTrajectory path = PathPlanner.loadPath(pathName, Constants.AUTON.SLOW_CONSTRAINTS);
+      PathPlannerTrajectory path = getPathByName(pathName, Constants.AUTON.SLOW_CONSTRAINTS);
       path = PathPlannerTrajectory.transformTrajectoryForAlliance(path, DriverStation.getAlliance());
       var initPose = path.getInitialPose();
       s.swerve.setPose(initPose);

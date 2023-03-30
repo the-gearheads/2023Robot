@@ -7,8 +7,11 @@ package frc.robot.commands.drive.autoalign;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants.AUTO_ALIGN;
 import frc.robot.Constants.AUTO_ALIGN.COMMUNITY;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
@@ -21,7 +24,24 @@ import frc.robot.util.MoreMath;
 
 public class GridAlign extends SequentialCommandGroup {
   public GridAlign(Swerve swerve, Arm arm) {
-    addCommands(simpleAlign(swerve, arm));
+    if(isRotated(swerve)){
+      addCommands(simpleAlign(swerve, arm));
+    }else{
+      addCommands(new InstantCommand());
+    }
+  }
+
+  public static boolean isRotated(Swerve swerve) {
+    var currentPose = swerve.getPose();
+
+    var destRad = Units.degreesToRadians(180);
+    var currentRad = currentPose.getRotation().getRadians();
+
+    var closestDestRad = MoreMath.getClosestRad(currentRad, destRad);
+
+    var radDist = Units.radiansToDegrees(Math.abs(closestDestRad - currentRad));
+
+    return radDist < AUTO_ALIGN.FEEDER.ROT_THRESHOLD;
   }
 
 
@@ -56,7 +76,6 @@ public class GridAlign extends SequentialCommandGroup {
     }
 
     var destPose = new Pose2d(desiredTrans, Rotation2d.fromDegrees(180));
-    destPose = MoreMath.transformByAlliance(destPose);
     return destPose;
   }
 
@@ -87,28 +106,27 @@ public class GridAlign extends SequentialCommandGroup {
       desiredGridCol=desiredGrid.rightCol;
     }
 
-    //I hate mirrored fields
-    if (!MoreMath.isBlue()) {
-      if(desiredGridCol == desiredGrid.leftCol){
-        desiredGridCol = desiredGrid.rightCol;
-      }else if(desiredGridCol == desiredGrid.rightCol){
-        desiredGridCol = desiredGrid.leftCol;
-      }
-    }
-
     return desiredGridCol;
   }
 
+  public static Community getCommunity(){
+    if(MoreMath.isBlue()){
+      return Community.BLUE_GRID;
+    }
+    return Community.RED_GRID;
+  }
+
   public static Grid getClosestGrid(Pose2d currentPose) {
-    Grid[] grids = {Grid.LEFT_GRID,
-                    Grid.CENTER_GRID,
-                    Grid.RIGHT_GRID};
+    var community = getCommunity();
+    Grid[] grids = {community.leftGrid,
+                    community.centerGrid,
+                    community.rightGrid};
 
     var smallestDist = Double.POSITIVE_INFINITY;
-    Grid closestGrid = Grid.LEFT_GRID;
+    Grid closestGrid = grids[0];
 
     for (var grid : grids) {
-      var gridY = MoreMath.transformByAlliance(grid.getY());
+      var gridY = grid.getY();
       var dist = Math.abs(gridY - currentPose.getY());
       if (dist < smallestDist) {
         smallestDist = dist;

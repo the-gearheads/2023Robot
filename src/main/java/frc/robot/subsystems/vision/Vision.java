@@ -24,6 +24,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.commands.vision.FuseVisionEstimate;
+import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.vision.CustomEstimator.PoseStrategy;
 import frc.robot.util.MoreMath;
@@ -42,6 +44,8 @@ public class Vision extends SubsystemBase {
 
   private AprilTagFieldLayout atfl;
 
+  private FuseVisionEstimate defaultCommand;
+
   public Vision(Swerve swerve) {
     this.swerve = swerve;
 
@@ -50,11 +54,18 @@ public class Vision extends SubsystemBase {
     initEstimates();
     initBuffer();
     initField();
+
+    defaultCommand = new FuseVisionEstimate(this, ConfidenceStrat.ONLY_COMMUNITY_AND_FEEDER);
+    setDefaultCommand(defaultCommand);
   }
 
   private void initBuffer() {
     PoseBufferWrapper.createBuffers(swerve::getPose, swerve::getWheelPose, swerve::getModulePositions,
         swerve::getCtsGyroRotWithOffset, swerve.kinematics, swerve::setResetBuffer);
+  }
+
+  public void setConfidenceStrat(ConfidenceStrat confidenceStrat){
+    defaultCommand.setConfidenceStrat(confidenceStrat);
   }
 
   public void periodic() {

@@ -23,7 +23,11 @@ import frc.robot.util.MoreMath;
 public class FeederAlign extends SequentialCommandGroup {
   /** Creates a new FeederAlign. */
   public FeederAlign(Swerve swerve, Arm arm) {
-    if (isYAligned(swerve) && isArmRaised(arm) && isClose(swerve) && isRotated(swerve)) {
+    if (
+        // isYAligned(swerve) && 
+        isArmRaised(arm) && 
+        // isClose(swerve) && 
+        isRotated(swerve)) {
       addCommands(simpleAlign(swerve, arm));
     } else {
       // still needs some more work
@@ -46,11 +50,18 @@ public class FeederAlign extends SequentialCommandGroup {
   private static Pose2d getDestPose(Pose2d pose) {
     Pose2d destPose;
     if (isLeft(pose)) {
-      destPose = FEEDER.LEFT_DEST_POSE;
+      if(MoreMath.isBlue()){
+        destPose = FEEDER.BLUE_LEFT_DEST_POSE;
+      }else{
+        destPose = FEEDER.RED_LEFT_DEST_POSE;
+      }
     } else {
-      destPose = FEEDER.RIGHT_DEST_POSE;
+      if(MoreMath.isBlue()){
+        destPose = FEEDER.BLUE_RIGHT_DEST_POSE;
+      }else{
+        destPose = FEEDER.RED_RIGHT_DEST_POSE;
+      }
     }
-    destPose = MoreMath.transformByAlliance(destPose);
     return destPose;
   }
 
@@ -75,7 +86,7 @@ public class FeederAlign extends SequentialCommandGroup {
     return armDist < FEEDER.ARM_THRESHOLD;
   }
 
-  private static boolean isRotated(Swerve swerve) {
+  public static boolean isRotated(Swerve swerve) {
     var currentPose = swerve.getPose();
     var destPose = getDestPose(currentPose);
 
@@ -97,8 +108,7 @@ public class FeederAlign extends SequentialCommandGroup {
   }
 
   private static boolean isLeft(Pose2d pose) {
-    return (Controllers.driverController.getAutoLeft().getAsBoolean() && MoreMath.isBlue())
-        || (Controllers.driverController.getAutoRight().getAsBoolean() && !MoreMath.isBlue());
+    return (Controllers.driverController.getAutoLeft().getAsBoolean());
   }
 
   // private static Pose2d getPrepPose(Pose2d pose) {

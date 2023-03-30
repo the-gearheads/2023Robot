@@ -43,8 +43,8 @@ public class OldAlignToFeeder extends CustomProxy {
   private static Command prepThenGoToDest(Swerve swerve, Arm arm) {
 
     var startPose = swerve.getPose();
-    var prepPose = FEEDER.LEFT_PREP_POSE;
-    var destPose = FEEDER.LEFT_DEST_POSE;
+    var prepPose = FEEDER.BLUE_LEFT_PREP_POSE;
+    var destPose = FEEDER.BLUE_LEFT_DEST_POSE;
 
     prepPose = MoreMath.transformByAlliance(prepPose);
     destPose = MoreMath.transformByAlliance(destPose);
@@ -73,7 +73,7 @@ public class OldAlignToFeeder extends CustomProxy {
 
   private static Command simpleAlign(Swerve swerve, Arm arm) {
     var startPose = swerve.getPose();
-    var endPose = FEEDER.LEFT_DEST_POSE;
+    var endPose = FEEDER.BLUE_LEFT_DEST_POSE;
     var traj = MoreMath.createStraightPath(startPose, endPose, FEEDER.CONSTRAINTS);
 
     var trajCommand = swerve.followTrajectoryCommand(traj, false, true);
@@ -91,7 +91,7 @@ public class OldAlignToFeeder extends CustomProxy {
 
   private static boolean isYAligned(Swerve swerve) {
     var currentPose = swerve.getPose();
-    var destPose = FEEDER.LEFT_DEST_POSE;
+    var destPose = FEEDER.BLUE_LEFT_DEST_POSE;
 
     destPose = MoreMath.transformByAlliance(destPose);
 
@@ -114,7 +114,7 @@ public class OldAlignToFeeder extends CustomProxy {
 
   private static boolean isRotated(Swerve swerve) {
     var currentPose = swerve.getPose();
-    var destPose = FEEDER.LEFT_DEST_POSE;
+    var destPose = FEEDER.BLUE_LEFT_DEST_POSE;
 
     destPose = MoreMath.transformByAlliance(destPose);
 
@@ -130,7 +130,7 @@ public class OldAlignToFeeder extends CustomProxy {
 
   private static boolean isClose(Swerve swerve) {
     var currentPose = swerve.getPose();
-    var destPose = FEEDER.LEFT_DEST_POSE;
+    var destPose = FEEDER.BLUE_LEFT_DEST_POSE;
 
     destPose = MoreMath.transformByAlliance(destPose);
 

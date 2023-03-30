@@ -7,6 +7,7 @@ package frc.robot;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import javax.swing.text.StyleContext.SmallAttributeSet;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -15,6 +16,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DRIVE;
@@ -170,14 +172,14 @@ public class RobotContainer {
     //   swerve.setPose(new Pose2d(3, 0.38, Rotation2d.fromDegrees(90)));
     // }));
 
-    // Controllers.driverController.backUpFromFeeder().onTrue(new ProxyCommand(() -> {
-    //   var currentPose = swerve.getPose();
-    //   var dest = MoreMath.deepCopyPose(currentPose);
-    //   var translation = new Translation2d(Units.inchesToMeters(-4), 0);
-    //   dest = new Pose2d(dest.getTranslation().plus(translation), dest.getRotation());
-    //   return swerve.goTo(dest, Constants.AUTON.MID_CONSTRAINTS);
-    // }));
-    Controllers.driverController.backUpFromFeeder().onTrue(new CustomProxy(() -> {
+    Controllers.driverController.backUpFromFeeder().onTrue(new ProxyCommand(() -> {
+      var currentPose = swerve.getPose();
+      var dest = MoreMath.deepCopyPose(currentPose);
+      var translation = new Translation2d(Units.inchesToMeters(-4), 0);
+      dest = new Pose2d(dest.getTranslation().plus(translation), dest.getRotation());
+      return swerve.goTo(dest, Constants.AUTON.MID_CONSTRAINTS);
+    }));
+    Controllers.driverController.resetYaw().onTrue(new CustomProxy(() -> {
       return new InstantCommand(
         ()->{
           swerve.setPose(new Pose2d(swerve.getPose().getTranslation(),Rotation2d.fromDegrees(180)));
@@ -185,7 +187,7 @@ public class RobotContainer {
       );
     }, swerve));
 
-    Controllers.driverController.getAutoAlign().onTrue(new AutoAlign(swerve, arm));
+    Controllers.driverController.getAutoAlign().whileTrue(new AutoAlign(swerve, arm));
 
     Controllers.operatorController.armGoToLowNode()
         .onTrue(new SetArmPose(arm, ArmPose.LOW_NODE).andThen(new ManualWristControl(wrist, WristState.RIGHT)));
@@ -219,11 +221,14 @@ public class RobotContainer {
     }, swerve));
   }
 
-  public void setDisabledVisionCommand(){
-    vision.setDefaultCommand(new FuseVisionEstimate(vision, ConfidenceStrat.IRON_PANTHERS));
+  public void setDisabledVisionStrat(){
+    vision.setConfidenceStrat(ConfidenceStrat.DISABLED);
+    // vision.setDefaultCommand(new FuseVisionEstimate(vision, ConfidenceStrat.IRON_PANTHERS));
   }
 
-  public void setTeleopVisionCommand(){
-    vision.setDefaultCommand(new FuseVisionEstimate(vision, ConfidenceStrat.ONLY_COMMUNITY_AND_FEEDER));
+  public void setTeleopVisionStrat(){
+    vision.setConfidenceStrat(ConfidenceStrat.ONLY_COMMUNITY_AND_FEEDER);
+    SmartDashboard.putNumber("When was vision strat set", Timer.getFPGATimestamp());
+    // vision.setDefaultCommand(new FuseVisionEstimate(vision, ConfidenceStrat.ONLY_COMMUNITY_AND_FEEDER));
   }
 }

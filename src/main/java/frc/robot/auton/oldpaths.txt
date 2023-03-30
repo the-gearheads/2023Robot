@@ -381,3 +381,147 @@
   //       new AutoBalDriveToPivot(s.swerve).andThen(new AutoBalance(s.swerve));
   // }
 // }
+
+
+
+    // public static Command TwoGamePieceCenter(Subsystems s){
+  //   return new SequentialCommandGroup(
+
+  //     new InstantCommand(()->{
+  //       SmartDashboard.putNumber("auton phase", 1);
+  //     }),
+  //     new InstantCommand(()->{
+  //       s.vision.setConfidenceStrat(ConfidenceStrat.ONLY_COMMUNITY);
+  //     }),  
+  //     new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+
+  //     new InstantCommand(()->{
+  //       s.swerve.setPose(new Pose2d(s.swerve.getPose().getX(), s.swerve.getPose().getY(), Rotation2d.fromDegrees(180)));
+  //     }, s.swerve),
+
+  //     new CustomProxy(()->{
+  //       var destTrans = AutonHelper.getPathByName("startN4-gamepiece", defaultConstraints).getInitialHolonomicPose().getTranslation();
+  //       return s.swerve.goTo(new Pose2d(destTrans, Rotation2d.fromDegrees(180)), Constants.AUTON.SLOW_CONSTRAINTS);
+  //     }, s.swerve),
+
+  //     AutonHelper.getPlaceConeCommand(s),
+
+  //     new CustomProxy(()->{
+  //       return twoGamePieceCenterPathPickUpCubeProxy(s);
+  //     }),
+
+  //     (AutonHelper.closeGrabber(s.grabber).andThen(new WaitCommand(0.25))).raceWith(new FloorPickUp(s.arm, s.wrist)),
+
+  //     AutonHelper.stowAnd(s, new CustomProxy(()->{
+  //       return twoGamePieceCenterPathDockProxy(s);
+  //     })),
+  //     new AutoBalance(s.swerve)
+
+  //   );
+  // }
+
+  // public static Command twoGamePieceCenterPathPickUpCubeProxy(Subsystems s){
+  //   HashMap<String, Command> eventMap = new HashMap<>();
+  //   eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT));
+  //   eventMap.put("pickup", AutonHelper.openGrabber(s.grabber).alongWith(new FloorPickUp(s.arm, s.wrist)));
+
+  //   return AutonHelper.followWithEvents("startN4-gamepiece", eventMap,
+  //    false, Constants.AUTON.MID_CONSTRAINTS, s.swerve, false);
+  // }
+
+  // public static Command twoGamePieceCenterPathDockProxy(Subsystems s){
+  //   HashMap<String, Command> eventMap = new HashMap<>();
+  //   return AutonHelper.followWithEvents("center-gamepiece-dock", eventMap,
+  //    false, Constants.AUTON.MID_CONSTRAINTS, s.swerve, false);
+  // }
+  // public static PathConstraints centerExploreThenDockConstraints = new PathConstraints(1.5,1.25);
+  // public static Command centerExploreThenDock(Subsystems s){
+  //   return new SequentialCommandGroup(
+  //       new SequentialCommandGroup(
+  //         new InstantCommand(()->{
+  //           s.vision.setConfidenceStrat(ConfidenceStrat.ONLY_COMMUNITY);
+  //         }),  
+  //       new InstantCommand(()->{
+  //         SmartDashboard.putNumber("auton phase", 1);
+  //       }),
+  //       new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+
+  //     new InstantCommand(()->{
+  //       s.swerve.setPose(new Pose2d(s.swerve.getPose().getX(), s.swerve.getPose().getY(), Rotation2d.fromDegrees(180)));
+  //     }, s.swerve),
+
+  //     new CustomProxy((
+
+  //     )->{
+  //       var destTrans = AutonHelper.getPathByName("macomb-startn4-explore", centerExploreThenDockConstraints).getInitialHolonomicPose().getTranslation();
+  //       return s.swerve.goTo(new Pose2d(destTrans, Rotation2d.fromDegrees(180)), Constants.AUTON.SLOW_CONSTRAINTS);
+  //     }, s.swerve)
+  //     // AutonHelper.setInitPose(s, "InertN4-StartN4"),
+  //     // AutonHelper.getCommandForPath("InertN4-StartN4", true, centerExploreThenDockConstraints, s.swerve)
+  //     )
+  //       ,
+  //     new SequentialCommandGroup(
+  //       new InstantCommand(()->{
+  //         s.vision.setConfidenceStrat(ConfidenceStrat.NONE);
+  //       }),  
+  //       AutonHelper.getPlaceConeCommand(s),
+
+  //       new CustomProxy(()->{return centerExploreThenDockProxy(s);}),
+  //       AutonHelper.getCommandForPath("macomb-explore-dock", false, centerExploreThenDockConstraints, s.swerve),
+  //       new AutoBalance(s.swerve)
+  //     )
+
+  //   )
+  //   ;
+  // }
+
+  // public static Command centerExploreThenDockProxy(Subsystems s){
+  //   HashMap<String, Command> eventMap = new HashMap<>();
+  //   eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT));
+  //   return AutonHelper.followWithEvents("macomb-startn4-explore", eventMap,
+  //   false, centerExploreThenDockConstraints, s.swerve, false);
+  // }
+
+  // public static Command TwoGamePieceNoBumpNoVision(Subsystems s){
+  //   return new SequentialCommandGroup(
+  //     new InstantCommand(()->{
+  //       s.vision.setConfidenceStrat(ConfidenceStrat.NONE);
+  //     }),  
+  //     AutonHelper.setInitPose(s, "InertN1-StartN1"),
+
+  //     new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+
+  //     AutonHelper.getCommandForPath("InertN1-StartN1", true, defaultConstraints, s.swerve),
+
+  //     AutonHelper.getPlaceConeCommand(s),
+
+  //     new CustomProxy(()->{
+  //       return twoGamePieceNoBumpNoVisionPathPickUpCubeProxy(s);
+  //     }),
+
+  //     (AutonHelper.closeGrabber(s.grabber).andThen(new WaitCommand(0.25)))
+  //     .raceWith(new FloorPickUp(s.arm, s.wrist))
+  //     ,
+
+  //     new CustomProxy(()->{
+  //       return twoGamePieceNoBumpNoVisionPathPlaceCubeProxy(s);
+  //     })
+
+  //   );
+  // }
+
+  // public static Command twoGamePieceNoBumpNoVisionPathPickUpCubeProxy(Subsystems s){
+  //   HashMap<String, Command> eventMap = new HashMap<>();
+  //   eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT));
+  //   eventMap.put("pickup", AutonHelper.openGrabber(s.grabber).alongWith(new FloorPickUp(s.arm, s.wrist)));
+  //   return AutonHelper.followWithEvents("startn1-gamepiece-novision", eventMap,
+  //   false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve, false);
+  // }
+
+  // public static Command twoGamePieceNoBumpNoVisionPathPlaceCubeProxy(Subsystems s){
+  //   HashMap<String, Command> eventMap = new HashMap<>();
+  //   eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT));
+  //   eventMap.put("raise-arm", new SetArmPose(s.arm, ArmPose.HIGH_NODE));
+  //   return AutonHelper.followWithEvents("gamepiece-placecube-novision", eventMap,
+  //   false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve, false);
+  // }

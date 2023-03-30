@@ -167,17 +167,17 @@ public class Constants extends AnnotatedClass {
         new Translation2d(Units.inchesToMeters(-12.25), Units.inchesToMeters(-13.25));
 
     @NTPublish
-    public static double HIGH_LIN_VEL = 5;
+    public static double HIGH_LIN_VEL = 5.5;
 
     public static double MID_LIN_VEL = 1.5;//set to 2
 
-    public static double LOW_LIN_VEL = 0.15;
+    public static double LOW_LIN_VEL = 0.15;//testing: 0.15
     @NTPublish
     public static double HIGH_ROT_VEL = 2.5;
 
     public static double MID_ROT_VEL = 1.5;
 
-    public static double LOW_ROT_VEL = 0.3;
+    public static double LOW_ROT_VEL = 0.3;//testing: 0.3
 
     @NTPublish
     public static double MAX_MODULE_SPEED = 5;
@@ -199,7 +199,7 @@ public class Constants extends AnnotatedClass {
     public static PathConstraints DOUBLE_CONE = new PathConstraints(4.5, 2.5);
     public static final PathConstraints DOCK_CONSTRAINTS = SLOW_CONSTRAINTS;
 
-    public static final String EVENT_NAME = "Wayne";
+    public static final String EVENT_NAME = "Macomb";
 
     public static PIDController AUTO_BALANCE_PID = new PIDController(0.021, 0, 00);
     public static double AUTO_BALANCE_VEL = 0.5;
@@ -214,7 +214,7 @@ public class Constants extends AnnotatedClass {
       SHOP, REAL, TEST;
     }
 
-    public static final FieldType FIELD_TYPE = FieldType.SHOP;
+    public static final FieldType FIELD_TYPE = FieldType.REAL;
   }
   public static final class CONTROLLERS {
     public static final double JOYSTICK_DEADBAND = 0.075;
@@ -432,13 +432,28 @@ public class Constants extends AnnotatedClass {
       public static final double ARM_THRESHOLD = 20;//in degrees
       public static final double ROT_THRESHOLD = 20;
       public static final double DIST_THRESHOLD = 1;
-      public static final PathConstraints CONSTRAINTS = new PathConstraints(2, 1);
-      public static final ArrayList<Translation2d> DIAG_CORNERS = new ArrayList<Translation2d>() {
-        {
-          add(new Translation2d(0, 0));
-          add(new Translation2d(3, FIELD_CONSTANTS.WIDTH));
+      public static final PathConstraints CONSTRAINTS = new PathConstraints(2, 1.5);
+      public static final ArrayList<Translation2d> DIAG_CORNERS; 
+      static {
+        switch (FIELD_CONSTANTS.FIELD_TYPE) {
+          case SHOP:
+          DIAG_CORNERS = new ArrayList<Translation2d>() {
+            {
+              add(new Translation2d(0, 0));
+              add(new Translation2d(3, FIELD_CONSTANTS.WIDTH));
+            }
+          };
+          break;
+          default:
+          DIAG_CORNERS = new ArrayList<Translation2d>() {
+            {
+              add(new Translation2d(0, 0));
+              add(new Translation2d(3.8, 5.56));
+            }
+          };
+          break;
         }
-      };
+     }
     }
     public static class FEEDER {
       public static final double Y_THRESHOLD = 0.5;
@@ -448,13 +463,17 @@ public class Constants extends AnnotatedClass {
       public static final double LENGTH = FIELD_CONSTANTS.LENGTH - 10;
       public static final double DIST_THRESHOLD = 1;
       public static final Transform2d PREP2DEST = new Transform2d(new Translation2d(-1, 0), new Rotation2d());
-      public static final PathConstraints CONSTRAINTS = new PathConstraints(2, 1);
+      public static final PathConstraints CONSTRAINTS = new PathConstraints(2, 1.5);
 
-      public static Pose2d RIGHT_PREP_POSE;
-      public static Pose2d LEFT_PREP_POSE;
-      public static Pose2d RIGHT_DEST_POSE;
-      public static Pose2d LEFT_DEST_POSE;
+      public static Pose2d BLUE_RIGHT_PREP_POSE;
+      public static Pose2d BLUE_LEFT_PREP_POSE;
+      public static Pose2d BLUE_RIGHT_DEST_POSE;
+      public static Pose2d BLUE_LEFT_DEST_POSE;
 
+      public static Pose2d RED_RIGHT_PREP_POSE;
+      public static Pose2d RED_LEFT_PREP_POSE;
+      public static Pose2d RED_RIGHT_DEST_POSE;
+      public static Pose2d RED_LEFT_DEST_POSE;
 
       public static final ArrayList<Translation2d> DIAG_CORNERS;
       public static final double CLOSE_THRESHOLD = 3;
@@ -462,8 +481,10 @@ public class Constants extends AnnotatedClass {
       static {
         switch (FIELD_CONSTANTS.FIELD_TYPE) {
           case SHOP:
-            RIGHT_DEST_POSE = new Pose2d(8.08, 3.2, Rotation2d.fromDegrees(180));
-            LEFT_DEST_POSE = new Pose2d(8.08, 3.2, Rotation2d.fromDegrees(180));
+            BLUE_RIGHT_DEST_POSE = new Pose2d(8.08, 3.2, Rotation2d.fromDegrees(180));
+            BLUE_LEFT_DEST_POSE = new Pose2d(8.08, 3.2, Rotation2d.fromDegrees(180));
+            RED_RIGHT_DEST_POSE = new Pose2d(8.08, 3.2, Rotation2d.fromDegrees(180));
+            RED_LEFT_DEST_POSE = new Pose2d(8.08, 3.2, Rotation2d.fromDegrees(180));
             DIAG_CORNERS = new ArrayList<Translation2d>() {
               {
                 var corner = new Translation2d(FIELD_CONSTANTS.LENGTH / 2, FIELD_CONSTANTS.WIDTH / 2);
@@ -473,18 +494,22 @@ public class Constants extends AnnotatedClass {
             };
             break;
           default:
-            RIGHT_DEST_POSE = new Pose2d(15.5, 6, Rotation2d.fromDegrees(180));
-            LEFT_DEST_POSE = new Pose2d(15.5, 7.5, Rotation2d.fromDegrees(180));
+            BLUE_RIGHT_DEST_POSE = new Pose2d(15.5, 6.1, Rotation2d.fromDegrees(180));
+            BLUE_LEFT_DEST_POSE = new Pose2d(15.5, 7.4, Rotation2d.fromDegrees(180));
+            RED_RIGHT_DEST_POSE = new Pose2d(15.5, 0.5, Rotation2d.fromDegrees(180));
+            RED_LEFT_DEST_POSE = new Pose2d(15.5, 1.882, Rotation2d.fromDegrees(180));
             DIAG_CORNERS = new ArrayList<Translation2d>() {
               {
-                add(new Translation2d(10, 5.6));
+                add(new Translation2d(9.8, 5.6));
                 add(new Translation2d(FIELD_CONSTANTS.LENGTH, FIELD_CONSTANTS.WIDTH));
               }
             };
             break;
         }
-        RIGHT_PREP_POSE = RIGHT_DEST_POSE.transformBy(PREP2DEST.inverse());
-        LEFT_PREP_POSE = LEFT_DEST_POSE.transformBy(PREP2DEST.inverse());
+        BLUE_RIGHT_PREP_POSE = BLUE_RIGHT_DEST_POSE.transformBy(PREP2DEST.inverse());
+        BLUE_LEFT_PREP_POSE = BLUE_LEFT_DEST_POSE.transformBy(PREP2DEST.inverse());
+        RED_RIGHT_PREP_POSE = BLUE_RIGHT_DEST_POSE.transformBy(PREP2DEST.inverse());
+        RED_LEFT_PREP_POSE = BLUE_LEFT_DEST_POSE.transformBy(PREP2DEST.inverse());
       }
     }
   }

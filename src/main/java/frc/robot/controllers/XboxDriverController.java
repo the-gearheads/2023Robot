@@ -124,4 +124,11 @@ public class XboxDriverController implements DriverController {
   public Trigger getAutoRight() {
     return new JoystickButton(controller, XboxController.Button.kB.value);
   };
+
+  public Trigger resetYaw(){
+    return new Trigger(()->{
+      var val = controller.getLeftTriggerAxis();
+      return Math.abs(val) > 0.75;
+    });
+  }
 }
