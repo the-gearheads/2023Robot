@@ -61,4 +61,13 @@ public class ThrustMaster implements OperatorController {
       return false;
     });
   }
+
+  public Trigger signalCube() {
+    return new JoystickButton(joy, 9);
+
+  }
+
+  public Trigger signalCone() {
+    return new JoystickButton(joy, 10);
+  }
 }

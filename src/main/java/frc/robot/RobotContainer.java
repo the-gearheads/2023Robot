@@ -198,8 +198,8 @@ public class RobotContainer {
     Controllers.operatorController.setWristAlternatePose().whileTrue(new AltWristControl(wrist).repeatedly());
     Controllers.operatorController.openGrabber().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
     Controllers.operatorController.setArmByJoystick().onTrue(new JoystickArmControl(arm));
-    Controllers.operatorController.signalCone().onTrue(leds.getSetStateCommand(LedState.YELLOW));
-    Controllers.operatorController.signalCube().onTrue(leds.getSetStateCommand(LedState.PURPLE));
+    Controllers.operatorController.signalCone().onTrue(leds.setStateForTimeCommand(LedState.YELLOW, 2));
+    Controllers.operatorController.signalCube().onTrue(leds.setStateForTimeCommand(LedState.PURPLE, 2));
 
     // Controllers.operatorController.throwCube()
     //     .onTrue(new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 80, 20)));

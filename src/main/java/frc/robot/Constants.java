@@ -223,7 +223,7 @@ public class Constants extends AnnotatedClass {
   public static final class LEDS {
     public static final int PORT = 9;
     /* Rough estimate, refine later */
-    public static final int LENGTH = 160;
+    public static final int LENGTH = 260;
   }
 
   public static final class ROBOT{
