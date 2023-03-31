@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import frc.robot.Constants.RobotMode;
 import frc.robot.auton.TestPlaceThenDock;
-import frc.robot.commands.vision.AutonSetupBuddy;
 import frc.robot.util.NTToAdvantageKit;
 
 /**

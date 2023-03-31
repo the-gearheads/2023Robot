@@ -28,7 +28,6 @@ import frc.robot.commands.arm.ThrowState;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.drive.autoalign.AutoAlign;
-import frc.robot.commands.vision.AutonSetupBuddy;
 import frc.robot.commands.vision.FuseVisionEstimate;
 import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
 import frc.robot.commands.wrist.AltWristControl;
@@ -37,6 +36,7 @@ import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.auton.AutonChooser;
 import frc.robot.subsystems.Grabber;
+import frc.robot.subsystems.leds.LedState;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionSim;
@@ -198,6 +198,8 @@ public class RobotContainer {
     Controllers.operatorController.setWristAlternatePose().whileTrue(new AltWristControl(wrist).repeatedly());
     Controllers.operatorController.openGrabber().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
     Controllers.operatorController.setArmByJoystick().onTrue(new JoystickArmControl(arm));
+    Controllers.operatorController.signalCone().onTrue(leds.getSetStateCommand(LedState.YELLOW));
+    Controllers.operatorController.signalCube().onTrue(leds.getSetStateCommand(LedState.PURPLE));
 
     // Controllers.operatorController.throwCube()
     //     .onTrue(new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 80, 20)));

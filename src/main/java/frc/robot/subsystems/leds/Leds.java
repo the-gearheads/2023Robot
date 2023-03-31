@@ -70,8 +70,10 @@ public class Leds extends SubsystemBase {
     if (DriverStation.isTeleop()) {
       double timeRemaining = Robot.matchTime;
       if (timeRemaining >= 57.0 && timeRemaining < 60.0) {
-        LedState.FLASH_YELLOW.updateBuffer(buffer);
+        LedState.FLASH_GREEN.updateBuffer(buffer);
       } else if (timeRemaining >= 27.0 && timeRemaining < 30.0) {
+        LedState.FLASH_YELLOW.updateBuffer(buffer);
+      } else if (timeRemaining >= 12.0 && timeRemaining < 15.0) {
         LedState.FLASH_RED.updateBuffer(buffer);
       }
     }

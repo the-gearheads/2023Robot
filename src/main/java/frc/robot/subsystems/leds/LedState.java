@@ -5,24 +5,12 @@ import java.util.function.Function;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.util.MoreMath;
 
 public enum LedState {
   //@formatter:off
-  GREEN(Color.kGreen), WHITE(Color.kWhite), ORANGE(Color.kOrange),
   PURPLE(Color.kPurple), YELLOW(Color.kYellow),
-  RED(Color.kRed), PINK(Color.kPink), NONE(new Color(0,0,0)),
-
- YELLOW_SOUTH(Color.kYellow, (i)->i==7), 
- YELLOW_SW(Color.kYellow, (i)->i==6), 
- YELLOW_WEST(Color.kYellow, (i)->i==3), 
- YELLOW_NW(Color.kYellow, (i)->i==0), 
- YELLOW_NORTH(Color.kYellow, (i)->i==1), 
- YELLOW_NE(Color.kYellow, (i)->i==2), 
- YELLOW_EAST(Color.kYellow, (i)->i==5), 
- YELLOW_SE(Color.kYellow, (i)->i==8), 
- YELLOW_COUNTERCLOCKWISE(Color.kYellow, (i)->i==9), 
- YELLOW_CLOCKWISE(Color.kYellow, (i)->i==10), BLACK(Color.kBlack),
+  BLACK(Color.kBlack), WHITE(Color.kWhite),
+  GREEN(Color.kGreen),
   FLASH_RED((AddressableLEDBuffer buf) -> {
     boolean isOn = Math.floor(Timer.getFPGATimestamp() * 10) % 2 == 0; 
     Color color = isOn ? Color.kRed : Color.kBlack;
@@ -37,8 +25,15 @@ public enum LedState {
       buf.setLED(i, color);
     }
   }),
+  FLASH_GREEN((AddressableLEDBuffer buf) -> {
+    boolean isOn = Math.floor(Timer.getFPGATimestamp() * 10) % 2 == 0;
+    Color color = isOn ? Color.kGreen : Color.kBlack;
+    for (int i = 0; i < buf.getLength(); i++) {
+      buf.setLED(i, color);
+    }
+  }),
   RAINBOW(LedState::rainbowFunc);
-   //@formatter:on
+  //@formatter:on
 private Consumer<AddressableLEDBuffer> updateBufferLambda;
 
   public void updateBuffer(AddressableLEDBuffer buffer) {
