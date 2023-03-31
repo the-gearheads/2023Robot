@@ -4,6 +4,8 @@
 
 package frc.robot.commands.vision;
 
+import java.util.ArrayList;
+import java.util.List;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -104,8 +106,10 @@ public class FuseVisionEstimate extends CommandBase {
         stDev1.set(2,0,Double.POSITIVE_INFINITY);
         estimate.setConfidence(stDev1);
         if(inCommunity(estimate.best.toPose2d())){
-          SmartDashboard.putBoolean("fusing", true);
-          fuseEstimate(estimate);
+          if(correctColorTag(estimate)){
+            SmartDashboard.putBoolean("fusing", true);
+            fuseEstimate(estimate);
+          }
         }else{
           SmartDashboard.putBoolean("fusing", false);
         }
@@ -146,5 +150,33 @@ public class FuseVisionEstimate extends CommandBase {
     var secondCorner = MoreMath.transformByAlliance(FEEDER.DIAG_CORNERS.get(1));
 
     return MoreMath.within(pose, firstCorner, secondCorner);
+  }
+
+  private static boolean correctColorTag(CustomEstimate estimate){
+    List<Integer> validTags;
+    if(MoreMath.isBlue()){
+      validTags = new ArrayList<Integer>(){{
+        add(4);
+        add(6);
+        add(7);
+        add(8);
+      }};
+    }else{
+      validTags = new ArrayList<Integer>(){{
+        add(1);
+        add(2);
+        add(3);
+        add(5);
+      }};
+    }
+    SmartDashboard.putNumber("vision testing/targets length", estimate.targetsUsed.size());
+    for(var target : estimate.targetsUsed){
+      var id = target.getFiducialId();
+      var isValid = validTags.contains(id);
+      if(!isValid){
+        return false;
+      }
+    }
+    return true;
   }
 }

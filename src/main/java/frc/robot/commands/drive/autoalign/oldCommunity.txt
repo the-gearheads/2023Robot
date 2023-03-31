@@ -12,8 +12,8 @@ public enum Community {
     BLUE_GRID(
         new Grid(
             new GridCol(
-                new Translation2d(1.77,5.026),
-                new Translation2d(2.163,5.024),
+                new Translation2d(1.789,5.026),
+                new Translation2d(2.237,5.0),
                 new Translation2d(2.0,5.162)
             ),
             new GridCol(
@@ -22,15 +22,15 @@ public enum Community {
                 new Translation2d(2.03, 4.4)
             ),
             new GridCol(
-                new Translation2d(1.763, 3.943),
-                new Translation2d(2.188, 3.916),
+                new Translation2d(1.803, 3.87),
+                new Translation2d(2.196, 3.82),
                 new Translation2d(1.99, 3.8)
             )
         ), 
         new Grid(
             new GridCol(
-                new Translation2d(1.773,3.30),
-                new Translation2d(2.173,3.34),
+                new Translation2d(1.837,3.316),
+                new Translation2d(2.237,3.316),
                 new Translation2d(2.0,3.316)
             ),
             new GridCol(
@@ -39,15 +39,15 @@ public enum Community {
                 new Translation2d(2.03, 2.728)
             ),
             new GridCol(
-                new Translation2d(1.77, 2.17),
-                new Translation2d(2.17, 2.21),
+                new Translation2d(1.803, 2.192),
+                new Translation2d(2.196, 2.192),
                 new Translation2d(1.99, 2.192)
             )
         ),
         new Grid(
             new GridCol(
-                new Translation2d(1.776,1.69),
-                new Translation2d(2.155,1.66),
+                new Translation2d(1.837,1.68),
+                new Translation2d(2.237,1.68),
                 new Translation2d(2.0,1.68)
             ),
             new GridCol(
@@ -56,8 +56,8 @@ public enum Community {
                 new Translation2d(2.03, 1.1)
             ),
             new GridCol(
-                new Translation2d(1.78, 0.46),
-                new Translation2d(2.175, 0.45),
+                new Translation2d(1.803, 0.554),
+                new Translation2d(2.196, 0.554),
                 new Translation2d(1.99, 0.554)
             )
         )
@@ -93,14 +93,14 @@ public enum Community {
             ),
             new GridCol(
                 new Translation2d(1.8, 4.75),
-                new Translation2d(2.196, 4.749),//we don't have this one
+                new Translation2d(2.196, 4.749),
                 new Translation2d(1.99, 4.749)
             )
         ),
         new Grid(//right
             new GridCol(
                 new Translation2d(1.8,4.18),
-                new Translation2d(2.158,4.12),
+                new Translation2d(2.237,4.159),
                 new Translation2d(2.0,4.159)
             ),
             new GridCol(
@@ -110,7 +110,7 @@ public enum Community {
             ),
             new GridCol(
                 new Translation2d(1.75, 3.05),
-                new Translation2d(2.09, 2.99),
+                new Translation2d(2.196, 3.064),
                 new Translation2d(1.99, 3.064)
             )
         )

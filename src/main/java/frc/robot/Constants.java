@@ -494,10 +494,10 @@ public class Constants extends AnnotatedClass {
             };
             break;
           default:
-            BLUE_RIGHT_DEST_POSE = new Pose2d(15.5, 6.1, Rotation2d.fromDegrees(180));
-            BLUE_LEFT_DEST_POSE = new Pose2d(15.8, 7.58, Rotation2d.fromDegrees(180));
-            RED_RIGHT_DEST_POSE = new Pose2d(15.71, 0.45, Rotation2d.fromDegrees(180));
-            RED_LEFT_DEST_POSE = new Pose2d(15.5, 1.882, Rotation2d.fromDegrees(180));
+            BLUE_RIGHT_DEST_POSE = new Pose2d(15.792, 5.949, Rotation2d.fromDegrees(180));
+            BLUE_LEFT_DEST_POSE = new Pose2d(15.82, 7.593, Rotation2d.fromDegrees(180));
+            RED_RIGHT_DEST_POSE = new Pose2d(15.789, 0.424, Rotation2d.fromDegrees(180));
+            RED_LEFT_DEST_POSE = new Pose2d(15.748, 2.088, Rotation2d.fromDegrees(180));
             DIAG_CORNERS = new ArrayList<Translation2d>() {
               {
                 add(new Translation2d(9.8, 5.6));
