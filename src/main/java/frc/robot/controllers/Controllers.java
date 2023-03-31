@@ -61,7 +61,7 @@ public class Controllers {
         } else if (joyName.toLowerCase().contains("keyboard")) {
           operatorController = new LogitechOperatorController(i);
           Logger.getInstance().recordOutput("controllers/operator controller",
-              "Found Thrustmaster operator controller on port " + i);
+              "Found keyboard operator controller on port " + i);
         } else {
           foundOperatorController = false;
         }
