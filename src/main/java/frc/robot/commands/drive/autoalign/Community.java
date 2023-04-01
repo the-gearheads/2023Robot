@@ -109,7 +109,7 @@ public enum Community {
                 new Translation2d(2.03, 3.581)
             ),
             new GridCol(
-                new Translation2d(1.75, 3.05),
+                new Translation2d(1.75, 2.98),//3.05
                 new Translation2d(2.09, 2.99),
                 new Translation2d(1.99, 3.064)
             )
