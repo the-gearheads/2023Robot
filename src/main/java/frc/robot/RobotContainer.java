@@ -189,6 +189,9 @@ public class RobotContainer {
       );
     }, swerve));
 
+    Controllers.driverController.HIGH_SPEED().whileTrue(LedState.getSetRainbowSpeedCommand(6));
+    Controllers.driverController.LOW_SPEED().whileTrue(LedState.getSetRainbowSpeedCommand(1));
+
     Controllers.driverController.getAutoAlign().whileTrue(new AutoAlign(swerve, arm));
 
     Controllers.operatorController.armGoToLowNode()
@@ -219,6 +222,10 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autonChooser.getSelectedAuton();
+  }
+
+  public Leds getLeds() {
+    return leds;
   }
 
   public void setTeleopDefault() {

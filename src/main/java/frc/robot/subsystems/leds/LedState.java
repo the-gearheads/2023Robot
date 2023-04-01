@@ -5,12 +5,14 @@ import java.util.function.Function;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 
 public enum LedState {
   //@formatter:off
   PURPLE(Color.kPurple), YELLOW(Color.kYellow),
   BLACK(Color.kBlack), WHITE(Color.kWhite),
-  GREEN(Color.kGreen),
+  GREEN(Color.kGreen), HOT_PINK(new Color(255, 0, 200)),
   FLASH_RED((AddressableLEDBuffer buf) -> {
     boolean isOn = Math.floor(Timer.getFPGATimestamp() * 10) % 2 == 0; 
     Color color = isOn ? Color.kRed : Color.kBlack;
@@ -65,7 +67,7 @@ private Consumer<AddressableLEDBuffer> updateBufferLambda;
   }
 
   private static int rainbowFirstPixelHue = 0;
-
+  private static int rainbowSpeed = 3;
   private static void rainbowFunc(AddressableLEDBuffer buf) {
     // For every pixel
     for (var i = 0; i < buf.getLength(); i++) {
@@ -76,8 +78,25 @@ private Consumer<AddressableLEDBuffer> updateBufferLambda;
       buf.setHSV(i, hue, 255, 128);
     }
     // Increase by to make the rainbow "move"
-    rainbowFirstPixelHue += 3;
+    rainbowFirstPixelHue += rainbowSpeed;
     // Check bounds
     rainbowFirstPixelHue %= 180;
+  }
+
+  public static void setRainbowSpeed(int newSpeed) {
+    rainbowSpeed = newSpeed;
+  }
+
+  public static void resetRainbowSpeed() {
+    rainbowSpeed = 3;
+  }
+
+  public static CommandBase getSetRainbowSpeedCommand(int newSpeed) {
+    return new StartEndCommand(()->{
+      setRainbowSpeed(newSpeed);
+    },
+    ()->{
+      resetRainbowSpeed();
+    });
   }
 }
