@@ -189,7 +189,7 @@ public class RobotContainer {
       );
     }, swerve));
 
-    Controllers.driverController.HIGH_SPEED().whileTrue(LedState.getSetRainbowSpeedCommand(6));
+    Controllers.driverController.HIGH_SPEED().whileTrue(LedState.getSetRainbowSpeedCommand(5));
     Controllers.driverController.LOW_SPEED().whileTrue(LedState.getSetRainbowSpeedCommand(1));
 
     Controllers.driverController.getAutoAlign().whileTrue(new AutoAlign(swerve, arm));
