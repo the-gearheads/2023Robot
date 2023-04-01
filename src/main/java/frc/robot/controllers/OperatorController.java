@@ -58,4 +58,8 @@ public interface OperatorController {
   public default Trigger signalCone() {
     return new Trigger(() -> false);
   }
+
+  public default Trigger reconfigEVERYTHING() {
+    return new Trigger(()->false);
+  }
 }

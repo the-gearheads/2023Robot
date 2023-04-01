@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.SPI;
@@ -58,6 +59,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very little robot logic should actually be handled in
@@ -200,6 +202,11 @@ public class RobotContainer {
     Controllers.operatorController.setArmByJoystick().onTrue(new JoystickArmControl(arm));
     Controllers.operatorController.signalCone().onTrue(leds.setStateForTimeCommand(LedState.YELLOW, 2));
     Controllers.operatorController.signalCube().onTrue(leds.setStateForTimeCommand(LedState.PURPLE, 2));
+    Controllers.operatorController.reconfigEVERYTHING().onTrue(new InstantCommand(()->{
+      DriverStation.reportWarning("RECONFIG EVERYTHING!!!", false);
+      wrist.configure();
+      arm.configure();
+    }));
 
     // Controllers.operatorController.throwCube()
     //     .onTrue(new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 80, 20)));

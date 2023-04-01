@@ -243,7 +243,7 @@ public class Arm extends SubsystemBase {
     return pose <= ARM.MAX_ANGLE && pose >= ARM.MIN_ANGLE;
   }
 
-  private ArrayList<REVLibError> configure() {
+  public ArrayList<REVLibError> configure() {
     ArrayList<REVLibError> e = new ArrayList<>();
     e.add(motor.restoreFactoryDefaults());
     motor.setInverted(false);

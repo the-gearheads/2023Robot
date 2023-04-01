@@ -103,7 +103,7 @@ public class Constants extends AnnotatedClass {
 
 
     public static final double[] WRIST_FF = {0, 0.5, 0};
-    public static final double ANGLE_OFFSET = -180;
+    public static final double ANGLE_OFFSET = 180;//-180
     public static final double WRAP_RANGE_SPEED = 2;
     public static final double WRAP_RANGE_UPPER_BOUND = 135;
     public static final double WRAP_RANGE_LOWER_BOUND = -135;
@@ -169,11 +169,11 @@ public class Constants extends AnnotatedClass {
     @NTPublish
     public static double HIGH_LIN_VEL = 10;
 
-    public static double MID_LIN_VEL = 1.5;//set to 2
+    public static double MID_LIN_VEL = 2.3;//set to 2
 
     public static double LOW_LIN_VEL = 0.5;//testing: 0.15
     @NTPublish
-    public static double HIGH_ROT_VEL = 2.5;
+    public static double HIGH_ROT_VEL = 7.5;
 
     public static double MID_ROT_VEL = 1.5;
 
@@ -494,10 +494,10 @@ public class Constants extends AnnotatedClass {
             };
             break;
           default:
-            BLUE_RIGHT_DEST_POSE = new Pose2d(15.792, 5.949, Rotation2d.fromDegrees(180));
-            BLUE_LEFT_DEST_POSE = new Pose2d(15.82, 7.593, Rotation2d.fromDegrees(180));
-            RED_RIGHT_DEST_POSE = new Pose2d(15.789, 0.424, Rotation2d.fromDegrees(180));
-            RED_LEFT_DEST_POSE = new Pose2d(15.748, 2.088, Rotation2d.fromDegrees(180));
+            BLUE_RIGHT_DEST_POSE = new Pose2d(15.772, 5.949, Rotation2d.fromDegrees(180)); // -0.02
+            BLUE_LEFT_DEST_POSE = new Pose2d(15.78, 7.593, Rotation2d.fromDegrees(180));//was 15.82 in calibration
+            RED_RIGHT_DEST_POSE = new Pose2d(15.769, 0.424, Rotation2d.fromDegrees(180)); // -0.02
+            RED_LEFT_DEST_POSE = new Pose2d(15.728, 2.088, Rotation2d.fromDegrees(180)); // -0.02
             DIAG_CORNERS = new ArrayList<Translation2d>() {
               {
                 add(new Translation2d(9.8, 5.6));

@@ -65,11 +65,11 @@ public class Wrist extends SubsystemBase {
   }
 
   public double getPose() {
-    return encoder.getPosition() + Constants.WRIST.ANGLE_OFFSET;
+    return -encoder.getPosition() + Constants.WRIST.ANGLE_OFFSET;
   }
 
   public double getVelocity() {
-    return encoder.getVelocity();
+    return -encoder.getVelocity();
   }
 
   //In case a wrist command needs to access arm pose (don't want to give it entire arm subsystem)
@@ -79,7 +79,7 @@ public class Wrist extends SubsystemBase {
 
   public void setVoltage(double volts) {
     this.volts = volts;
-    motor.setVoltage(volts);
+    motor.setVoltage(-volts);
   }
 
   public void setGoal(WristState state) {
@@ -229,12 +229,12 @@ public class Wrist extends SubsystemBase {
 
   }
 
-  private ArrayList<REVLibError> configure() {
+  public ArrayList<REVLibError> configure() {
     ArrayList<REVLibError> e = new ArrayList<>();
 
     e.add(motor.restoreFactoryDefaults());
-    motor.setInverted(true);
-    e.add(encoder.setInverted(true));
+    motor.setInverted(false);
+    e.add(encoder.setInverted(false));
     e.add(motor.setIdleMode(IdleMode.kCoast));
     e.add(encoder.setPositionConversionFactor(360));
     e.add(encoder.setVelocityConversionFactor(360));

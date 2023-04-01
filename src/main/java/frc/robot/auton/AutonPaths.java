@@ -195,9 +195,15 @@ public class AutonPaths {
       new CustomProxy((
 
       )->{
-        var path = AutonHelper.getPathByName("slow-startn4-explore", centerExploreThenDockSlowConstraints);
-        path = PathPlannerTrajectory.transformTrajectoryForAlliance(path, DriverStation.getAlliance());
-        var destTrans = path.getInitialHolonomicPose().getTranslation();
+        // var path = AutonHelper.getPathByName("slow-startn4-explore", centerExploreThenDockSlowConstraints);
+        // path = PathPlannerTrajectory.transformTrajectoryForAlliance(path, DriverStation.getAlliance());
+        // var destTrans = path.getInitialHolonomicPose().getTranslation();
+        Translation2d destTrans;
+          if(MoreMath.isBlue()){
+            destTrans = Community.BLUE_GRID.centerGrid.leftCol.high;
+          }else{
+            destTrans = Community.RED_GRID.centerGrid.rightCol.high;
+          }
         return s.swerve.goTo(new Pose2d(destTrans, Rotation2d.fromDegrees(180)), Constants.AUTON.SLOW_CONSTRAINTS);
       }, s.swerve)
       // AutonHelper.setInitPose(s, "InertN4-StartN4"),

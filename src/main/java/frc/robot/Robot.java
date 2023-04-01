@@ -135,6 +135,7 @@ public class Robot extends LoggedRobot {
   public void teleopPeriodic() {
     matchTime = 135 - (Timer.getFPGATimestamp() - matchTimeStart);
     matchTime = matchTime < 0 ? 0 : matchTime;
+    Logger.getInstance().recordOutput("TeleopMatchTime", matchTime);
   }
 
   @Override

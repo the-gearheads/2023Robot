@@ -70,4 +70,8 @@ public class ThrustMaster implements OperatorController {
   public Trigger signalCone() {
     return new JoystickButton(joy, 10);
   }
+
+  public Trigger reconfigEVERYTHING() {
+    return new JoystickButton(joy, 16);
+  }
 }
