@@ -13,6 +13,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.pathplanner.lib.server.PathPlannerServer;
 import com.revrobotics.REVPhysicsSim;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -21,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import frc.robot.Constants.RobotMode;
 import frc.robot.auton.TestPlaceThenDock;
+import frc.robot.subsystems.leds.LedState;
 import frc.robot.util.NTToAdvantageKit;
 
 /**
@@ -87,6 +89,10 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
     NTToAdvantageKit.periodic();
     robotContainer.updateControllers();
+
+    if(DriverStation.isEStopped()) {
+      robotContainer.getLeds().setState(LedState.HOT_PINK);
+    }
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
