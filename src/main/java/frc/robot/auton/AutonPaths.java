@@ -8,6 +8,7 @@ import com.pathplanner.lib.commands.FollowPathWithEvents;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.commands.arm.SetArmPose;
+import frc.robot.commands.arm.StowArm;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.AutoBalDriveToPivot;
 import frc.robot.commands.drive.AutoBalance;
@@ -163,7 +165,7 @@ public class AutonPaths {
 
     // eventMap.put("stow-arm", AutonHelper.openGrabber(s.grabber).alongWith(new PickUpFromGround(s.arm, s.wrist)));
     return AutonHelper.followWithEvents("pi-start-gamepiece1", eventMap,
-     false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve, false);
+      false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve, false);
   }
 
   public static Command twoGamePieceNoBumpPathPlaceCubeProxy(Subsystems s){
@@ -174,7 +176,68 @@ public class AutonPaths {
      false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve, false);
   }
 
+  public static Command twoConeBump(Subsystems s) {
+    return new SequentialCommandGroup(
+      new InstantCommand(()->{
+        s.vision.setConfidenceStrat(ConfidenceStrat.NONE);
+      }),
+      new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+      new InstantCommand(()->{
+        s.swerve.setPose(new Pose2d(s.swerve.getPose().getX(), s.swerve.getPose().getY(), Rotation2d.fromDegrees(180)));
+      }, s.swerve),
 
+      new CustomProxy(()->{
+        Translation2d destTrans;
+        if(MoreMath.isBlue()){
+          destTrans = Community.BLUE_GRID.rightGrid.rightCol.high;
+        }else{
+          destTrans = Community.RED_GRID.leftGrid.leftCol.high;
+        }
+        return s.swerve.goTo(new Pose2d(destTrans, Rotation2d.fromDegrees(180)), Constants.AUTON.SLOW_CONSTRAINTS);
+      }, s.swerve),
+
+      AutonHelper.getPlaceConeCommand(s),
+      AutonHelper.stowAnd(s, 
+        AutonHelper.getCommandForPath("StartN9_prebump", false, defaultConstraints, s.swerve)
+      ),
+      AutonHelper.getCommandForPath("prebump-overbump", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
+      new SequentialCommandGroup(
+          new WaitCommand(0.5),
+          AutonHelper.openGrabber(s.grabber).alongWith(new FloorPickUp(s.arm, s.wrist))
+      ).raceWith(
+        AutonHelper.getCommandForPath("overbump-gamepiece1", false, defaultConstraints, s.swerve)
+      ),
+      
+      (AutonHelper.closeGrabber(s.grabber).andThen(new WaitCommand(0.25)))
+        .raceWith(new FloorPickUp(s.arm, s.wrist))
+        ,
+
+      new CustomProxy(()->{
+        return twoconeBumpPlaceConeProxy(s);
+      }),
+      
+
+      new CustomProxy(()->{
+        Translation2d destTrans;
+        if(MoreMath.isBlue()){
+          destTrans = Community.BLUE_GRID.rightGrid.leftCol.high;
+        }else{
+          destTrans = Community.RED_GRID.leftGrid.rightCol.high;
+        }
+        return s.swerve.goTo(new Pose2d(destTrans, Rotation2d.fromDegrees(180)), Constants.AUTON.SLOW_CONSTRAINTS);
+      }, s.swerve),
+
+      AutonHelper.getPlaceConeCommand(s)
+      
+    );
+  }
+  public static Command twoconeBumpPlaceConeProxy(Subsystems s){
+    HashMap<String, Command> eventMap = new HashMap<>();
+    eventMap.put("stow-arm", new StowArm(s.arm, s.wrist));
+    eventMap.put("raise-arm", new SetArmPose(s.arm, ArmPose.HIGH_NODE));
+    return AutonHelper.followWithEvents("StartN9_gamepiece1-InertN7", eventMap,
+      false, defaultConstraints, s.swerve, false);
+  }
 
   public static PathConstraints centerExploreThenDockSlowConstraints = new PathConstraints(1,0.75);
   public static Command centerExploreThenDockSlow(Subsystems s){

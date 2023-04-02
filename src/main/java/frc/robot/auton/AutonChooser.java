@@ -83,12 +83,14 @@ public class AutonChooser {
     Command justPlace = AutonPaths.InertN1Place(s);
     Command TwoGamePieceNoBump = AutonPaths.TwoGamePieceNoBump(s);
     Command centerExploreThenDockSlow = AutonPaths.centerExploreThenDockSlow(s);
+    Command twoconeBump = AutonPaths.twoConeBump(s);
 
     autons.put("Just Place", justPlace);
     autons.put("CENTER Place Then Dock", InertN4PlaceThenDock);
     autons.put("NO BUMP Place Then Move", InertN1PlaceThenExplore);
     autons.put("BUMP Place Then Move", InertN9PlaceThenExplore);
     autons.put("NO BUMP 2 Gamepiece", TwoGamePieceNoBump);
+    autons.put("BUMP Two Cone", twoconeBump);
     autons.put("CENTER explore then dock", centerExploreThenDockSlow);
   }
 }
