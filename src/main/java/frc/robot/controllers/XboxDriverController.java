@@ -71,30 +71,14 @@ public class XboxDriverController implements DriverController {
     return new JoystickButton(controller, XboxController.Button.kStart.value);
   }
 
-  public Trigger getSetHeading0Btn() {
-    return new Trigger(() -> {
-      return getRotateButton().getAsBoolean() && (controller.getRightY() < -0.75);
-    });
-  };
-
-  public Trigger getSetHeading90Btn() {
-    return new Trigger(() -> {
-      return getRotateButton().getAsBoolean() && (controller.getRightX() < -0.75);
-    });
-  };
-
-  public Trigger getSetHeading180Btn() {
-    return new Trigger(() -> {
-      return getRotateButton().getAsBoolean() && (controller.getRightY() > 0.75);
-    });
-  };
-
-  public Trigger getSetHeading270Btn() {
-    return new Trigger(() -> {
-      return getRotateButton().getAsBoolean() && (controller.getRightX() > 0.75);
-    });
-  };
-
+  public double getSetHeadingPOV() {
+    if (!getRotateButton().getAsBoolean()) return -1;
+    if (controller.getRightX() > 0.75) return 270;
+    if (controller.getRightY() > 0.75) return 180;
+    if (controller.getRightX() < -0.75) return 90;
+    if (controller.getRightY() < -0.75) return 0;
+    return -1;
+  }
   public double getPOV() {
     return controller.getPOV();
   };
