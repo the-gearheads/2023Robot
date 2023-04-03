@@ -8,7 +8,6 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -67,7 +66,7 @@ public class TeleopDrive extends CommandBase {
     spds = cube(spds);
     logSpds("Cubed", spds);
 
-    if(SmartDashboard.getBoolean("TeleopDrive/RateLimitDrive", false)) {
+    if (SmartDashboard.getBoolean("TeleopDrive/RateLimitDrive", false)) {
       spds = rateLimit(spds);
       logSpds("Rate Limited", spds);
     }
@@ -88,7 +87,8 @@ public class TeleopDrive extends CommandBase {
   private void cardinalBtns() {
     double heading = Controllers.driverController.getSetHeadingPOV();
     var ctsGyroAngle = swerve.getCtsGyroRot().getRadians();
-    if(heading == -1) return;
+    if (heading == -1)
+      return;
     angleGoal = MoreMath.getClosestRad(ctsGyroAngle, 0);
   }
 

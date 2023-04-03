@@ -6,17 +6,17 @@ package frc.robot.commands.drive.autoalign;
 
 /** Add your docs here. */
 public class Grid {
-    public GridCol centerCol;
-    public GridCol rightCol;
-    public GridCol leftCol;
+  public GridCol centerCol;
+  public GridCol rightCol;
+  public GridCol leftCol;
 
-    public Grid(GridCol leftCol, GridCol centerCol, GridCol rightCol){
-        this.leftCol=leftCol;
-        this.centerCol=centerCol;
-        this.rightCol=rightCol;
-    }
+  public Grid(GridCol leftCol, GridCol centerCol, GridCol rightCol) {
+    this.leftCol = leftCol;
+    this.centerCol = centerCol;
+    this.rightCol = rightCol;
+  }
 
-    public double getY(){
-        return this.centerCol.high.getY();
-    }
+  public double getY() {
+    return this.centerCol.high.getY();
+  }
 }

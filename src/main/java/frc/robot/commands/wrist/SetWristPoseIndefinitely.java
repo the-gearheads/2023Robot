@@ -18,20 +18,23 @@ public class SetWristPoseIndefinitely extends CommandBase {
     this.shouldSet = shouldSet;
     addRequirements(wrist);
     this.pose = pose;
-    this.wrist=wrist;
+    this.wrist = wrist;
   }
 
   public SetWristPoseIndefinitely(Wrist wrist, double pose) {
-    this(wrist, pose, ()->true);
+    this(wrist, pose, () -> true);
   }
 
   @Override
   public void execute() {
-    if(!shouldSet.get())return;
+    if (!shouldSet.get())
+      return;
     var wristState = WristState.getStateWithGoal(pose);
     wrist.setGoal(wristState);
   }
 
   @Override
-  public boolean isFinished() {return false;}
+  public boolean isFinished() {
+    return false;
+  }
 }

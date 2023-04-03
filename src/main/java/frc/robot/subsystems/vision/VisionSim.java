@@ -67,8 +67,7 @@ public class VisionSim extends Vision {
     simCams = new ArrayList<SimVisionSystem>();
     for (SimCamParams simCamParams : Constants.VISION_SIM.SIM_CAM_PARAMS) {
       var simCam = new SimVisionSystem(simCamParams.name, simCamParams.camDiagFOV, simCamParams.robot2Cam,
-          simCamParams.maxLEDRange, simCamParams.camResWidth, simCamParams.camResHeight, simCamParams.minTargetArea,
-          0);
+          simCamParams.maxLEDRange, simCamParams.camResWidth, simCamParams.camResHeight, simCamParams.minTargetArea, 0);
       simCams.add(simCam);
 
       double hypotPixels = Math.hypot(simCamParams.camResWidth, simCamParams.camResHeight);

@@ -15,7 +15,8 @@ public class SetArmPose extends CommandBase {
   private ArmPose armPose;
 
   public enum ArmPose {
-    FLOOR(-74), HIGH_NODE(4.58), MID_NODE(-15.46), LOW_NODE(-61.87), FEEDER_STATION(-184), INSIDE_ROBOT(-110), VARIABLE(0);
+    FLOOR(-74), HIGH_NODE(4.58), MID_NODE(-15.46), LOW_NODE(-61.87), FEEDER_STATION(-184), INSIDE_ROBOT(-110), VARIABLE(
+        0);
 
     public double val;
 
@@ -23,8 +24,8 @@ public class SetArmPose extends CommandBase {
       this.val = val;
     }
 
-    private void setGoal(double val){
-      this.val=val;
+    private void setGoal(double val) {
+      this.val = val;
     }
 
   }

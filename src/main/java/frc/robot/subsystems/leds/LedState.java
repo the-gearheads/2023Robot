@@ -36,7 +36,7 @@ public enum LedState {
   }),
   RAINBOW(LedState::rainbowFunc);
   //@formatter:on
-private Consumer<AddressableLEDBuffer> updateBufferLambda;
+  private Consumer<AddressableLEDBuffer> updateBufferLambda;
 
   public void updateBuffer(AddressableLEDBuffer buffer) {
     this.updateBufferLambda.accept(buffer);
@@ -50,13 +50,13 @@ private Consumer<AddressableLEDBuffer> updateBufferLambda;
     });
   }
 
-  private LedState(Color color, Function<Integer, Boolean> indexCondition){
+  private LedState(Color color, Function<Integer, Boolean> indexCondition) {
     this((AddressableLEDBuffer buffer) -> {
       for (int i = 0; i < buffer.getLength(); i++) {
-        if(indexCondition.apply(i)){
+        if (indexCondition.apply(i)) {
           buffer.setLED(i, color);
-        }else{
-          buffer.setLED(i, new Color(0,0,0));
+        } else {
+          buffer.setLED(i, new Color(0, 0, 0));
         }
       }
     });
@@ -68,6 +68,7 @@ private Consumer<AddressableLEDBuffer> updateBufferLambda;
 
   private static int rainbowFirstPixelHue = 0;
   private static int rainbowSpeed = 3;
+
   private static void rainbowFunc(AddressableLEDBuffer buf) {
     // For every pixel
     for (var i = 0; i < buf.getLength(); i++) {
@@ -92,10 +93,9 @@ private Consumer<AddressableLEDBuffer> updateBufferLambda;
   }
 
   public static CommandBase getSetRainbowSpeedCommand(int newSpeed) {
-    return new StartEndCommand(()->{
+    return new StartEndCommand(() -> {
       setRainbowSpeed(newSpeed);
-    },
-    ()->{
+    }, () -> {
       resetRainbowSpeed();
     });
   }

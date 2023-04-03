@@ -7,7 +7,6 @@ package frc.robot;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import javax.swing.text.StyleContext.SmallAttributeSet;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -24,12 +23,9 @@ import frc.robot.Constants.DRIVE;
 import frc.robot.commands.arm.JoystickArmControl;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.StowArm;
-import frc.robot.commands.arm.Throw;
-import frc.robot.commands.arm.ThrowState;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.drive.autoalign.AutoAlign;
-import frc.robot.commands.vision.FuseVisionEstimate;
 import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
 import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.commands.wrist.ManualWristControl;
@@ -59,7 +55,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very little robot logic should actually be handled in
@@ -182,11 +177,9 @@ public class RobotContainer {
       return swerve.goTo(dest, Constants.AUTON.MID_CONSTRAINTS);
     }));
     Controllers.driverController.resetYaw().onTrue(new CustomProxy(() -> {
-      return new InstantCommand(
-        ()->{
-          swerve.setPose(new Pose2d(swerve.getPose().getTranslation(),Rotation2d.fromDegrees(180)));
-        }
-      );
+      return new InstantCommand(() -> {
+        swerve.setPose(new Pose2d(swerve.getPose().getTranslation(), Rotation2d.fromDegrees(180)));
+      });
     }, swerve));
 
     Controllers.driverController.HIGH_SPEED().whileTrue(LedState.getSetRainbowSpeedCommand(5));
@@ -205,7 +198,7 @@ public class RobotContainer {
     Controllers.operatorController.setArmByJoystick().onTrue(new JoystickArmControl(arm));
     Controllers.operatorController.signalCone().onTrue(leds.setStateForTimeCommand(LedState.YELLOW, 2));
     Controllers.operatorController.signalCube().onTrue(leds.setStateForTimeCommand(LedState.PURPLE, 2));
-    Controllers.operatorController.reconfigEVERYTHING().onTrue(new InstantCommand(()->{
+    Controllers.operatorController.reconfigEVERYTHING().onTrue(new InstantCommand(() -> {
       DriverStation.reportWarning("RECONFIG EVERYTHING!!!", false);
       wrist.configure();
       arm.configure();
@@ -237,12 +230,12 @@ public class RobotContainer {
     }, swerve));
   }
 
-  public void setDisabledVisionStrat(){
+  public void setDisabledVisionStrat() {
     vision.setConfidenceStrat(ConfidenceStrat.DISABLED);
     // vision.setDefaultCommand(new FuseVisionEstimate(vision, ConfidenceStrat.IRON_PANTHERS));
   }
 
-  public void setTeleopVisionStrat(){
+  public void setTeleopVisionStrat() {
     vision.setConfidenceStrat(ConfidenceStrat.ONLY_COMMUNITY_AND_FEEDER);
     SmartDashboard.putNumber("When was vision strat set", Timer.getFPGATimestamp());
     // vision.setDefaultCommand(new FuseVisionEstimate(vision, ConfidenceStrat.ONLY_COMMUNITY_AND_FEEDER));

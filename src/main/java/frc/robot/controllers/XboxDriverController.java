@@ -72,13 +72,19 @@ public class XboxDriverController implements DriverController {
   }
 
   public double getSetHeadingPOV() {
-    if (!getRotateButton().getAsBoolean()) return -1;
-    if (controller.getRightX() > 0.75) return 270;
-    if (controller.getRightY() > 0.75) return 180;
-    if (controller.getRightX() < -0.75) return 90;
-    if (controller.getRightY() < -0.75) return 0;
+    if (!getRotateButton().getAsBoolean())
+      return -1;
+    if (controller.getRightX() > 0.75)
+      return 270;
+    if (controller.getRightY() > 0.75)
+      return 180;
+    if (controller.getRightX() < -0.75)
+      return 90;
+    if (controller.getRightY() < -0.75)
+      return 0;
     return -1;
   }
+
   public double getPOV() {
     return controller.getPOV();
   };
@@ -109,8 +115,8 @@ public class XboxDriverController implements DriverController {
     return new JoystickButton(controller, XboxController.Button.kB.value);
   };
 
-  public Trigger resetYaw(){
-    return new Trigger(()->{
+  public Trigger resetYaw() {
+    return new Trigger(() -> {
       var val = controller.getLeftTriggerAxis();
       return Math.abs(val) > 0.75;
     });

@@ -5,16 +5,12 @@
 package frc.robot.commands.drive.autoalign;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import com.pathplanner.lib.PathPlanner;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.AUTO_ALIGN.FEEDER;
-import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
-import frc.robot.commands.drive.rotateTo;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.Swerve;
@@ -24,9 +20,9 @@ public class FeederAlign extends SequentialCommandGroup {
   /** Creates a new FeederAlign. */
   public FeederAlign(Swerve swerve, Arm arm) {
     if (
-        // isYAligned(swerve) && 
-        isArmRaised(arm) && 
-        // isClose(swerve) && 
+    // isYAligned(swerve) && 
+    isArmRaised(arm) &&
+    // isClose(swerve) && 
         isRotated(swerve)) {
       addCommands(simpleAlign(swerve, arm));
     } else {
@@ -46,19 +42,19 @@ public class FeederAlign extends SequentialCommandGroup {
 
     return trajCommand;
   }
-  
+
   private static Pose2d getDestPose(Pose2d pose) {
     Pose2d destPose;
     if (isLeft(pose)) {
-      if(MoreMath.isBlue()){
+      if (MoreMath.isBlue()) {
         destPose = FEEDER.BLUE_LEFT_DEST_POSE;
-      }else{
+      } else {
         destPose = FEEDER.RED_LEFT_DEST_POSE;
       }
     } else {
-      if(MoreMath.isBlue()){
+      if (MoreMath.isBlue()) {
         destPose = FEEDER.BLUE_RIGHT_DEST_POSE;
-      }else{
+      } else {
         destPose = FEEDER.RED_RIGHT_DEST_POSE;
       }
     }

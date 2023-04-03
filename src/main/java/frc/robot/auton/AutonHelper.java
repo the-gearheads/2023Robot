@@ -35,8 +35,8 @@ public class AutonHelper {
 
   public static Command getGroundPickUpCommand(Subsystems s) {
     return new SequentialCommandGroup(openGrabber(s.grabber), new WaitCommand(0.25),
-        new AltWristControl(s.wrist).raceWith(
-            new SequentialCommandGroup(new WaitCommand(1), closeGrabber(s.grabber), new WaitCommand(1))),
+        new AltWristControl(s.wrist)
+            .raceWith(new SequentialCommandGroup(new WaitCommand(1), closeGrabber(s.grabber), new WaitCommand(1))),
         new WaitCommand(1));
   }
 
@@ -114,12 +114,11 @@ public class AutonHelper {
   }
 
   public static Command followWithEvents(String pathName, Map<String, Command> eventMap, boolean resetOdometry,
-  PathConstraints constrainsts, Swerve swerve, boolean reversed) {
+      PathConstraints constrainsts, Swerve swerve, boolean reversed) {
     var path = AutonHelper.getPathByName(pathName, constrainsts);
-    var pathCommand = AutonHelper.getCommandForPath(pathName, resetOdometry,
-        constrainsts, swerve);
+    var pathCommand = AutonHelper.getCommandForPath(pathName, resetOdometry, constrainsts, swerve);
 
     return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);
-}
+  }
 }
 //format:on

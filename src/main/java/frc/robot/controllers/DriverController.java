@@ -59,7 +59,9 @@ public interface DriverController {
     return new Trigger(() -> false);
   }
 
-  public default double getSetHeadingPOV() { return -1; }
+  public default double getSetHeadingPOV() {
+    return -1;
+  }
 
   public default double getPOV() {
     return -1;
@@ -93,7 +95,7 @@ public interface DriverController {
     return new Trigger(() -> false);
   }
 
-  public default Trigger resetYaw(){
-    return new Trigger(()->false);  
+  public default Trigger resetYaw() {
+    return new Trigger(() -> false);
   }
 }

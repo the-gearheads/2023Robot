@@ -60,6 +60,6 @@ public interface OperatorController {
   }
 
   public default Trigger reconfigEVERYTHING() {
-    return new Trigger(()->false);
+    return new Trigger(() -> false);
   }
 }

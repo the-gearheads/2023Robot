@@ -182,10 +182,12 @@ public class CustomEstimator {
     }
 
     var boundaryTargets = new ArrayList<PhotonTrackedTarget>();
-    for(var target : cameraResult.targets){
-      for(var corner: target.getDetectedCorners()){
-        if(!MoreMath.within(corner.x, Constants.VISION.CORNER_THRESHOLD, Constants.VISION.X_RES - Constants.VISION.CORNER_THRESHOLD) 
-        || !MoreMath.within(corner.y, Constants.VISION.CORNER_THRESHOLD, Constants.VISION.Y_RES - Constants.VISION.CORNER_THRESHOLD)){
+    for (var target : cameraResult.targets) {
+      for (var corner : target.getDetectedCorners()) {
+        if (!MoreMath.within(corner.x, Constants.VISION.CORNER_THRESHOLD,
+            Constants.VISION.X_RES - Constants.VISION.CORNER_THRESHOLD)
+            || !MoreMath.within(corner.y, Constants.VISION.CORNER_THRESHOLD,
+                Constants.VISION.Y_RES - Constants.VISION.CORNER_THRESHOLD)) {
           boundaryTargets.add(target);
           break;
         }
@@ -264,12 +266,11 @@ public class CustomEstimator {
       return Optional.of(estimate.getBestEstimate());
     } else {
       var contemporaryPoseOpt = PoseBufferWrapper.getPoseInstance().getSample(estimate.timestampSeconds);
-      if(contemporaryPoseOpt.isEmpty()){
+      if (contemporaryPoseOpt.isEmpty()) {
         SmartDashboard.putString("contemporary pose opt does not exist", "it doesn't");
         return Optional.empty();
       }
-      var contemporaryGyroRad = contemporaryPoseOpt
-          .get().gyroAngle.getRadians();
+      var contemporaryGyroRad = contemporaryPoseOpt.get().gyroAngle.getRadians();
 
       var bestRad = estimate.best.getRotation().getZ();
       var altRad = estimate.alt.getRotation().getZ();

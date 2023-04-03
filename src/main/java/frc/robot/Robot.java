@@ -91,7 +91,7 @@ public class Robot extends LoggedRobot {
     NTToAdvantageKit.periodic();
     robotContainer.updateControllers();
 
-    if(DriverStation.isEStopped()) {
+    if (DriverStation.isEStopped()) {
       robotContainer.getLeds().setState(LedState.HOT_PINK);
     }
   }
