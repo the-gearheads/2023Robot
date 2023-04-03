@@ -5,8 +5,13 @@ import org.littletonrobotics.junction.Logger;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.FollowPathWithEvents;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
@@ -35,8 +40,8 @@ public class AutonHelper {
 
   public static Command getGroundPickUpCommand(Subsystems s) {
     return new SequentialCommandGroup(openGrabber(s.grabber), new WaitCommand(0.25),
-        new AltWristControl(s.wrist)
-            .raceWith(new SequentialCommandGroup(new WaitCommand(1), closeGrabber(s.grabber), new WaitCommand(1))),
+        new AltWristControl(s.wrist).raceWith(
+            new SequentialCommandGroup(new WaitCommand(1), closeGrabber(s.grabber), new WaitCommand(1))),
         new WaitCommand(1));
   }
 
@@ -106,18 +111,38 @@ public class AutonHelper {
 
   public static Command setInitPose(Subsystems s, String pathName) {
     return new InstantCommand(() -> {
-      PathPlannerTrajectory path = getPathByName(pathName, Constants.AUTON.SLOW_CONSTRAINTS);
+      PathPlannerTrajectory path = PathPlanner.loadPath(pathName, Constants.AUTON.SLOW_CONSTRAINTS);
       path = PathPlannerTrajectory.transformTrajectoryForAlliance(path, DriverStation.getAlliance());
       var initPose = path.getInitialPose();
       s.swerve.setPose(initPose);
     });
   }
 
+  public static Command setInitRot(Swerve swerve, String pathName) {
+    return new InstantCommand(()->{
+      PathPlannerTrajectory path = PathPlanner.loadPath(pathName, Constants.AUTON.SLOW_CONSTRAINTS);
+      path = PathPlannerTrajectory.transformTrajectoryForAlliance(path, DriverStation.getAlliance());
+      var initRot = path.getInitialPose().getRotation();
+      swerve.setPose(new Pose2d(swerve.getPose().getX(), swerve.getPose().getY(), initRot));
+    });
+  }
+
+  public static CustomProxy goToPathDesination(Swerve swerve, String pathName, PathConstraints constraints) {  
+    return new CustomProxy(()->{
+      PathPlannerTrajectory path = PathPlanner.loadPath(pathName, constraints);
+      path = PathPlannerTrajectory.transformTrajectoryForAlliance(path, DriverStation.getAlliance());
+      var finalState = path.getEndState();
+      var finalPose = new Pose2d(finalState.poseMeters.getX(), finalState.poseMeters.getY(), finalState.holonomicRotation);
+  
+      return swerve.goTo(finalPose, constraints);
+    }, swerve);
+  }
+
   public static Command followWithEvents(String pathName, Map<String, Command> eventMap, boolean resetOdometry,
-      PathConstraints constrainsts, Swerve swerve, boolean reversed) {
+  PathConstraints constrainsts, Swerve swerve, boolean reversed) {
     var path = AutonHelper.getPathByName(pathName, constrainsts);
     var pathCommand = AutonHelper.getCommandForPath(pathName, resetOdometry, constrainsts, swerve);
-
+    
     return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);
   }
 }
