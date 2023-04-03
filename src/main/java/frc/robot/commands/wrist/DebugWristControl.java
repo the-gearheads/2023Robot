@@ -29,9 +29,7 @@ public class DebugWristControl extends CommandBase {
   @Override
   public void execute() {
     var goal = SmartDashboard.getNumber("Wrist/set goal", 0);
-    var goalState = WristState.VARIABLE;
-
-    goalState.setWristGoal(goal);
+    var goalState = WristState.getStateWithGoal(goal);
     wrist.setGoal(goalState);
   }
 

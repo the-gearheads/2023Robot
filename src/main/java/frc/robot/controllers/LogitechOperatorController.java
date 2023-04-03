@@ -37,16 +37,16 @@ public class LogitechOperatorController implements OperatorController {
     return new JoystickButton(joy, 6);
   }
 
-  public Trigger armGoToGroundPickUpNode() {
-    return new JoystickButton(joy, 6);
-  }
-
   public Trigger setWristAlternatePose() {
     return new JoystickButton(joy, 1);
   }
 
   public Trigger openGrabber() {
     return new JoystickButton(joy, 2);
+  }
+
+  public Trigger throwCube() {
+    return new JoystickButton(joy, 8);
   }
 
   public Trigger setArmByJoystick() {

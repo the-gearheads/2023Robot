@@ -15,12 +15,16 @@ public class SetArmPose extends CommandBase {
   private ArmPose armPose;
 
   public enum ArmPose {
-    FLOOR(-65), HIGH_NODE(4.58), MID_NODE(-15.46), LOW_NODE(-61.87), FEEDER_STATION(-184), INSIDE_ROBOT(-110);
+    FLOOR(-74), HIGH_NODE(4.58), MID_NODE(-15.46), LOW_NODE(-61.87), FEEDER_STATION(-184), INSIDE_ROBOT(-110), VARIABLE(0);
 
     public double val;
 
     private ArmPose(double val) {
       this.val = val;
+    }
+
+    private void setGoal(double val){
+      this.val=val;
     }
 
   }
@@ -33,6 +37,15 @@ public class SetArmPose extends CommandBase {
   public SetArmPose(Arm arm, ArmPose armPose) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.arm = arm;
+    this.armPose = armPose;
+    addRequirements(arm);
+  }
+
+  public SetArmPose(Arm arm, double armPoseVal) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    this.arm = arm;
+    var armPose = ArmPose.VARIABLE;
+    armPose.setGoal(armPoseVal);
     this.armPose = armPose;
     addRequirements(arm);
   }
@@ -55,7 +68,7 @@ public class SetArmPose extends CommandBase {
       return true;
     }
 
-    double goal = arm.getPoseGoal();
+    double goal = armPose.val;
     double currentPose = arm.getPose();
     double poseError = goal - currentPose;
     poseError = Math.abs(poseError);

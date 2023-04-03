@@ -4,8 +4,10 @@
 
 package frc.robot.subsystems.arm;
 
+import java.util.ArrayList;
 import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.CANSparkMax.FaultID;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -13,28 +15,29 @@ import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ARM;
+import frc.robot.util.RevConfigUtils;
 import frc.robot.util.SendableArmFeedforward;
 
 public class Arm extends SubsystemBase {
   /** Creates a new arm. */
   public boolean configureHasRan = false;
   private int zeroCount = 0;
-  private double poseGoal = 0;
+  private TrapezoidProfile.State poseGoal = new TrapezoidProfile.State();
   private double velGoal = 0;
   protected CANSparkMax motor = new CANSparkMax(ARM.ARM_ID, MotorType.kBrushless);
   private SparkMaxAbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
-  private ProfiledPIDController pid =
+  protected ProfiledPIDController pid =
       new ProfiledPIDController(ARM.ARM_POS_PID[0], ARM.ARM_POS_PID[1], ARM.ARM_POS_PID[2], ARM.ARM_CONSTRAINTS);
-  private ProfiledPIDController velPid =
+  protected ProfiledPIDController velPid =
       new ProfiledPIDController(ARM.ARM_VEL_PID[0], ARM.ARM_VEL_PID[1], ARM.ARM_VEL_PID[2], ARM.ARM_VEL_CONSTRAINTS);
-  private SendableArmFeedforward ff =
+  protected SendableArmFeedforward ff =
       new SendableArmFeedforward(ARM.ARM_FF[0], ARM.ARM_FF[1], ARM.ARM_FF[2], ARM.ARM_FF[3]);
   private double lastTime = Timer.getFPGATimestamp();
   private double lastVel = 0;
@@ -55,7 +58,7 @@ public class Arm extends SubsystemBase {
 
   public Arm() {
     controlMode = ArmControlMode.VEL;
-    configure();
+    RevConfigUtils.configure(this::configure, "Arm");
 
     SmartDashboard.putData("Arm/pPid", pid);
     SmartDashboard.putData("Arm/vPid", velPid);
@@ -70,16 +73,26 @@ public class Arm extends SubsystemBase {
   }
 
   public void resetPIDs() {
-    pid.reset(getPose(), getVelocity());
-    velPid.reset(getVelocity(), 0);
+    pid.reset(getPose(), getVel());
+    velPid.reset(getVel(), 0);
   }
 
-  public double getPoseGoal() {
+  public TrapezoidProfile.State getPoseGoal() {
     return poseGoal;
   }
 
-  public void setPoseGoal(double newGoal) {
-    poseGoal = newGoal;
+  public void setPoseGoal(double poseGoal) {
+    this.setPoseGoal(new TrapezoidProfile.State(poseGoal, 0));
+  }
+
+  public void setPoseGoal(TrapezoidProfile.State poseGoal) {
+    if (!inAllowableRange(poseGoal.position)) {
+      DriverStation.reportWarning("Arm Pose Handler TRIGGERED!!!", true);
+      Logger.getInstance().recordOutput("Arm Pose Handler TRIGGERED!!!", true);
+      return;
+    }
+    Logger.getInstance().recordOutput("Arm Pose Handler TRIGGERED!!!", false);
+    this.poseGoal = poseGoal;
   }
 
   public double getVelGoal() {
@@ -94,7 +107,7 @@ public class Arm extends SubsystemBase {
     return encoder.getPosition() + ARM.ANGLE_OFFSET;
   }
 
-  public double getVelocity() {
+  public double getVel() {
     return encoder.getVelocity();
   }
 
@@ -119,14 +132,14 @@ public class Arm extends SubsystemBase {
       DriverStation.reportError("OUR ZERO ERROR IN ARM", true);
       setVoltage(0);
       if (configureHasRan == false) {
-        configure();
+        RevConfigUtils.configure(this::configure, "Arm");
       }
       configureHasRan = true;
       return;
     }
 
     var pose = getPose();
-    var vel = getVelocity();
+    var vel = getVel();
     var volts = 0.0;
 
     /* Calculate accleration. IT'S DOUBLE DIFFERENTIATION TIME*/
@@ -135,23 +148,28 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/CurrentPose", pose);
     Logger.getInstance().recordOutput("Arm/CurrentVel", vel);
     Logger.getInstance().recordOutput("Arm/Acceleration", acceleration);
-    Logger.getInstance().recordOutput("Arm/Pose/Goal", poseGoal);
+    Logger.getInstance().recordOutput("Arm/Pose/Pose Goal", poseGoal.position);
+    Logger.getInstance().recordOutput("Arm/Pose/Vel Goal", poseGoal.velocity);
     Logger.getInstance().recordOutput("Arm/Vel/Goal", velGoal);
     Logger.getInstance().recordOutput("Arm/ControlMode", controlMode.name);
-    Logger.getInstance().recordOutput("Arm/Pose/Setpoint", pid.getSetpoint().position);
+    Logger.getInstance().recordOutput("Arm/Pose/pose setpoint", pid.getSetpoint().position);
+    Logger.getInstance().recordOutput("Arm/Pose/vel setpoint", pid.getSetpoint().velocity);
+    Logger.getInstance().recordOutput("Arm/current command",
+        this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "");
+
     Logger.getInstance().recordOutput("Arm/Vel/Setpoint", velPid.getSetpoint().position);
 
     /* Controlled entirely via setVoltage() */
     if (controlMode == ArmControlMode.VOLTAGE)
       return;
 
-    if (controlMode == ArmControlMode.VEL && MathUtil.applyDeadband(velGoal, 0.1) != 0) {
+    if (controlMode == ArmControlMode.VEL) {
       volts = velControl();
     } else {
       volts = poseControl();
     }
 
-    lastVel = getVelocity();
+    lastVel = getVel();
     lastTime = Timer.getFPGATimestamp();
 
     volts = applySoftLimit(volts);
@@ -187,13 +205,13 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Pose/PIDval", pidval);
     Logger.getInstance().recordOutput("Arm/Pose/Error", pid.getPositionError());
 
-    velPid.reset(getVelocity(), acceleration);
+    velPid.reset(getVel(), 0); // do not replace 0 with acceleration
     return ffval + pidval;
   }
 
   public double velControl() {
     var pose = getPose();
-    var vel = getVelocity();
+    var vel = getVel();
 
     /* Prospective Soft Limit */
     if ((getPose() + velGoal * 0.02 > ARM.MAX_ANGLE)) {
@@ -210,7 +228,7 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/Vel/Error", velPid.getPositionError());
 
     setPoseGoal(pose);
-    pid.reset(getPose(), getVelocity());
+    pid.reset(getPose(), getVel());
     return ffval + pidval;
   }
 
@@ -221,37 +239,38 @@ public class Arm extends SubsystemBase {
     return volts;
   }
 
-  private void configure() {
-    motor.restoreFactoryDefaults();
+  public boolean inAllowableRange(double pose) {
+    return pose <= ARM.MAX_ANGLE && pose >= ARM.MIN_ANGLE;
+  }
+
+  public ArrayList<REVLibError> configure() {
+    ArrayList<REVLibError> e = new ArrayList<>();
+    e.add(motor.restoreFactoryDefaults());
     motor.setInverted(false);
-    motor.setSmartCurrentLimit(50);
-    encoder.setInverted(false);
-    motor.setIdleMode(IdleMode.kBrake);
-    encoder.setPositionConversionFactor(360);
-    encoder.setVelocityConversionFactor(360);
+    e.add(motor.setSmartCurrentLimit(50));
+    e.add(encoder.setInverted(false));
+    e.add(motor.setIdleMode(IdleMode.kBrake));
+    e.add(encoder.setPositionConversionFactor(360));
+    e.add(encoder.setVelocityConversionFactor(360));
 
     //currently useless
-    motor.setSoftLimit(SoftLimitDirection.kForward, (float) (ARM.MAX_ANGLE - ARM.ANGLE_OFFSET));
-    motor.setSoftLimit(SoftLimitDirection.kReverse, (float) (ARM.MIN_ANGLE - ARM.ANGLE_OFFSET));
-    motor.enableSoftLimit(SoftLimitDirection.kForward, false);
-    motor.enableSoftLimit(SoftLimitDirection.kReverse, false);
+    e.add(motor.setSoftLimit(SoftLimitDirection.kForward, (float) (ARM.MAX_ANGLE - ARM.ANGLE_OFFSET)));
+    e.add(motor.setSoftLimit(SoftLimitDirection.kReverse, (float) (ARM.MIN_ANGLE - ARM.ANGLE_OFFSET)));
+    e.add(motor.enableSoftLimit(SoftLimitDirection.kForward, false));
+    e.add(motor.enableSoftLimit(SoftLimitDirection.kReverse, false));
 
     /* Status 0 governs applied output, faults, and whether is a follower. Not important for this. */
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20));
     /* Integrated motor position isn't important here. */
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500);
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500));
     /* Don't have an analog sensor */
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 500);
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 500));
     /* Don't have an alternate encoder */
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500);
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500));
     /* Have a duty cycle encoder */
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20));
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20));
 
-    try {
-      Thread.sleep((long) 40.0);
-    } catch (Exception e) {
-      e.printStackTrace();
-    } ;
+    return e;
   }
 }

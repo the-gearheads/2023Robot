@@ -40,24 +40,12 @@ public class XboxDriverController implements DriverController {
     return -Controllers.deadband(controller.getRightX());
   }
 
-  public Trigger getPPLoadDebugForwardPath() {
-    return new JoystickButton(controller, XboxController.Button.kY.value);
-  }
-
-  public Trigger getPPLoadDebugBackwardPath() {
-    return new JoystickButton(controller, XboxController.Button.kA.value);
-  }
-
-  public Trigger getPPLoadDebugLeftPath() {
-    return new JoystickButton(controller, XboxController.Button.kX.value);
-  }
-
-  public Trigger getPPLoadDebugRightPath() {
+  public Trigger alignToFeederStation() {
     return new JoystickButton(controller, XboxController.Button.kB.value);
   }
 
-  public Trigger getPPGotoTag8() {
-    return new JoystickButton(controller, XboxController.Button.kRightBumper.value);
+  public Trigger alignToGrid() {
+    return new JoystickButton(controller, XboxController.Button.kY.value);
   }
 
   public Trigger HIGH_SPEED() {
@@ -83,35 +71,48 @@ public class XboxDriverController implements DriverController {
     return new JoystickButton(controller, XboxController.Button.kStart.value);
   }
 
-  public Trigger getSetHeading0Btn() {
-    return new Trigger(() -> {
-      return getRotateButton().getAsBoolean() && (controller.getRightY() < -0.75);
-    });
-  };
-
-  public Trigger getSetHeading90Btn() {
-    return new Trigger(() -> {
-      return getRotateButton().getAsBoolean() && (controller.getRightX() < -0.75);
-    });
-  };
-
-  public Trigger getSetHeading180Btn() {
-    return new Trigger(() -> {
-      return getRotateButton().getAsBoolean() && (controller.getRightY() > 0.75);
-    });
-  };
-
-  public Trigger getSetHeading270Btn() {
-    return new Trigger(() -> {
-      return getRotateButton().getAsBoolean() && (controller.getRightX() > 0.75);
-    });
-  };
-
+  public double getSetHeadingPOV() {
+    if (!getRotateButton().getAsBoolean()) return -1;
+    if (controller.getRightX() > 0.75) return 270;
+    if (controller.getRightY() > 0.75) return 180;
+    if (controller.getRightX() < -0.75) return 90;
+    if (controller.getRightY() < -0.75) return 0;
+    return -1;
+  }
   public double getPOV() {
     return controller.getPOV();
   };
 
   public Trigger testDockPath() {
     return new JoystickButton(controller, XboxController.Button.kY.value);
+  }
+
+  public Trigger getAutoAlign() {
+
+    return new Trigger(() -> {
+      var left = getAutoLeft().getAsBoolean();
+      var center = getAutoCenter().getAsBoolean();
+      var right = getAutoRight().getAsBoolean();
+      return (left || center || right);
+    });
+  }
+
+  public Trigger getAutoLeft() {
+    return new JoystickButton(controller, XboxController.Button.kX.value);
+  };
+
+  public Trigger getAutoCenter() {
+    return new JoystickButton(controller, XboxController.Button.kY.value);
+  };
+
+  public Trigger getAutoRight() {
+    return new JoystickButton(controller, XboxController.Button.kB.value);
+  };
+
+  public Trigger resetYaw(){
+    return new Trigger(()->{
+      var val = controller.getLeftTriggerAxis();
+      return Math.abs(val) > 0.75;
+    });
   }
 }

@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.revrobotics.CANSparkMaxLowLevel;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -13,7 +14,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.pathplanner.lib.server.PathPlannerServer;
 import com.revrobotics.REVPhysicsSim;
-
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import frc.robot.Constants.RobotMode;
 import frc.robot.auton.TestPlaceThenDock;
+import frc.robot.subsystems.leds.LedState;
 import frc.robot.util.NTToAdvantageKit;
 
 /**
@@ -30,6 +33,10 @@ import frc.robot.util.NTToAdvantageKit;
 public class Robot extends LoggedRobot {
   private Command autonCommand;
   private RobotContainer robotContainer;
+
+  /* Globals :( */
+  public static double matchTime = -1;
+  private static double matchTimeStart = 0;
 
   /**
    * This function is run when the robot is first started up and should be used for any initialization code.
@@ -83,11 +90,17 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
     NTToAdvantageKit.periodic();
     robotContainer.updateControllers();
+
+    if(DriverStation.isEStopped()) {
+      robotContainer.getLeds().setState(LedState.HOT_PINK);
+    }
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    robotContainer.setDisabledVisionStrat();
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -95,6 +108,7 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    matchTime = -1;
     autonCommand = robotContainer.getAutonomousCommand();
     robotContainer.clearTeleopDefault();
 
@@ -119,16 +133,24 @@ public class Robot extends LoggedRobot {
     }
     TestPlaceThenDock.initDockTestingTelemetry();
     robotContainer.setTeleopDefault();
+    CANSparkMaxLowLevel.enableExternalUSBControl(false);
+    robotContainer.setTeleopVisionStrat();
+    matchTimeStart = Timer.getFPGATimestamp();
   }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    matchTime = 135 - (Timer.getFPGATimestamp() - matchTimeStart);
+    matchTime = matchTime < 0 ? 0 : matchTime;
+    Logger.getInstance().recordOutput("TeleopMatchTime", matchTime);
+  }
 
   @Override
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+    CANSparkMaxLowLevel.enableExternalUSBControl(true);
   }
 
   /** This function is called periodically during test mode. */

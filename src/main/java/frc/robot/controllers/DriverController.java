@@ -59,21 +59,7 @@ public interface DriverController {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getSetHeading0Btn() {
-    return new Trigger(() -> false);
-  };
-
-  public default Trigger getSetHeading90Btn() {
-    return new Trigger(() -> false);
-  };
-
-  public default Trigger getSetHeading180Btn() {
-    return new Trigger(() -> false);
-  };
-
-  public default Trigger getSetHeading270Btn() {
-    return new Trigger(() -> false);
-  };
+  public default double getSetHeadingPOV() { return -1; }
 
   public default double getPOV() {
     return -1;
@@ -81,5 +67,33 @@ public interface DriverController {
 
   public default Trigger testDockPath() {
     return new Trigger(() -> false);
+  }
+
+  public default Trigger alignToFeederStation() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger alignToGrid() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getAutoLeft() {
+    return new Trigger(() -> false);
+  };
+
+  public default Trigger getAutoCenter() {
+    return new Trigger(() -> false);
+  };
+
+  public default Trigger getAutoRight() {
+    return new Trigger(() -> false);
+  };
+
+  public default Trigger getAutoAlign() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger resetYaw(){
+    return new Trigger(()->false);  
   }
 }

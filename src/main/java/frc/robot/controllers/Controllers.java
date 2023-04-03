@@ -1,5 +1,6 @@
 package frc.robot.controllers;
 
+import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
@@ -12,6 +13,7 @@ public class Controllers {
 
   public static DriverController driverController;
   public static OperatorController operatorController;
+  public static AlignController alignController;
 
   /** Returns true if the connected controllers have changed since last called. */
   public static boolean didControllersChange() {
@@ -32,36 +34,69 @@ public class Controllers {
     // Defaults, since a NullPointerException would be far worse than any warnings
     driverController = new DriverController() {};
     operatorController = new OperatorController() {};
+    alignController = new AlignController() {};
 
     boolean foundOperatorController = false;
     boolean foundDriveController = false;
+    boolean foundAlignController = false;
 
     for (int i = 0; i < DriverStation.kJoystickPorts; i++) {
       String joyName = DriverStation.getJoystickName(i);
       if (joyName.equals(""))
         continue;
-      if (!foundOperatorController
-          && (joyName.toLowerCase().contains("logitech") || joyName.toLowerCase().contains("keyboard"))) {
-        System.out.println("Found logitech operator controller on port " + i);
-        operatorController = new LogitechOperatorController(i);
+      if (!foundOperatorController) {
         foundOperatorController = true;
-        continue;
-      } else if (!foundOperatorController && (joyName.toLowerCase().contains("16000m"))) {
-        System.out.println("Found Thrustmaster operator controller on port " + i);
-        operatorController = new ThrustMaster(i);
-        foundOperatorController = true;
-        continue;
-      } else if (!foundOperatorController && (joyName.toLowerCase().contains("USB Gamepad"))) {
-        System.out.println("Found Thrustmaster operator controller on port " + i);
-        operatorController = new SegaOperatorController(i);
-        foundOperatorController = true;
-        continue;
+        if (joyName.toLowerCase().contains("logitech")) {
+          operatorController = new LogitechOperatorController(i);
+          Logger.getInstance().recordOutput("controllers/operator controller",
+              "Found logitech operator controller on port " + i);
+        } else if (joyName.toLowerCase().contains("16000m")) {
+          Logger.getInstance().recordOutput("controllers/operator controller",
+              "Found thrustmaster operator controller on port " + i);
+          operatorController = new ThrustMaster(i);
+        } else if (joyName.toLowerCase().contains("USB Gamepad")) {
+          Logger.getInstance().recordOutput("controllers/operator controller",
+              "Found Sega operator controller on port " + i);
+          operatorController = new SegaOperatorController(i);
+        } else if (joyName.toLowerCase().contains("keyboard")) {
+          operatorController = new LogitechOperatorController(i);
+          Logger.getInstance().recordOutput("controllers/operator controller",
+              "Found keyboard operator controller on port " + i);
+        } else {
+          foundOperatorController = false;
+        }
+        if (foundOperatorController)
+          continue;
       }
-      // Fallback
+
       if (!foundDriveController) {
-        System.out.println("Found xbox drive controller controller on port " + i);
-        driverController = new XboxDriverController(i);
         foundDriveController = true;
+        if (joyName.toLowerCase().contains("xbox")) {
+          Logger.getInstance().recordOutput("controllers/driver controller",
+              "Found xbox drive controller controller on port " + i);
+          driverController = new XboxDriverController(i);
+        } else if (joyName.toLowerCase().contains("keyboard")) {
+          Logger.getInstance().recordOutput("controllers/driver controller",
+              "Found xbox drive controller controller on port " + i);
+          driverController = new XboxDriverController(i);
+        } else {
+          foundDriveController = false;
+        }
+        if (foundDriveController)
+          continue;
+      }
+
+      if (!foundAlignController) {
+        foundAlignController = true;
+        if (joyName.toLowerCase().contains("keyboard")) {
+          Logger.getInstance().recordOutput("controllers/align controller",
+              "Found keyboard align controller controller on port " + i);
+          alignController = new KeypadAlignController(i);
+        } else {
+          foundAlignController = false;
+        }
+        if (foundAlignController)
+          continue;
       }
     }
   }

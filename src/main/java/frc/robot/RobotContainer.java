@@ -7,33 +7,46 @@ package frc.robot;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import javax.swing.text.StyleContext.SmallAttributeSet;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DRIVE;
 import frc.robot.commands.arm.JoystickArmControl;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.StowArm;
+import frc.robot.commands.arm.Throw;
+import frc.robot.commands.arm.ThrowState;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.TeleopDrive;
+import frc.robot.commands.drive.autoalign.AutoAlign;
+import frc.robot.commands.vision.FuseVisionEstimate;
+import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
 import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.commands.wrist.ManualWristControl;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.auton.AutonChooser;
 import frc.robot.subsystems.Grabber;
+import frc.robot.subsystems.leds.LedState;
 import frc.robot.subsystems.leds.Leds;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionSim;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmSim;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristSim;
 import frc.robot.subsystems.wrist.WristState;
+import frc.robot.util.CustomProxy;
 import frc.robot.util.MoreMath;
 import frc.robot.subsystems.drive.SwerveModule;
 import frc.robot.subsystems.drive.SwerveModuleIO;
@@ -46,6 +59,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very little robot logic should actually be handled in
@@ -56,7 +70,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Swerve swerve;
   @SuppressWarnings("unused")
-  // private final Vision vision;
+  private Vision vision;
   private final AutonChooser autonChooser;
   private final Arm arm;
   private Wrist wrist;
@@ -88,6 +102,7 @@ public class RobotContainer {
             new SwerveModule(3, DRIVE.RR_IDS[0], DRIVE.RR_IDS[1], DRIVE.RR_OFFSETS, "RR"));
         arm = new Arm();
         wrist = new Wrist(arm);
+        vision = new Vision(swerve);
         break;
       case SIM:
         SmartDashboard.putString("/Mode", "SIM");
@@ -98,6 +113,7 @@ public class RobotContainer {
                 new SwerveModuleSim(3, DRIVE.RR_IDS[0], DRIVE.RR_IDS[1], DRIVE.RR_OFFSETS, "RR"));
         arm = new ArmSim();
         wrist = new WristSim((ArmSim) arm);
+        vision = new VisionSim(swerve);
         break;
       default:
       case SIM_REPLAY:
@@ -106,18 +122,18 @@ public class RobotContainer {
             new SwerveModuleIO() {});
         arm = new ArmSim();
         wrist = new WristSim((ArmSim) arm);
+        vision = new Vision(swerve);
         break;
     }
 
     grabber = new Grabber();
-    // vision = new Vision(swerve);
-    autonChooser = new AutonChooser(swerve, arm, wrist, grabber);
+    autonChooser = new AutonChooser(swerve, arm, wrist, grabber, vision);
     leds = new Leds();
     // Configure the button binding
 
     // swerve.setDefaultCommand(new TeleopDrive(swerve));
     arm.setDefaultCommand(new JoystickArmControl(arm));
-    // vision.setDefaultCommand(new UpdateSwervePoseEstimator(vision).ignoringDisable(true));
+    // vision.setDefaultCommand(new FuseVisionEstimate(vision));
     updateControllers();
 
     // PortForwarder.add(5800, "photonvision.local", 5800);
@@ -165,9 +181,18 @@ public class RobotContainer {
       dest = new Pose2d(dest.getTranslation().plus(translation), dest.getRotation());
       return swerve.goTo(dest, Constants.AUTON.MID_CONSTRAINTS);
     }));
-    Controllers.driverController.getResetPoseButton().onTrue(new InstantCommand(() -> {
-      swerve.setPose(new Pose2d());
+    Controllers.driverController.resetYaw().onTrue(new CustomProxy(() -> {
+      return new InstantCommand(
+        ()->{
+          swerve.setPose(new Pose2d(swerve.getPose().getTranslation(),Rotation2d.fromDegrees(180)));
+        }
+      );
     }, swerve));
+
+    Controllers.driverController.HIGH_SPEED().whileTrue(LedState.getSetRainbowSpeedCommand(5));
+    Controllers.driverController.LOW_SPEED().whileTrue(LedState.getSetRainbowSpeedCommand(1));
+
+    Controllers.driverController.getAutoAlign().whileTrue(new AutoAlign(swerve, arm));
 
     Controllers.operatorController.armGoToLowNode()
         .onTrue(new SetArmPose(arm, ArmPose.LOW_NODE).andThen(new ManualWristControl(wrist, WristState.RIGHT)));
@@ -177,8 +202,17 @@ public class RobotContainer {
     Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
     Controllers.operatorController.setWristAlternatePose().whileTrue(new AltWristControl(wrist).repeatedly());
     Controllers.operatorController.openGrabber().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
-
     Controllers.operatorController.setArmByJoystick().onTrue(new JoystickArmControl(arm));
+    Controllers.operatorController.signalCone().onTrue(leds.setStateForTimeCommand(LedState.YELLOW, 2));
+    Controllers.operatorController.signalCube().onTrue(leds.setStateForTimeCommand(LedState.PURPLE, 2));
+    Controllers.operatorController.reconfigEVERYTHING().onTrue(new InstantCommand(()->{
+      DriverStation.reportWarning("RECONFIG EVERYTHING!!!", false);
+      wrist.configure();
+      arm.configure();
+    }));
+
+    // Controllers.operatorController.throwCube()
+    //     .onTrue(new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 80, 20)));
   }
 
   /**
@@ -190,6 +224,10 @@ public class RobotContainer {
     return autonChooser.getSelectedAuton();
   }
 
+  public Leds getLeds() {
+    return leds;
+  }
+
   public void setTeleopDefault() {
     swerve.setDefaultCommand(new TeleopDrive(swerve));
   }
@@ -197,5 +235,16 @@ public class RobotContainer {
   public void clearTeleopDefault() {
     swerve.setDefaultCommand(new InstantCommand(() -> {
     }, swerve));
+  }
+
+  public void setDisabledVisionStrat(){
+    vision.setConfidenceStrat(ConfidenceStrat.DISABLED);
+    // vision.setDefaultCommand(new FuseVisionEstimate(vision, ConfidenceStrat.IRON_PANTHERS));
+  }
+
+  public void setTeleopVisionStrat(){
+    vision.setConfidenceStrat(ConfidenceStrat.ONLY_COMMUNITY_AND_FEEDER);
+    SmartDashboard.putNumber("When was vision strat set", Timer.getFPGATimestamp());
+    // vision.setDefaultCommand(new FuseVisionEstimate(vision, ConfidenceStrat.ONLY_COMMUNITY_AND_FEEDER));
   }
 }
