@@ -34,7 +34,9 @@ import frc.robot.commands.wrist.ManualWristControl;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.auton.AutonChooser;
+import frc.robot.auton.AutonLoader;
 import frc.robot.subsystems.Grabber;
+import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.leds.LedState;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.vision.Vision;
@@ -124,6 +126,7 @@ public class RobotContainer {
 
     grabber = new Grabber();
     autonChooser = new AutonChooser(swerve, arm, wrist, grabber, vision);
+    AutonLoader.load(new Subsystems(swerve, wrist, arm, vision, grabber));
     leds = new Leds();
     // Configure the button binding
 
@@ -218,7 +221,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autonChooser.getSelectedAuton();
+    return AutonLoader.getCommand();
   }
 
   public Leds getLeds() {
