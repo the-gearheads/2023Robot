@@ -64,8 +64,8 @@ public class Swerve extends SubsystemBase {
     /* Get module states to pass to odometry */
     updateInputs();
 
-    this.odometry = new SwerveDrivePoseEstimator(kinematics, getRotation(), getModulePositions(), new Pose2d());
-    this.wheelOdometry = new SwerveDriveOdometry(kinematics, getRotation(), getModulePositions());
+    this.odometry = new SwerveDrivePoseEstimator(kinematics, getCtsGyroRot(), getModulePositions(), new Pose2d());
+    this.wheelOdometry = new SwerveDriveOdometry(kinematics, getCtsGyroRot(), getModulePositions());
     zeroEncoders();
 
     /* Initialize SmartDashboard values */
@@ -81,8 +81,8 @@ public class Swerve extends SubsystemBase {
   @Override
   public void periodic() {
     updateInputs();
-    odometry.update(getRotation(), getPositionsFromInputs(lastInputs));
-    wheelOdometry.update(getRotation(), getPositionsFromInputs(lastInputs));
+    odometry.update(getCtsGyroRot(), getPositionsFromInputs(lastInputs));
+    wheelOdometry.update(getCtsGyroRot(), getPositionsFromInputs(lastInputs));
     log();
   }
 
@@ -174,9 +174,9 @@ public class Swerve extends SubsystemBase {
    * @param pose Position robot is at
    */
   public void setPose(Pose2d pose) {
-    this.gyroOffset = pose.getRotation().minus(getRotation());
-    odometry.resetPosition(getRotation(), getPositionsFromInputs(lastInputs), pose);
-    wheelOdometry.resetPosition(getRotation(), getPositionsFromInputs(lastInputs), pose);
+    this.gyroOffset = pose.getRotation().minus(getCtsGyroRot());
+    odometry.resetPosition(getCtsGyroRot(), getPositionsFromInputs(lastInputs), pose);
+    wheelOdometry.resetPosition(getCtsGyroRot(), getPositionsFromInputs(lastInputs), pose);
     resetBuffer.run();
   }
 
@@ -286,6 +286,17 @@ public class Swerve extends SubsystemBase {
   public Command followTrajectoriesCommand(ArrayList<PathPlannerTrajectory> trajectories, boolean stopWhenDone) {
     Command fullCommand = new InstantCommand();
     boolean isFirstTrajectory = true;
+    for (PathPlannerTrajectory trajectory : trajectories) {
+      fullCommand = fullCommand.andThen(followTrajectoryCommand(trajectory, isFirstTrajectory, false));
+      isFirstTrajectory = false;
+    }
+    return fullCommand;
+  }
+
+  public Command followTrajectoriesCommand(ArrayList<PathPlannerTrajectory> trajectories, boolean resetPose,
+      boolean stopWhenDone) {
+    Command fullCommand = new InstantCommand();
+    boolean isFirstTrajectory = resetPose;
     for (PathPlannerTrajectory trajectory : trajectories) {
       fullCommand = fullCommand.andThen(followTrajectoryCommand(trajectory, isFirstTrajectory, false));
       isFirstTrajectory = false;
@@ -416,8 +427,12 @@ public class Swerve extends SubsystemBase {
     return new double[] {lastInputs[0].driveVelocity, -lastInputs[1].driveVelocity};
   }
 
-  public Rotation2d getRotation() {
+  public Rotation2d getCtsGyroRot() {
     return new Rotation2d(lastGyroInputs.angleRadians);
+  }
+
+  public Rotation2d getCtsGyroRotWithOffset() {
+    return new Rotation2d(getCtsGyroRot().getRadians() + gyroOffset.getRadians());
   }
 
   /* Returns Z axis rotation speed in degrees per second */
@@ -430,17 +445,6 @@ public class Swerve extends SubsystemBase {
     return getAngularVel();
   }
 
-  public double getCtsRawGyroAngle() {
-    return getRotation().getDegrees();
-  }
-
-  public double getCtsRawGyroRad() {
-    return getRotation().getRadians();
-  }
-
-  public double getCtsPoseRotRad() {
-    return getRotation().getRadians() + gyroOffset.getRadians();
-  }
 
   public double getPitch() {
     return lastGyroInputs.pitchDegrees;

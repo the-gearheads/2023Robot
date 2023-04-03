@@ -68,4 +68,32 @@ public interface DriverController {
   public default Trigger testDockPath() {
     return new Trigger(() -> false);
   }
+
+  public default Trigger alignToFeederStation() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger alignToGrid() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getAutoLeft() {
+    return new Trigger(() -> false);
+  };
+
+  public default Trigger getAutoCenter() {
+    return new Trigger(() -> false);
+  };
+
+  public default Trigger getAutoRight() {
+    return new Trigger(() -> false);
+  };
+
+  public default Trigger getAutoAlign() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger resetYaw(){
+    return new Trigger(()->false);  
+  }
 }

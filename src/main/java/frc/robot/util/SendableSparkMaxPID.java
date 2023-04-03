@@ -1,5 +1,6 @@
 package frc.robot.util;
 
+import com.revrobotics.REVLibError;
 import com.revrobotics.SparkMaxPIDController;
 
 import edu.wpi.first.util.sendable.Sendable;
@@ -21,22 +22,22 @@ public class SendableSparkMaxPID implements Sendable {
     b.addDoubleProperty("FF", this::getFF, this::setFF);
   }
 
-  public void setP(double newP) {
+  public REVLibError setP(double newP) {
     lastP = newP;
-    pid.setP(newP);
+    return pid.setP(newP);
   }
 
-  public void setI(double newI) {
+  public REVLibError setI(double newI) {
     lastI = newI;
-    pid.setI(newI);
+    return pid.setI(newI);
   }
 
-  public void setD(double newD) {
-    pid.setD(newD);
+  public REVLibError setD(double newD) {
+    return pid.setD(newD);
   }
 
-  public void setFF(double newFF) {
-    pid.setFF(newFF);
+  public REVLibError setFF(double newFF) {
+    return pid.setFF(newFF);
   }
 
   public double getP() {

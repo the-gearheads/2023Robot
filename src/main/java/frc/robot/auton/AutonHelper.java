@@ -1,5 +1,6 @@
 package frc.robot.auton;
 
+import java.util.Map;
 import org.littletonrobotics.junction.Logger;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -9,7 +10,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
@@ -18,23 +18,26 @@ import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.drive.Swerve;
+import frc.robot.util.CustomProxy;
+import com.pathplanner.lib.commands.FollowPathWithEvents;
 
 public class AutonHelper {
 
+  //format:off
   /* Places a cone on the grid
    * ASSUPTIONS: Cone being held, arm in correct position, alt mode corresponds to setting wrist to 0deg, and default sets it to 90deg
    */
   public static Command getPlaceConeCommand(Subsystems s) {
-    return new AltWristControl(s.wrist).raceWith(new SequentialCommandGroup(new WaitCommand(0.5), // Wait for wrist to rotate before dropping cone
-        getGrabberOpenCommand(s.grabber))).andThen(new WaitCommand(0.5), // Wait for grabber and gravity to drop cone
-            getGrabberCloseCommand(s.grabber));
+    return new AltWristControl(s.wrist).raceWith(new SequentialCommandGroup(new WaitCommand(0.25), // Wait for wrist to rotate before dropping cone
+        openGrabber(s.grabber))).andThen(new WaitCommand(0.25), // Wait for grabber and gravity to drop cone
+            closeGrabber(s.grabber));
   }
 
   public static Command getGroundPickUpCommand(Subsystems s) {
-    return new SequentialCommandGroup(getGrabberOpenCommand(s.grabber), new WaitCommand(0.25),
+    return new SequentialCommandGroup(openGrabber(s.grabber), new WaitCommand(0.25),
         new AltWristControl(s.wrist).raceWith(
-            new SequentialCommandGroup(new WaitCommand(0.5), getGrabberCloseCommand(s.grabber), new WaitCommand(0.25))),
-        new WaitCommand(0.25));
+            new SequentialCommandGroup(new WaitCommand(1), closeGrabber(s.grabber), new WaitCommand(1))),
+        new WaitCommand(1));
   }
 
   public static Command stowAnd(Subsystems s, Command... commands) {
@@ -42,43 +45,43 @@ public class AutonHelper {
         new WaitCommand(1), new StowArm(s.arm, s.wrist)));
   }
 
-  public static Command getGrabberOpenCommand(Grabber grabber) {
-    return new InstantCommand(() -> {
-      grabber.open();
-    }, grabber);
+  public static Command openGrabber(Grabber grabber) {
+    return new InstantCommand(grabber::open, grabber);
   }
 
-  public static Command getGrabberCloseCommand(Grabber grabber) {
-    return new InstantCommand(() -> {
-      grabber.close();
-    }, grabber);
+  public static Command closeGrabber(Grabber grabber) {
+    return new InstantCommand(grabber::close, grabber);
   }
 
   public static PathPlannerTrajectory getPathByName(String pathName, PathConstraints constraints) {
+    return getPathByName(pathName, constraints, false);
+  }
+
+  public static PathPlannerTrajectory getPathByName(String pathName, PathConstraints constraints, boolean reversed) {
     //just curious what it will give us
     Logger.getInstance().recordOutput("Auton/Event Name", DriverStation.getEventName());
     if (DriverStation.getAlliance() == Alliance.Red) {
-      var overridePath = PathPlanner.loadPath(Constants.AUTON.EVENT_NAME + "_Red_" + pathName, constraints);
+      var overridePath = PathPlanner.loadPath(Constants.AUTON.EVENT_NAME + "_Red_" + pathName, constraints, reversed);
       if (overridePath != null) {
         Logger.getInstance().recordOutput("Auton/Last Loaded Path", Constants.AUTON.EVENT_NAME + "_Red_" + pathName);
         return overridePath;
       }
     } else {
-      var overridePath = PathPlanner.loadPath(Constants.AUTON.EVENT_NAME + "_Blue_" + pathName, constraints);
+      var overridePath = PathPlanner.loadPath(Constants.AUTON.EVENT_NAME + "_Blue_" + pathName, constraints, reversed);
       if (overridePath != null) {
         Logger.getInstance().recordOutput("Auton/Last Loaded Path", Constants.AUTON.EVENT_NAME + "_Blue_" + pathName);
         return overridePath;
       }
     }
     /* Both alliances */
-    var path = PathPlanner.loadPath(Constants.AUTON.EVENT_NAME + "_" + pathName, constraints);
+    var path = PathPlanner.loadPath(Constants.AUTON.EVENT_NAME + "_" + pathName, constraints, reversed);
     if (path != null) {
       Logger.getInstance().recordOutput("Auton/Last Loaded Path", Constants.AUTON.EVENT_NAME + "_" + pathName);
       return path;
     }
 
     /* Actual path */
-    path = PathPlanner.loadPath(pathName, constraints);
+    path = PathPlanner.loadPath(pathName, constraints, reversed);
     if (path == null) {
       DriverStation.reportError("Failed to load path: " + pathName, true);
     }
@@ -89,19 +92,34 @@ public class AutonHelper {
 
   public static Command getCommandForPath(String pathName, boolean resetOdometry, PathConstraints constraints,
       Swerve swerve) {
-    return new ProxyCommand(() -> {
+    return getCommandForPath(pathName, resetOdometry, constraints, swerve, false);
+  }
+
+  public static Command getCommandForPath(String pathName, boolean resetOdometry, PathConstraints constraints,
+      Swerve swerve, boolean reversed) {
+    return new CustomProxy(() -> {
       //   var path = PathPlanner.loadPath(pathName, constraints);
-      var path = getPathByName(pathName, constraints);
-      return swerve.silentFollowTrajectoryCommand(path, resetOdometry, true);
+      var path = getPathByName(pathName, constraints, reversed);
+      return swerve.followTrajectoryCommand(path, resetOdometry, true);
     });
   }
 
   public static Command setInitPose(Subsystems s, String pathName) {
     return new InstantCommand(() -> {
-      PathPlannerTrajectory path = PathPlanner.loadPath(pathName, Constants.AUTON.SLOW_CONSTRAINTS);
+      PathPlannerTrajectory path = getPathByName(pathName, Constants.AUTON.SLOW_CONSTRAINTS);
       path = PathPlannerTrajectory.transformTrajectoryForAlliance(path, DriverStation.getAlliance());
       var initPose = path.getInitialPose();
       s.swerve.setPose(initPose);
     });
   }
+
+  public static Command followWithEvents(String pathName, Map<String, Command> eventMap, boolean resetOdometry,
+  PathConstraints constrainsts, Swerve swerve, boolean reversed) {
+    var path = AutonHelper.getPathByName(pathName, constrainsts);
+    var pathCommand = AutonHelper.getCommandForPath(pathName, resetOdometry,
+        constrainsts, swerve);
+
+    return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);
 }
+}
+//format:on

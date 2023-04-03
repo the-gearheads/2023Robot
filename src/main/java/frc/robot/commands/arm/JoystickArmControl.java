@@ -4,6 +4,7 @@
 
 package frc.robot.commands.arm;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
@@ -31,7 +32,6 @@ public class JoystickArmControl extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    arm.setControlMode(ArmControlMode.VEL);
     double pov = Controllers.operatorController.getPOVAngle();
     double axis = Controllers.operatorController.getArmAxis();
     double armPose = arm.getPose();
@@ -53,7 +53,13 @@ public class JoystickArmControl extends CommandBase {
       }
       armvel += posvel;
     }
-    arm.setVelGoal(armvel);
+
+    if (MathUtil.applyDeadband(armvel, 0.1) != 0) {
+      arm.setControlMode(ArmControlMode.VEL);
+      arm.setVelGoal(armvel);
+    } else {
+      arm.setControlMode(ArmControlMode.POS);
+    }
   }
 
   // Called once the command ends or is interrupted.

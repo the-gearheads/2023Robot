@@ -10,10 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Map.Entry;
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.TargetCorner;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -27,21 +24,27 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.commands.vision.FuseVisionEstimate;
+import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
 import frc.robot.subsystems.drive.Swerve;
+import frc.robot.util.vision.CustomEstimator.PoseStrategy;
 import frc.robot.util.MoreMath;
-import frc.robot.util.multicamvision.ClosestEstimateFinder;
+import frc.robot.util.vision.CustomEstimate;
+import frc.robot.util.vision.CustomEstimator;
+import frc.robot.util.vision.PoseBufferWrapper;
 
 public class Vision extends SubsystemBase {
   public Swerve swerve;
 
-  public ClosestEstimateFinder closestEstimateFinder;
-  public List<PhotonPoseEstimator> estimators;
+  public List<CustomEstimator> estimators;
   private Field2d field = new Field2d();
 
   public List<List<PhotonTrackedTarget>> targetsPerCam;
-  public List<Optional<EstimatedRobotPose>> estimates;
+  public List<Optional<CustomEstimate>> estimates;
 
   private AprilTagFieldLayout atfl;
+
+  private FuseVisionEstimate defaultCommand;
 
   public Vision(Swerve swerve) {
     this.swerve = swerve;
@@ -49,14 +52,25 @@ public class Vision extends SubsystemBase {
     initAtfl();
     initPoseEstimators();
     initEstimates();
-    initClosestEstimateFinder();
+    initBuffer();
     initField();
+
+    defaultCommand = new FuseVisionEstimate(this, ConfidenceStrat.ONLY_COMMUNITY_AND_FEEDER);
+    setDefaultCommand(defaultCommand);
+  }
+
+  private void initBuffer() {
+    PoseBufferWrapper.createBuffers(swerve::getPose, swerve::getWheelPose, swerve::getModulePositions,
+        swerve::getCtsGyroRotWithOffset, swerve.kinematics, swerve::setResetBuffer);
+  }
+
+  public void setConfidenceStrat(ConfidenceStrat confidenceStrat){
+    defaultCommand.setConfidenceStrat(confidenceStrat);
   }
 
   public void periodic() {
-    // updateAtflOrigin();
+    updateAtflOrigin();
     updateEstimates();
-    closestEstimateFinder.update();
     logTagPoses();
   }
 
@@ -99,22 +113,18 @@ public class Vision extends SubsystemBase {
       var targets = cam.getLatestResult().getTargets();
       targetsPerCam.add(targets);
 
-      var lastPose = swerve.getPose();
-      poseEstimator.setReferencePose(lastPose);
-
       var estimate = poseEstimator.update();
       estimates.add(estimate);
     }
   }
 
-  public static boolean isEstimatePresent(Optional<EstimatedRobotPose> estimatedRobotPos) {
-    return estimatedRobotPos.isPresent() && estimatedRobotPos.get().estimatedPose != null
-        && estimatedRobotPos.get().estimatedPose.getRotation() != null;
+  public static boolean isEstimatePresent(Optional<CustomEstimate> estimate) {
+    return estimate.isPresent() && estimate.get().best != null && estimate.get().best.getRotation() != null;
   }
 
   private void initAtfl() {
     try {
-      this.atfl = Constants.VISION.TEST_ATFL;
+      this.atfl = Constants.VISION.ATFL;
       // this.atfl = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
     } catch (Exception e) {//I really wish we could be doing this in constants.java, not here lol (if you can fix this, plz do)
       DriverStation.reportError("Welp, if ur reading this, imma guess ur getting a nullpointer exception.", true);
@@ -124,36 +134,26 @@ public class Vision extends SubsystemBase {
   private void initPoseEstimators() {
     estimators = new ArrayList<>();
     for (var camAndTransform : Constants.VISION.CAMS_AND_TRANS.entrySet()) {
-      estimators.add(new PhotonPoseEstimator(atfl, PoseStrategy.MULTI_TAG_PNP, camAndTransform.getKey(),
-          camAndTransform.getValue()));
+      estimators.add(
+          new CustomEstimator(atfl, PoseStrategy.MIN_AMBIGUITY, camAndTransform.getKey(), camAndTransform.getValue()));
     }
   }
 
-  private void initClosestEstimateFinder() {
-    this.closestEstimateFinder =
-        new ClosestEstimateFinder(Constants.VISION.CAMS_AND_TRANS, getAtfl(), swerve.kinematics);
-    // this.multiCamPoseEstimator = new MultiCamPoseEstimator(
-    //   Constants.VISION.CAMS_AND_TRANS, 
-    //   getAtfl(), 
-    //   swerve::getWheelPose, 
-    //   swerve::getModulePositions, 
-    //   swerve::getRotation,
-    //   swerve.kinematics, 
-    //   swerve::setResetBuffer);
-  }
-
   public void logTagPoses() {
-    /* Loop through estimators */
+    /* Loop through estimators/cams */
     for (var i = 0; i < estimators.size(); i++) {
+      //create camera and transform variables to ease access
       var camAndTrans = (Entry<PhotonCamera, Transform3d>) Constants.VISION.CAMS_AND_TRANS.entrySet().toArray()[i];
       var cam = camAndTrans.getKey();
       var robot2Cam = camAndTrans.getValue();
-      var optEstimate = estimates.get(i);
 
+      //prepare arrays
       var tagIds = new ArrayList<Integer>();
-      var tagPoses = new ArrayList<Pose3d>();
-      var robotEstPerTag = new ArrayList<Pose2d>();
       var tagCorners = new ArrayList<TargetCorner>();
+      var fieldToTags = new ArrayList<Pose3d>();
+      var fieldToRobots = new ArrayList<Pose3d>();
+      var fieldToCams = new ArrayList<Pose3d>();
+      var camToTags = new ArrayList<Transform3d>();
 
       /* Loop through targets */
       for (var target : cam.getLatestResult().getTargets()) {
@@ -162,40 +162,56 @@ public class Vision extends SubsystemBase {
 
         var tagPoseOpt = atfl.getTagPose(id);
         if (tagPoseOpt.isEmpty()) {
-          tagPoses.add(new Pose3d());
-          robotEstPerTag.add(new Pose2d());
+          fieldToTags.add(new Pose3d());
+          fieldToRobots.add(new Pose3d());
+          camToTags.add(new Transform3d());
+          tagCorners.addAll(Collections.emptyList());
           continue;
         }
 
-        var tagPose = tagPoseOpt.get();
-        var estRobotPose =
-            tagPose.transformBy(target.getBestCameraToTarget().inverse()).transformBy(robot2Cam.inverse()).toPose2d();
+        var fieldToTag = tagPoseOpt.get();
+        var fieldToRobot =
+            fieldToTag.transformBy(target.getBestCameraToTarget().inverse()).transformBy(robot2Cam.inverse());
+        var fieldToCam = fieldToTag.transformBy(target.getBestCameraToTarget().inverse());
 
-        var corner = target.getDetectedCorners(); // actually 4, but who cares about understandable variable naming lol
+        var corners = target.getDetectedCorners(); // actually 4, but who cares about understandable variable naming lol
 
-        tagPoses.add(tagPose);
-        robotEstPerTag.add(estRobotPose);
-        tagCorners.addAll(corner);
+        fieldToCams.add(fieldToCam);
+        fieldToTags.add(fieldToTag);
+        fieldToRobots.add(fieldToRobot);
+        tagCorners.addAll(corners);
+        camToTags.add(target.getBestCameraToTarget());
       }
 
       /* Prepare values for logging */
       var tagIdsArray = tagIds.stream().mapToLong(Long::valueOf).toArray();
 
-      var robotEstPerTagStrs = robotEstPerTag.stream().map((estRobotPose) -> MoreMath.pos2dToString(estRobotPose, 1))
+      var fieldToRobotStrs = fieldToRobots.stream().map((estRobotPose) -> MoreMath.pose3dToString(estRobotPose, 1))
           .toList().toArray(new String[0]);
 
-      var tagPoseStrs = tagPoses.stream().map((tagPose) -> (MoreMath.pos2dToString(tagPose.toPose2d(), 1))).toList()
+      var fieldToCamStrs = fieldToCams.stream().map((estRobotPose) -> MoreMath.pose3dToString(estRobotPose, 3)).toList()
+          .toArray(new String[0]);
+
+      var fieldToTagStrs = fieldToTags.stream().map((tagPose) -> (MoreMath.pose2dToString(tagPose.toPose2d(), 1)))
+          .toList().toArray(new String[0]);
+
+      var camToTagStrs = camToTags.stream().map((camToTag) -> (MoreMath.transform3dToString(camToTag, 1))).toList()
           .toArray(new String[0]);
 
       var tagCornersStr =
           tagCorners.stream().map((corner) -> MoreMath.cornerToString(corner, 1)).toList().toArray(new String[0]);
 
-      var estimateStr = "invalid";
+      var optEstimate = estimates.get(i);
+      var estimateStatus = "invalid";
+      var estimateStr = "";
+      var estimate3dStr = "";
       if (isEstimatePresent(optEstimate)) {
+        estimateStatus = "valid";
         var estimate = optEstimate.get();
-        var pose = estimate.estimatedPose.toPose2d();
+        var pose = estimate.best.toPose2d();
         this.field.getObject(cam.getName()).setPose(pose);
-        estimateStr = MoreMath.pos2dToString(pose, 1);
+        estimateStr = MoreMath.pose2dToString(pose, 1);
+        estimate3dStr = MoreMath.pose3dToString(estimate.best, 1);
       }
 
       var timestamp = cam.getLatestResult().getTimestampSeconds();
@@ -210,8 +226,9 @@ public class Vision extends SubsystemBase {
         distCoeffPresent = "valid";
       }
 
-      var statusStr = cam.isConnected() ? "connected" : "disconnected";
+      var camPresent = cam.isConnected() ? "connected" : "disconnected";
 
+      // advantage kit logging (because why not)
       List<Pose3d> akTagPoses = new ArrayList<>();
       List<Integer> akTagIds = new ArrayList<>();
       for (var target : cam.getLatestResult().getTargets()) {
@@ -219,13 +236,20 @@ public class Vision extends SubsystemBase {
         akTagPoses.add(swervePose.transformBy(target.getBestCameraToTarget()));
         akTagIds.add(target.getFiducialId());
       }
-      var akTagPosesArray = tagPoses.toArray(new Pose3d[tagPoses.size()]);
+      var akTagPosesArray = fieldToTags.toArray(new Pose3d[fieldToTags.size()]);
+      var akFieldToCams = fieldToCams.toArray(new Pose3d[fieldToCams.size()]);
+      var akFieldToRobots = fieldToRobots.toArray(new Pose3d[fieldToRobots.size()]);
+
       /* May be slightly cursed */
       var akTagIdsArray = tagIds.stream().mapToLong(Long::valueOf).toArray();
 
       var path = "vision/" + cam.getName() + "/";
-      Logger.getInstance().recordOutput(path + "status", statusStr);
-      Logger.getInstance().recordOutput(path + "estimate", estimateStr);
+      Logger.getInstance().recordOutput(path + "cam status", camPresent);
+      Logger.getInstance().recordOutput(path + "estimate status", estimateStatus);
+      if (!estimateStatus.equals("invalid")) {
+        Logger.getInstance().recordOutput(path + "estimate", estimateStr);
+        Logger.getInstance().recordOutput(path + "3d estimate", estimate3dStr);
+      }
       Logger.getInstance().recordOutput(path + "timestamp", timestamp);
       Logger.getInstance().recordOutput(path + "cam matrix", camMatrixPresent);
       Logger.getInstance().recordOutput(path + "dist coeff", distCoeffPresent);
@@ -233,12 +257,20 @@ public class Vision extends SubsystemBase {
       var targetPath = path + "targets/";
       Logger.getInstance().recordOutput(targetPath + "tag ids", tagIdsArray);
       Logger.getInstance().recordOutput(targetPath + "tag corners", tagCornersStr);
-      Logger.getInstance().recordOutput(targetPath + "tag poses", tagPoseStrs);
-      Logger.getInstance().recordOutput(targetPath + "robot est per tag", robotEstPerTagStrs);
+      Logger.getInstance().recordOutput(targetPath + "field to tags", fieldToTagStrs);
+      Logger.getInstance().recordOutput(targetPath + "field to cams", fieldToCamStrs);
+      Logger.getInstance().recordOutput(targetPath + "field to robots", fieldToRobotStrs);
+      Logger.getInstance().recordOutput(targetPath + "cam to tags", camToTagStrs);
 
       var akPath = path + "ak/";
       Logger.getInstance().recordOutput(akPath + "tag poses", akTagPosesArray);
       Logger.getInstance().recordOutput(akPath + "tag ids", akTagIdsArray);
+      Logger.getInstance().recordOutput(akPath + "field to cams", akFieldToCams);
+      Logger.getInstance().recordOutput(akPath + "field to robots", akFieldToRobots);
+
+
+      field.getObject("Robot Pose").setPose(swerve.getPose());
+      field.getObject("Wheel Pose").setPose(swerve.getWheelPose());
     }
   }
 }

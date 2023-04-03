@@ -1,6 +1,8 @@
 package frc.robot.subsystems.drive.motors;
 
+import java.util.ArrayList;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -9,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
 import frc.robot.Constants.DRIVE;
+import frc.robot.util.RevConfigUtils;
 import frc.robot.util.SendableSparkMaxPID;
 
 public class NeoDrive {
@@ -19,52 +22,49 @@ public class NeoDrive {
 
   private double setpoint;
 
-  public NeoDrive(int id) {
+  public NeoDrive(int id, String path) {
     max = new CANSparkMax(id, MotorType.kBrushless);
     encoder = max.getEncoder();
     pid = max.getPIDController();
     sPid = new SendableSparkMaxPID(pid);
-    configure();
+    RevConfigUtils.configure(this::configure, path + "/Drive");
   }
 
-  private void configure() {
-    max.restoreFactoryDefaults();
-    max.setSmartCurrentLimit(DRIVE.DRIVE_CURRENT_LIMIT);
-    max.setIdleMode(IdleMode.kBrake);
+  private ArrayList<REVLibError> configure() {
+    ArrayList<REVLibError> e = new ArrayList<>();
+    e.add(max.restoreFactoryDefaults());
+    e.add(max.setSmartCurrentLimit(DRIVE.DRIVE_CURRENT_LIMIT));
+    e.add(max.setIdleMode(IdleMode.kBrake));
 
-    encoder.setPositionConversionFactor(DRIVE.DRIVE_POS_FACTOR);
-    encoder.setVelocityConversionFactor(DRIVE.DRIVE_VEL_FACTOR);
+    e.add(encoder.setPositionConversionFactor(DRIVE.DRIVE_POS_FACTOR));
+    e.add(encoder.setVelocityConversionFactor(DRIVE.DRIVE_VEL_FACTOR));
 
     // TODO: 1) check if this is too noisy 2) check if this impacts other robot code that deals with encoder velocities
-    encoder.setMeasurementPeriod(10);
+    e.add(encoder.setMeasurementPeriod(10));
 
-    pid.setFeedbackDevice(encoder);
+    e.add(pid.setFeedbackDevice(encoder));
 
-    sPid.setP(DRIVE.DRIVE_PIDF[0]);
-    sPid.setI(DRIVE.DRIVE_PIDF[1]);
-    sPid.setD(DRIVE.DRIVE_PIDF[2]);
-    sPid.setFF(DRIVE.DRIVE_PIDF[3]);
+    e.add(sPid.setP(DRIVE.DRIVE_PIDF[0]));
+    e.add(sPid.setI(DRIVE.DRIVE_PIDF[1]));
+    e.add(sPid.setD(DRIVE.DRIVE_PIDF[2]));
+    e.add(sPid.setFF(DRIVE.DRIVE_PIDF[3]));
 
     // Probably the default
-    pid.setOutputRange(-1, 1);
+    e.add(pid.setOutputRange(-1, 1));
 
     /* Set periodic frame periods */
 
     /* Send our velocity more frequently */
-    max.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 10);
+    e.add(max.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 10));
     /* Don't have an analog encoder */
-    max.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 500);
+    e.add(max.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 500));
     /* Don't have an alternate encoder */
-    max.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500);
+    e.add(max.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500));
     /* Don't have a duty cycle encoder */
-    max.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 500);
-    max.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 500);
+    e.add(max.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 500));
+    e.add(max.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 500));
 
-    try {
-      Thread.sleep((long) 40.0);
-    } catch (Exception e) {
-      e.printStackTrace();
-    } ;
+    return e;
   }
 
   public void setSpeed(double speed) {

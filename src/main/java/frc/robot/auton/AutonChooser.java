@@ -11,29 +11,31 @@ import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.Swerve;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.wrist.Wrist;
 
 public class AutonChooser {
-  private HashMap<String, Command> autons;
+  public static HashMap<String, Command> autons;
   private Swerve swerve;//necessary to create PPSwerveCommand instances
-  private SendableChooser<Command> chooser;
+  public static SendableChooser<Command> chooser = new SendableChooser<>();
   private final String defaultChoice = "N4 Place Then Dock";
   private Wrist wrist;
   private Arm arm;
   private Grabber grabber;
+  private Vision vision;
 
-  public AutonChooser(Swerve swerve, Arm arm, Wrist wrist, Grabber grabber) {
+  public AutonChooser(Swerve swerve, Arm arm, Wrist wrist, Grabber grabber, Vision vision) {
     this.swerve = swerve;
     this.arm = arm;
     this.wrist = wrist;
     this.grabber = grabber;
-    this.chooser = new SendableChooser<>();
+    this.vision = vision;
     this.autons = new HashMap<>();
 
     initializeAutons();
     populateChooser();
     setDefaultAuton();
-    SmartDashboard.putData(chooser);
+    SmartDashboard.putData("Auton Chooser", chooser);
   }
 
   public void populateChooser() {
@@ -73,18 +75,22 @@ public class AutonChooser {
   }
 
   public void initializeAutons() {//Here we define auton choices
-    Subsystems s = new Subsystems(swerve, wrist, arm, grabber);
+    Subsystems s = new Subsystems(swerve, wrist, arm, vision, grabber);
 
     Command InertN4PlaceThenDock = AutonPaths.InertN4PlaceThenDock(s);
     Command InertN1PlaceThenExplore = AutonPaths.InertN1PlaceThenExplore(s);
     Command InertN9PlaceThenExplore = AutonPaths.InertN9PlaceThenExplore(s);
     Command justPlace = AutonPaths.InertN1Place(s);
-    // Command doubleCone = AutonPaths.InertN12ConePrime(s);
+    Command TwoGamePieceNoBump = AutonPaths.TwoGamePieceNoBump(s);
+    Command centerExploreThenDockSlow = AutonPaths.centerExploreThenDockSlow(s);
+    Command twoconeBump = AutonPaths.twoConeBump(s);
 
-    // autons.put("2 cone", doubleCone);
-    autons.put("NO BUMP Place Then Move", InertN1PlaceThenExplore);
-    autons.put("N4 Place Then Dock", InertN4PlaceThenDock);
-    autons.put("BUMP Place Then Move", InertN9PlaceThenExplore);
     autons.put("Just Place", justPlace);
+    autons.put("CENTER Place Then Dock", InertN4PlaceThenDock);
+    autons.put("NO BUMP Place Then Move", InertN1PlaceThenExplore);
+    autons.put("BUMP Place Then Move", InertN9PlaceThenExplore);
+    autons.put("NO BUMP 2 Gamepiece", TwoGamePieceNoBump);
+    autons.put("BUMP Two Cone", twoconeBump);
+    autons.put("CENTER explore then dock", centerExploreThenDockSlow);
   }
 }

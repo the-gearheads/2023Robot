@@ -133,7 +133,7 @@ public class TeleopDrive extends CommandBase {
   /*Make sure the robot maintains its heading when we aren't toggling the rotation axis*/
   public ChassisSpeeds maintainHeading(ChassisSpeeds spds) {
     var rotSpd = spds.omegaRadiansPerSecond;
-    var ctsGyroAngle = swerve.getCtsPoseRotRad();
+    var ctsGyroAngle = swerve.getCtsGyroRotWithOffset().getRadians();
 
     var runRotPid = SmartDashboard.getBoolean("TeleopDrive/rot pid/Turn On", false);
     var rotSpdEqualZero = MathUtil.applyDeadband(rotSpd, 1E-2) == 0;
