@@ -49,6 +49,9 @@ public class TwoCone extends AutonRoutine {
                 ),
           false, TwoConeConstraints, s.swerve, false
         ),
+
+        AutonHelper.goToGridAlignment(s.swerve, Community.BLUE_GRID.leftGrid.rightCol.high, Community.RED_GRID.leftGrid.rightCol.high, 
+          Rotation2d.fromDegrees(180), TwoConeConstraints),
         AutonHelper.getPlaceConeCommand(s)
       ).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.ONLY_COMMUNITY));
     } else if (v.equals("N9")) {
@@ -56,7 +59,7 @@ public class TwoCone extends AutonRoutine {
         AutonHelper.setInitRot(s.swerve, v + "_Inert-Start"),
 
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-        AutonHelper.goToGridAlignment(s.swerve, Community.BLUE_GRID.leftGrid.leftCol.high, Community.RED_GRID.leftGrid.leftCol.high, 
+        AutonHelper.goToGridAlignment(s.swerve, Community.BLUE_GRID.rightGrid.rightCol.high, Community.RED_GRID.rightGrid.rightCol.high, 
           Rotation2d.fromDegrees(180), TwoConeConstraints),
         AutonHelper.getPlaceConeCommand(s),
 
@@ -78,6 +81,8 @@ public class TwoCone extends AutonRoutine {
                 ),
           false, TwoConeConstraints, s.swerve, false
         ),
+        AutonHelper.goToGridAlignment(s.swerve, Community.BLUE_GRID.rightGrid.leftCol.high, Community.RED_GRID.rightGrid.leftCol.high, 
+        Rotation2d.fromDegrees(180), TwoConeConstraints),
         AutonHelper.getPlaceConeCommand(s)
       ).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.ONLY_COMMUNITY));
     } else {
@@ -98,7 +103,7 @@ public class TwoCone extends AutonRoutine {
 
         AutonHelper.pickupCone(s),
         AutonHelper.stowAnd(s, 
-          AutonHelper.getCommandForPath(v + "_Gamepiece1-PrepareDock", false, TwoConeConstraints, null)
+          AutonHelper.getCommandForPath(v + "_Gamepiece1-PrepareDock", false, TwoConeConstraints, s.swerve)
         )
       );
     }

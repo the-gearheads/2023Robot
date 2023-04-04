@@ -2,38 +2,13 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 6.4,
-        "y": 4.58
+        "x": 2.5,
+        "y": 3.3
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.810733899455043,
-        "y": 4.8872450035615875
-      },
-      "holonomicAngle": 0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": false,
-      "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
-        "waitBehavior": "none",
-        "waitTime": 0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 4.355869292886709,
-        "y": 4.851794933922965
-      },
-      "prevControl": {
-        "x": 4.866433051549461,
-        "y": 4.855783713287517
-      },
-      "nextControl": {
-        "x": 3.6286681786687462,
-        "y": 4.846113675218137
+        "x": 2.767019159126906,
+        "y": 3.328406293524139
       },
       "holonomicAngle": 180.0,
       "isReversal": false,
@@ -49,12 +24,37 @@
     },
     {
       "anchorPoint": {
-        "x": 1.95,
-        "y": 4.466
+        "x": 5.65,
+        "y": 3.3
       },
       "prevControl": {
-        "x": 2.819623009781811,
-        "y": 4.777938570760203
+        "x": 5.394618817809064,
+        "y": 3.2925940709024277
+      },
+      "nextControl": {
+        "x": 5.905381182190936,
+        "y": 3.307405929097572
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 7.268224536449073,
+        "y": 3.2351318988352262
+      },
+      "prevControl": {
+        "x": 7.411371965601074,
+        "y": 3.220817155920026
       },
       "nextControl": null,
       "holonomicAngle": 180.0,
@@ -70,21 +70,5 @@
       }
     }
   ],
-  "maxVelocity": 3.0,
-  "maxAcceleration": 1.5,
-  "isReversed": null,
-  "markers": [
-    {
-      "position": 0.21818181818181814,
-      "names": [
-        "stow-arm"
-      ]
-    },
-    {
-      "position": 1.0109090909091052,
-      "names": [
-        "raise-arm"
-      ]
-    }
-  ]
+  "markers": []
 }

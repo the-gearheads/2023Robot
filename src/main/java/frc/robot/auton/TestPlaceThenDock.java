@@ -20,7 +20,7 @@ public class TestPlaceThenDock extends ProxyCommand {
   public TestPlaceThenDock(Swerve s) {
     super(() -> {
 
-      var defaultPath = AutonHelper.getPathByName("StartN4-PrepareDock", Constants.AUTON.DOCK_CONSTRAINTS);
+      var defaultPath = AutonHelper.getPathByName("N4_Start-PrepareDock", Constants.AUTON.DOCK_CONSTRAINTS);
       // defaultPath = PathPlannerTrajectory.transformTrajectoryForAlliance(defaultPath, DriverStation.getAlliance());
       var startPose = defaultPath.getInitialPose();
       var endPose = MoreMath.deepCopyPose(startPose);
@@ -47,7 +47,7 @@ public class TestPlaceThenDock extends ProxyCommand {
     var defaultVel = Constants.AUTON.DOCK_CONSTRAINTS.maxVelocity;
     var defaultAcc = Constants.AUTON.DOCK_CONSTRAINTS.maxAcceleration;
 
-    var path = AutonHelper.getPathByName("StartN4-PrepareDock", Constants.AUTON.DOCK_CONSTRAINTS);
+    var path = AutonHelper.getPathByName("N4_Start-PrepareDock", Constants.AUTON.DOCK_CONSTRAINTS);
 
     var startPose = path.getInitialPose();
     var endPose = path.getEndState().poseMeters;

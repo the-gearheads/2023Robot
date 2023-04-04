@@ -7,6 +7,8 @@ import frc.robot.Constants;
 import frc.robot.auton.AutonAnnotation;
 import frc.robot.auton.AutonHelper;
 import frc.robot.auton.AutonRoutine;
+import frc.robot.commands.arm.SetArmPose;
+import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.vision.FuseVisionEstimate;
 import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
 import frc.robot.subsystems.Subsystems;
@@ -20,9 +22,12 @@ public class PlaceExplore extends AutonRoutine {
       return new SequentialCommandGroup(
         AutonHelper.setInitRot(s.swerve, v + "_Inert-Start"),
 
+        new SetArmPose(s.arm, ArmPose.HIGH_NODE),
         AutonHelper.getCommandForPath(v + "_Inert-Start", true, PlaceExploreConstraints, s.swerve),
         AutonHelper.getPlaceConeCommand(s),
-        AutonHelper.getCommandForPath(v + "_Start-Gamepiece1", false, PlaceExploreConstraints, s.swerve)
+        AutonHelper.stowAnd(s, 
+          AutonHelper.getCommandForPath(v + "_Start-Explore", false, PlaceExploreConstraints, s.swerve)
+        )
       ).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.ONLY_COMMUNITY));
     }
 }
