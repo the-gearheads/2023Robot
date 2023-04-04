@@ -286,7 +286,7 @@ public class AutonPaths {
       public static Command center2ConeFirstProxy(Subsystems s) {
         HashMap<String, Command> eventMap = new HashMap<>();
         eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT));
-        eventMap.put("pickup", new FloorPickUp(s.arm, s.wrist));
+        eventMap.put("pickup", new FloorPickUp(s.arm, s.wrist).alongWith(AutonHelper.openGrabber(s.grabber)));
         return AutonHelper.followWithEvents("center2cone-startn4-pickup", eventMap, false, centerExploreThenDockSlowConstraints,
             s.swerve, false);
       }
