@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.GRABBER;
+import static frc.robot.Constants.GRABBER.*;
 
 public class Grabber extends SubsystemBase {
   boolean isClosed = true;
@@ -21,10 +21,10 @@ public class Grabber extends SubsystemBase {
   Solenoid openSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 1);
   PowerDistribution pdh = new PowerDistribution();
   Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
-  Trigger grabbedSwitch = new Trigger(new DigitalInput(2)::get);
+  Trigger grabbedObjectSwitch = new Trigger(new DigitalInput(GRABBER_SWITCH_ID)::get);
 
   public Grabber() {
-    compressor.enableAnalog(GRABBER.MIN_PRESSURE, GRABBER.MAX_PRESSURE);
+    compressor.enableAnalog(MIN_PRESSURE, MAX_PRESSURE);
     close();
   }
 
@@ -44,8 +44,8 @@ public class Grabber extends SubsystemBase {
     return isClosed;
   }
 
-  public Trigger getGrabberLimitTrigger() {
-    return grabbedSwitch;
+  public Trigger getGrabbedObjectSwitch() {
+    return grabbedObjectSwitch;
   }
 
   boolean wasLastEnabled = false;

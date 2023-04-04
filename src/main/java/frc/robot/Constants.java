@@ -113,6 +113,7 @@ public class Constants extends AnnotatedClass {
     /* Compressor min and max pressures */
     public static final double MIN_PRESSURE = 100;
     public static final double MAX_PRESSURE = 120;
+    public static final int GRABBER_SWITCH_ID = 2;
   }
 
   public static final class DRIVE {

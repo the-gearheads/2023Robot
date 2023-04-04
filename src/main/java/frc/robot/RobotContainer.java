@@ -206,7 +206,7 @@ public class RobotContainer {
       arm.configure();
     }));
 
-    Controllers.operatorController.frontPickup().and(()->{return grabber.getGrabberLimitTrigger().getAsBoolean();}).onTrue(new WaitForDriveAwayCommand(swerve, leds));
+    Controllers.operatorController.frontPickup().and(grabber.getGrabbedObjectSwitch()::getAsBoolean).onTrue(new WaitForDriveAwayCommand(swerve, leds));
 
     // Controllers.operatorController.throwCube()
     //     .onTrue(new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 80, 20)));
