@@ -1,6 +1,7 @@
 package frc.robot.auton;
 
 import java.util.Map;
+import javax.sound.midi.Sequence;
 import org.littletonrobotics.junction.Logger;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -23,6 +24,7 @@ import frc.robot.commands.arm.StowArm;
 import frc.robot.commands.drive.autoalign.Community;
 import frc.robot.commands.drive.autoalign.GridCol;
 import frc.robot.commands.wrist.AltWristControl;
+import frc.robot.commands.wrist.FloorPickUp;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.drive.Swerve;
@@ -158,6 +160,10 @@ public class AutonHelper {
     var pathCommand = AutonHelper.getCommandForPath(pathName, resetOdometry, constrainsts, swerve);
     
     return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);
+  }
+
+  public static Command pickupCone(Subsystems s) {
+    return (AutonHelper.closeGrabber(s.grabber).andThen(new WaitCommand(0.25))).raceWith(new FloorPickUp(s.arm, s.wrist));
   }
 }
 //format:on

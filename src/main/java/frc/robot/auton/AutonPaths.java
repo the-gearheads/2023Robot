@@ -270,6 +270,7 @@ public class AutonPaths {
         }
         return s.swerve.goTo(new Pose2d(destTrans, Rotation2d.fromDegrees(180)), Constants.AUTON.SLOW_CONSTRAINTS);
       }, s.swerve),
+      
       new InstantCommand(() -> {
         s.vision.setConfidenceStrat(ConfidenceStrat.NONE);
       }), AutonHelper.getPlaceConeCommand(s),

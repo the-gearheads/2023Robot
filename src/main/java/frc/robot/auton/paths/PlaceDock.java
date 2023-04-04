@@ -12,7 +12,7 @@ import frc.robot.commands.vision.FuseVisionEstimate;
 import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
 import frc.robot.subsystems.Subsystems;
 
-@AutonAnnotation(name = "Place Then Explore", variants = {"N4"})
+@AutonAnnotation(name = "Place Then Dock", variants = {"N4"})
 public class PlaceDock extends AutonRoutine {
     private static PathConstraints PlaceDockConstraints = Constants.AUTON.MID_CONSTRAINTS;
 
