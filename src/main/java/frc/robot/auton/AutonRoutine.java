@@ -7,6 +7,8 @@ import frc.robot.subsystems.Subsystems;
 
 public class AutonRoutine {
   public CommandBase getCommand(Subsystems s, String variant) {
-    return new InstantCommand(()->{DriverStation.reportWarning("[AutonRoutine] Override me!", false);});
+    return new InstantCommand(() -> {
+      DriverStation.reportWarning("[AutonRoutine] Override me!", false);
+    });
   }
 }
