@@ -32,7 +32,7 @@ public class WaitForDriveAwayCommand extends CommandBase {
     // Called once the commak nd ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-      leds.setState(LedState.RAINBOW);
+      leds.resetState();
     }
   
     // Returns true when the command should end.

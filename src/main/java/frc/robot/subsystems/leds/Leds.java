@@ -17,15 +17,14 @@ import frc.robot.Robot;
 import frc.robot.Constants.LEDS;
 
 public class Leds extends SubsystemBase {
-  /** Creates a new LEDS. d */
+  /** Creates a new LEDS. */
   private AddressableLED ledStrip;
   private AddressableLEDSim ledSim;
 
-  // one buffer for all the live shit, one for no lights
-  public AddressableLEDBuffer buffer;
+  private AddressableLEDBuffer buffer;
 
   // LED States
-  public LedState state;
+  private LedState state;
   // Assuming that both strips are the same length - therefore we can use one buffer
 
   private LedState defaultState = LedState.RAINBOW;
@@ -47,6 +46,10 @@ public class Leds extends SubsystemBase {
 
   public void setState(LedState newState) {
     this.state = newState;
+  }
+
+  public void resetState() {
+    this.state = defaultState;
   }
 
   public CommandBase getSetStateCommand(LedState newState) {
