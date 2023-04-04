@@ -87,13 +87,13 @@ public class AutonChooser {
     Command twoConeCenter = AutonPaths.center2Cone(s);
 
 
-    autons.put("Just Place", justPlace);
-    autons.put("CENTER Place Then Dock", InertN4PlaceThenDock);
-    autons.put("NO BUMP Place Then Move", InertN1PlaceThenExplore);
-    autons.put("BUMP Place Then Move", InertN9PlaceThenExplore);
-    autons.put("NO BUMP 2 Gamepiece", TwoGamePieceNoBump);
+    // autons.put("Just Place", justPlace);
+    // autons.put("CENTER Place Then Dock", InertN4PlaceThenDock);
+    // autons.put("NO BUMP Place Then Move", InertN1PlaceThenExplore);
+    // autons.put("BUMP Place Then Move", InertN9PlaceThenExplore);
+    autons.put("NO BUMP 2 Cone", TwoGamePieceNoBump);
     autons.put("BUMP Two Cone", twoconeBump);
-    autons.put("CENTER explore then dock", centerExploreThenDockSlow);
+    // autons.put("CENTER explore then dock", centerExploreThenDockSlow);
     autons.put("CENTER 2 Cone", twoConeCenter);
   }
 }

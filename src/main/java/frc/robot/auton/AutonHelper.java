@@ -8,6 +8,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -19,11 +20,14 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.commands.arm.StowArm;
+import frc.robot.commands.drive.autoalign.Community;
+import frc.robot.commands.drive.autoalign.GridCol;
 import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.CustomProxy;
+import frc.robot.util.MoreMath;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
 
 public class AutonHelper {
@@ -135,6 +139,16 @@ public class AutonHelper {
       var finalPose = new Pose2d(finalState.poseMeters.getX(), finalState.poseMeters.getY(), finalState.holonomicRotation);
   
       return swerve.goTo(finalPose, constraints);
+    }, swerve);
+  }
+
+  public static CustomProxy goToGridAlignment(Swerve swerve, Translation2d blueDest, Translation2d redDest, Rotation2d rot, PathConstraints constraints) {
+    return new CustomProxy(() -> {
+      if (MoreMath.isBlue()) {
+        return swerve.goTo(new  Pose2d(blueDest, rot), Constants.AUTON.SLOW_CONSTRAINTS);
+      } else {
+        return swerve.goTo(new  Pose2d(redDest, rot), Constants.AUTON.SLOW_CONSTRAINTS);
+      }
     }, swerve);
   }
 
