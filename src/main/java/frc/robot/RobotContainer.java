@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DRIVE;
+import frc.robot.commands.WaitForDriveAwayCommand;
 import frc.robot.commands.arm.FrontPickup;
 import frc.robot.commands.arm.JoystickArmControl;
 import frc.robot.commands.arm.SetArmPose;
@@ -65,7 +66,6 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Swerve swerve;
-  @SuppressWarnings("unused")
   private Vision vision;
   private final AutonChooser autonChooser;
   private final Arm arm;
@@ -205,6 +205,8 @@ public class RobotContainer {
       wrist.configure();
       arm.configure();
     }));
+
+    Controllers.operatorController.frontPickup().and(()->{return grabber.getGrabberLimitTrigger().getAsBoolean();}).onTrue(new WaitForDriveAwayCommand(swerve, leds));
 
     // Controllers.operatorController.throwCube()
     //     .onTrue(new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 80, 20)));
