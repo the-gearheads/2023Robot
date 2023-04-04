@@ -1,6 +1,7 @@
 package frc.robot.controllers;
 
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.arm.FrontPickup;
 
 public interface OperatorController {
   public default double getArmAxis() {
@@ -32,6 +33,10 @@ public interface OperatorController {
   }
 
   public default Trigger armGoToGroundPickUpNode() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger frontPickup() {
     return new Trigger(() -> false);
   }
 

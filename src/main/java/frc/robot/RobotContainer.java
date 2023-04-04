@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DRIVE;
+import frc.robot.commands.arm.FrontPickup;
 import frc.robot.commands.arm.JoystickArmControl;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.StowArm;
@@ -193,6 +194,7 @@ public class RobotContainer {
     Controllers.operatorController.armGoToHighNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
     Controllers.operatorController.armGoToInsideRobotNode().onTrue(new StowArm(arm, wrist));
     Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
+    Controllers.operatorController.frontPickup().onTrue(new FrontPickup(arm, wrist));
     Controllers.operatorController.setWristAlternatePose().whileTrue(new AltWristControl(wrist).repeatedly());
     Controllers.operatorController.openGrabber().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
     Controllers.operatorController.setArmByJoystick().onTrue(new JoystickArmControl(arm));
