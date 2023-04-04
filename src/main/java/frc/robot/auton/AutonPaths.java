@@ -248,5 +248,54 @@ public class AutonPaths {
     return AutonHelper.followWithEvents("slow-startn4-explore", eventMap, false, centerExploreThenDockSlowConstraints,
         s.swerve, false);
   }
+
+  public static Command center2Cone(Subsystems s){
+    return new SequentialCommandGroup(
+      new InstantCommand(() -> {
+          s.vision.setConfidenceStrat(ConfidenceStrat.ONLY_COMMUNITY);
+        }), 
+      new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+      new InstantCommand(() -> {
+        s.swerve
+            .setPose(new Pose2d(s.swerve.getPose().getX(), s.swerve.getPose().getY(), Rotation2d.fromDegrees(180)));
+      }, s.swerve),
+
+      new CustomProxy((
+      ) -> {
+        Translation2d destTrans;
+        if (MoreMath.isBlue()) {
+          destTrans = Community.BLUE_GRID.centerGrid.leftCol.high;
+        } else {
+          destTrans = Community.RED_GRID.centerGrid.rightCol.high;
+        }
+        return s.swerve.goTo(new Pose2d(destTrans, Rotation2d.fromDegrees(180)), Constants.AUTON.SLOW_CONSTRAINTS);
+      }, s.swerve),
+      new InstantCommand(() -> {
+        s.vision.setConfidenceStrat(ConfidenceStrat.NONE);
+      }), AutonHelper.getPlaceConeCommand(s),
+
+      new CustomProxy(() -> {
+        return center2ConeFirstProxy(s);
+      }), 
+      (AutonHelper.closeGrabber(s.grabber).andThen(new WaitCommand(0.25))).raceWith(new FloorPickUp(s.arm, s.wrist)),
+      new CustomProxy(() -> {
+        return center2ConeSecondProxy(s);
+      }),
+      new AutoBalance(s.swerve)); 
+    }
+      public static Command center2ConeFirstProxy(Subsystems s) {
+        HashMap<String, Command> eventMap = new HashMap<>();
+        eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT));
+        eventMap.put("pickup", new FloorPickUp(s.arm, s.wrist));
+        return AutonHelper.followWithEvents("center2cone-startn4-pickup", eventMap, false, centerExploreThenDockSlowConstraints,
+            s.swerve, false);
+      }
+
+      public static Command center2ConeSecondProxy(Subsystems s) {
+        HashMap<String, Command> eventMap = new HashMap<>();
+        eventMap.put("stow-arm", new SetArmPose(s.arm, ArmPose.INSIDE_ROBOT));
+        return AutonHelper.followWithEvents("center2cone-pickup-dock", eventMap, false, centerExploreThenDockSlowConstraints,
+            s.swerve, false);
+      }
 }
 // format: on

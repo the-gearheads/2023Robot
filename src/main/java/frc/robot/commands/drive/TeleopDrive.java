@@ -45,7 +45,7 @@ public class TeleopDrive extends CommandBase {
   @Override
   public void initialize() {
     // swerve.setPose(new Pose2d());
-    angleGoal = swerve.getCtsGyroRot().getRadians();
+    angleGoal = swerve.getCtsGyroRotWithOffset().getRadians();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -86,10 +86,10 @@ public class TeleopDrive extends CommandBase {
 
   private void cardinalBtns() {
     double heading = Controllers.driverController.getSetHeadingPOV();
-    var ctsGyroAngle = swerve.getCtsGyroRot().getRadians();
+    var ctsGyroAngle = swerve.getCtsGyroRotWithOffset().getRadians();
     if (heading == -1)
       return;
-    angleGoal = MoreMath.getClosestRad(ctsGyroAngle, 0);
+    angleGoal = MoreMath.getClosestRad(ctsGyroAngle, heading);
   }
 
   public ChassisSpeeds cube(ChassisSpeeds spds) {
