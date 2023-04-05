@@ -36,12 +36,9 @@ public class BumpTwoCone extends AutonRoutine {
           Rotation2d.fromDegrees(180), TwoConeConstraints),
         AutonHelper.getPlaceConeCommand(s),
 
-        AutonHelper.stowAnd(s, 
-          AutonHelper.getCommandForPath("N9_Start-prebump", false, TwoConeConstraints, s.swerve)
-        ),
-        AutonHelper.getCommandForPath("prebump-overbump", false, Constants.AUTON.SLOW_CONSTRAINTS, s.swerve),
-        AutonHelper.followWithEvents("overbump-gamepiece1",
+        AutonHelper.followWithEvents("N9_Start-Gamepiece1",
           Map.of(
+                  "stow-arm", new StowArm(s.arm, s.wrist),
                   "pickup", AutonHelper.openGrabber(s.grabber).alongWith(new FloorPickUp(s.arm, s.wrist))
                 ),
           false, TwoConeConstraints, s.swerve, false
