@@ -14,16 +14,18 @@ import frc.robot.auton.AutonRoutine;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.StowArm;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
+import frc.robot.commands.drive.AutoBalance;
 import frc.robot.commands.drive.autoalign.Community;
 import frc.robot.commands.vision.FuseVisionEstimate;
 import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
 import frc.robot.commands.wrist.FloorPickUp;
-import frc.robot.subsystems.Subsystems;
+import frc.robot.subsystems.Subsystems; 
+
 
 @AutonAnnotation(name = "Two Cone", variants = {"N1", "N9", "N4"})
 public class TwoCone extends AutonRoutine {
   private static PathConstraints TwoConeConstraints = Constants.AUTON.MID_CONSTRAINTS;
-  private static PathConstraints centerTwoConeConstraints = Constants.AUTON.MID_CONSTRAINTS;
+  private static PathConstraints centerTwoConeConstraints = new PathConstraints(1.1, 1);
   @Override
   public CommandBase getCommand(Subsystems s, String v) {
     if (v.equals("N1")) {
@@ -103,9 +105,10 @@ public class TwoCone extends AutonRoutine {
 
         AutonHelper.pickupCone(s),
         AutonHelper.stowAnd(s, 
-          AutonHelper.getCommandForPath(v + "_Gamepiece1-PrepareDock", false, TwoConeConstraints, s.swerve)
-        )
-      );
+          AutonHelper.getCommandForPath(v + "_Gamepiece1-PrepareDock", false, centerTwoConeConstraints, s.swerve)
+        ),
+        new AutoBalance(s.swerve)
+      ).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.ONLY_COMMUNITY));
     }
   }
 }

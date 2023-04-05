@@ -69,7 +69,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Swerve swerve;
   private Vision vision;
-  private final AutonChooser autonChooser;
+  //private final AutonChooser autonChooser;
   private final Arm arm;
   private Wrist wrist;
   private Grabber grabber;
@@ -125,7 +125,7 @@ public class RobotContainer {
     }
 
     grabber = new Grabber();
-    autonChooser = new AutonChooser(swerve, arm, wrist, grabber, vision);
+    //autonChooser = new AutonChooser(swerve, arm, wrist, grabber, vision);
     AutonLoader.load(new Subsystems(swerve, wrist, arm, vision, grabber));
     leds = new Leds();
     // Configure the button binding

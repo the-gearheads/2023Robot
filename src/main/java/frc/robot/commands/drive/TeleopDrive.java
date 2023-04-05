@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -89,7 +90,7 @@ public class TeleopDrive extends CommandBase {
     var ctsGyroAngle = swerve.getCtsGyroRotWithOffset().getRadians();
     if (heading == -1)
       return;
-    angleGoal = MoreMath.getClosestRad(ctsGyroAngle, heading);
+    angleGoal = MoreMath.getClosestRad(ctsGyroAngle, Units.degreesToRadians(heading));
   }
 
   public ChassisSpeeds cube(ChassisSpeeds spds) {
