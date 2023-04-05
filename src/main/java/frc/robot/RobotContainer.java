@@ -209,8 +209,10 @@ public class RobotContainer {
       arm.configure();
     }));
 
-    Controllers.operatorController.frontPickup().and(grabber.getGrabbedObjectSwitch()::getAsBoolean).onTrue(new WaitForDriveAwayCommand(swerve, leds));
-
+    Controllers.operatorController.autoGrab().onTrue(new InstantCommand(grabber::open, grabber));
+    Controllers.operatorController.autoGrab().and(grabber.getGrabbedObjectSwitch()::getAsBoolean)
+        .onTrue(new InstantCommand(grabber::close, grabber).andThen(new WaitForDriveAwayCommand(swerve, leds)));
+  
     // Controllers.operatorController.throwCube()
     //     .onTrue(new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 80, 20)));
   }
