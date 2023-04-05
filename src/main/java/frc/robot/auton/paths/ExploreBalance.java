@@ -19,7 +19,7 @@ import frc.robot.subsystems.Subsystems;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-@AutonAnnotation(name = "Explore Then Balance", variants = {"N4"})
+@AutonAnnotation(name = "CENTER Explore Then Balance")
 public class ExploreBalance extends AutonRoutine {
     private static PathConstraints ExploreBalanceConstraints = Constants.AUTON.MID_CONSTRAINTS;
     public static PathConstraints centerExploreThenDockSlowConstraints = new PathConstraints(1, 0.75);
@@ -30,7 +30,7 @@ public class ExploreBalance extends AutonRoutine {
         AutonHelper.setInitRot(s.swerve, "N4_Inert-Start"),
 
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-        AutonHelper.goToGridAlignment(s.swerve, Community.BLUE_GRID.centerGrid.leftCol.high, Community.RED_GRID.centerGrid.leftCol.high,
+        AutonHelper.goToGridAlignment(s.swerve, Community.BLUE_GRID.centerGrid.leftCol.high, Community.RED_GRID.centerGrid.rightCol.high,
           Rotation2d.fromDegrees(180), ExploreBalanceConstraints),
         AutonHelper.getPlaceConeCommand(s),
        

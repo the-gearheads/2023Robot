@@ -7,25 +7,29 @@ import frc.robot.Constants;
 import frc.robot.auton.AutonAnnotation;
 import frc.robot.auton.AutonHelper;
 import frc.robot.auton.AutonRoutine;
+import frc.robot.commands.arm.SetArmPose;
+import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.AutoBalance;
 import frc.robot.commands.vision.FuseVisionEstimate;
 import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
 import frc.robot.subsystems.Subsystems;
 
-@AutonAnnotation(name = "Place Then Dock", variants = {"N4"})
+@AutonAnnotation(name = "Place Then Dock")
 public class PlaceDock extends AutonRoutine {
     private static PathConstraints PlaceDockConstraints = Constants.AUTON.MID_CONSTRAINTS;
 
     @Override
     public CommandBase getCommand(Subsystems s, String v) {
       return new SequentialCommandGroup(
-        AutonHelper.setInitRot(s.swerve, v + "_Inert-Start"),
+        AutonHelper.setInitRot(s.swerve, "N4_Inert-Start"),
 
-        AutonHelper.getCommandForPath(v + "_Inert-Start", true, PlaceDockConstraints, s.swerve),
+        new SetArmPose(s.arm, ArmPose.HIGH_NODE),
+
+        AutonHelper.getCommandForPath("N4_Inert-Start", true, PlaceDockConstraints, s.swerve),
         AutonHelper.getPlaceConeCommand(s),
-        AutonHelper.getCommandForPath(v + "_Start-PrepareDock", false, PlaceDockConstraints, s.swerve),
+        AutonHelper.getCommandForPath("N4_Start-PrepareDock", false, PlaceDockConstraints, s.swerve),
         new AutoBalance(s.swerve)
-      ).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.ONLY_COMMUNITY));
+      ).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.NONE));
     }
 
 }

@@ -9,25 +9,25 @@ import frc.robot.auton.AutonHelper;
 import frc.robot.auton.AutonRoutine;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
+import frc.robot.commands.drive.AutoBalance;
 import frc.robot.commands.vision.FuseVisionEstimate;
 import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
 import frc.robot.subsystems.Subsystems;
 
-@AutonAnnotation(name = "Place Then Explore", variants = {"N1", "N9"})
-public class PlaceExplore extends AutonRoutine {
-    private static PathConstraints PlaceExploreConstraints = Constants.AUTON.MID_CONSTRAINTS;
+@AutonAnnotation(name = "Just Place")
+public class JustPlace extends AutonRoutine {
+    private static PathConstraints PlaceDockConstraints = Constants.AUTON.MID_CONSTRAINTS;
 
     @Override
     public CommandBase getCommand(Subsystems s, String v) {
       return new SequentialCommandGroup(
-        AutonHelper.setInitRot(s.swerve, v + "_Inert-Start"),
+        AutonHelper.setInitRot(s.swerve, "N4_Inert-Start"),
 
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
-        AutonHelper.getCommandForPath(v + "_Inert-Start", true, PlaceExploreConstraints, s.swerve),
-        AutonHelper.getPlaceConeCommand(s),
-        AutonHelper.stowAnd(s, 
-          AutonHelper.getCommandForPath(v + "_Start-Explore", false, PlaceExploreConstraints, s.swerve)
-        )
+
+        AutonHelper.getCommandForPath("N4_Inert-Start", true, PlaceDockConstraints, s.swerve),
+        AutonHelper.getPlaceConeCommand(s)
       ).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.NONE));
     }
+
 }

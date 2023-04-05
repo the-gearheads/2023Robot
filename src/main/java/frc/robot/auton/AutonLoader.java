@@ -1,15 +1,19 @@
 package frc.robot.auton;
 
 import org.reflections.Reflections;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.subsystems.Subsystems;
+import frc.robot.util.CustomSendableChooser;
 import static org.reflections.scanners.Scanners.*;
+import java.util.Map;
 
 
 public class AutonLoader {
-  public static SendableChooser<Command> chooser = new SendableChooser<>();
+  public static CustomSendableChooser<Command> chooser = new CustomSendableChooser<>();
 
   public static void load(Subsystems s) {
     try {
@@ -39,6 +43,19 @@ public class AutonLoader {
   }
 
   public static Command getCommand() {
-    return chooser.getSelected();
+    Command selectedAuton = chooser.getSelected();
+    var autons = chooser.getAutons();
+    
+    if (selectedAuton == null) {
+      DriverStation.reportError("Selected Auton is null", false);
+      if (autons.size() > 0) {
+        var firstAuton = (Map.Entry<String, Command>) autons.entrySet().iterator().next();
+        selectedAuton = firstAuton.getValue();
+      } else {
+        DriverStation.reportError("No Autons Defined", false);
+        selectedAuton = new PrintCommand("No Auton Selected");
+      }
+    }
+    return selectedAuton;
   }
 }
