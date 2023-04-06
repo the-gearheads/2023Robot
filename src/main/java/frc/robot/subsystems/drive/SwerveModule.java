@@ -70,11 +70,13 @@ public class SwerveModule implements SwerveModuleIO {
     inputs.drivePosition = drive.getPosition();
     inputs.driveVelocity = drive.getVelocity();
     inputs.driveVelocitySetpoint = drive.getVelocitySetpoint();
+    inputs.driveTemperature = drive.getTemperature();
 
     inputs.steerAppliedVolts = steer.getAppliedVolts();
     inputs.steerAngle = getAngle().getRadians();
     inputs.steerVelocity = steer.getVelocity();
     inputs.steerAngleSetpoint = steer.getAngleSetpoint().getRadians();
+    inputs.steerTemperature = steer.getTemperature();
   }
 
   @Override

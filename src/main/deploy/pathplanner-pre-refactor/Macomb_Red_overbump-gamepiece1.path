@@ -45,12 +45,5 @@
       }
     }
   ],
-  "markers": [
-    {
-      "position": 0.5818181818181815,
-      "names": [
-        "pickup"
-      ]
-    }
-  ]
+  "markers": []
 }

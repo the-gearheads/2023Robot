@@ -97,33 +97,33 @@ public class AutonPaths {
   public static Command TwoGamePieceNoBump(Subsystems s) {
     return new SequentialCommandGroup(new InstantCommand(() -> {
       SmartDashboard.putNumber("auton phase", 1);
-    }), new InstantCommand(() -> {
-      s.vision.setConfidenceStrat(ConfidenceStrat.ONLY_COMMUNITY);
-    }), new SetArmPose(s.arm, ArmPose.HIGH_NODE), new InstantCommand(() -> {
-      s.swerve.setPose(new Pose2d(s.swerve.getPose().getX(), s.swerve.getPose().getY(), Rotation2d.fromDegrees(180)));
-    }, s.swerve),
+      }), new InstantCommand(() -> {
+        s.vision.setConfidenceStrat(ConfidenceStrat.ONLY_COMMUNITY);
+      }), new SetArmPose(s.arm, ArmPose.HIGH_NODE), new InstantCommand(() -> {
+        s.swerve.setPose(new Pose2d(s.swerve.getPose().getX(), s.swerve.getPose().getY(), Rotation2d.fromDegrees(180)));
+      }, s.swerve),
 
-        new CustomProxy(() -> {
-          Translation2d destTrans;
-          if (MoreMath.isBlue()) {
-            destTrans = Community.BLUE_GRID.leftGrid.leftCol.high;
-          } else {
-            destTrans = Community.RED_GRID.rightGrid.rightCol.high;
-          }
-          return s.swerve.goTo(new Pose2d(destTrans, Rotation2d.fromDegrees(180)), Constants.AUTON.SLOW_CONSTRAINTS);
-        }, s.swerve),
+      new CustomProxy(() -> {
+        Translation2d destTrans;
+        if (MoreMath.isBlue()) {
+          destTrans = Community.BLUE_GRID.leftGrid.leftCol.high;
+        } else {
+          destTrans = Community.RED_GRID.rightGrid.rightCol.high;
+        }
+        return s.swerve.goTo(new Pose2d(destTrans, Rotation2d.fromDegrees(180)), Constants.AUTON.SLOW_CONSTRAINTS);
+      }, s.swerve),
 
-        AutonHelper.getPlaceConeCommand(s),
+      AutonHelper.getPlaceConeCommand(s),
 
-        new CustomProxy(() -> {
-          return twoGamePieceNoBumpPathPickUpCubeProxy(s);
-        }),
+      new CustomProxy(() -> {
+        return twoGamePieceNoBumpPathPickUpCubeProxy(s);
+      }),
 
-        (AutonHelper.closeGrabber(s.grabber).andThen(new WaitCommand(0.25))).raceWith(new FloorPickUp(s.arm, s.wrist)),
+      (AutonHelper.closeGrabber(s.grabber).andThen(new WaitCommand(0.25))).raceWith(new FloorPickUp(s.arm, s.wrist)),
 
-        new CustomProxy(() -> {
-          return twoGamePieceNoBumpPathPlaceCubeProxy(s);
-        }), AutonHelper.getPlaceConeCommand(s)
+      new CustomProxy(() -> {
+        return twoGamePieceNoBumpPathPlaceCubeProxy(s);
+      }), AutonHelper.getPlaceConeCommand(s)
 
     );
   }
@@ -270,6 +270,7 @@ public class AutonPaths {
         }
         return s.swerve.goTo(new Pose2d(destTrans, Rotation2d.fromDegrees(180)), Constants.AUTON.SLOW_CONSTRAINTS);
       }, s.swerve),
+      
       new InstantCommand(() -> {
         s.vision.setConfidenceStrat(ConfidenceStrat.NONE);
       }), AutonHelper.getPlaceConeCommand(s),

@@ -31,12 +31,10 @@ public class XboxDriverController implements DriverController {
 
   @Override
   public double getRotateAxis() {
-    // if (Constants.getMode() == Constants.RobotMode.SIM) {
-    //   return -Controllers.deadband(controller.getRawAxis(2));
-    // }
-    if (getRotateButton().getAsBoolean()) {
+    if(cardinalIsSet().getAsBoolean()){
       return 0;
     }
+
     return -Controllers.deadband(controller.getRightX());
   }
 
@@ -56,7 +54,13 @@ public class XboxDriverController implements DriverController {
     return new JoystickButton(controller, XboxController.Button.kLeftBumper.value);
   }
 
-  private Trigger getRotateButton() {
+  // private Trigger getRotateButton() {
+  //   return new Trigger(() -> {
+  //     return controller.getRightTriggerAxis() > 0.7;
+  //   });
+  // }
+
+  public Trigger getFastPickUpBtn() {
     return new Trigger(() -> {
       return controller.getRightTriggerAxis() > 0.7;
     });
@@ -72,17 +76,17 @@ public class XboxDriverController implements DriverController {
   }
 
   public double getSetHeadingPOV() {
-    if (!getRotateButton().getAsBoolean())
-      return -1;
-    if (controller.getRightX() > 0.75)
-      return 270;
     if (controller.getRightY() > 0.75)
       return 180;
-    if (controller.getRightX() < -0.75)
-      return 90;
     if (controller.getRightY() < -0.75)
       return 0;
     return -1;
+  }
+
+  public Trigger cardinalIsSet(){
+    return new Trigger(()->{
+      return getSetHeadingPOV()!=-1;
+    });
   }
 
   public double getPOV() {

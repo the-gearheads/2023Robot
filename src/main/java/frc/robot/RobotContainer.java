@@ -34,7 +34,9 @@ import frc.robot.commands.wrist.ManualWristControl;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.auton.AutonChooser;
+import frc.robot.auton.AutonLoader;
 import frc.robot.subsystems.Grabber;
+import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.leds.LedState;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.vision.Vision;
@@ -67,7 +69,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Swerve swerve;
   private Vision vision;
-  private final AutonChooser autonChooser;
+  //private final AutonChooser autonChooser;
   private final Arm arm;
   private Wrist wrist;
   private Grabber grabber;
@@ -123,7 +125,8 @@ public class RobotContainer {
     }
 
     grabber = new Grabber();
-    autonChooser = new AutonChooser(swerve, arm, wrist, grabber, vision);
+    //autonChooser = new AutonChooser(swerve, arm, wrist, grabber, vision);
+    AutonLoader.load(new Subsystems(swerve, wrist, arm, vision, grabber));
     leds = new Leds();
     // Configure the button binding
 
@@ -206,8 +209,10 @@ public class RobotContainer {
       arm.configure();
     }));
 
-    Controllers.operatorController.frontPickup().and(grabber.getGrabbedObjectSwitch()::getAsBoolean).onTrue(new WaitForDriveAwayCommand(swerve, leds));
-
+    Controllers.operatorController.autoGrab().onTrue(new InstantCommand(grabber::open, grabber));
+    Controllers.operatorController.autoGrab().and(grabber.getGrabbedObjectSwitch()::getAsBoolean)
+        .onTrue(new InstantCommand(grabber::close, grabber).andThen(new WaitForDriveAwayCommand(swerve, leds)));
+  
     // Controllers.operatorController.throwCube()
     //     .onTrue(new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 80, 20)));
   }
@@ -218,7 +223,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autonChooser.getSelectedAuton();
+    return AutonLoader.getCommand();
   }
 
   public Leds getLeds() {

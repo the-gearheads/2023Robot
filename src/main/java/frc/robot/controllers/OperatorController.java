@@ -67,4 +67,8 @@ public interface OperatorController {
   public default Trigger reconfigEVERYTHING() {
     return new Trigger(() -> false);
   }
+
+  public default Trigger autoGrab() {
+    return new Trigger(() -> false);
+  }
 }
