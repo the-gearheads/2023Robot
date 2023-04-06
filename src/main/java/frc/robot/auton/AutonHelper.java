@@ -147,9 +147,9 @@ public class AutonHelper {
   public static CustomProxy goToGridAlignment(Swerve swerve, Translation2d blueDest, Translation2d redDest, Rotation2d rot, PathConstraints constraints) {
     return new CustomProxy(() -> {
       if (MoreMath.isBlue()) {
-        return swerve.goTo(new  Pose2d(blueDest, rot), Constants.AUTON.SLOW_CONSTRAINTS);
+        return swerve.goTo(new Pose2d(blueDest, rot), constraints);
       } else {
-        return swerve.goTo(new  Pose2d(redDest, rot), Constants.AUTON.SLOW_CONSTRAINTS);
+        return swerve.goTo(new Pose2d(redDest, rot), constraints);
       }
     }, swerve);
   }
