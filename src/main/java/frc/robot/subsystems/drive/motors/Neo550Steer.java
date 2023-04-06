@@ -106,6 +106,10 @@ public class Neo550Steer {
     return max.getAppliedOutput() * max.getBusVoltage();
   }
 
+  public double getTemperature() {
+    return max.getMotorTemperature();
+  }
+
   public void updatePIDConstants(double P, double I, double D, double F) {
     pid.setP(P);
     pid.setI(I);
