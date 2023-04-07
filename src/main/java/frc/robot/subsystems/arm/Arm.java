@@ -138,6 +138,10 @@ public class Arm extends SubsystemBase {
       return;
     }
 
+    if(Math.floor(Timer.getFPGATimestamp()) % 2 == 0) {
+      configureHasRan = false;
+    }
+
     var pose = getPose();
     var vel = getVel();
     var volts = 0.0;
@@ -268,8 +272,8 @@ public class Arm extends SubsystemBase {
     /* Don't have an alternate encoder */
     e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500));
     /* Have a duty cycle encoder */
-    // e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20));
-    // e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20));
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20));
+    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20));
 
     return e;
   }
