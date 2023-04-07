@@ -35,6 +35,10 @@ public interface OperatorController {
     return new Trigger(() -> false);
   }
 
+  public default Trigger frontPickup() {
+    return new Trigger(() -> false);
+  }
+
   public default Trigger setArmByJoystick() {
     return new Trigger(() -> false);
   }
@@ -60,6 +64,10 @@ public interface OperatorController {
   }
 
   public default Trigger reconfigEVERYTHING() {
-    return new Trigger(()->false);
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger autoGrab() {
+    return new Trigger(() -> false);
   }
 }

@@ -79,7 +79,11 @@ public class Controllers {
           Logger.getInstance().recordOutput("controllers/driver controller",
               "Found xbox drive controller controller on port " + i);
           driverController = new XboxDriverController(i);
-        } else {
+        } else if (joyName.toLowerCase().contains("gamesir")) {
+          Logger.getInstance().recordOutput("controllers/driver controller",
+              "Found GAMESIR DRIVE controller controller on port " + i);
+          driverController = new XboxDriverController(i);
+        }else {
           foundDriveController = false;
         }
         if (foundDriveController)

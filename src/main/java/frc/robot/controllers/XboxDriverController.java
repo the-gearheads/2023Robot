@@ -31,12 +31,10 @@ public class XboxDriverController implements DriverController {
 
   @Override
   public double getRotateAxis() {
-    // if (Constants.getMode() == Constants.RobotMode.SIM) {
-    //   return -Controllers.deadband(controller.getRawAxis(2));
-    // }
-    if (getRotateButton().getAsBoolean()) {
+    if(cardinalIsSet().getAsBoolean()){
       return 0;
     }
+
     return -Controllers.deadband(controller.getRightX());
   }
 
@@ -56,7 +54,13 @@ public class XboxDriverController implements DriverController {
     return new JoystickButton(controller, XboxController.Button.kLeftBumper.value);
   }
 
-  private Trigger getRotateButton() {
+  // private Trigger getRotateButton() {
+  //   return new Trigger(() -> {
+  //     return controller.getRightTriggerAxis() > 0.7;
+  //   });
+  // }
+
+  public Trigger getFastPickUpBtn() {
     return new Trigger(() -> {
       return controller.getRightTriggerAxis() > 0.7;
     });
@@ -71,29 +75,19 @@ public class XboxDriverController implements DriverController {
     return new JoystickButton(controller, XboxController.Button.kStart.value);
   }
 
-  public Trigger getSetHeading0Btn() {
-    return new Trigger(() -> {
-      return getRotateButton().getAsBoolean() && (controller.getRightY() < -0.75);
-    });
-  };
+  public double getSetHeadingPOV() {
+    if (controller.getRightY() > 0.75)
+      return 180;
+    if (controller.getRightY() < -0.75)
+      return 0;
+    return -1;
+  }
 
-  public Trigger getSetHeading90Btn() {
-    return new Trigger(() -> {
-      return getRotateButton().getAsBoolean() && (controller.getRightX() < -0.75);
+  public Trigger cardinalIsSet(){
+    return new Trigger(()->{
+      return getSetHeadingPOV()!=-1;
     });
-  };
-
-  public Trigger getSetHeading180Btn() {
-    return new Trigger(() -> {
-      return getRotateButton().getAsBoolean() && (controller.getRightY() > 0.75);
-    });
-  };
-
-  public Trigger getSetHeading270Btn() {
-    return new Trigger(() -> {
-      return getRotateButton().getAsBoolean() && (controller.getRightX() > 0.75);
-    });
-  };
+  }
 
   public double getPOV() {
     return controller.getPOV();
@@ -125,8 +119,8 @@ public class XboxDriverController implements DriverController {
     return new JoystickButton(controller, XboxController.Button.kB.value);
   };
 
-  public Trigger resetYaw(){
-    return new Trigger(()->{
+  public Trigger resetYaw() {
+    return new Trigger(() -> {
       var val = controller.getLeftTriggerAxis();
       return Math.abs(val) > 0.75;
     });

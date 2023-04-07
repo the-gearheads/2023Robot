@@ -268,8 +268,8 @@ public class Arm extends SubsystemBase {
     /* Don't have an alternate encoder */
     e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500));
     /* Have a duty cycle encoder */
-    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20));
-    e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20));
+    // e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20));
+    // e.add(motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20));
 
     return e;
   }

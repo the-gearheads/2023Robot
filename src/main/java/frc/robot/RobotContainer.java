@@ -43,6 +43,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionSim;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmSim;
+import frc.robot.subsystems.arm.FrontPickup;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristSim;
 import frc.robot.subsystems.wrist.WristState;
@@ -205,6 +206,7 @@ public class RobotContainer {
     Controllers.operatorController.setArmByJoystick().onTrue(new JoystickArmControl(arm));
     Controllers.operatorController.signalCone().onTrue(leds.setStateForTimeCommand(LedState.YELLOW, 2));
     Controllers.operatorController.signalCube().onTrue(leds.setStateForTimeCommand(LedState.PURPLE, 2));
+    Controllers.operatorController.frontPickup().onTrue(new FrontPickup(arm, wrist));
     Controllers.operatorController.reconfigEVERYTHING().onTrue(new InstantCommand(()->{
       DriverStation.reportWarning("RECONFIG EVERYTHING!!!", false);
       wrist.configure();
