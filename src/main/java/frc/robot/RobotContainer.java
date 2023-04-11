@@ -211,6 +211,7 @@ public class RobotContainer {
       DriverStation.reportWarning("RECONFIG EVERYTHING!!!", false);
       wrist.configure();
       arm.configure();
+      swerve.configureAllMotors(); // please test
     }));
 
     // Controllers.operatorController.throwCube()

@@ -38,7 +38,7 @@ public class Neo550Steer {
     RevConfigUtils.configure(this::configure, path + "/Steer");
   }
 
-  private ArrayList<REVLibError> configure() {
+  public ArrayList<REVLibError> configure() {
     ArrayList<REVLibError> e = new ArrayList<>();
     e.add(max.restoreFactoryDefaults());
     e.add(max.setSmartCurrentLimit(DRIVE.STEER_CURRENT_LIMIT));
