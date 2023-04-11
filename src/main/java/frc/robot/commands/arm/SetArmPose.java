@@ -23,8 +23,8 @@ public class SetArmPose extends CommandBase {
       this.val = val;
     }
 
-    private void setGoal(double val){
-      this.val=val;
+    private void setGoal(double val) {
+      this.val = val;
     }
 
   }

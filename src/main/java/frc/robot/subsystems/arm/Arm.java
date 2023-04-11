@@ -158,6 +158,7 @@ public class Arm extends SubsystemBase {
     Logger.getInstance().recordOutput("Arm/ControlMode", controlMode.name);
     Logger.getInstance().recordOutput("Arm/Pose/pose setpoint", pid.getSetpoint().position);
     Logger.getInstance().recordOutput("Arm/Pose/vel setpoint", pid.getSetpoint().velocity);
+    Logger.getInstance().recordOutput("Arm/MotorTemperature", motor.getMotorTemperature());
     Logger.getInstance().recordOutput("Arm/current command",
         this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "");
 

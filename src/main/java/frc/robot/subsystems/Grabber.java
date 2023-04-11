@@ -6,12 +6,14 @@ package frc.robot.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.GRABBER;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import static frc.robot.Constants.GRABBER.*;
 
 public class Grabber extends SubsystemBase {
   boolean isClosed = true;
@@ -19,9 +21,10 @@ public class Grabber extends SubsystemBase {
   Solenoid openSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 1);
   PowerDistribution pdh = new PowerDistribution();
   Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
+  Trigger grabbedObjectSwitch = new Trigger(new DigitalInput(GRABBER_SWITCH_ID)::get);
 
   public Grabber() {
-    compressor.enableAnalog(GRABBER.MIN_PRESSURE, GRABBER.MAX_PRESSURE);
+    compressor.enableAnalog(MIN_PRESSURE, MAX_PRESSURE);
     close();
   }
 
@@ -39,6 +42,10 @@ public class Grabber extends SubsystemBase {
 
   public boolean isClosed() {
     return isClosed;
+  }
+
+  public Trigger getGrabbedObjectSwitch() {
+    return grabbedObjectSwitch;
   }
 
   boolean wasLastEnabled = false;

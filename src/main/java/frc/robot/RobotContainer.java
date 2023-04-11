@@ -7,7 +7,6 @@ package frc.robot;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import javax.swing.text.StyleContext.SmallAttributeSet;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -21,22 +20,23 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DRIVE;
+import frc.robot.commands.WaitForDriveAwayCommand;
+import frc.robot.commands.arm.FrontPickup;
 import frc.robot.commands.arm.JoystickArmControl;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.StowArm;
-import frc.robot.commands.arm.Throw;
-import frc.robot.commands.arm.ThrowState;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
 import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.drive.autoalign.AutoAlign;
-import frc.robot.commands.vision.FuseVisionEstimate;
 import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
 import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.commands.wrist.ManualWristControl;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.auton.AutonChooser;
+import frc.robot.auton.AutonLoader;
 import frc.robot.subsystems.Grabber;
+import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.leds.LedState;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.vision.Vision;
@@ -60,7 +60,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very little robot logic should actually be handled in
@@ -70,9 +69,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Swerve swerve;
-  @SuppressWarnings("unused")
   private Vision vision;
-  private final AutonChooser autonChooser;
+  //private final AutonChooser autonChooser;
   private final Arm arm;
   private Wrist wrist;
   private Grabber grabber;
@@ -128,7 +126,8 @@ public class RobotContainer {
     }
 
     grabber = new Grabber();
-    autonChooser = new AutonChooser(swerve, arm, wrist, grabber, vision);
+    //autonChooser = new AutonChooser(swerve, arm, wrist, grabber, vision);
+    AutonLoader.load(new Subsystems(swerve, wrist, arm, vision, grabber));
     leds = new Leds();
     // Configure the button binding
 
@@ -183,11 +182,9 @@ public class RobotContainer {
       return swerve.goTo(dest, Constants.AUTON.MID_CONSTRAINTS);
     }));
     Controllers.driverController.resetYaw().onTrue(new CustomProxy(() -> {
-      return new InstantCommand(
-        ()->{
-          swerve.setPose(new Pose2d(swerve.getPose().getTranslation(),Rotation2d.fromDegrees(180)));
-        }
-      );
+      return new InstantCommand(() -> {
+        swerve.setPose(new Pose2d(swerve.getPose().getTranslation(), Rotation2d.fromDegrees(180)));
+      });
     }, swerve));
 
     Controllers.driverController.HIGH_SPEED().whileTrue(LedState.getSetRainbowSpeedCommand(5));
@@ -201,19 +198,23 @@ public class RobotContainer {
     Controllers.operatorController.armGoToHighNode().onTrue(new SetArmPose(arm, ArmPose.HIGH_NODE));
     Controllers.operatorController.armGoToInsideRobotNode().onTrue(new StowArm(arm, wrist));
     Controllers.operatorController.armGoToFeederStationNode().onTrue(new SetArmPose(arm, ArmPose.FEEDER_STATION));
+    Controllers.operatorController.frontPickup().onTrue(new FrontPickup(arm, wrist));
     Controllers.operatorController.setWristAlternatePose().whileTrue(new AltWristControl(wrist).repeatedly());
     Controllers.operatorController.openGrabber().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
     Controllers.operatorController.setArmByJoystick().onTrue(new JoystickArmControl(arm));
     Controllers.operatorController.signalCone().onTrue(leds.setStateForTimeCommand(LedState.YELLOW, 2));
     Controllers.operatorController.signalCube().onTrue(leds.setStateForTimeCommand(LedState.PURPLE, 2));
-    Controllers.operatorController.frontPickup().onTrue(new FrontPickup(arm, wrist));
-    Controllers.operatorController.reconfigEVERYTHING().onTrue(new InstantCommand(()->{
+    Controllers.operatorController.reconfigEVERYTHING().onTrue(new InstantCommand(() -> {
       DriverStation.reportWarning("RECONFIG EVERYTHING!!!", false);
       wrist.configure();
       arm.configure();
       swerve.configureAllMotors(); // please test
     }));
 
+    Controllers.operatorController.autoGrab().onTrue(new InstantCommand(grabber::open, grabber));
+    Controllers.operatorController.autoGrab().and(grabber.getGrabbedObjectSwitch()::getAsBoolean)
+        .onTrue(new InstantCommand(grabber::close, grabber).andThen(new WaitForDriveAwayCommand(swerve, leds)));
+  
     // Controllers.operatorController.throwCube()
     //     .onTrue(new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 80, 20)));
   }
@@ -224,7 +225,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autonChooser.getSelectedAuton();
+    return AutonLoader.getCommand();
   }
 
   public Leds getLeds() {
@@ -240,12 +241,12 @@ public class RobotContainer {
     }, swerve));
   }
 
-  public void setDisabledVisionStrat(){
+  public void setDisabledVisionStrat() {
     vision.setConfidenceStrat(ConfidenceStrat.DISABLED);
     // vision.setDefaultCommand(new FuseVisionEstimate(vision, ConfidenceStrat.IRON_PANTHERS));
   }
 
-  public void setTeleopVisionStrat(){
+  public void setTeleopVisionStrat() {
     vision.setConfidenceStrat(ConfidenceStrat.ONLY_COMMUNITY_AND_FEEDER);
     SmartDashboard.putNumber("When was vision strat set", Timer.getFPGATimestamp());
     // vision.setDefaultCommand(new FuseVisionEstimate(vision, ConfidenceStrat.ONLY_COMMUNITY_AND_FEEDER));

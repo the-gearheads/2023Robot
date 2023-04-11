@@ -42,11 +42,11 @@ public class FuseVisionEstimate extends CommandBase {
   }
 
   @Override
-  public void initialize(){
+  public void initialize() {
     initChooser();
   }
 
-  public void setConfidenceStrat(ConfidenceStrat confidenceStrat){
+  public void setConfidenceStrat(ConfidenceStrat confidenceStrat) {
     this.confidenceStrat = confidenceStrat;
     initChooser();
   }
@@ -64,7 +64,7 @@ public class FuseVisionEstimate extends CommandBase {
   }
 
   @Override
-  public boolean runsWhenDisabled(){
+  public boolean runsWhenDisabled() {
     return true;
   }
 
@@ -80,7 +80,7 @@ public class FuseVisionEstimate extends CommandBase {
       switch (confidenceStrat) {
         case DISABLED:
           confidence = VisionHelper.ironPanthersStdDevs(estimate);
-          var disabledStDevs = VecBuilder.fill(0.05,0.05,0.05);
+          var disabledStDevs = VecBuilder.fill(0.05, 0.05, 0.05);
           estimate.setConfidence(disabledStDevs);
           fuseEstimate(estimate);
           break;
@@ -97,31 +97,31 @@ public class FuseVisionEstimate extends CommandBase {
           break;
         case TEST:
           var stDevs = VisionHelper.ironPanthersStdDevs(estimate);
-          stDevs.set(2,0,Double.POSITIVE_INFINITY);
+          stDevs.set(2, 0, Double.POSITIVE_INFINITY);
           estimate.setConfidence(stDevs);
           fuseEstimate(estimate);
           break;
         case ONLY_COMMUNITY:
-        var stDev1 = VisionHelper.ironPanthersStdDevs(estimate);
-        stDev1.set(2,0,Double.POSITIVE_INFINITY);
-        estimate.setConfidence(stDev1);
-        if(inCommunity(estimate.best.toPose2d())){
-          if(correctColorTag(estimate)){
-            SmartDashboard.putBoolean("fusing", true);
-            fuseEstimate(estimate);
+          var stDev1 = VisionHelper.ironPanthersStdDevs(estimate);
+          stDev1.set(2, 0, Double.POSITIVE_INFINITY);
+          estimate.setConfidence(stDev1);
+          if (inCommunity(estimate.best.toPose2d())) {
+            if (correctColorTag(estimate)) {
+              SmartDashboard.putBoolean("fusing", true);
+              fuseEstimate(estimate);
+            }
+          } else {
+            SmartDashboard.putBoolean("fusing", false);
           }
-        }else{
-          SmartDashboard.putBoolean("fusing", false);
-        }
-        break;
+          break;
         case ONLY_COMMUNITY_AND_FEEDER:
           var stDev = VisionHelper.ironPanthersStdDevs(estimate);
-          stDev.set(2,0,Double.POSITIVE_INFINITY);
+          stDev.set(2, 0, Double.POSITIVE_INFINITY);
           estimate.setConfidence(stDev);
-          if(inCommunity(estimate.best.toPose2d()) || inFeederArea(estimate.best.toPose2d())){
+          if (inCommunity(estimate.best.toPose2d()) || inFeederArea(estimate.best.toPose2d())) {
             SmartDashboard.putBoolean("fusing", true);
             fuseEstimate(estimate);
-          }else{
+          } else {
             SmartDashboard.putBoolean("fusing", false);
           }
           break;
@@ -152,28 +152,32 @@ public class FuseVisionEstimate extends CommandBase {
     return MoreMath.within(pose, firstCorner, secondCorner);
   }
 
-  private static boolean correctColorTag(CustomEstimate estimate){
+  private static boolean correctColorTag(CustomEstimate estimate) {
     List<Integer> validTags;
-    if(MoreMath.isBlue()){
-      validTags = new ArrayList<Integer>(){{
-        add(4);
-        add(6);
-        add(7);
-        add(8);
-      }};
-    }else{
-      validTags = new ArrayList<Integer>(){{
-        add(1);
-        add(2);
-        add(3);
-        add(5);
-      }};
+    if (MoreMath.isBlue()) {
+      validTags = new ArrayList<Integer>() {
+        {
+          add(4);
+          add(6);
+          add(7);
+          add(8);
+        }
+      };
+    } else {
+      validTags = new ArrayList<Integer>() {
+        {
+          add(1);
+          add(2);
+          add(3);
+          add(5);
+        }
+      };
     }
     SmartDashboard.putNumber("vision testing/targets length", estimate.targetsUsed.size());
-    for(var target : estimate.targetsUsed){
+    for (var target : estimate.targetsUsed) {
       var id = target.getFiducialId();
       var isValid = validTags.contains(id);
-      if(!isValid){
+      if (!isValid) {
         return false;
       }
     }

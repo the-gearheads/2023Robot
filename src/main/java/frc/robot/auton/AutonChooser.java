@@ -75,20 +75,25 @@ public class AutonChooser {
   }
 
   public void initializeAutons() {//Here we define auton choices
-    Subsystems s = new Subsystems(swerve, wrist, arm, vision, grabber);
+    // Subsystems s = new Subsystems(swerve, wrist, arm, vision, grabber);
 
-    Command InertN4PlaceThenDock = AutonPaths.InertN4PlaceThenDock(s);
-    Command InertN1PlaceThenExplore = AutonPaths.InertN1PlaceThenExplore(s);
-    Command InertN9PlaceThenExplore = AutonPaths.InertN9PlaceThenExplore(s);
-    Command justPlace = AutonPaths.InertN1Place(s);
-    Command TwoGamePieceNoBump = AutonPaths.TwoGamePieceNoBump(s);
-    Command centerExploreThenDockSlow = AutonPaths.centerExploreThenDockSlow(s);
+    // Command InertN4PlaceThenDock = AutonPaths.InertN4PlaceThenDock(s);
+    // Command InertN1PlaceThenExplore = AutonPaths.InertN1PlaceThenExplore(s);
+    // Command InertN9PlaceThenExplore = AutonPaths.InertN9PlaceThenExplore(s);
+    // Command justPlace = AutonPaths.InertN1Place(s);
+    // Command TwoGamePieceNoBump = AutonPaths.TwoGamePieceNoBump(s);
+    // Command centerExploreThenDockSlow = AutonPaths.centerExploreThenDockSlow(s);
+    // Command twoconeBump = AutonPaths.twoConeBump(s);
+    // Command twoConeCenter = AutonPaths.center2Cone(s);
 
-    autons.put("Just Place", justPlace);
-    autons.put("CENTER Place Then Dock", InertN4PlaceThenDock);
-    autons.put("NO BUMP Place Then Move", InertN1PlaceThenExplore);
-    autons.put("BUMP Place Then Move", InertN9PlaceThenExplore);
-    autons.put("NO BUMP 2 Gamepiece", TwoGamePieceNoBump);
-    autons.put("CENTER explore then dock", centerExploreThenDockSlow);
+
+    // autons.put("Just Place", justPlace);
+    // autons.put("CENTER Place Then Dock", InertN4PlaceThenDock);
+    // autons.put("NO BUMP Place Then Move", InertN1PlaceThenExplore);
+    // autons.put("BUMP Place Then Move", InertN9PlaceThenExplore);
+    // autons.put("NO BUMP 2 Cone", TwoGamePieceNoBump);
+    // autons.put("BUMP Two Cone", twoconeBump);
+    // autons.put("CENTER explore then dock", centerExploreThenDockSlow);
+    // autons.put("CENTER 2 Cone", twoConeCenter);
   }
 }

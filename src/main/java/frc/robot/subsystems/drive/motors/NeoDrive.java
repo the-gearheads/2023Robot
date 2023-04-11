@@ -95,6 +95,10 @@ public class NeoDrive {
     return encoder.getVelocity();
   }
 
+  public double getTemperature() {
+    return max.getMotorTemperature();
+  }
+
   public double getAppliedVolts() {
     return max.getAppliedOutput() * max.getBusVoltage();
   }

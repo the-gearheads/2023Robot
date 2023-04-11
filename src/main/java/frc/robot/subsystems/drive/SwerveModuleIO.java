@@ -12,6 +12,7 @@ public interface SwerveModuleIO {
     public double drivePosition;
     public double driveVelocity;
     public double driveVelocitySetpoint;
+    public double driveTemperature;
 
     public String description;
 
@@ -19,6 +20,8 @@ public interface SwerveModuleIO {
     public double steerVelocity;
     public double steerAngle;
     public double steerAngleSetpoint;
+    public double steerTemperature;
+
   }
 
   public default void setState(SwerveModuleState state) {}

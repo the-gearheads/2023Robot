@@ -203,9 +203,9 @@ public class Wrist extends SubsystemBase {
       DriverStation.reportError("OUR ZERO ERROR IN WRIST", true);
       setVoltage(0);
       // if (configureHasRan == false) {
-        if(Math.floor(Timer.getFPGATimestamp()) % 2 == 0){
-          RevConfigUtils.configure(this::configure, "Wrist");
-        }
+      if (Math.floor(Timer.getFPGATimestamp()) % 2 == 0) {
+        RevConfigUtils.configure(this::configure, "Wrist");
+      }
       // }
       configureHasRan = true;
     }

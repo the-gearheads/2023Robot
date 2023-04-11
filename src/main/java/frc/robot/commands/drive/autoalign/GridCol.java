@@ -6,14 +6,14 @@ package frc.robot.commands.drive.autoalign;
 
 import edu.wpi.first.math.geometry.Translation2d;
 
-public class GridCol{
-    public Translation2d low;
-    public Translation2d mid;
-    public Translation2d high;
+public class GridCol {
+  public Translation2d low;
+  public Translation2d mid;
+  public Translation2d high;
 
-    public GridCol(Translation2d high, Translation2d mid, Translation2d low){
-        this.high=high;
-        this.mid=mid;
-        this.low=low;
-    }
+  public GridCol(Translation2d high, Translation2d mid, Translation2d low) {
+    this.high = high;
+    this.mid = mid;
+    this.low = low;
+  }
 }

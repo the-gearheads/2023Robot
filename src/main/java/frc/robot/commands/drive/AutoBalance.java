@@ -38,7 +38,7 @@ public class AutoBalance extends CommandBase {
 
     var vx = balancePid.calculate(roll, -2.6);
 
-    swerve.drive(new ChassisSpeeds(vx, 0, 0));
+    swerve.driveFieldRelative(new ChassisSpeeds(vx, 0, 0));
 
     SmartDashboard.putNumber("autobalance/roll", roll);
     SmartDashboard.putNumber("autobalance/vx", vx);

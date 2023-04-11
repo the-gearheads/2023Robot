@@ -113,6 +113,7 @@ public class Constants extends AnnotatedClass {
     /* Compressor min and max pressures */
     public static final double MIN_PRESSURE = 100;
     public static final double MAX_PRESSURE = 120;
+    public static final int GRABBER_SWITCH_ID = 2;
   }
 
   public static final class DRIVE {
@@ -214,7 +215,7 @@ public class Constants extends AnnotatedClass {
       SHOP, REAL, TEST;
     }
 
-    public static final FieldType FIELD_TYPE = FieldType.REAL;
+    public static final FieldType FIELD_TYPE = FieldType.SHOP;
   }
   public static final class CONTROLLERS {
     public static final double JOYSTICK_DEADBAND = 0.075;
@@ -226,7 +227,7 @@ public class Constants extends AnnotatedClass {
     public static final int LENGTH = 260;
   }
 
-  public static final class ROBOT{
+  public static final class ROBOT {
     public static final double ROBOT_X = Units.inchesToMeters(30.25);//without bumpers
     public static final double ROBOT_Y = Units.inchesToMeters(28.5);//without bumpers
     public static final double ROBOT_X_WITH_BUMPER = Units.inchesToMeters(36);
@@ -373,11 +374,9 @@ public class Constants extends AnnotatedClass {
         apriltagsCopy.add(new AprilTag(apriltag.ID, apriltag.pose));
       }
 
-      apriltagsCopy.get(4 - 1).pose = new Pose3d(
-        Units.inchesToMeters(277.4)+ Units.inchesToMeters(60),
-        Units.inchesToMeters(84.3) + Units.inchesToMeters(10),
-        apriltagsCopy.get(4 - 1).pose.getZ(),
-        new Rotation3d(0, 0, Units.degreesToRadians(180)));
+      apriltagsCopy.get(4 - 1).pose = new Pose3d(Units.inchesToMeters(277.4) + Units.inchesToMeters(60),
+          Units.inchesToMeters(84.3) + Units.inchesToMeters(10), apriltagsCopy.get(4 - 1).pose.getZ(),
+          new Rotation3d(0, 0, Units.degreesToRadians(180)));
 
       SHOP_ATFL = new AprilTagFieldLayout(apriltagsCopy, FIELD_CONSTANTS.LENGTH, FIELD_CONSTANTS.WIDTH);
     }
@@ -414,13 +413,11 @@ public class Constants extends AnnotatedClass {
 
   public static final class VISION_SIM {
     public static final List<SimCamParams> SIM_CAM_PARAMS = new ArrayList<SimCamParams>();
-    static{
-      for(var camAndTrans : VISION.CAMS_AND_TRANS.entrySet()){
+    static {
+      for (var camAndTrans : VISION.CAMS_AND_TRANS.entrySet()) {
         var camName = camAndTrans.getKey().getName();
         var trans = camAndTrans.getValue();
-        SIM_CAM_PARAMS.add(new SimCamParams(92, 9000, 640, 400, 0,
-        trans,
-        camName));
+        SIM_CAM_PARAMS.add(new SimCamParams(92, 9000, 640, 400, 0, trans, camName));
       }
 
     }
@@ -433,27 +430,27 @@ public class Constants extends AnnotatedClass {
       public static final double ROT_THRESHOLD = 20;
       public static final double DIST_THRESHOLD = 1;
       public static final PathConstraints CONSTRAINTS = new PathConstraints(2, 1.5);
-      public static final ArrayList<Translation2d> DIAG_CORNERS; 
+      public static final ArrayList<Translation2d> DIAG_CORNERS;
       static {
         switch (FIELD_CONSTANTS.FIELD_TYPE) {
           case SHOP:
-          DIAG_CORNERS = new ArrayList<Translation2d>() {
-            {
-              add(new Translation2d(0, 0));
-              add(new Translation2d(3, FIELD_CONSTANTS.WIDTH));
-            }
-          };
-          break;
+            DIAG_CORNERS = new ArrayList<Translation2d>() {
+              {
+                add(new Translation2d(0, 0));
+                add(new Translation2d(3, FIELD_CONSTANTS.WIDTH));
+              }
+            };
+            break;
           default:
-          DIAG_CORNERS = new ArrayList<Translation2d>() {
-            {
-              add(new Translation2d(0, 0));
-              add(new Translation2d(3.8, 5.56));
-            }
-          };
-          break;
+            DIAG_CORNERS = new ArrayList<Translation2d>() {
+              {
+                add(new Translation2d(0, 0));
+                add(new Translation2d(3.8, 5.56));
+              }
+            };
+            break;
         }
-     }
+      }
     }
     public static class FEEDER {
       public static final double Y_THRESHOLD = 0.5;

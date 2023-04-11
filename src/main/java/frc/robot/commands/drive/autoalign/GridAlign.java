@@ -13,10 +13,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.AUTO_ALIGN;
 import frc.robot.Constants.AUTO_ALIGN.COMMUNITY;
-import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
-import frc.robot.commands.drive.obsolete.Nodes.NodeX;
-import frc.robot.commands.drive.obsolete.Nodes.NodeY;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drive.Swerve;
@@ -24,9 +21,9 @@ import frc.robot.util.MoreMath;
 
 public class GridAlign extends SequentialCommandGroup {
   public GridAlign(Swerve swerve, Arm arm) {
-    if(isRotated(swerve)){
+    if (isRotated(swerve)) {
       addCommands(simpleAlign(swerve, arm));
-    }else{
+    } else {
       addCommands(new InstantCommand());
     }
   }
@@ -48,7 +45,7 @@ public class GridAlign extends SequentialCommandGroup {
   public static Command simpleAlign(Swerve swerve, Arm arm) {
     var destPose = getDestPose(swerve, arm);
     // var desiredArmPose = getDesiredArmPose(arm);
-  
+
     var pathCommand = swerve.goTo(destPose, COMMUNITY.CONSTRAINTS);
     // var armCommand = new SetArmPose(arm, desiredArmPose);
     return pathCommand;
@@ -99,18 +96,18 @@ public class GridAlign extends SequentialCommandGroup {
     var desiredGrid = getClosestGrid(swerve.getPose());
     var desiredGridCol = desiredGrid.leftCol;
     if (Controllers.driverController.getAutoLeft().getAsBoolean()) {
-      desiredGridCol=desiredGrid.leftCol;
+      desiredGridCol = desiredGrid.leftCol;
     } else if (Controllers.driverController.getAutoCenter().getAsBoolean()) {
-      desiredGridCol=desiredGrid.centerCol;
+      desiredGridCol = desiredGrid.centerCol;
     } else if (Controllers.driverController.getAutoRight().getAsBoolean()) {
-      desiredGridCol=desiredGrid.rightCol;
+      desiredGridCol = desiredGrid.rightCol;
     }
 
     return desiredGridCol;
   }
 
-  public static Community getCommunity(){
-    if(MoreMath.isBlue()){
+  public static Community getCommunity() {
+    if (MoreMath.isBlue()) {
       return Community.BLUE_GRID;
     }
     return Community.RED_GRID;
@@ -118,9 +115,7 @@ public class GridAlign extends SequentialCommandGroup {
 
   public static Grid getClosestGrid(Pose2d currentPose) {
     var community = getCommunity();
-    Grid[] grids = {community.leftGrid,
-                    community.centerGrid,
-                    community.rightGrid};
+    Grid[] grids = {community.leftGrid, community.centerGrid, community.rightGrid};
 
     var smallestDist = Double.POSITIVE_INFINITY;
     Grid closestGrid = grids[0];

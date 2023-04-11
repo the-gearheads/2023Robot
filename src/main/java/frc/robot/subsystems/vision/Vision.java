@@ -64,7 +64,7 @@ public class Vision extends SubsystemBase {
         swerve::getCtsGyroRotWithOffset, swerve.kinematics, swerve::setResetBuffer);
   }
 
-  public void setConfidenceStrat(ConfidenceStrat confidenceStrat){
+  public void setConfidenceStrat(ConfidenceStrat confidenceStrat) {
     defaultCommand.setConfidenceStrat(confidenceStrat);
   }
 
