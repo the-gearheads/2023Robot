@@ -138,6 +138,10 @@ public class Arm extends SubsystemBase {
       return;
     }
 
+    if(Math.floor(Timer.getFPGATimestamp()) % 2 == 0) {
+      configureHasRan = false;
+    }
+
     var pose = getPose();
     var vel = getVel();
     var volts = 0.0;

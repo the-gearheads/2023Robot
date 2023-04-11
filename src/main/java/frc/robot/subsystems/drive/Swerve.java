@@ -468,6 +468,12 @@ public class Swerve extends SubsystemBase {
     }
   }
 
+  public void configureAllMotors() {
+    for (int i = 0; i < modules.length; i++) {
+      modules[i].reconfigure();
+    } 
+  }
+
   public SwerveModulePosition[] getModulePositions() {
     return getPositionsFromInputs(lastInputs);
   }

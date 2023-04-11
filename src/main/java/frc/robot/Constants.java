@@ -170,9 +170,9 @@ public class Constants extends AnnotatedClass {
     @NTPublish
     public static double HIGH_LIN_VEL = 10;
 
-    public static double MID_LIN_VEL = 2.3;//set to 2
+    public static double MID_LIN_VEL = 2.6;//set to 2
 
-    public static double LOW_LIN_VEL = 0.5;//testing: 0.15
+    public static double LOW_LIN_VEL = 0.55;//testing: 0.15
     @NTPublish
     public static double HIGH_ROT_VEL = 7.5;
 

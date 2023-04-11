@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.subsystems.drive.motors.Neo550Steer;
 import frc.robot.subsystems.drive.motors.NeoDrive;
+import frc.robot.util.RevConfigUtils;
 
 public class SwerveModule implements SwerveModuleIO {
 
@@ -55,6 +56,12 @@ public class SwerveModule implements SwerveModuleIO {
 
     steer.setAngle(state.angle);
     drive.setSpeed(state.speedMetersPerSecond);
+  }
+
+  @Override
+  public void reconfigure() {
+    RevConfigUtils.configure(steer::configure, "Swerve " + id + "Steer");
+    RevConfigUtils.configure(drive::configure, "Swerve " + id + "Drive");
   }
 
   public void updateSteerPIDConstants(double kP, double kI, double kD, double kF) {

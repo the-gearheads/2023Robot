@@ -36,6 +36,8 @@ public interface SwerveModuleIO {
 
   public default void updateInputs(SwerveModuleInputs inputs) {}
 
+  public default void reconfigure() {}
+
   public default String getDescription() {
     return "";
   }

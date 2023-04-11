@@ -30,7 +30,7 @@ public class NeoDrive {
     RevConfigUtils.configure(this::configure, path + "/Drive");
   }
 
-  private ArrayList<REVLibError> configure() {
+  public ArrayList<REVLibError> configure() {
     ArrayList<REVLibError> e = new ArrayList<>();
     e.add(max.restoreFactoryDefaults());
     e.add(max.setSmartCurrentLimit(DRIVE.DRIVE_CURRENT_LIMIT));
