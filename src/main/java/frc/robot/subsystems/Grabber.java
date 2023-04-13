@@ -21,12 +21,22 @@ public class Grabber extends SubsystemBase {
   Solenoid openSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 1);
   PowerDistribution pdh = new PowerDistribution();
   Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
-  Trigger grabbedObjectSwitch = new Trigger(new DigitalInput(GRABBER_SWITCH_ID)::get).negate().debounce(0.1);
+  Trigger grabbedObjectSwitch = new Trigger(new DigitalInput(GRABBER_SWITCH_ID)::get).negate();
+  // .debounce(0.1);
 
   public Grabber() {
-    compressor.enableAnalog(MIN_PRESSURE, MAX_PRESSURE);
+    enableCompressor();
     close();
   }
+
+  public void enableCompressor() {
+    compressor.enableAnalog(MIN_PRESSURE, MAX_PRESSURE);
+  }
+
+  public void disableCompressor() {
+    compressor.disable();
+  }
+
 
   public void close() {
     openSolenoid.set(false);

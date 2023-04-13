@@ -45,7 +45,7 @@ public class AutonPaths {
 
         AutonHelper.stowAnd(s,
             AutonHelper.getCommandForPath("StartN4-PrepareDock", false, Constants.AUTON.DOCK_CONSTRAINTS, s.swerve),
-            new AutoBalance(s.swerve)));
+            new AutoBalance(s.swerve, s.grabber)));
   }
 
   public static Command InertN1Place(Subsystems s) {
@@ -237,7 +237,7 @@ public class AutonPaths {
         new CustomProxy(() -> {
           return centerExploreThenDockSlowProxy(s);
         }), AutonHelper.getCommandForPath("slow-explore-dock", false, centerExploreThenDockSlowConstraints, s.swerve),
-        new AutoBalance(s.swerve))
+        new AutoBalance(s.swerve, s.grabber))
 
     );
   }
@@ -282,7 +282,7 @@ public class AutonPaths {
       new CustomProxy(() -> {
         return center2ConeSecondProxy(s);
       }),
-      new AutoBalance(s.swerve)); 
+      new AutoBalance(s.swerve, s.grabber)); 
     }
       public static Command center2ConeFirstProxy(Subsystems s) {
         HashMap<String, Command> eventMap = new HashMap<>();

@@ -9,16 +9,19 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.AUTON;
+import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.drive.Swerve;
 
 public class AutoBalance extends CommandBase {
   // assumes already on chargin station.
   private Swerve swerve;
+  private Grabber grabber;
   private PIDController balancePid = AUTON.AUTO_BALANCE_PID;
 
   /** Creates a new AutoBalance. */
-  public AutoBalance(Swerve swerve) {
+  public AutoBalance(Swerve swerve, Grabber grabber) {
     this.swerve = swerve;
+    this.grabber = grabber;
     addRequirements(swerve);
     SmartDashboard.putData("AutoBalancePID", balancePid);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -29,6 +32,7 @@ public class AutoBalance extends CommandBase {
   public void initialize() {
     balancePid.reset();
     balancePid.setTolerance(1.5);
+    grabber.disableCompressor();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -38,7 +42,7 @@ public class AutoBalance extends CommandBase {
 
     var vx = balancePid.calculate(roll, -2.6);
 
-    swerve.driveFieldRelative(new ChassisSpeeds(vx, 0, 0));
+    swerve.drive(new ChassisSpeeds(vx, 0, 0));
 
     SmartDashboard.putNumber("autobalance/roll", roll);
     SmartDashboard.putNumber("autobalance/vx", vx);
@@ -50,6 +54,7 @@ public class AutoBalance extends CommandBase {
   public void end(boolean interrupted) {
     swerve.setX();
     swerve.drive(new ChassisSpeeds());
+    grabber.enableCompressor();
   }
 
   // Returns true when the command should end.

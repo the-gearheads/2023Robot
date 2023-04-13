@@ -41,7 +41,7 @@ public class ExploreBalance extends AutonRoutine {
 
         AutonHelper.getCommandForPath("N4_Explore-PrepareDock", false, centerExploreThenDockSlowConstraints, s.swerve),
 
-        new AutoBalance(s.swerve)
+        new AutoBalance(s.swerve, s.grabber)
       ).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.ONLY_COMMUNITY));
     }
 }

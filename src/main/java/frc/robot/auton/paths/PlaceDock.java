@@ -28,7 +28,7 @@ public class PlaceDock extends AutonRoutine {
         AutonHelper.getCommandForPath("N4_Inert-Start", true, PlaceDockConstraints, s.swerve),
         AutonHelper.getPlaceConeCommand(s),
         AutonHelper.getCommandForPath("N4_Start-PrepareDock", false, PlaceDockConstraints, s.swerve),
-        new AutoBalance(s.swerve)
+        new AutoBalance(s.swerve, s.grabber)
       ).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.NONE));
     }
 

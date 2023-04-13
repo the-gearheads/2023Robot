@@ -78,4 +78,9 @@ public class ThrustMaster implements OperatorController {
   public Trigger reconfigEVERYTHING() {
     return new JoystickButton(joy, 16);
   }
+
+  @Override
+  public Trigger autoGrab() {
+    return new JoystickButton(joy, 14);
+  }
 }

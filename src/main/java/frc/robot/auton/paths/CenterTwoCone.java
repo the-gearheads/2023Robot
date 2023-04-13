@@ -47,7 +47,7 @@ public class CenterTwoCone extends AutonRoutine {
         AutonHelper.stowAnd(s, 
           AutonHelper.getCommandForPath("N4_Gamepiece1-PrepareDock", false, centerTwoConeConstraints, s.swerve)
         ),
-        new AutoBalance(s.swerve)
+        new AutoBalance(s.swerve, s.grabber)
       ).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.ONLY_COMMUNITY));
   }
 }
