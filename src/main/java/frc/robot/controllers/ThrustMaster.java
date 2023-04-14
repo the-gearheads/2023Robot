@@ -42,7 +42,7 @@ public class ThrustMaster implements OperatorController {
   }
 
   public Trigger frontPickup() {
-    return new JoystickButton(joy, 8);
+    return new JoystickButton(joy, 16);
   }
 
   public Trigger armGoToInsideRobotNode() {
@@ -81,6 +81,6 @@ public class ThrustMaster implements OperatorController {
 
   @Override
   public Trigger autoGrab() {
-    return new JoystickButton(joy, 14);
+    return new JoystickButton(joy, 8);
   }
 }

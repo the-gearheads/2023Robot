@@ -17,8 +17,8 @@ import static frc.robot.Constants.GRABBER.*;
 
 public class Grabber extends SubsystemBase {
   boolean isClosed = true;
-  Solenoid closeSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 0);
-  Solenoid openSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 1);
+  Solenoid closeSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 1);
+  Solenoid openSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 0);
   PowerDistribution pdh = new PowerDistribution();
   Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
   Trigger grabbedObjectSwitch = new Trigger(new DigitalInput(GRABBER_SWITCH_ID)::get).negate();

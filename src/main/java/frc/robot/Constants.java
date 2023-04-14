@@ -82,7 +82,7 @@ public class Constants extends AnnotatedClass {
 
   public static class ARM {
     public static final int ARM_ID = 9;
-    public static final double[] ARM_POS_PID = {0.086, 0, 0};
+    public static final double[] ARM_POS_PID = {0.086, 0.001, 0};
     public static final double[] ARM_VEL_PID = {0.009, 0, 0};
     // ks, kg, kv, ka
     public static final double[] ARM_FF = {0, 0.5, 3, 0};
@@ -172,11 +172,11 @@ public class Constants extends AnnotatedClass {
 
     public static double MID_LIN_VEL = 2.6;//set to 2
 
-    public static double LOW_LIN_VEL = 0.55;//testing: 0.15
+    public static double LOW_LIN_VEL = 1.5;//testing: 0.15
     @NTPublish
     public static double HIGH_ROT_VEL = 7.5;
 
-    public static double MID_ROT_VEL = 1.5;
+    public static double MID_ROT_VEL = 1;
 
     public static double LOW_ROT_VEL = 0.5;//testing: 0.3
 
