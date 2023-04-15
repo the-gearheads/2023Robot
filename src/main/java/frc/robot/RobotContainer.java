@@ -210,8 +210,8 @@ public class RobotContainer {
       swerve.configureAllMotors(); // please test
     }));
 
-    Controllers.operatorController.autoGrab().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
-    Controllers.operatorController.autoGrab().and(grabber.getGrabbedObjectSwitch()::getAsBoolean)
+    Controllers.driverController.autoGrab().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
+    Controllers.driverController.autoGrab().and(grabber.getGrabbedObjectSwitch()::getAsBoolean)
         .whileTrue(new InstantCommand(grabber::close, grabber).andThen(new WaitForDriveAwayCommand(swerve, leds)));
   
     // Controllers.operatorController.throwCube()

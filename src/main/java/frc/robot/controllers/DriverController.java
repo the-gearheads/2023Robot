@@ -98,4 +98,8 @@ public interface DriverController {
   public default Trigger resetYaw() {
     return new Trigger(() -> false);
   }
+
+  public default Trigger autoGrab(){
+    return new Trigger(()->false);
+  }
 }

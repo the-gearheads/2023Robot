@@ -76,9 +76,9 @@ public class XboxDriverController implements DriverController {
   }
 
   public double getSetHeadingPOV() {
-    if (controller.getRightY() > 0.75)
+    if (controller.getRightY() > 0.9)
       return 180;
-    if (controller.getRightY() < -0.75)
+    if (controller.getRightY() < -0.9)
       return 0;
     return -1;
   }
@@ -122,7 +122,13 @@ public class XboxDriverController implements DriverController {
   public Trigger resetYaw() {
     return new Trigger(() -> {
       var val = controller.getLeftTriggerAxis();
-      return Math.abs(val) > 0.75;
+      return Math.abs(val) > 0.9;
+    });
+  }
+
+  public Trigger autoGrab(){
+    return new Trigger(()->{
+      return Math.abs(controller.getRightTriggerAxis()) > 0.9;
     });
   }
 }

@@ -167,18 +167,24 @@ public class Constants extends AnnotatedClass {
     public static final Translation2d RR_POS =
         new Translation2d(Units.inchesToMeters(-12.25), Units.inchesToMeters(-13.25));
 
+
     @NTPublish
     public static double HIGH_LIN_VEL = 10;
 
     public static double MID_LIN_VEL = 2.6;//set to 2
 
-    public static double LOW_LIN_VEL = 1.5;//testing: 0.15
+    public static double LOW_LIN_VEL = 0.55;//testing: 0.15
+
+    public static final double AUTO_GRAB_LIN_VEL = 1.5;
+
     @NTPublish
     public static double HIGH_ROT_VEL = 7.5;
 
     public static double MID_ROT_VEL = 1;
 
     public static double LOW_ROT_VEL = 0.5;//testing: 0.3
+
+    public static final double AUTO_GRAB_ROT_VEL = 0.5;
 
     @NTPublish
     public static double MAX_MODULE_SPEED = 5;

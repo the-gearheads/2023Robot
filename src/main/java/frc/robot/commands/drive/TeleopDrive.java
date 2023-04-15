@@ -123,6 +123,9 @@ public class TeleopDrive extends CommandBase {
     } else if (Controllers.driverController.HIGH_SPEED().getAsBoolean()) {
       lin_mult = Constants.DRIVE.HIGH_LIN_VEL;
       rot_mult = Constants.DRIVE.HIGH_ROT_VEL;
+    }else if(Controrllers.driverController.autoGrab().getAsBoolean()){
+      lin_mult = Constants.DRIVE.AUTO_GRAB_LIN_VEL;
+      rot_mult = Constants.DRIVE.AUTO_GRAB_ROT_VEL;
     }
     spds.vxMetersPerSecond *= lin_mult;
     spds.vyMetersPerSecond *= lin_mult;
