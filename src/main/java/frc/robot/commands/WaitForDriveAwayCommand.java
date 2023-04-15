@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
@@ -21,12 +22,16 @@ public class WaitForDriveAwayCommand extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-     leds.setState(LedState.GREEN); 
     }
   
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+      if(Math.floor(Timer.getFPGATimestamp() / 3.0) % 2 == 0){
+        leds.setState(LedState.GREEN);
+      }else{
+        leds.setState(LedState.WHITE);
+      }
     }
   
     // Called once the commak nd ends or is interrupted.
