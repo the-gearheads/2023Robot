@@ -30,7 +30,7 @@ public class WaitForDriveAwayCommand extends CommandBase {
       if(Math.floor(Timer.getFPGATimestamp() / 3.0) % 2 == 0){
         leds.setState(LedState.GREEN);
       }else{
-        leds.setState(LedState.WHITE);
+        leds.resetState();
       }
     }
   
