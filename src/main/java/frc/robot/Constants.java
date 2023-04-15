@@ -215,7 +215,7 @@ public class Constants extends AnnotatedClass {
       SHOP, REAL, TEST;
     }
 
-    public static final FieldType FIELD_TYPE = FieldType.SHOP;
+    public static final FieldType FIELD_TYPE = FieldType.REAL;
   }
   public static final class CONTROLLERS {
     public static final double JOYSTICK_DEADBAND = 0.075;

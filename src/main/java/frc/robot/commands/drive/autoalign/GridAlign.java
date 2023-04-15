@@ -4,6 +4,8 @@
 
 package frc.robot.commands.drive.autoalign;
 
+import com.pathplanner.lib.PathConstraints;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -11,6 +13,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants;
 import frc.robot.Constants.AUTO_ALIGN;
 import frc.robot.Constants.AUTO_ALIGN.COMMUNITY;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
@@ -44,11 +47,18 @@ public class GridAlign extends SequentialCommandGroup {
 
   public static Command simpleAlign(Swerve swerve, Arm arm) {
     var destPose = getDestPose(swerve, arm);
-    // var desiredArmPose = getDesiredArmPose(arm);
-
-    var pathCommand = swerve.goTo(destPose, COMMUNITY.CONSTRAINTS);
-    // var armCommand = new SetArmPose(arm, desiredArmPose);
+    var initSpeed = calcInitSpeed(swerve.getPose(), destPose);
+    var pathCommand = swerve.goTo(destPose, COMMUNITY.CONSTRAINTS, initSpeed);
     return pathCommand;
+  }
+
+  public static double calcInitSpeed(Pose2d initPose, Pose2d endPose){
+    var constraints = COMMUNITY.CONSTRAINTS;
+    //v^2=v0^2+2ad
+    var dist = endPose.getTranslation().minus(initPose.getTranslation()).getNorm();
+    var initSpeed = Math.sqrt(2*constraints.maxAcceleration*dist);
+    initSpeed = MathUtil.clamp(initSpeed, 0, constraints.maxVelocity);
+    return initSpeed;
   }
 
   public static Pose2d getDestPose(Swerve swerve, Arm arm) {

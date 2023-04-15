@@ -5,6 +5,7 @@
 package frc.robot.commands.drive.autoalign;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -35,12 +36,20 @@ public class FeederAlign extends SequentialCommandGroup {
   private static Command simpleAlign(Swerve swerve, Arm arm) {
     var startPose = swerve.getPose();
     var endPose = getDestPose(startPose);
-    var traj = MoreMath.createStraightPath(startPose, endPose, FEEDER.CONSTRAINTS);
+    var initSpeed = calcInitSpeed(swerve.getPose(), endPose);
+    // var traj = MoreMath.createStraightPath(startPose, endPose, FEEDER.CONSTRAINTS);
+    // var trajCommand = swerve.followTrajectoryCommand(traj, false, true);
+    // return trajCommand;
+    return swerve.goTo(endPose, FEEDER.CONSTRAINTS, initSpeed);
+  }
 
-    var trajCommand = swerve.followTrajectoryCommand(traj, false, true);
-    // var armCommand = new SetArmPose(arm, ArmPose.FEEDER_STATION);
-
-    return trajCommand;
+  public static double calcInitSpeed(Pose2d initPose, Pose2d endPose){
+    var constraints = FEEDER.CONSTRAINTS;
+    //v^2=v0^2+2ad
+    var dist = endPose.getTranslation().minus(initPose.getTranslation()).getNorm();
+    var initSpeed = Math.sqrt(2*constraints.maxAcceleration*dist);
+    initSpeed = MathUtil.clamp(initSpeed, 0, constraints.maxVelocity);
+    return initSpeed;
   }
 
   private static Pose2d getDestPose(Pose2d pose) {

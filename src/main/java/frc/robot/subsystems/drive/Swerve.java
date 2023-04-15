@@ -305,12 +305,16 @@ public class Swerve extends SubsystemBase {
   }
 
   public Command goTo(Pose2d endPose, PathConstraints constraints) {
+    return goTo(endPose, constraints, -1);
+  }
+
+  public Command goTo(Pose2d endPose, PathConstraints constraints, double initSpeed) {
     Pose2d startPose = getPose();
     Rotation2d startHeading = endPose.getTranslation().minus(startPose.getTranslation()).getAngle();
     Rotation2d endHeading = startHeading;
     // .rotateBy(Rotation2d.fromDegrees(180));
 
-    PathPoint startPoint = new PathPoint(startPose.getTranslation(), startHeading, startPose.getRotation());// position, heading(direction of travel), holonomic rotation
+    PathPoint startPoint = new PathPoint(startPose.getTranslation(), startHeading, startPose.getRotation(), initSpeed);// position, heading(direction of travel), holonomic rotation
     PathPoint endPoint = new PathPoint(endPose.getTranslation(), endHeading, endPose.getRotation());
     PathPlannerTrajectory traj = PathPlanner.generatePath(constraints, startPoint, endPoint);
     return followTrajectoryCommand(traj, false, true);
