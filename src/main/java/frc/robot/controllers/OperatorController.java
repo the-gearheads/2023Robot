@@ -68,7 +68,7 @@ public interface OperatorController {
     return new Trigger(() -> false);
   }
 
-  public default Trigger autoGrab() {
+  public default Trigger floorPickup() {
     return new Trigger(() -> false);
   }
 }

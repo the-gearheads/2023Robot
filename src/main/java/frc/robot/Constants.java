@@ -180,7 +180,8 @@ public class Constants extends AnnotatedClass {
     @NTPublish
     public static double HIGH_ROT_VEL = 7.5;
 
-    public static double MID_ROT_VEL = 1;
+    public static double MID_ROT_VEL = 2;
+    ;//0.5
 
     public static double LOW_ROT_VEL = 0.5;//testing: 0.3
 

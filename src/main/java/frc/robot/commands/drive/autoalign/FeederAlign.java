@@ -47,7 +47,7 @@ public class FeederAlign extends SequentialCommandGroup {
     var constraints = FEEDER.CONSTRAINTS;
     //v^2=v0^2+2ad
     var dist = endPose.getTranslation().minus(initPose.getTranslation()).getNorm();
-    var initSpeed = Math.sqrt(2*constraints.maxAcceleration*dist);
+    var initSpeed = Math.sqrt(2*constraints.maxAcceleration*dist) * 0.25;
     initSpeed = MathUtil.clamp(initSpeed, 0, constraints.maxVelocity);
     return initSpeed;
   }

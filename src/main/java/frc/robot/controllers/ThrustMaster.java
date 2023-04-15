@@ -80,7 +80,7 @@ public class ThrustMaster implements OperatorController {
   }
 
   @Override
-  public Trigger autoGrab() {
+  public Trigger floorPickup() {
     return new JoystickButton(joy, 8);
   }
 }

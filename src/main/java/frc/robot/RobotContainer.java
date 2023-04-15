@@ -30,6 +30,7 @@ import frc.robot.commands.drive.TeleopDrive;
 import frc.robot.commands.drive.autoalign.AutoAlign;
 import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
 import frc.robot.commands.wrist.AltWristControl;
+import frc.robot.commands.wrist.FloorPickUp;
 import frc.robot.commands.wrist.ManualWristControl;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
@@ -209,6 +210,8 @@ public class RobotContainer {
       arm.configure();
       swerve.configureAllMotors(); // please test
     }));
+
+    Controllers.operatorController.floorPickup().onTrue(new FloorPickUp(arm, wrist));
 
     Controllers.driverController.autoGrab().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
     Controllers.driverController.autoGrab().and(grabber.getGrabbedObjectSwitch()::getAsBoolean)

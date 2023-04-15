@@ -56,7 +56,7 @@ public class GridAlign extends SequentialCommandGroup {
     var constraints = COMMUNITY.CONSTRAINTS;
     //v^2=v0^2+2ad
     var dist = endPose.getTranslation().minus(initPose.getTranslation()).getNorm();
-    var initSpeed = Math.sqrt(2*constraints.maxAcceleration*dist);
+    var initSpeed = Math.sqrt(2*constraints.maxAcceleration*dist) * 0.25;
     initSpeed = MathUtil.clamp(initSpeed, 0, constraints.maxVelocity);
     return initSpeed;
   }
@@ -93,7 +93,7 @@ public class GridAlign extends SequentialCommandGroup {
     ArmPose closestArmPose = ArmPose.HIGH_NODE;
 
     for (var armPose : armPoses) {
-      var dist = Math.abs(armPose.val - arm.getPose());
+      var dist = Math.abs(armPose.val - arm.getPoseGoal().position);
       if (dist < smallestDist) {
         smallestDist = dist;
         closestArmPose = armPose;
