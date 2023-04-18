@@ -25,11 +25,6 @@ public class WaitForDriveAwayCommand extends CommandBase {
       leds.setState(LedState.FLASH_GREEN);
     }
   
-    // Called every time the scheduler runs while the command is scheduled.
-    @Override
-    public void execute() {
-    }
-  
     // Called once the commak nd ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
