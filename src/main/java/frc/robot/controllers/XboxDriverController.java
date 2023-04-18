@@ -78,8 +78,8 @@ public class XboxDriverController implements DriverController {
   public double getSetHeadingPOV() {
     if (controller.getRightY() > 0.9)
       return 180;
-    if (controller.getRightY() < -0.9)
-      return 0;
+    // if (controller.getRightY() < -0.9)
+    //   return 0;
     return -1;
   }
 
