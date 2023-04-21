@@ -40,7 +40,7 @@ public class AutonHelper {
    */
   public static Command getPlaceConeCommand(Subsystems s) {
     return new AltWristControl(s.wrist).raceWith(new SequentialCommandGroup(new WaitCommand(0.25), // Wait for wrist to rotate before dropping cone
-        openGrabber(s.grabber))).andThen(new WaitCommand(0.25), // Wait for grabber and gravity to drop cone
+        openGrabber(s.grabber))).andThen(new WaitCommand(0.35), // Wait for grabber and gravity to drop cone used to be 0.25
             closeGrabber(s.grabber));
   }
 
