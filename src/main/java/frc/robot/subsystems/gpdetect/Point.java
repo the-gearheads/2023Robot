@@ -14,6 +14,12 @@ public final class Point {
     this.y = y;
   }
 
+  public double distanceTo(Point p2) {
+    double dx = p2.x - x;
+    double dy = p2.y - y;
+    return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)); 
+  }
+
   @Override
   public String toString() {
     return "(PT) X: " + x + ", Y: " + y;

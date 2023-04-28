@@ -1,6 +1,7 @@
 package frc.robot.subsystems.gpdetect;
 
 import java.util.ArrayList;
+import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -9,9 +10,15 @@ import frc.robot.subsystems.gpdetect.Detection.GamePiece;
 
 public class GamePieceDetector extends SubsystemBase {
   private NetworkTable table = NetworkTableInstance.getDefault().getTable("/GPDetect");
+  private DoubleArraySubscriber sub = table.getDoubleArrayTopic("Detections").subscribe(new double[] {});
+  private BooleanPublisher enablePub = table.getBooleanTopic("Enabled").publish();
   private int packetLength = 6;
   private ArrayList<Detection> detections = new ArrayList<>(packetLength * 10);
-  private DoubleArraySubscriber sub = table.getDoubleArrayTopic("Detections").subscribe(new double[] {});
+  private boolean enabled = false;
+
+  public GamePieceDetector() {
+    disableDetection();
+  }
 
   @Override
   public void periodic() {
@@ -31,6 +38,57 @@ public class GamePieceDetector extends SubsystemBase {
       }
       detections.add(new Detection(gp, confidence, points.toArray(new Point[points.size()])));
     }
+  }
 
+  public Detection getDetectionByArea() {
+    Detection maxArea = null;
+    for(var det: detections) {
+      if(maxArea == null) {maxArea = det; continue;}
+      if(maxArea.area < det.area) {
+        maxArea = det;
+      }
+    }
+    return maxArea;
+  }
+
+  /* Might not be needed, evaluate later. */
+  public Detection getDetectionClosestToCenter() {
+    Detection closest = null;
+    Point center = new Point(0.5, 0.5);
+    for(var det: detections) {
+      if(closest == null) {closest = det; continue;}
+      if(closest.centerPoint.distanceTo(center) > det.centerPoint.distanceTo(center)) {
+        closest = det;
+      }
+    }
+    return closest;
+  }
+
+  public int getNumTargets() {
+    return detections.size();
+  }
+
+  public void enableDetection() {
+    enablePub.accept(true);
+    enabled = true;
+  }
+
+  public void disableDetection() {
+    enablePub.accept(false);
+    enabled = false;
+  }
+
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public boolean isConnected() {
+    var connections = NetworkTableInstance.getDefault().getConnections();
+    for (var conn : connections) {
+      if(conn.remote_id.equals("GPDetect")) { 
+        return true;
+      }
+    }
+    return false;
   }
 }
