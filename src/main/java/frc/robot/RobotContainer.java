@@ -55,6 +55,7 @@ import frc.robot.subsystems.drive.SwerveModuleSim;
 import frc.robot.subsystems.drive.gyro.Gyro;
 import frc.robot.subsystems.drive.gyro.GyroIO;
 import frc.robot.subsystems.drive.gyro.GyroSim;
+import frc.robot.subsystems.gpdetect.GamePieceDetector;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -129,6 +130,7 @@ public class RobotContainer {
     autonChooser = new AutonChooser(swerve, arm, wrist, grabber, vision);
     // AutonLoader.load(new Subsystems(swerve, wrist, arm, vision, grabber));
     leds = new Leds();
+    new GamePieceDetector();
     // Configure the button binding
 
     // swerve.setDefaultCommand(new TeleopDrive(swerve));

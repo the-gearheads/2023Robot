@@ -22,21 +22,25 @@ public class GamePieceDetector extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // intended format: type(0==cube, 1==cone), confidence, 4x corners (x, then y, origin top left)
+    // intended format: type(0==cube, 1==cone), confidence, TLX, TLY, BRX, BRY
     var data = sub.get();
     if (data.length < packetLength) {
       return;
     }
 
     detections.clear();
-    for (int i = 0; i < data.length % packetLength; i++) {
+    for (int i = 0; i < Math.floor(data.length / packetLength); i++) {
       GamePiece gp = GamePiece.fromInt((int) data[i * packetLength + 0]);
       double confidence = data[i * packetLength + 1];
-      ArrayList<Point> points = new ArrayList<>(4);
-      for (int j = 0; j < 4; j++) {
-        points.add(new Point(data[i * packetLength + 2 * j + 0], data[i * packetLength + 2 * j + 1]));
+      ArrayList<Point> points = new ArrayList<>(2);
+      for (int j = 0; j < 2; j++) {
+        points.add(new Point(data[i * packetLength + 2 + 2*j + 0], data[i * packetLength + 2 + 2*j + 1]));
       }
       detections.add(new Detection(gp, confidence, points.toArray(new Point[points.size()])));
+    }
+
+    if(isConnected() && detections.size() > 0) {
+      System.out.println(detections.get(0).toString());
     }
   }
 
@@ -85,7 +89,7 @@ public class GamePieceDetector extends SubsystemBase {
   public boolean isConnected() {
     var connections = NetworkTableInstance.getDefault().getConnections();
     for (var conn : connections) {
-      if(conn.remote_id.equals("GPDetect")) { 
+      if(conn.remote_id.contains("GPDetect")) { 
         return true;
       }
     }
