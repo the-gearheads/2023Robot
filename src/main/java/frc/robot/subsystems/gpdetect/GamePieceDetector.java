@@ -38,10 +38,6 @@ public class GamePieceDetector extends SubsystemBase {
       }
       detections.add(new Detection(gp, confidence, points.toArray(new Point[points.size()])));
     }
-
-    if(isConnected() && detections.size() > 0) {
-      System.out.println(detections.get(0).toString());
-    }
   }
 
   public Detection getDetectionByArea() {
