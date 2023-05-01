@@ -12,10 +12,10 @@ import frc.robot.subsystems.arm.Arm.ArmControlMode;
 
 public class SetArmPose extends CommandBase {
   private Arm arm;
-  private ArmPose armPose;
+  private double armPoseVal;
 
   public enum ArmPose {//-8.2 for front pickup -184 for feederstation
-    FRONT_PICKUP(-6.2), FLOOR(-74), HIGH_NODE(4), MID_NODE(-15.46), LOW_NODE(-61.87), FEEDER_STATION(-185), INSIDE_ROBOT(-110), VARIABLE(0);
+    FRONT_PICKUP(-6.2), FLOOR(-74), HIGH_NODE(4), MID_NODE(-15.46), LOW_NODE(-61.87), FEEDER_STATION(-187), INSIDE_ROBOT(-110), VARIABLE(0);
 
     public double val;
 
@@ -37,16 +37,14 @@ public class SetArmPose extends CommandBase {
   public SetArmPose(Arm arm, ArmPose armPose) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.arm = arm;
-    this.armPose = armPose;
+    this.armPoseVal = armPose.val;
     addRequirements(arm);
   }
 
   public SetArmPose(Arm arm, double armPoseVal) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.arm = arm;
-    var armPose = ArmPose.VARIABLE;
-    armPose.setGoal(armPoseVal);
-    this.armPose = armPose;
+    this.armPoseVal = armPoseVal;
     addRequirements(arm);
   }
 
@@ -54,7 +52,7 @@ public class SetArmPose extends CommandBase {
   @Override
   public void initialize() {
     arm.setControlMode(ArmControlMode.POS);
-    arm.setPoseGoal(armPose.val);
+    arm.setPoseGoal(armPoseVal);
   }
 
   // Called once the command ends or is interrupted.
@@ -68,7 +66,7 @@ public class SetArmPose extends CommandBase {
       return true;
     }
 
-    double goal = armPose.val;
+    double goal = armPoseVal;
     double currentPose = arm.getPose();
     double poseError = goal - currentPose;
     poseError = Math.abs(poseError);

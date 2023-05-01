@@ -175,10 +175,10 @@ public class Constants extends AnnotatedClass {
 
     public static double LOW_LIN_VEL = 0.55;//testing: 0.15
 
-    public static final double AUTO_GRAB_LIN_VEL = 1.5;
+    public static final double AUTO_GRAB_LIN_VEL = 1.8;//used to be 1.5
 
     @NTPublish
-    public static double HIGH_ROT_VEL = 7.5;
+    public static double HIGH_ROT_VEL = 15;  // 7.5 og, changed at houston
 
     public static double MID_ROT_VEL = 2;
     ;//0.5
@@ -200,7 +200,7 @@ public class Constants extends AnnotatedClass {
     public static PIDController Y_PID = new PIDController(5, 0, 0);//0.5
     public static PIDController ROT_PID = new PIDController(1.5, 0, 0);
     public static PathConstraints REALLY_SLOW_CONSTRAINTS = new PathConstraints(0.75, 0.7);
-    public static PathConstraints SLOW_CONSTRAINTS = new PathConstraints(2, 1);
+    public static PathConstraints SLOW_CONSTRAINTS = new PathConstraints(2.03, 1.01);
     public static PathConstraints MID_CONSTRAINTS = new PathConstraints(3, 1.5);
     public static PathConstraints FAST_CONSTRAINTS = new PathConstraints(7, 3);
 

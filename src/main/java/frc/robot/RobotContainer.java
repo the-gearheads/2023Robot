@@ -217,7 +217,8 @@ public class RobotContainer {
 
     Controllers.driverController.autoGrab().whileTrue(new StartEndCommand(grabber::open, grabber::close, grabber));
     Controllers.driverController.autoGrab().and(grabber.getGrabbedObjectSwitch()::getAsBoolean)
-        .whileTrue(new InstantCommand(grabber::close, grabber).andThen(new WaitForDriveAwayCommand(swerve, leds)));
+        .onTrue(new SetArmPose(arm, SetArmPose.ArmPose.FEEDER_STATION.val+2).andThen(new InstantCommand(grabber::close, grabber))
+        .andThen(new WaitForDriveAwayCommand(swerve, leds)));
   
     // Controllers.operatorController.throwCube()
     //     .onTrue(new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 80, 20)));
