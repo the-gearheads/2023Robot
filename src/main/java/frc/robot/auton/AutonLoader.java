@@ -49,8 +49,7 @@ public class AutonLoader {
     if (selectedAuton == null) {
       DriverStation.reportError("Selected Auton is null", false);
       if (autons.size() > 0) {
-        var firstAuton = (Map.Entry<String, Command>) autons.entrySet().iterator().next();
-        selectedAuton = firstAuton.getValue();
+        selectedAuton = autons.values().iterator().next();
       } else {
         DriverStation.reportError("No Autons Defined", false);
         selectedAuton = new PrintCommand("No Auton Selected");

@@ -56,7 +56,7 @@ public class CustomSendableChooser<V> implements NTSendable, AutoCloseable {
     SendableRegistry.add(this, "SendableChooser", m_instance);
   }
 
-  public Map getAutons(){
+  public Map<String, V> getAutons(){
     return m_map;
   }
 
