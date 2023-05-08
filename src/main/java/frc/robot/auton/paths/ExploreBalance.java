@@ -10,14 +10,12 @@ import frc.robot.auton.AutonHelper;
 import frc.robot.auton.AutonRoutine;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
-import frc.robot.commands.drive.AutoBalDriveToPivot;
 import frc.robot.commands.drive.AutoBalance;
 import frc.robot.commands.drive.autoalign.Community;
 import frc.robot.commands.vision.FuseVisionEstimate;
 import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
 import frc.robot.subsystems.Subsystems;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 @AutonAnnotation(name = "CENTER Explore Then Balance")
 public class ExploreBalance extends AutonRoutine {

@@ -29,7 +29,6 @@ import org.photonvision.common.networktables.NTTopicSet;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-@SuppressWarnings("unused")
 public class SimPhotonCamera {
   NTTopicSet ts = new NTTopicSet();
   PhotonPipelineResult latestResult;

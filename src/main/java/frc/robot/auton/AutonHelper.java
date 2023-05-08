@@ -1,7 +1,6 @@
 package frc.robot.auton;
 
 import java.util.Map;
-import javax.sound.midi.Sequence;
 import org.littletonrobotics.junction.Logger;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -10,10 +9,8 @@ import com.pathplanner.lib.commands.FollowPathWithEvents;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
@@ -21,8 +18,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.commands.arm.StowArm;
-import frc.robot.commands.drive.autoalign.Community;
-import frc.robot.commands.drive.autoalign.GridCol;
 import frc.robot.commands.wrist.AltWristControl;
 import frc.robot.commands.wrist.FloorPickUp;
 import frc.robot.subsystems.Grabber;
@@ -30,7 +25,6 @@ import frc.robot.subsystems.Subsystems;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.CustomProxy;
 import frc.robot.util.MoreMath;
-import com.pathplanner.lib.commands.FollowPathWithEvents;
 
 public class AutonHelper {
 

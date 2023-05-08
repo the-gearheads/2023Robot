@@ -143,6 +143,8 @@ public class Throw extends CommandBase {
           this.lastState = getCurrentState();
         }
         break;
+      default:
+        // :(
     }
   }
 

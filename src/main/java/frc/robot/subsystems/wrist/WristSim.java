@@ -37,7 +37,7 @@ public class WristSim extends Wrist {
     super(arm);
     this.armSim = arm;
 
-    simPivot = new MechRootWrapper(this.armSim.m_mech2d, "WristPivot", 0, 0);
+    simPivot = new MechRootWrapper(ArmSim.m_mech2d, "WristPivot", 0, 0);
     simLig = simPivot.append(new MechanismLigament2d("Wrist", MECH_PLOT.WRIST_LENGTH,
         Units.radiansToDegrees(sim.getAngleRads()), 10.0, new Color8Bit(Color.kBlue)));
     simCone = new Cone(simPivot, new Pose2d(5, 0, new Rotation2d(180)));
@@ -86,8 +86,8 @@ public class WristSim extends Wrist {
 
   public void simulationPeriodic() {
     double armPosRads = Units.degreesToRadians(armSim.getPose());
-    double pivot_x = MECH_PLOT.ARM_PIVOT_X + (armSim.m_arm.getLength()) * Math.cos(armPosRads);
-    double pivot_y = MECH_PLOT.ARM_PIVOT_Y + (armSim.m_arm.getLength()) * Math.sin(armPosRads);
+    double pivot_x = MECH_PLOT.ARM_PIVOT_X + (ArmSim.m_arm.getLength()) * Math.cos(armPosRads);
+    double pivot_y = MECH_PLOT.ARM_PIVOT_Y + (ArmSim.m_arm.getLength()) * Math.sin(armPosRads);
     simPivot.setPosition(pivot_x, pivot_y);
     // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)

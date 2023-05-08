@@ -9,7 +9,6 @@ import frc.robot.auton.AutonHelper;
 import frc.robot.auton.AutonRoutine;
 import frc.robot.commands.arm.SetArmPose;
 import frc.robot.commands.arm.SetArmPose.ArmPose;
-import frc.robot.commands.drive.AutoBalance;
 import frc.robot.commands.vision.FuseVisionEstimate;
 import frc.robot.commands.vision.FuseVisionEstimate.ConfidenceStrat;
 import frc.robot.subsystems.Subsystems;

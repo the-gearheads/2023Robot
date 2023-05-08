@@ -5,7 +5,6 @@
 package frc.robot.commands.drive.autoalign;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 
 /** Add your docs here. */
 public enum Community {

@@ -141,9 +141,10 @@ public class Vision extends SubsystemBase {
 
   public void logTagPoses() {
     /* Loop through estimators/cams */
+    var camTransIter = Constants.VISION.CAMS_AND_TRANS.entrySet().iterator();
     for (var i = 0; i < estimators.size(); i++) {
       //create camera and transform variables to ease access
-      var camAndTrans = (Entry<PhotonCamera, Transform3d>) Constants.VISION.CAMS_AND_TRANS.entrySet().toArray()[i];
+      Entry<PhotonCamera, Transform3d> camAndTrans = camTransIter.next();
       var cam = camAndTrans.getKey();
       var robot2Cam = camAndTrans.getValue();
 
