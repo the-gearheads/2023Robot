@@ -43,11 +43,11 @@ public class FeederAlign extends SequentialCommandGroup {
     return swerve.goTo(endPose, FEEDER.CONSTRAINTS, initSpeed);
   }
 
-  public static double calcInitSpeed(Pose2d initPose, Pose2d endPose){
+  public static double calcInitSpeed(Pose2d initPose, Pose2d endPose) {
     var constraints = FEEDER.CONSTRAINTS;
     //v^2=v0^2+2ad
     var dist = endPose.getTranslation().minus(initPose.getTranslation()).getNorm();
-    var initSpeed = Math.sqrt(2*constraints.maxAcceleration*dist) * 0.25;
+    var initSpeed = Math.sqrt(2 * constraints.maxAcceleration * dist) * 0.25;
     initSpeed = MathUtil.clamp(initSpeed, 0, constraints.maxVelocity);
     return initSpeed;
   }

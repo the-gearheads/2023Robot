@@ -15,7 +15,7 @@ public class Detection {
   public final double confidence;
   public final double area;
   public final GamePiece type;
-  
+
   public Detection(GamePiece type, double confidence, Point[] corners) {
     this.type = type;
     this.confidence = confidence;
@@ -26,10 +26,7 @@ public class Detection {
   }
 
   private Point calculateCenterPoint() {
-    return new Point(
-      (topLeft.x + bottomRight.x) / 2,
-      (topLeft.y + bottomRight.y) / 2
-    );
+    return new Point((topLeft.x + bottomRight.x) / 2, (topLeft.y + bottomRight.y) / 2);
   }
 
   private double calculateArea() {
@@ -38,17 +35,13 @@ public class Detection {
 
   @Override
   public String toString() {
+    // spotless: off
     return new StringBuilder()
-      .append("(DET) T: ")
-      .append(type.name())
-      .append(", C: ")
-      .append(Double.toString(confidence))
-      .append(", C-P: ")
-      .append(centerPoint.toString())
-      .append(", TL: ")
-      .append(topLeft.toString())
-      .append(", BR: ")
-      .append(bottomRight.toString())
-      .toString();
+        .append("(DET) T: ").append(type.name())
+        .append(", C: ").append(Double.toString(confidence))
+        .append(", C-P: ").append(centerPoint.toString())
+        .append(", TL: ").append(topLeft.toString())
+        .append(", BR: ").append(bottomRight.toString()).toString();
+    // spotless: on
   }
 }

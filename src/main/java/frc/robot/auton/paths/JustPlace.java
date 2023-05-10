@@ -15,18 +15,16 @@ import frc.robot.subsystems.Subsystems;
 
 @AutonAnnotation(name = "Just Place")
 public class JustPlace extends AutonRoutine {
-    private static PathConstraints PlaceDockConstraints = Constants.AUTON.MID_CONSTRAINTS;
+  private static PathConstraints PlaceDockConstraints = Constants.AUTON.MID_CONSTRAINTS;
 
-    @Override
-    public CommandBase getCommand(Subsystems s, String v) {
-      return new SequentialCommandGroup(
-        AutonHelper.setInitRot(s.swerve, "N4_Inert-Start"),
+  @Override
+  public CommandBase getCommand(Subsystems s, String v) {
+    return new SequentialCommandGroup(AutonHelper.setInitRot(s.swerve, "N4_Inert-Start"),
 
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),
 
         AutonHelper.getCommandForPath("N4_Inert-Start", true, PlaceDockConstraints, s.swerve),
-        AutonHelper.getPlaceConeCommand(s)
-      ).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.NONE));
-    }
+        AutonHelper.getPlaceConeCommand(s)).raceWith(new FuseVisionEstimate(s.vision, ConfidenceStrat.NONE));
+  }
 
 }

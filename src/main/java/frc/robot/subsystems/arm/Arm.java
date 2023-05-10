@@ -138,7 +138,7 @@ public class Arm extends SubsystemBase {
       return;
     }
 
-    if(Math.floor(Timer.getFPGATimestamp()) % 2 == 0) {
+    if (Math.floor(Timer.getFPGATimestamp()) % 2 == 0) {
       configureHasRan = false;
     }
 

@@ -99,7 +99,7 @@ public interface DriverController {
     return new Trigger(() -> false);
   }
 
-  public default Trigger autoGrab(){
-    return new Trigger(()->false);
+  public default Trigger autoGrab() {
+    return new Trigger(() -> false);
   }
 }

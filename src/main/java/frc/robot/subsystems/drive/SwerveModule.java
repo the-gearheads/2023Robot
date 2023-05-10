@@ -22,7 +22,7 @@ public class SwerveModule implements SwerveModuleIO {
     this.id = id;
     this.description = description;
     this.angleOffset = Rotation2d.fromDegrees(offsets[0]);
-    if(DRIVE.DRIVE_MOTOR.isFalcon) {
+    if (DRIVE.DRIVE_MOTOR.isFalcon) {
       drive = new FalconDrive(driveId, getPath());
     } else {
       drive = new NeoDrive(driveId, getPath());

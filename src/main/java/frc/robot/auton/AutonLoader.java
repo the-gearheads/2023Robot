@@ -43,7 +43,7 @@ public class AutonLoader {
   public static Command getCommand() {
     Command selectedAuton = chooser.getSelected();
     var autons = chooser.getAutons();
-    
+
     if (selectedAuton == null) {
       DriverStation.reportError("Selected Auton is null", false);
       if (autons.size() > 0) {

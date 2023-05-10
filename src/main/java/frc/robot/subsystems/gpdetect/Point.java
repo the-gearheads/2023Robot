@@ -17,7 +17,7 @@ public final class Point {
   public double distanceTo(Point p2) {
     double dx = p2.x - x;
     double dy = p2.y - y;
-    return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)); 
+    return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
   }
 
   @Override

@@ -31,7 +31,7 @@ public class XboxDriverController implements DriverController {
 
   @Override
   public double getRotateAxis() {
-    if(cardinalIsSet().getAsBoolean()){
+    if (cardinalIsSet().getAsBoolean()) {
       return 0;
     }
 
@@ -83,9 +83,9 @@ public class XboxDriverController implements DriverController {
     return -1;
   }
 
-  public Trigger cardinalIsSet(){
-    return new Trigger(()->{
-      return getSetHeadingPOV()!=-1;
+  public Trigger cardinalIsSet() {
+    return new Trigger(() -> {
+      return getSetHeadingPOV() != -1;
     });
   }
 
@@ -126,8 +126,8 @@ public class XboxDriverController implements DriverController {
     });
   }
 
-  public Trigger autoGrab(){
-    return new Trigger(()->{
+  public Trigger autoGrab() {
+    return new Trigger(() -> {
       return Math.abs(controller.getRightTriggerAxis()) > 0.9;
     });
   }

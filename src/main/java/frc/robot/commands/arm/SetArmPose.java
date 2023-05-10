@@ -15,7 +15,8 @@ public class SetArmPose extends CommandBase {
   private double armPoseVal;
 
   public enum ArmPose {//-8.2 for front pickup -184 for feederstation
-    FRONT_PICKUP(-6.2), FLOOR(-74), HIGH_NODE(4), MID_NODE(-15.46), LOW_NODE(-61.87), FEEDER_STATION(-187), INSIDE_ROBOT(-110), VARIABLE(0);
+    FRONT_PICKUP(-6.2), FLOOR(-74), HIGH_NODE(4), MID_NODE(-15.46), LOW_NODE(-61.87), FEEDER_STATION(
+        -187), INSIDE_ROBOT(-110), VARIABLE(0);
 
     public double val;
 

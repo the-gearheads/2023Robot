@@ -40,8 +40,8 @@ public class AutonHelper {
 
   public static Command getGroundPickUpCommand(Subsystems s) {
     return new SequentialCommandGroup(openGrabber(s.grabber), new WaitCommand(0.25),
-        new AltWristControl(s.wrist).raceWith(
-            new SequentialCommandGroup(new WaitCommand(1), closeGrabber(s.grabber), new WaitCommand(1))),
+        new AltWristControl(s.wrist)
+            .raceWith(new SequentialCommandGroup(new WaitCommand(1), closeGrabber(s.grabber), new WaitCommand(1))),
         new WaitCommand(1));
   }
 
@@ -119,7 +119,7 @@ public class AutonHelper {
   }
 
   public static Command setInitRot(Swerve swerve, String pathName) {
-    return new InstantCommand(()->{
+    return new InstantCommand(() -> {
       PathPlannerTrajectory path = PathPlanner.loadPath(pathName, Constants.AUTON.SLOW_CONSTRAINTS);
       path = PathPlannerTrajectory.transformTrajectoryForAlliance(path, DriverStation.getAlliance());
       var initRot = path.getInitialPose().getRotation();
@@ -127,18 +127,20 @@ public class AutonHelper {
     });
   }
 
-  public static CustomProxy goToPathDesination(Swerve swerve, String pathName, PathConstraints constraints) {  
-    return new CustomProxy(()->{
+  public static CustomProxy goToPathDesination(Swerve swerve, String pathName, PathConstraints constraints) {
+    return new CustomProxy(() -> {
       PathPlannerTrajectory path = PathPlanner.loadPath(pathName, constraints);
       path = PathPlannerTrajectory.transformTrajectoryForAlliance(path, DriverStation.getAlliance());
       var finalState = path.getEndState();
-      var finalPose = new Pose2d(finalState.poseMeters.getX(), finalState.poseMeters.getY(), finalState.holonomicRotation);
-  
+      var finalPose =
+          new Pose2d(finalState.poseMeters.getX(), finalState.poseMeters.getY(), finalState.holonomicRotation);
+
       return swerve.goTo(finalPose, constraints);
     }, swerve);
   }
 
-  public static CustomProxy goToGridAlignment(Swerve swerve, Translation2d blueDest, Translation2d redDest, Rotation2d rot, PathConstraints constraints) {
+  public static CustomProxy goToGridAlignment(Swerve swerve, Translation2d blueDest, Translation2d redDest,
+      Rotation2d rot, PathConstraints constraints) {
     return new CustomProxy(() -> {
       if (MoreMath.isBlue()) {
         return swerve.goTo(new Pose2d(blueDest, rot), constraints);
@@ -149,15 +151,16 @@ public class AutonHelper {
   }
 
   public static Command followWithEvents(String pathName, Map<String, Command> eventMap, boolean resetOdometry,
-  PathConstraints constrainsts, Swerve swerve, boolean reversed) {
+      PathConstraints constrainsts, Swerve swerve, boolean reversed) {
     var path = AutonHelper.getPathByName(pathName, constrainsts);
     var pathCommand = AutonHelper.getCommandForPath(pathName, resetOdometry, constrainsts, swerve);
-    
+
     return new FollowPathWithEvents(pathCommand, path.getMarkers(), eventMap);
   }
 
   public static Command pickupCone(Subsystems s) {
-    return (AutonHelper.closeGrabber(s.grabber).andThen(new WaitCommand(0.25))).raceWith(new FloorPickUp(s.arm, s.wrist));
+    return (AutonHelper.closeGrabber(s.grabber).andThen(new WaitCommand(0.25)))
+        .raceWith(new FloorPickUp(s.arm, s.wrist));
   }
 }
 //format:on

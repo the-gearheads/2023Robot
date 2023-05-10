@@ -8,8 +8,8 @@ import frc.robot.subsystems.wrist.Wrist;
 
 public class FrontPickup extends ParallelCommandGroup {
 
-    public FrontPickup(Arm arm, Wrist wrist) {
-        super(new SetArmPose(arm, ArmPose.FRONT_PICKUP), new SetWristPoseIndefinitely(wrist, 0));
-        // Use addRequirements() here to declare subsystem dependencies.
-    }
+  public FrontPickup(Arm arm, Wrist wrist) {
+    super(new SetArmPose(arm, ArmPose.FRONT_PICKUP), new SetWristPoseIndefinitely(wrist, 0));
+    // Use addRequirements() here to declare subsystem dependencies.
+  }
 }
