@@ -35,10 +35,14 @@ public class Neo550Steer {
     pid = max.getPIDController();
     sPid = new SendableSparkMaxPID(pid);
     encoder = max.getAbsoluteEncoder(Type.kDutyCycle);
-    RevConfigUtils.configure(this::configure, path + "/Steer");
+    configure();
   }
 
-  public ArrayList<REVLibError> configure() {
+  public void configure() {
+    RevConfigUtils.configure(this::configureFunc, path + "/Steer");
+  }
+
+  private ArrayList<REVLibError> configureFunc() {
     ArrayList<REVLibError> e = new ArrayList<>();
     e.add(max.restoreFactoryDefaults());
     e.add(max.setSmartCurrentLimit(DRIVE.STEER_CURRENT_LIMIT));

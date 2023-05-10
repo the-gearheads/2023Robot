@@ -14,11 +14,12 @@ import frc.robot.Constants.DRIVE;
 import frc.robot.util.RevConfigUtils;
 import frc.robot.util.SendableSparkMaxPID;
 
-public class NeoDrive {
+public class NeoDrive implements DriveMotor {
   private CANSparkMax max;
   private RelativeEncoder encoder;
   private SparkMaxPIDController pid;
   private SendableSparkMaxPID sPid;
+  private String path;
 
   private double setpoint;
 
@@ -27,13 +28,18 @@ public class NeoDrive {
     encoder = max.getEncoder();
     pid = max.getPIDController();
     sPid = new SendableSparkMaxPID(pid);
-    RevConfigUtils.configure(this::configure, path + "/Drive");
+    this.path = path;
+    configure();
   }
 
-  public ArrayList<REVLibError> configure() {
+  public void configure() {
+    RevConfigUtils.configure(this::configureFunc, path + "/Drive");
+  }
+
+  private ArrayList<REVLibError> configureFunc() {
     ArrayList<REVLibError> e = new ArrayList<>();
     e.add(max.restoreFactoryDefaults());
-    e.add(max.setSmartCurrentLimit(DRIVE.DRIVE_CURRENT_LIMIT));
+    e.add(max.setSmartCurrentLimit(DRIVE.DRIVE_MOTOR.CURRENT_LIMIT));
     e.add(max.setIdleMode(IdleMode.kBrake));
 
     e.add(encoder.setPositionConversionFactor(DRIVE.DRIVE_POS_FACTOR));
@@ -44,10 +50,10 @@ public class NeoDrive {
 
     e.add(pid.setFeedbackDevice(encoder));
 
-    e.add(sPid.setP(DRIVE.DRIVE_PIDF[0]));
-    e.add(sPid.setI(DRIVE.DRIVE_PIDF[1]));
-    e.add(sPid.setD(DRIVE.DRIVE_PIDF[2]));
-    e.add(sPid.setFF(DRIVE.DRIVE_PIDF[3]));
+    e.add(sPid.setP(DRIVE.DRIVE_MOTOR.DRIVE_PIDF[0]));
+    e.add(sPid.setI(DRIVE.DRIVE_MOTOR.DRIVE_PIDF[1]));
+    e.add(sPid.setD(DRIVE.DRIVE_MOTOR.DRIVE_PIDF[2]));
+    e.add(sPid.setFF(DRIVE.DRIVE_MOTOR.DRIVE_PIDF[3]));
 
     // Probably the default
     e.add(pid.setOutputRange(-1, 1));

@@ -2,13 +2,16 @@ package frc.robot.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.robot.Constants.DRIVE;
+import frc.robot.subsystems.drive.motors.DriveMotor;
+import frc.robot.subsystems.drive.motors.FalconDrive;
 import frc.robot.subsystems.drive.motors.Neo550Steer;
 import frc.robot.subsystems.drive.motors.NeoDrive;
 import frc.robot.util.RevConfigUtils;
 
 public class SwerveModule implements SwerveModuleIO {
 
-  protected NeoDrive drive;
+  protected DriveMotor drive;
   protected Neo550Steer steer;
 
   protected Rotation2d angleOffset;
@@ -20,7 +23,11 @@ public class SwerveModule implements SwerveModuleIO {
     this.id = id;
     this.description = description;
     this.angleOffset = Rotation2d.fromDegrees(offsets[0]);
-    drive = new NeoDrive(driveId, getPath());
+    if(DRIVE.DRIVE_MOTOR.isFalcon) {
+      drive = new FalconDrive(driveId, getPath());
+    } else {
+      drive = new NeoDrive(driveId, getPath());
+    }
     steer = new Neo550Steer(steerId, offsets[1], getPath());
   }
 
@@ -60,8 +67,8 @@ public class SwerveModule implements SwerveModuleIO {
 
   @Override
   public void reconfigure() {
-    RevConfigUtils.configure(steer::configure, "Swerve " + id + "Steer");
-    RevConfigUtils.configure(drive::configure, "Swerve " + id + "Drive");
+    steer.configure();
+    drive.configure();
   }
 
   public void updateSteerPIDConstants(double kP, double kI, double kD, double kF) {
@@ -71,6 +78,7 @@ public class SwerveModule implements SwerveModuleIO {
   /* Called every periodic() */
   @Override
   public void updateInputs(SwerveModuleInputs inputs) {
+    drive.periodic();
     inputs.description = this.description;
 
     inputs.driveAppliedVolts = drive.getAppliedVolts();
