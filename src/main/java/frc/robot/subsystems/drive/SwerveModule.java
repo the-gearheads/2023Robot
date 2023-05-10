@@ -7,7 +7,6 @@ import frc.robot.subsystems.drive.motors.DriveMotor;
 import frc.robot.subsystems.drive.motors.FalconDrive;
 import frc.robot.subsystems.drive.motors.Neo550Steer;
 import frc.robot.subsystems.drive.motors.NeoDrive;
-import frc.robot.util.RevConfigUtils;
 
 public class SwerveModule implements SwerveModuleIO {
 
