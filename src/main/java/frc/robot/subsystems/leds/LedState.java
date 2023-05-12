@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 public enum LedState {
   //@formatter:off
   PURPLE(Color.kPurple), YELLOW(Color.kYellow),
-  BLACK(Color.kBlack), WHITE(Color.kWhite),
+  BLACK(Color.kBlack), WHITE(Color.kWhite), ORANGE(Color.kOrange),
   GREEN(Color.kGreen), HOT_PINK(new Color(255, 0, 200)),
   FLASH_RED((AddressableLEDBuffer buf) -> {
     boolean isOn = Math.floor(Timer.getFPGATimestamp() * 10) % 2 == 0; 

@@ -2,6 +2,7 @@ package frc.robot.subsystems.gpdetect;
 
 import java.util.ArrayList;
 import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -12,9 +13,9 @@ public class GamePieceDetector extends SubsystemBase {
   private NetworkTable table = NetworkTableInstance.getDefault().getTable("/GPDetect");
   private DoubleArraySubscriber sub = table.getDoubleArrayTopic("Detections").subscribe(new double[] {});
   private BooleanPublisher enablePub = table.getBooleanTopic("Enabled").publish();
+  private BooleanSubscriber enableAck = table.getBooleanTopic("EnabledACK").subscribe(false);
   private int packetLength = 6;
   private ArrayList<Detection> detections = new ArrayList<>(packetLength * 10);
-  private boolean enabled = false;
 
   public GamePieceDetector() {
     disableDetection();
@@ -76,16 +77,14 @@ public class GamePieceDetector extends SubsystemBase {
 
   public void enableDetection() {
     enablePub.accept(true);
-    enabled = true;
   }
 
   public void disableDetection() {
     enablePub.accept(false);
-    enabled = false;
   }
 
   public boolean isEnabled() {
-    return enabled;
+    return isConnected() && enableAck.get();
   }
 
   public boolean isConnected() {

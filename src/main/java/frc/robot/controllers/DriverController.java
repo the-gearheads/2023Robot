@@ -102,4 +102,8 @@ public interface DriverController {
   public default Trigger autoGrab() {
     return new Trigger(() -> false);
   }
+
+  public default Trigger gpAlign() {
+    return new Trigger(() -> false);
+  }
 }

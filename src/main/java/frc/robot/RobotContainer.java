@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DRIVE;
+import frc.robot.commands.GPAlignTeleop;
 import frc.robot.commands.WaitForDriveAwayCommand;
 import frc.robot.commands.arm.JoystickArmControl;
 import frc.robot.commands.arm.SetArmPose;
@@ -56,6 +57,7 @@ import frc.robot.subsystems.gpdetect.GamePieceDetector;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 
@@ -70,6 +72,7 @@ public class RobotContainer {
   private Vision vision;
   private final AutonChooser autonChooser;
   private final Arm arm;
+  private final GamePieceDetector gpdetect;
   private Wrist wrist;
   private Grabber grabber;
   private Leds leds;
@@ -127,7 +130,7 @@ public class RobotContainer {
     autonChooser = new AutonChooser(swerve, arm, wrist, grabber, vision);
     // AutonLoader.load(new Subsystems(swerve, wrist, arm, vision, grabber));
     leds = new Leds();
-    new GamePieceDetector();
+    gpdetect = new GamePieceDetector();
     // Configure the button binding
 
     // swerve.setDefaultCommand(new TeleopDrive(swerve));
@@ -216,6 +219,11 @@ public class RobotContainer {
     Controllers.driverController.autoGrab().and(grabber.getGrabbedObjectSwitch()::getAsBoolean)
         .onTrue(new SetArmPose(arm, SetArmPose.ArmPose.FEEDER_STATION.val + 2)
             .andThen(new InstantCommand(grabber::close, grabber)).andThen(new WaitForDriveAwayCommand(swerve, leds)));
+
+    Controllers.driverController.gpAlign().whileTrue(new ParallelRaceGroup(
+      new GPAlignTeleop(swerve, gpdetect, leds),
+      new StartEndCommand(grabber::open, grabber::close, grabber).until(grabber.getGrabbedObjectSwitch()::getAsBoolean)
+    ));
 
     // Controllers.operatorController.throwCube()
     //     .onTrue(new Throw(arm, wrist, grabber, leds, new ThrowState(-45, 80, 20)));
