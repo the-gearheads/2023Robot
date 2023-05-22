@@ -1,68 +1,75 @@
 package frc.robot.subsystems.drive.motors;
 
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+
+import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.PIDController;
 import frc.robot.Constants.DRIVE;
 
 public class FalconDrive implements DriveMotor {
 
-  private WPI_TalonFX motor;
+  private TalonFX motor;
   private DRIVE.DriveMotor drv = DRIVE.DRIVE_MOTOR;
-  private PIDController pid;
-  private double arbFF;
   private String path;
 
+  private static double ROTATIONS_TO_METERS = DRIVE.DRIVE_POS_FACTOR;
+  private static double METERS_TO_ROTATIONS = 1d / DRIVE.DRIVE_POS_FACTOR;
+  /* Yes this is intentional, Phoenix6 uses rot/sec rather than rot/min so no conversion is needed and code becomes ugly
+   * See https://pro.docs.ctr-electronics.com/en/latest/docs/migration/migration-guide/closed-loop-guide.html */
+  private static double RPM_TO_MPS = DRIVE.DRIVE_POS_FACTOR;
+  private static double MPS_TO_RPM = 1d / DRIVE.DRIVE_POS_FACTOR;
 
   public FalconDrive(int id, String path) {
-    var pidf = drv.DRIVE_PIDF;
-    this.motor = new WPI_TalonFX(id);
-    this.pid = new PIDController(pidf[0], pidf[1], pidf[2]);
-    this.arbFF = pidf[3];
+    this.motor = new TalonFX(id);
     this.path = path;
     configure();
   }
 
+
   public void configure() {
-    motor.configFactoryDefault();
-    motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, drv.CURRENT_LIMIT, 0, 0));
+    TalonFXConfiguration cfg = new TalonFXConfiguration();
+
+    cfg.Slot0.kP = drv.DRIVE_PIDF[0];
+    cfg.Slot0.kI = drv.DRIVE_PIDF[1];
+    cfg.Slot0.kD = drv.DRIVE_PIDF[2];
+    cfg.Slot0.kV = drv.DRIVE_PIDF[3];
+
+    cfg.MotorOutput.DutyCycleNeutralDeadband = 0.005;
+    cfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    cfg.CurrentLimits.StatorCurrentLimit = drv.CURRENT_LIMIT;
+    cfg.CurrentLimits.StatorCurrentLimitEnable = true;
+
+    /* Retry config apply up to 5 times, report if failure */
+    StatusCode status = StatusCode.StatusCodeNotInitialized;
+    for (int i = 0; i < 5; ++i) {
+      status = motor.getConfigurator().apply(cfg);
+      if (status.isOK())
+        break;
+    }
+    if (!status.isOK()) {
+      System.out.println("Could not apply configs, error code: " + status.toString());
+    }
   }
 
-  private double nativeToMeters(double distance) {
-    double ratioed = distance / DRIVE.DRIVE_GEAR_RATIO; // m -> rotations
-    return ratioed * 8192.0;
-  }
-
-  @SuppressWarnings("unused")
-  private double metersToNative(double distance) {
-    // the above, but in reverse :)
-    double unTalonified = distance / 8192.0;
-    return unTalonified * DRIVE.DRIVE_GEAR_RATIO;
-  }
-
-  private double nativeVelToMeters(double velocity) {
-    return nativeToMeters(velocity) / 10; // m/s -> m/100ms
-  }
-
+  private VelocityDutyCycle velDutyCycle = new VelocityDutyCycle(0, false, 0, 0, false);
   public void setSpeed(double speed) {
-    pid.setSetpoint(speed);
-  }
-
-  public void periodic() {
-    // hope this works
-    motor.set(pid.calculate(getPosition()) + pid.getSetpoint() * arbFF);
+    motor.setControl(velDutyCycle.withVelocity(speed * MPS_TO_RPM));
   }
 
   public void zeroEncoders() {
-    motor.setSelectedSensorPosition(0);
+    motor.
   }
 
   public double getPosition() {
-    return nativeToMeters(motor.getSelectedSensorPosition());
+    return motor.getRotorPosition().getValue().doubleValue() * ROTATIONS_TO_METERS;
   }
 
   public double getVelocity() {
-    return nativeVelToMeters(motor.getSelectedSensorVelocity());
+    return motor.getRotorVelocity().getValue().doubleValue() * RPM_TO_MPS;
   }
 
   public double getVelocitySetpoint() {
@@ -70,10 +77,10 @@ public class FalconDrive implements DriveMotor {
   }
 
   public double getTemperature() {
-    return motor.getTemperature();
+    return motor.getDeviceTemp().getValue();
   }
 
   public double getAppliedVolts() {
-    return motor.getMotorOutputVoltage();
+    return motor.getDutyCycle().getValue() * motor.getSupplyVoltage().getValue();
   }
 }
