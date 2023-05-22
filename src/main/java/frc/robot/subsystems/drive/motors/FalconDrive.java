@@ -61,6 +61,7 @@ public class FalconDrive implements DriveMotor {
   }
 
   public void zeroEncoders() {
+    motor.setRotorPosition(0);
   }
 
   public double getPosition() {
@@ -72,7 +73,7 @@ public class FalconDrive implements DriveMotor {
   }
 
   public double getVelocitySetpoint() {
-    return 0;
+    return motor.getClosedLoopReference().getValue();
   }
 
   public double getTemperature() {
