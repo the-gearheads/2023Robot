@@ -169,7 +169,7 @@ public class Constants extends AnnotatedClass {
       public final boolean isFalcon = true;
       public final int MOTOR_FREE_RPM = 6380;
       public final int CURRENT_LIMIT = 40;
-      public final double[] DRIVE_PIDF = {0.04, 0, 0, 1 / DRIVE_FREE_SPEED};
+      public final double[] DRIVE_PIDF = {0.04, 0, 0, 1 / (MOTOR_FREE_RPM / 60d)};
 
     }
     public static class DriveMotor {

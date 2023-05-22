@@ -17,10 +17,10 @@ public class FalconDrive implements DriveMotor {
 
   private static double ROTATIONS_TO_METERS = DRIVE.DRIVE_POS_FACTOR;
   private static double METERS_TO_ROTATIONS = 1d / DRIVE.DRIVE_POS_FACTOR;
-  /* Yes this is intentional, Phoenix6 uses rot/sec rather than rot/min so no conversion is needed and code becomes ugly
+  /* Yes this is intentional, Phoenix6 uses rot/sec rather than rot/min so we don't use the vel factor as that uses RPM.
    * See https://pro.docs.ctr-electronics.com/en/latest/docs/migration/migration-guide/closed-loop-guide.html */
-  private static double RPM_TO_MPS = DRIVE.DRIVE_POS_FACTOR;
-  private static double MPS_TO_RPM = 1d / DRIVE.DRIVE_POS_FACTOR;
+  private static double RPS_TO_MPS = DRIVE.DRIVE_POS_FACTOR;
+  private static double MPS_TO_RPS = 1d / DRIVE.DRIVE_POS_FACTOR;
 
   public FalconDrive(int id, String path) {
     this.motor = new TalonFX(id);
@@ -57,11 +57,10 @@ public class FalconDrive implements DriveMotor {
 
   private VelocityDutyCycle velDutyCycle = new VelocityDutyCycle(0, false, 0, 0, false);
   public void setSpeed(double speed) {
-    motor.setControl(velDutyCycle.withVelocity(speed * MPS_TO_RPM));
+    motor.setControl(velDutyCycle.withVelocity(speed * MPS_TO_RPS));
   }
 
   public void zeroEncoders() {
-    motor.
   }
 
   public double getPosition() {
@@ -69,11 +68,11 @@ public class FalconDrive implements DriveMotor {
   }
 
   public double getVelocity() {
-    return motor.getRotorVelocity().getValue().doubleValue() * RPM_TO_MPS;
+    return motor.getRotorVelocity().getValue().doubleValue() * RPS_TO_MPS;
   }
 
   public double getVelocitySetpoint() {
-    return pid.getSetpoint();
+    return 0;
   }
 
   public double getTemperature() {
