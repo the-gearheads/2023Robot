@@ -129,12 +129,12 @@ public class Constants extends AnnotatedClass {
     public static final double[] RL_OFFSETS = {180, 0.534};
     public static final double[] RR_OFFSETS = {90, 0.033};//-90
 
-    public static final DriveMotor DRIVE_MOTOR = new NeoMotorConfig();
+    public static final DriveMotor DRIVE_MOTOR = new FalconMotorConfig();
 
     public static final double WHEEL_DIAMETER = Units.inchesToMeters(3);
     public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
 
-    public static final double DRIVE_PINION_TOOTH_COUNT = 13;
+    public static final double DRIVE_PINION_TOOTH_COUNT = 14;
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the bevel pinion
     public static final double DRIVE_GEAR_RATIO = (45.0 * 22) / (DRIVE_PINION_TOOTH_COUNT * 15);
 
@@ -159,25 +159,28 @@ public class Constants extends AnnotatedClass {
     public static final double[] STEER_PIDF = {1, 0, 0, 0};
 
     public static class NeoMotorConfig extends DriveMotor {
-      public final boolean isFalcon = false;
-      public final int MOTOR_FREE_RPM = 5676;
-      public final int CURRENT_LIMIT = 40;
-      public final double[] DRIVE_PIDF = {0.04, 0, 0, 1 / DRIVE_FREE_SPEED};
+      public NeoMotorConfig() {
+        this.isFalcon = false;
+        this.MOTOR_FREE_RPM = 5676;
+        this.CURRENT_LIMIT = 40;
+        this.DRIVE_PIDF = new double[]{0.04, 0, 0, 1 / DRIVE_FREE_SPEED};
+      }
     }
 
     public static class FalconMotorConfig extends DriveMotor {
-      public final boolean isFalcon = true;
-      public final int MOTOR_FREE_RPM = 6380;
-      public final int CURRENT_LIMIT = 40;
-      // consider trying a P value of 0.0018856
-      public final double[] DRIVE_PIDF = {0.04, 0, 0, 1 / (MOTOR_FREE_RPM / 60d)};
-
+      public FalconMotorConfig() {
+        this.isFalcon = true;
+        this.MOTOR_FREE_RPM = 6380;
+        this.CURRENT_LIMIT = 80;
+        // consider trying a P value of 0.0018856
+        this.DRIVE_PIDF = new double[]{0.04, 0, 0, 1 / (MOTOR_FREE_RPM / 60d)};
+      }
     }
     public static class DriveMotor {
-      public final boolean isFalcon = false;
-      public final int MOTOR_FREE_RPM = 0;
-      public final int CURRENT_LIMIT = 0;
-      public final double[] DRIVE_PIDF = {0.04, 0, 0, 1 / DRIVE_FREE_SPEED};
+      public boolean isFalcon = false;
+      public int MOTOR_FREE_RPM = 0;
+      public int CURRENT_LIMIT = 0;
+      public double[] DRIVE_PIDF = {0.04, 0, 0, 1 / DRIVE_FREE_SPEED};
     }
 
     public static final Translation2d FL_POS =

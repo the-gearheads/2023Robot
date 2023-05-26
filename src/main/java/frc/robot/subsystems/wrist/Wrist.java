@@ -40,7 +40,7 @@ public class Wrist extends SubsystemBase {
   private double ffval;
   private double volts;
 
-  private WristState goal;
+  private WristState goal = WristState.INSIDE_ROBOT;
 
   private double lastNonWrapRangePose = 90;
   private boolean wrapRangeEntered = false;

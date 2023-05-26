@@ -153,6 +153,7 @@ public class TeleopDrive extends CommandBase {
       rotSpd = rotPIDCnt.calculate(ctsGyroAngle, angleGoal);
       Logger.getInstance().recordOutput("TeleopDrive/rot pid/rotSpd", rotSpd);
       rotSpd = MathUtil.clamp(rotSpd, -2.5, 2.5);
+      rotSpd = MathUtil.applyDeadband(rotSpd, 0.1);
       Logger.getInstance().recordOutput("TeleopDrive/rot pid/clamped rotSpd", rotSpd);
 
       spds.omegaRadiansPerSecond = rotSpd;

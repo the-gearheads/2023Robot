@@ -73,7 +73,7 @@ public class FalconDrive implements DriveMotor {
   }
 
   public double getVelocitySetpoint() {
-    return motor.getClosedLoopReference().getValue();
+    return motor.getClosedLoopReference().getValue() * RPS_TO_MPS;
   }
 
   public double getTemperature() {
