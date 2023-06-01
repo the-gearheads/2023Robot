@@ -13,7 +13,7 @@ import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.drive.Swerve;
 
 public class AutoBalance extends CommandBase {
-  // assumes already on chargin station.
+  // assumes already on charging station.
   private Swerve swerve;
   private Grabber grabber;
   private PIDController balancePid = AUTON.AUTO_BALANCE_PID;
@@ -24,7 +24,6 @@ public class AutoBalance extends CommandBase {
     this.grabber = grabber;
     addRequirements(swerve);
     SmartDashboard.putData("AutoBalancePID", balancePid);
-    // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
@@ -39,14 +38,12 @@ public class AutoBalance extends CommandBase {
   @Override
   public void execute() {
     double roll = swerve.getRoll();
-
     var vx = balancePid.calculate(roll, -2.6);
 
     swerve.drive(new ChassisSpeeds(vx, 0, 0));
 
     SmartDashboard.putNumber("autobalance/roll", roll);
     SmartDashboard.putNumber("autobalance/vx", vx);
-    // SmartDashboard.putNumber("auto")
   }
 
   // Called once the commak nd ends or is interrupted.
