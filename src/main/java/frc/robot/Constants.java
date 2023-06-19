@@ -194,18 +194,18 @@ public class Constants extends AnnotatedClass {
 
 
     @NTPublish
-    public static double HIGH_LIN_VEL = 10;
+    public static double HIGH_LIN_VEL = 1.5; // 10
 
-    public static double MID_LIN_VEL = 2.6;//set to 2
+    public static double MID_LIN_VEL = 1;// 2.6
 
-    public static double LOW_LIN_VEL = 0.55;//testing: 0.15
+    public static double LOW_LIN_VEL = 0.5; // 0.55
 
     public static final double AUTO_GRAB_LIN_VEL = 1.8;//used to be 1.5
 
     @NTPublish
-    public static double HIGH_ROT_VEL = 15; // 7.5 og, changed at houston
+    public static double HIGH_ROT_VEL = 1.5; // 7.5 og, changed at houston to 15
 
-    public static double MID_ROT_VEL = 2;;//0.5
+    public static double MID_ROT_VEL = 1;; // 2
 
     public static double LOW_ROT_VEL = 0.5;//testing: 0.3
 
