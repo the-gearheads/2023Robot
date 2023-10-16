@@ -1,12 +1,12 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.leds.LedState;
 import frc.robot.subsystems.leds.Leds;
 
-public class WaitForDriveAwayCommand extends CommandBase {
+public class WaitForDriveAwayCommand extends Command {
   /** Creates a new AutoBalance. */
   Swerve swerve;
   Leds leds;

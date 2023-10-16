@@ -1,11 +1,11 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AUTON;
 import frc.robot.subsystems.drive.Swerve;
 
-public class AutoBalDriveToPivot extends CommandBase {
+public class AutoBalDriveToPivot extends Command {
   private Swerve swerve;
 
   /** Creates a new AutoBalance. */

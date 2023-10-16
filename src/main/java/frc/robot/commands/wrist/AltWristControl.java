@@ -4,11 +4,11 @@
 
 package frc.robot.commands.wrist;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristState.WristControlType;
 
-public class AltWristControl extends CommandBase {
+public class AltWristControl extends Command {
   private Wrist wrist;
 
   /** Creates a new SetWristAlternatePose. */

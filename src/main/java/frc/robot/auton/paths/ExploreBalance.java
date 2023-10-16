@@ -3,7 +3,7 @@ package frc.robot.auton.paths;
 import java.util.Map;
 import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.auton.AutonAnnotation;
 import frc.robot.auton.AutonHelper;
@@ -23,7 +23,7 @@ public class ExploreBalance extends AutonRoutine {
   public static PathConstraints centerExploreThenDockSlowConstraints = new PathConstraints(1, 0.75);
 
   @Override
-  public CommandBase getCommand(Subsystems s, String v) {
+  public Command getCommand(Subsystems s, String v) {
     return new SequentialCommandGroup(AutonHelper.setInitRot(s.swerve, "N4_Inert-Start"),
 
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),

@@ -6,13 +6,13 @@ package frc.robot.commands.arm;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Arm.ArmControlMode;
 
-public class JoystickArmControl extends CommandBase {
+public class JoystickArmControl extends Command {
   private Arm arm;
 
   /** Creates a new JoystickArmControl. */

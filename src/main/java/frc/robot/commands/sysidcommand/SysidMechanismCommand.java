@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.ArrayList;
 import java.util.function.Consumer;
@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 import frc.robot.Robot;
 
 // This is going to be slightly weird
-public class SysidMechanismCommand extends CommandBase {
+public class SysidMechanismCommand extends Command {
   private ArrayList<Double> data = new ArrayList<Double>();
   /* If the test is dynamic, false if quasistatic */
   private boolean isDynamicTest;

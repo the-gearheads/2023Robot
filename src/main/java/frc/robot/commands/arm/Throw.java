@@ -7,7 +7,7 @@ package frc.robot.commands.arm;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ARM;
 import frc.robot.commands.arm.ThrowState.ThrowPhase;
 import frc.robot.subsystems.Grabber;
@@ -18,7 +18,7 @@ import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristState;
 
-public class Throw extends CommandBase {
+public class Throw extends Command {
   private static final double wristTolerance = 10;
   private static final double armTolerance = 2;
   private static final double grabber_wait_time = 1;

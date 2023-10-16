@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.AddressableLEDSim;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -52,11 +52,11 @@ public class Leds extends SubsystemBase {
     this.state = defaultState;
   }
 
-  public CommandBase getSetStateCommand(LedState newState) {
+  public Command getSetStateCommand(LedState newState) {
     return new InstantCommand(() -> setState(newState), this);
   }
 
-  public CommandBase setStateForTimeCommand(LedState newState, double waitSecs) {
+  public Command setStateForTimeCommand(LedState newState, double waitSecs) {
     return getSetStateCommand(newState).andThen(new WaitCommand(waitSecs)).andThen(getSetStateCommand(defaultState));
   }
 

@@ -13,14 +13,14 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.util.MoreMath;
 import frc.robot.util.vision.CustomEstimate;
 import frc.robot.Constants.AUTO_ALIGN.COMMUNITY;
 import frc.robot.Constants.AUTO_ALIGN.FEEDER;
 import frc.robot.subsystems.vision.Vision;
 
-public class FuseVisionEstimate extends CommandBase {
+public class FuseVisionEstimate extends Command {
   private Vision vision;
 
   public enum ConfidenceStrat {

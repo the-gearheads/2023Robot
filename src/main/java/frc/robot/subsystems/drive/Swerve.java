@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;

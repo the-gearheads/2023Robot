@@ -4,13 +4,13 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import java.util.ArrayList;
 import frc.robot.Robot;
 import frc.robot.subsystems.drive.Swerve;
 
 // This is going to be slightly weird
-public class SysidCommand extends CommandBase {
+public class SysidCommand extends Command {
   private Swerve drive;
   private ArrayList<Double> data = new ArrayList<Double>();
   /* If the test is dynamic, false if quasistatic */

@@ -11,7 +11,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
@@ -19,7 +19,7 @@ import frc.robot.util.MoreMath;
 import frc.robot.util.SwerveRateLimit;
 
 /** An example command that uses an example subsystem. */
-public class TeleopDrive extends CommandBase {
+public class TeleopDrive extends Command {
   private final Swerve swerve;
   private final PIDController rotPIDCnt = new PIDController(5d, 0d, 0d);
   private final SwerveRateLimit rateLimiter = new SwerveRateLimit();

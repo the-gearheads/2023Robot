@@ -7,12 +7,12 @@ package frc.robot.commands.drive;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AUTON;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.drive.Swerve;
 
-public class AutoBalance extends CommandBase {
+public class AutoBalance extends Command {
   // assumes already on charging station.
   private Swerve swerve;
   private Grabber grabber;

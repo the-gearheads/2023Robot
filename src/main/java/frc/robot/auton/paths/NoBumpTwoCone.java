@@ -3,7 +3,7 @@ package frc.robot.auton.paths;
 import java.util.Map;
 import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.auton.AutonAnnotation;
@@ -24,7 +24,7 @@ public class NoBumpTwoCone extends AutonRoutine {
   private static PathConstraints TwoConeConstraints = Constants.AUTON.MID_CONSTRAINTS;
 
   @Override
-  public CommandBase getCommand(Subsystems s, String v) {
+  public Command getCommand(Subsystems s, String v) {
     return new SequentialCommandGroup(AutonHelper.setInitRot(s.swerve, "N1_Inert-Start"),
 
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),

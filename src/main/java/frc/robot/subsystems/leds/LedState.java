@@ -5,7 +5,7 @@ import java.util.function.Function;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 
 public enum LedState {
@@ -92,7 +92,7 @@ public enum LedState {
     rainbowSpeed = 3;
   }
 
-  public static CommandBase getSetRainbowSpeedCommand(int newSpeed) {
+  public static Command getSetRainbowSpeedCommand(int newSpeed) {
     return new StartEndCommand(() -> {
       setRainbowSpeed(newSpeed);
     }, () -> {

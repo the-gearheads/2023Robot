@@ -3,7 +3,7 @@ package frc.robot.auton.paths;
 import java.util.Map;
 import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.auton.AutonAnnotation;
@@ -25,7 +25,7 @@ public class CenterTwoCone extends AutonRoutine {
   private static PathConstraints centerTwoConeConstraints = new PathConstraints(1.1, 1);
 
   @Override
-  public CommandBase getCommand(Subsystems s, String v) {
+  public Command getCommand(Subsystems s, String v) {
 
     return new SequentialCommandGroup(AutonHelper.setInitRot(s.swerve, "N4_Inert-Start"),
         new SetArmPose(s.arm, ArmPose.HIGH_NODE),

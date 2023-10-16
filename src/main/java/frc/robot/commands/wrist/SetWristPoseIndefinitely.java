@@ -5,11 +5,11 @@
 package frc.robot.commands.wrist;
 
 import java.util.function.Supplier;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.subsystems.wrist.WristState;
 
-public class SetWristPoseIndefinitely extends CommandBase {
+public class SetWristPoseIndefinitely extends Command {
   private double pose;
   private Wrist wrist;
   private Supplier<Boolean> shouldSet;

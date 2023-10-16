@@ -8,11 +8,11 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.MoreMath;
 
-public class rotateTo extends CommandBase {
+public class rotateTo extends Command {
   private Swerve swerve;
   private PIDController rotPIDCnt = new PIDController(5d, 0d, 0d);
   private Rotation2d rotGoal;

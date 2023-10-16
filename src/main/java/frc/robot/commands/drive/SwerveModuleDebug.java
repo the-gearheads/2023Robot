@@ -7,10 +7,10 @@ package frc.robot.commands.drive;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Swerve;
 
-public class SwerveModuleDebug extends CommandBase {
+public class SwerveModuleDebug extends Command {
   private Swerve swerve;
 
   /** Creates a new SwerveModuleDebug. */

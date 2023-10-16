@@ -5,7 +5,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DRIVE;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.drive.Swerve;
@@ -13,7 +13,7 @@ import frc.robot.subsystems.gpdetect.GamePieceDetector;
 import frc.robot.subsystems.leds.LedState;
 import frc.robot.subsystems.leds.Leds;
 
-public class GPAlignTeleop extends CommandBase {
+public class GPAlignTeleop extends Command {
   Swerve swerve;
   GamePieceDetector gpdetect;
   Leds leds;
