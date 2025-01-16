@@ -1,5 +1,6 @@
 package frc.robot.subsystems.leds;
 
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -34,7 +35,16 @@ public enum LedState {
       buf.setLED(i, color);
     }
   }),
-  RAINBOW(LedState::rainbowFunc);
+  RAINBOW(LedState::rainbowFunc),
+  RANDOM((AddressableLEDBuffer buf) -> {
+    if (true) {
+      for(int i = 0; i < buf.getLength(); i += 2) {
+        var color = Color.fromHSV((int)Math.floor(Math.random() * 180), 255, 255);
+        buf.setLED(i, color);
+        buf.setLED(i + 1, color);
+      }
+    }
+  });
   //@formatter:on
   private Consumer<AddressableLEDBuffer> updateBufferLambda;
 

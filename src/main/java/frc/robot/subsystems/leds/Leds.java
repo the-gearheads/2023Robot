@@ -27,7 +27,7 @@ public class Leds extends SubsystemBase {
   private LedState state;
   // Assuming that both strips are the same length - therefore we can use one buffer
 
-  private LedState defaultState = LedState.RAINBOW;
+  private LedState defaultState = LedState.RANDOM;
 
   public Leds() {
     buffer = new AddressableLEDBuffer(LEDS.LENGTH);
